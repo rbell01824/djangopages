@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load chartkick %}
+
+{% block content %}
+    <h3>{{ exchange_text }}</h3>
+    {% line_chart exchange with min=0.4 id='rates' %}
+    {% pie_chart browser_stats with library={"title":"Browser Statistics, May 2013"} %}
+    {% column_chart browser_stats %}
+    {% line_chart temperature with id='temperature' %}
+    {% bar_chart sizes with id='sizes' %}
+    {% area_chart areas with id='areas' %}
+    <h3>End of charts</h3>
+{% endblock content %}
+
