@@ -1,0 +1,362 @@
+[
+{
+    "pk": 1, 
+    "model": "test_data.vnode", 
+    "fields": {
+        "status": "RFU", 
+        "node_ip": "192.168.1.1", 
+        "company": 1, 
+        "is_active": true, 
+        "node_type": [
+            1, 
+            3
+        ], 
+        "created_by": null, 
+        "created_on": "2014-05-01T14:42:14.217Z", 
+        "host_name": "host_DemoCo", 
+        "has_syslog_records": false
+    }
+},
+{
+    "pk": 2, 
+    "model": "test_data.vnode", 
+    "fields": {
+        "status": "RFU", 
+        "node_ip": "192.168.1.1", 
+        "company": 1, 
+        "is_active": true, 
+        "node_type": [
+            1, 
+            3
+        ], 
+        "created_by": null, 
+        "created_on": "2014-05-01T14:42:14.236Z", 
+        "host_name": "host_DemoCo", 
+        "has_syslog_records": false
+    }
+},
+{
+    "pk": 3, 
+    "model": "test_data.vnode", 
+    "fields": {
+        "status": "RFU", 
+        "node_ip": "192.168.1.1", 
+        "company": 1, 
+        "is_active": true, 
+        "node_type": [
+            1, 
+            3
+        ], 
+        "created_by": null, 
+        "created_on": "2014-05-01T14:42:14.250Z", 
+        "host_name": "host_DemoCo", 
+        "has_syslog_records": false
+    }
+},
+{
+    "pk": 4, 
+    "model": "test_data.vnode", 
+    "fields": {
+        "status": "RFU", 
+        "node_ip": "192.168.1.1", 
+        "company": 2, 
+        "is_active": true, 
+        "node_type": [
+            1, 
+            3
+        ], 
+        "created_by": null, 
+        "created_on": "2014-05-01T14:42:16.222Z", 
+        "host_name": "host_TestCo", 
+        "has_syslog_records": false
+    }
+},
+{
+    "pk": 5, 
+    "model": "test_data.vnode", 
+    "fields": {
+        "status": "RFU", 
+        "node_ip": "192.168.1.1", 
+        "company": 2, 
+        "is_active": true, 
+        "node_type": [
+            1, 
+            3
+        ], 
+        "created_by": null, 
+        "created_on": "2014-05-01T14:42:16.236Z", 
+        "host_name": "host_TestCo", 
+        "has_syslog_records": false
+    }
+},
+{
+    "pk": 6, 
+    "model": "test_data.vnode", 
+    "fields": {
+        "status": "RFU", 
+        "node_ip": "192.168.1.1", 
+        "company": 2, 
+        "is_active": true, 
+        "node_type": [
+            1, 
+            3
+        ], 
+        "created_by": null, 
+        "created_on": "2014-05-01T14:42:16.251Z", 
+        "host_name": "host_TestCo", 
+        "has_syslog_records": false
+    }
+},
+{
+    "pk": 7, 
+    "model": "test_data.vnode", 
+    "fields": {
+        "status": "RFU", 
+        "node_ip": "192.168.1.1", 
+        "company": 3, 
+        "is_active": true, 
+        "node_type": [
+            1, 
+            3
+        ], 
+        "created_by": null, 
+        "created_on": "2014-05-01T14:42:16.266Z", 
+        "host_name": "host_TestCo_1", 
+        "has_syslog_records": false
+    }
+},
+{
+    "pk": 8, 
+    "model": "test_data.vnode", 
+    "fields": {
+        "status": "RFU", 
+        "node_ip": "192.168.1.1", 
+        "company": 3, 
+        "is_active": true, 
+        "node_type": [
+            1, 
+            3
+        ], 
+        "created_by": null, 
+        "created_on": "2014-05-01T14:42:16.280Z", 
+        "host_name": "host_TestCo_1", 
+        "has_syslog_records": false
+    }
+},
+{
+    "pk": 9, 
+    "model": "test_data.vnode", 
+    "fields": {
+        "status": "RFU", 
+        "node_ip": "192.168.1.1", 
+        "company": 3, 
+        "is_active": true, 
+        "node_type": [
+            1, 
+            3
+        ], 
+        "created_by": null, 
+        "created_on": "2014-05-01T14:42:16.296Z", 
+        "host_name": "host_TestCo_1", 
+        "has_syslog_records": false
+    }
+},
+{
+    "pk": 10, 
+    "model": "test_data.vnode", 
+    "fields": {
+        "status": "RFU", 
+        "node_ip": "192.168.1.1", 
+        "company": 4, 
+        "is_active": true, 
+        "node_type": [
+            1, 
+            3
+        ], 
+        "created_by": null, 
+        "created_on": "2014-05-01T14:42:16.310Z", 
+        "host_name": "host_TestCo_2", 
+        "has_syslog_records": false
+    }
+},
+{
+    "pk": 11, 
+    "model": "test_data.vnode", 
+    "fields": {
+        "status": "RFU", 
+        "node_ip": "192.168.1.1", 
+        "company": 4, 
+        "is_active": true, 
+        "node_type": [
+            1, 
+            3
+        ], 
+        "created_by": null, 
+        "created_on": "2014-05-01T14:42:16.326Z", 
+        "host_name": "host_TestCo_2", 
+        "has_syslog_records": false
+    }
+},
+{
+    "pk": 12, 
+    "model": "test_data.vnode", 
+    "fields": {
+        "status": "RFU", 
+        "node_ip": "192.168.1.1", 
+        "company": 4, 
+        "is_active": true, 
+        "node_type": [
+            1, 
+            3
+        ], 
+        "created_by": null, 
+        "created_on": "2014-05-01T14:42:16.341Z", 
+        "host_name": "host_TestCo_2", 
+        "has_syslog_records": false
+    }
+},
+{
+    "pk": 13, 
+    "model": "test_data.vnode", 
+    "fields": {
+        "status": "RFU", 
+        "node_ip": "192.168.1.1", 
+        "company": 5, 
+        "is_active": true, 
+        "node_type": [
+            1, 
+            3
+        ], 
+        "created_by": null, 
+        "created_on": "2014-05-01T14:42:16.356Z", 
+        "host_name": "host_TestCo_3", 
+        "has_syslog_records": false
+    }
+},
+{
+    "pk": 14, 
+    "model": "test_data.vnode", 
+    "fields": {
+        "status": "RFU", 
+        "node_ip": "192.168.1.1", 
+        "company": 5, 
+        "is_active": true, 
+        "node_type": [
+            1, 
+            3
+        ], 
+        "created_by": null, 
+        "created_on": "2014-05-01T14:42:16.370Z", 
+        "host_name": "host_TestCo_3", 
+        "has_syslog_records": false
+    }
+},
+{
+    "pk": 15, 
+    "model": "test_data.vnode", 
+    "fields": {
+        "status": "RFU", 
+        "node_ip": "192.168.1.1", 
+        "company": 5, 
+        "is_active": true, 
+        "node_type": [
+            1, 
+            3
+        ], 
+        "created_by": null, 
+        "created_on": "2014-05-01T14:42:16.386Z", 
+        "host_name": "host_TestCo_3", 
+        "has_syslog_records": false
+    }
+},
+{
+    "pk": 16, 
+    "model": "test_data.vnode", 
+    "fields": {
+        "status": "", 
+        "node_ip": "0.0.0.0", 
+        "company": 12, 
+        "is_active": true, 
+        "node_type": [], 
+        "created_by": 1, 
+        "created_on": "2014-05-01T14:43:26.144Z", 
+        "host_name": "A0040CnBEPC1", 
+        "has_syslog_records": true
+    }
+},
+{
+    "pk": 17, 
+    "model": "test_data.vnode", 
+    "fields": {
+        "status": "", 
+        "node_ip": "0.0.0.0", 
+        "company": 12, 
+        "is_active": true, 
+        "node_type": [], 
+        "created_by": 1, 
+        "created_on": "2014-05-01T14:43:27.393Z", 
+        "host_name": "A0040CnBEPC2", 
+        "has_syslog_records": true
+    }
+},
+{
+    "pk": 18, 
+    "model": "test_data.vnode", 
+    "fields": {
+        "status": "", 
+        "node_ip": "0.0.0.0", 
+        "company": 12, 
+        "is_active": true, 
+        "node_type": [], 
+        "created_by": 1, 
+        "created_on": "2014-05-01T14:43:28.515Z", 
+        "host_name": "A0040CnBPGC1", 
+        "has_syslog_records": true
+    }
+},
+{
+    "pk": 19, 
+    "model": "test_data.vnode", 
+    "fields": {
+        "status": "", 
+        "node_ip": "10.165.101.193", 
+        "company": 16, 
+        "is_active": true, 
+        "node_type": [], 
+        "created_by": 1, 
+        "created_on": "2014-05-01T14:43:53.736Z", 
+        "host_name": "", 
+        "has_syslog_records": true
+    }
+},
+{
+    "pk": 20, 
+    "model": "test_data.vnode", 
+    "fields": {
+        "status": "", 
+        "node_ip": "10.165.101.200", 
+        "company": 16, 
+        "is_active": true, 
+        "node_type": [], 
+        "created_by": 1, 
+        "created_on": "2014-05-01T14:43:53.831Z", 
+        "host_name": "", 
+        "has_syslog_records": true
+    }
+},
+{
+    "pk": 21, 
+    "model": "test_data.vnode", 
+    "fields": {
+        "status": "", 
+        "node_ip": "10.165.255.9", 
+        "company": 16, 
+        "is_active": true, 
+        "node_type": [], 
+        "created_by": 1, 
+        "created_on": "2014-05-01T14:43:53.870Z", 
+        "host_name": "", 
+        "has_syslog_records": true
+    }
+}
+]
