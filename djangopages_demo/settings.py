@@ -63,6 +63,7 @@ INSTALLED_APPS = (
     # 'debug_toolbar',
     'django_extensions',
     'djangopages_demo',
+    'djangopages',
     'graphpages',
     'chartkick',
     'chartkick_demo',

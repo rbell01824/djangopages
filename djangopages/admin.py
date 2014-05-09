@@ -1,8 +1,9 @@
 #!/usr/bin/env python
+# coding=utf-8
 
-"""
+""" Some description here
 
-11/18/13 - Initial creation
+5/9/14 - Initial creation
 
 """
 
@@ -11,15 +12,14 @@ import logging
 
 log = logging.getLogger(__name__)
 
-__author__ = 'rbell01824'
-__date__ = '11/18/13'
+__author__ = 'richabel'
+__date__ = '5/9/14'
 __copyright__ = "Copyright 2013, Richard Bell"
 __credits__ = ["rbell01824"]
 __license__ = "All rights reserved"
 __version__ = "0.1"
 __maintainer__ = "rbell01824"
 __email__ = "rbell01824@gmail.com"
-__status__ = "dev"
 
 import uuid
 import copy
@@ -29,20 +29,22 @@ from django.http import HttpResponseRedirect
 # from django.utils.text import slugify
 from django.forms import Textarea, TextInput
 from django.contrib import admin
+from django.utils.translation import ugettext_lazy as _
+from django.contrib.admin import SimpleListFilter
 
 from django_ace import AceWidget
-
-from .models import GraphPage
-
+from taggit.models import TaggedItem
 from taggit_suggest.utils import suggest_tags
+
+from djangopages.models import DjangoPage
 from djangopages.libs import TaggitListFilter
 
 
-class GraphPageAdmin(admin.ModelAdmin):
+class DjangoPageAdmin(admin.ModelAdmin):
     """
-    Graphpage admin
+    DjangoPage admin
     """
-    model = GraphPage
+    model = DjangoPage
     search_fields = ('title', 'description',)
     list_display_links = ('title',)
     list_display = ('display_graph', 'title', 'description', 'tags_slug',)
@@ -50,21 +52,12 @@ class GraphPageAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {'classes': ('suit-tab suit-tab-general',),
                 'fields': ('title', 'description', ('tags', 'tags_suggest'))}),
-        ('Form', {'classes': ('suit-tab suit-tab-form',),
-                  'fields': ('form_ref', 'form',)}),
-        ('Form Page', {'classes': ('suit-tab suit-tab-formpage',),
-                       'fields': ('form_page_ref', 'form_page',)}),
         ('Query', {'classes': ('suit-tab suit-tab-query',),
-                   'fields': ('query_ref', 'query',)}),
-        ('Graph Page', {'classes': ('suit-tab suit-tab-graphpage',),
-                        'fields': ('graph_page_ref', 'graph_page',)}),
+                   'fields': ('template', 'djangopage',)}),
     )
     list_filter = (TaggitListFilter,)
     suit_form_tabs = (('general', 'General'),
-                      ('form', 'Form'),
-                      ('formpage', 'Form Page'),
                       ('query', 'Query'),
-                      ('graphpage', 'Graph Page')
                       )
     save_on_top = True
     ordering = ('title',)
@@ -121,23 +114,15 @@ class GraphPageAdmin(admin.ModelAdmin):
             kwargs['widget'] = TextInput(attrs={'class': 'span12', 'size': '140'})
         if db_field.name == 'description':
             kwargs['widget'] = Textarea(attrs={'class': 'span12', 'rows': '2', 'cols': '140'})
-        if db_field.name == 'form':
+        if db_field.name == 'template':
+            kwargs['widget'] = Textarea(attrs={'class': 'span12', 'rows': '1', 'cols': '80'})
+            # kwargs['widget'] = AceWidget(mode='python', theme='chrome', width='100%', height='500px',
+            #                              attrs={'class': 'span12', 'rows': '30', 'cols': '140'})
+        if db_field.name == 'djangopage':
             # kwargs['widget'] = Textarea(attrs={'class': 'span12', 'rows': '30', 'cols': '140'})
             kwargs['widget'] = AceWidget(mode='python', theme='chrome', width='100%', height='500px',
                                          attrs={'class': 'span12', 'rows': '30', 'cols': '140'})
-        if db_field.name == 'form_page':
-            # kwargs['widget'] = Textarea(attrs={'class': 'span12', 'rows': '30', 'cols': '140'})
-            kwargs['widget'] = AceWidget(mode='html', theme='chrome', width='100%', height='500px',
-                                         attrs={'class': 'span12', 'rows': '30', 'cols': '140'})
-        if db_field.name == 'query':
-            # kwargs['widget'] = Textarea(attrs={'class': 'span12', 'rows': '30', 'cols': '140'})
-            kwargs['widget'] = AceWidget(mode='python', theme='chrome', width='100%', height='500px',
-                                         attrs={'class': 'span12', 'rows': '30', 'cols': '140'})
-        if db_field.name == 'graph_page':
-            # kwargs['widget'] = Textarea(attrs={'class': 'span12', 'rows': '30', 'cols': '140'})
-            kwargs['widget'] = AceWidget(mode='html', theme='chrome', width='100%', height='500px',
-                                         attrs={'class': 'span12', 'rows': '30', 'cols': '140'})
-        return super(GraphPageAdmin, self).formfield_for_dbfield(db_field, **kwargs)
+        return super(DjangoPageAdmin, self).formfield_for_dbfield(db_field, **kwargs)
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
     def duplicate_records(self, request, queryset):
@@ -157,4 +142,4 @@ class GraphPageAdmin(admin.ModelAdmin):
         return
     duplicate_records.short_description = "Duplicate selected records"
 
-admin.site.register(GraphPage, GraphPageAdmin)
+admin.site.register(DjangoPage, DjangoPageAdmin)
