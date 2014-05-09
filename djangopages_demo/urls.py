@@ -33,16 +33,14 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import login
 
 from djangopages_demo.views import index
-# from djangopages_demo.views import GraphPageListView               # fixme:
+from graphpages.views import GraphPageListView
 
 urlpatterns = patterns('',
 
-    # url(r'^test_data/', include('test_data.urls')),               # fixme:
-    # url(r'^display_graph_pages$', GraphPageListView.as_view(), name=GraphPageListView),               # fixme:
-    # url(r'^graphpages/', include('graphpages.urls')),               # fixme:
+    url(r'^test_data/', include('test_data.urls')),
+    url(r'^display_graph_pages$', GraphPageListView.as_view(), name=GraphPageListView),
+    url(r'^graphpages/', include('graphpages.urls')),
     url(r'^chartkick/', include('chartkick_demo.urls')),
-    # url(r'^admin/', include(admin.site.urls)),               # fixme:
-
     url(r'^$', login_required(index), name='index'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^login/$', login, {'template_name': 'admin/login.html'}),

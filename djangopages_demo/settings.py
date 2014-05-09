@@ -111,10 +111,10 @@ USE_TZ = True
 STATIC_ROOT = ''
 STATIC_URL = '/static/'
 
-# import chartkick        # fixme
+import chartkick
 
 STATICFILES_DIRS = (
-    # chartkick.js(),        # fixme
+    chartkick.js(),
     os.path.join(BASE_DIR, 'static'),
 )
 
@@ -175,19 +175,19 @@ SUIT_CONFIG = {
     # 'LIST_PER_PAGE': 15
 }
 
-# GRAPHPAGE_FORMPAGEHEADER ='{% extends "base.html" %}\n' \        # fixme
-#                           '{% block content %}\n' \        # fixme
-#                           '<div class="container-fluid">\n'        # fixme
-# GRAPHPAGE_FORMPAGEFOOTER = '</div>\n' \        # fixme
-#                            '{% endblock content %}'        # fixme
-# GRAPHPAGE_CONFIG = {        # fixme
-#     'graphpageheader': '{% extends "base.html" %}\n'        # fixme
-#                        '{% load chartkick %}\n'        # fixme
-#                        '{% block content %}\n'        # fixme
-#                        '<div class="container-fluid">\n',        # fixme
-#     'graphpagefooter': '</div>\n'        # fixme
-#                        '{% endblock content %}',        # fixme
-# }        # fixme
+GRAPHPAGE_FORMPAGEHEADER ='{% extends "base.html" %}\n' \
+                          '{% block content %}\n' \
+                          '<div class="container-fluid">\n'
+GRAPHPAGE_FORMPAGEFOOTER = '</div>\n' \
+                           '{% endblock content %}'
+GRAPHPAGE_CONFIG = {
+    'graphpageheader': '{% extends "base.html" %}\n'
+                       '{% load chartkick %}\n'
+                       '{% block content %}\n'
+                       '<div class="container-fluid">\n',
+    'graphpagefooter': '</div>\n'
+                       '{% endblock content %}',
+}
 
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
@@ -195,5 +195,5 @@ LOGIN_REDIRECT_URL = '/'
 # Define template tags to include by default.
 # The tag must be <application>.templatetags.<template tag lib>
 # See https://djangosnippets.org/snippets/342/
-# TEMPLATE_TAGS = ('chartkick.templatetags.chartkick',        # fixme
-#                  'graphpages.templatetags.graphpage_tags')        # fixme
+TEMPLATE_TAGS = ('chartkick.templatetags.chartkick',
+                 'graphpages.templatetags.graphpage_tags')
