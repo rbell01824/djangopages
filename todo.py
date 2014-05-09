@@ -20,6 +20,7 @@ __status__ = "dev"
 
 # work list
 """
+Start work on djangopages
 Define tests
 Set login required everywhere (current scheme only applies to a few urls, not all and there are issues with class views)
 Define default graph page template
@@ -32,7 +33,6 @@ Check options on markdown wrt line wraps.
 # todo 1: write tests
 # todo 1: look into fixme_login.html and try to resolve issues
 
-# todo 1: add GraphColumn to classes
 # todo 1: modify Graph... classes to accommodate type() to decide how to render objects
 # todo 1: create class for forms creation
 
