@@ -20,10 +20,3 @@ __version__ = "0.1"
 __maintainer__ = "rbell01824"
 __email__ = "rbell01824@gmail.com"
 __status__ = "dev"
-
-# Load the default template tags.
-# This insures that custom template tags are always available to Django's
-# template render process.
-
-from .utilities import load_templatetags
-load_templatetags()

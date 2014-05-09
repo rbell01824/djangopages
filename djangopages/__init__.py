@@ -22,3 +22,10 @@ __maintainer__ = "rbell01824"
 __email__ = "rbell01824@gmail.com"
 
 ########################################################################################################################
+
+# Load the default template tags.
+# This insures that custom template tags are always available to Django's
+# template render process.
+
+from djangopages.libs import load_templatetags
+load_templatetags()
