@@ -1,0 +1,306 @@
+[
+{
+    "pk": 1, 
+    "model": "graphpages.graphpage", 
+    "fields": {
+        "form_ref": null, 
+        "description": "Simple query and user defined graph page.  Two pie charts in column.\r\n", 
+        "form": "", 
+        "title": "Demo 1: query, graphpage", 
+        "form_page": "", 
+        "created": "2014-03-22T16:41:04.533Z", 
+        "graph_page": "<h3>{{ title1 }}</h3>\r\n{% pie_chart data1 with id='chart-1' %}\r\n<h3>{{ title2 }}</h3>\r\n{% pie_chart data2 with id='chart-2' %}\r\n", 
+        "modified": "2014-05-01T15:42:30.996Z", 
+        "graph_page_ref": null, 
+        "form_page_ref": null, 
+        "query": "from test_data.models import CIA\r\n\r\ntitle1 = 'Top 10 countries by land area'\r\nr = CIA.objects.order_by('-land_area')[:10]\r\ndata1 = [[o.name, o.land_area] for o in r]\r\n\r\ntitle2 = 'Top 10 countries by population'\r\nr = CIA.objects.order_by('-population')[:10]\r\ndata2 = [[o.name, o.population] for o in r]\r\n\r\n", 
+        "query_ref": null, 
+        "slug": ""
+    }
+},
+{
+    "pk": 2, 
+    "model": "graphpages.graphpage", 
+    "fields": {
+        "form_ref": null, 
+        "description": "Simple query and graphpage.  Bootstrap3 features.\r\n", 
+        "form": "", 
+        "title": "Demo 2: query, graphpage", 
+        "form_page": "", 
+        "created": "2014-03-22T16:41:04.535Z", 
+        "graph_page": "    <div class=\"container-fluid\">\r\n        <div class=\"jumbotron\">\r\n            <h3>Django Graph Pages</h3>\r\n            <p>This template displays two pie charts side by side in a fluid grid.</p>\r\n        </div>\r\n\r\n        <div class=\"row\">\r\n            <div class=\"col-md-6\">\r\n                <h3>{{ title1 }}</h3>\r\n                {% pie_chart data1 with id='chart-1' %}\r\n                <a class=\"btn btn-primary\" href=\"javascript:history.back()\">Back</a>\r\n\r\n            </div>\r\n            <div class=\"col-md-6\">\r\n                <h3>{{ title2 }}</h3>\r\n                {% pie_chart data2 with id='chart-2' %}\r\n                <a class=\"btn btn-primary\" href=\"javascript:history.back()\">Back</a>\r\n            </div>\r\n        </div>\r\n    </div>\r\n", 
+        "modified": "2014-05-01T15:44:28.757Z", 
+        "graph_page_ref": null, 
+        "form_page_ref": null, 
+        "query": "from test_data.models import CIA\r\n\r\ntitle1 = 'Top 10 countries by land area'\r\nr = CIA.objects.order_by('-land_area')[:10]\r\ndata1 = [[o.name, o.land_area] for o in r]\r\n\r\ntitle2 = 'Top 10 countries by population'\r\nr = CIA.objects.order_by('-population')[:10]\r\ndata2 = [[o.name, o.population] for o in r]\r\n\r\n", 
+        "query_ref": null, 
+        "slug": ""
+    }
+},
+{
+    "pk": 3, 
+    "model": "graphpages.graphpage", 
+    "fields": {
+        "form_ref": null, 
+        "description": "Form and form page.  Simple query and graphpage.  Shows context from form to graphpage.\r\n", 
+        "form": "class GraphForm(forms.Form):\r\n    title = forms.CharField(min_length=3, max_length=80, label='Title')\r\n    number_countries = forms.IntegerField(max_value=50, min_value=5,\r\n                                          label='Number of countries')\r\n", 
+        "title": "Demo 3: form, form page, query, graphpage", 
+        "form_page": "<div class=\"jumbotron\">\r\n    <h1>Graph Form</h1>\r\n\r\n    <p>Forms may be customized by first displaying a form and allowing the user to enter values to customize the\r\n        form.</p>\r\n\r\n    <p>These values may be used on the graph page or used in the graph query.</p>\r\n</>You can put explanation text above the form to explain the parameters.</p>\r\n</div>\r\n\r\n<form method=\"post\" class=\"bootstrap3\" action=\"/graphpages/graphpage/{{ graph_pk }}\"> {% csrf_token %}\r\n    {# Include the hidden fields #}\r\n    {% for hidden in graphform.hidden_fields %}\r\n        {{ hidden }}\r\n    {% endfor %}\r\n    {# Include the visible fields #}\r\n    {% for field in graphform.visible_fields %}\r\n        {% if field.errors %}\r\n            <div class=\"row bg-danger\">\r\n                <div class=\"col-md-3 text-right\"></div>\r\n                <div class=\"col-md-7\">{{ field.errors }}</div>\r\n            </div>\r\n        {% endif %}\r\n        <div class=\"row\">\r\n            <div class=\"col-md-3 text-right\">{{ field.label_tag }}</div>\r\n            <div class=\"col-md-7\">{{ field }}</div>\r\n        </div>\r\n    {% endfor %}\r\n    <div class=\"row\">\r\n        <div class='col-md-3 text-right'>\r\n            <input type=\"submit\" value=\"Display graph\" class=\"btn btn-primary\"/>\r\n        </div>\r\n    </div>\r\n</form>\r\n\r\n<div class=\"row\">\r\n    <div class=\"col-md-6\">\r\n        </br>\r\n        <p>Likewise you can put any instructions or whatever after the form.</p>\r\n    </div>\r\n</div>\r\n\r\n", 
+        "created": "2014-03-22T16:41:04.536Z", 
+        "graph_page": "    <div class=\"container-fluid\">\r\n        <div class=\"jumbotron\">\r\n            <h2>The form title should be here \"{{title}}\"</h2>\r\n            <p>This template displays two pie charts side by side in a fluid grid.</p>\r\n        </div>\r\n    </div>\r\n\r\n    <div class=\"container-fluid\">\r\n        <div class=\"row\">\r\n            <div class=\"col-md-6\">\r\n                <h3>{{ title1 }}</h3>\r\n                {% pie_chart data1 with id='chart-1' %}\r\n                <a class=\"btn btn-primary\" href=\"javascript:history.back()\">Back</a>\r\n\r\n            </div>\r\n            <div class=\"col-md-6\">\r\n                <h3>{{ title2 }}</h3>\r\n                {% pie_chart data2 with id='chart-2' %}\r\n                <a class=\"btn btn-primary\" href=\"javascript:history.back()\">Back</a>\r\n            </div>\r\n        </div>\r\n    </div>\r\n", 
+        "modified": "2014-05-01T15:49:55.728Z", 
+        "graph_page_ref": null, 
+        "form_page_ref": null, 
+        "query": "from test_data.models import CIA\r\n\r\ntitle1 = 'Top {} countries by land area'.format(number_countries)\r\nr = CIA.objects.order_by('-land_area')[:number_countries]\r\ndata1 = [[o.name, o.land_area] for o in r]\r\n\r\ntitle2 = 'Top {} countries by population'.format(number_countries)\r\nr = CIA.objects.order_by('-population')[:number_countries]\r\ndata2 = [[o.name, o.population] for o in r]\r\n", 
+        "query_ref": null, 
+        "slug": ""
+    }
+},
+{
+    "pk": 6, 
+    "model": "graphpages.graphpage", 
+    "fields": {
+        "form_ref": null, 
+        "description": "Bootstrap 3 example\r\n", 
+        "form": "class GraphForm(forms.Form):\r\n    title = forms.CharField(min_length=3, max_length=80, label='Title')\r\n    number_countries = forms.IntegerField(max_value=50, min_value=5,\r\n                                          label='Number of countries')\r\n", 
+        "title": "Demo 6a: form, form page, query, graph page", 
+        "form_page": "{% load bootstrap3 %}\r\n{% bootstrap_css %}\r\n{% bootstrap_messages %}\r\n\r\n<h1>Graph Form</h1>\r\n<p>Forms may be customized by first displaying a form and allowing the user to enter values to customize the form.</p>\r\n<p>These values may be used on the graph page or used in the graph query.</p>\r\n<p>You can put explanation text above the form to explain the parameters.</p>\r\n\r\n<form method=\"post\" class=\"bootstrap3\" action=\"/graphpages/graphpage/{{graph_pk}}\"> {% csrf_token %}\r\n{% bootstrap_form graphform %}\r\n    {% buttons %}\r\n        <button type=\"submit\" class=\"btn btn-primary\">\r\n            {% bootstrap_icon \"star\" %} Display Graph\r\n        </button>\r\n    {% endbuttons %}\r\n</form>\r\n\r\n</br>\r\n<p>Likewise you can put any instructions or whatever after the form.</p>\r\n", 
+        "created": "2014-03-22T16:41:04.539Z", 
+        "graph_page": "    <div class=\"container-fluid\">\r\n        <div class=\"jumbotron\">\r\n            <h2>The form title should be here \"{{title}}\"</h2>\r\n            <p>This template displays two pie charts side by side in a fluid grid.</p>\r\n        </div>\r\n    </div>\r\n\r\n    <div class=\"container-fluid\">\r\n        <div class=\"row\">\r\n            <div class=\"col-md-6\">\r\n                <h3>{{ title1 }}</h3>\r\n                {% pie_chart data1 with id='chart-1' %}\r\n                <a class=\"btn btn-primary\" href=\"javascript:history.back()\">Back</a>\r\n\r\n            </div>\r\n            <div class=\"col-md-6\">\r\n                <h3>{{ title2 }}</h3>\r\n                {% pie_chart data2 with id='chart-2' %}\r\n                <a class=\"btn btn-primary\" href=\"javascript:history.back()\">Back</a>\r\n            </div>\r\n        </div>\r\n", 
+        "modified": "2014-04-12T19:45:49.144Z", 
+        "graph_page_ref": null, 
+        "form_page_ref": null, 
+        "query": "from test_data.models import CIA\r\n\r\ntitle1 = 'Top {} countries by land area'.format(number_countries)\r\nr = CIA.objects.order_by('-land_area')[:number_countries]\r\ndata1 = [[o.name, o.land_area] for o in r]\r\n\r\ntitle2 = 'Top {} countries by population'.format(number_countries)\r\nr = CIA.objects.order_by('-population')[:number_countries]\r\ndata2 = [[o.name, o.population] for o in r]\r\n\r\n", 
+        "query_ref": null, 
+        "slug": ""
+    }
+},
+{
+    "pk": 8, 
+    "model": "graphpages.graphpage", 
+    "fields": {
+        "form_ref": null, 
+        "description": "Form uses default form page.  Query and graphpage.  Shows text_before, text_after, and markdown.  Has back button on page.\r\n", 
+        "form": "class GraphForm(forms.Form):\r\n    title = forms.CharField(min_length=3, max_length=80, label='Title')\r\n    number_countries = forms.IntegerField(max_value=50, min_value=5,\r\n                                          label='Number of countries')\r\n\r\ntext_before_form = \"\"\"\r\nText before form\r\n================\r\n\r\nThis is some text before the form.\r\n\r\nIt is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).\r\n\"\"\"\r\ntext_after_form = \"\"\"\r\nLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.\r\n\"\"\"", 
+        "title": "Demo 4: form, query, graphpage", 
+        "form_page": "", 
+        "created": "2014-03-22T16:41:04.536Z", 
+        "graph_page": "    <div class=\"container-fluid\">\r\n        <div class=\"jumbotron\">\r\n            <h2>The form title should be here \"{{title}}\"</h2>\r\n            <p>This template displays two pie charts side by side in a fluid grid.</p>\r\n        </div>\r\n    </div>\r\n\r\n    <div class=\"container-fluid\">\r\n        <div class=\"row\">\r\n            <div class=\"col-md-6\">\r\n                <h3>{{ title1 }}</h3>\r\n                {% pie_chart data1 with id='chart-1' %}\r\n                <a class=\"btn btn-primary\" href=\"javascript:history.back()\">Back</a>\r\n\r\n            </div>\r\n            <div class=\"col-md-6\">\r\n                <h3>{{ title2 }}</h3>\r\n                {% pie_chart data2 with id='chart-2' %}\r\n                <a class=\"btn btn-primary\" href=\"javascript:history.back()\">Back</a>\r\n            </div>\r\n        </div>\r\n    </div>\r\n", 
+        "modified": "2014-05-01T16:00:32.124Z", 
+        "graph_page_ref": null, 
+        "form_page_ref": null, 
+        "query": "from test_data.models import CIA\r\n\r\ntitle1 = 'Top {} countries by land area'.format(number_countries)\r\n# r = CIA.objects.order_by('-land_area')[:number_countries]\r\n# data1 = [(o.name, o.land_area) for o in r]\r\n# data1 = CIA.objects.order_by('-land_area').values_list('name', 'land_area')[:{{number_countries}}]\r\ndata1 = map(list, CIA.objects.order_by('-land_area').values_list('name', 'land_area')[:number_countries])\r\n\r\ntitle2 = 'Top {} countries by population'.format(number_countries)\r\n# data2 = CIA.objects.order_by('-population').values_list('name', 'population')[:{{number_countries}}]\r\nr = CIA.objects.order_by('-population')[:number_countries]\r\ndata2 = [[o.name, o.population] for o in r]\r\n", 
+        "query_ref": null, 
+        "slug": "top-n-countries-by-land-area-and-population-with-2"
+    }
+},
+{
+    "pk": 11, 
+    "model": "graphpages.graphpage", 
+    "fields": {
+        "form_ref": null, 
+        "description": "GraphPage class graphpage with many graphs in rows.", 
+        "form": "class GraphForm(forms.Form):\r\n    title = forms.CharField(min_length=3, max_length=80, label='Title')\r\n    number_countries = forms.IntegerField(max_value=50, min_value=5,\r\n                                          label='Number of countries')\r\n\r\ntext_before_form = \"\"\"\r\nText before form\r\n============\r\n\r\nThis is some text before the form.\r\n\r\nIt is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).\r\n\"\"\"\r\n\r\n\r\ntext_after_form = \"\"\"\r\nLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.\r\n\"\"\"", 
+        "title": "Demo 6b: form, query", 
+        "form_page": "", 
+        "created": "2014-03-25T12:45:46.185Z", 
+        "graph_page": "", 
+        "modified": "2014-05-01T16:15:07.124Z", 
+        "graph_page_ref": null, 
+        "form_page_ref": null, 
+        "query": "from test_data.models import CIA\r\n\r\ntitle1 = 'Top {} countries by land area'.format(number_countries)\r\ndata1 = map(list, CIA.objects.order_by('-land_area').values_list('name', 'land_area')[:number_countries])\r\n\r\ntitle2 = 'Top {} countries by population'.format(number_countries)\r\ntitlex=\"\"\"\r\nThis is a markdown title\r\n========================\r\n\"\"\" \r\ntitle2 = titlex + title2\r\ndata2 = map(list, CIA.objects.order_by('-population').values_list('name', 'population')[:number_countries])\r\n\r\ndata3 = map(list, CIA.objects.order_by('-population').values_list('name', 'population')[:number_countries])\r\n# data3 = {c[0]:c[1] for c in data3}\r\n# data3 = {'name':'xxxxx', 'data': data3 }\r\n\r\n\r\nexchange = {'2001-01-31': 1.064, '2002-01-31': 1.1305,\r\n            '2003-01-31': 0.9417, '2004-01-31': 0.7937,\r\n            '2005-01-31': 0.7609, '2006-01-31': 0.827,\r\n            '2007-01-31': 0.7692, '2008-01-31': 0.6801,\r\n            '2009-01-31': 0.7491, '2010-01-31': 0.7002,\r\n            '2011-01-31': 0.7489, '2012-01-31': 0.7755,\r\n            '2013-01-31': 0.7531,\r\n            }\r\n\r\ngraph1 = XGraphCK('pie', 'data1', width=6, text_before=title1, text_after='**Markdown bold after text**')\r\ngraph2 = XGraphCK('column', 'data1', width=6, text_before='Graph2 text before')\r\n\r\nrow1 = XGraphRow([graph1, graph2])\r\nrow2 = XGraphRow([XGraphCK('bar', 'data2', text_before='Line chart defined within the graph row')])\r\nrow3 = XGraphRow([XGraphCK('line', 'exchange', width=4, text_after = 'This is line graph'),\r\n                  XGraphCK('line', 'data3', width=4, text_after = 'This is line graph', \r\n                          options=\"height='500px' discrete=True \"),\r\n                  XGraphCK('column', 'data3', width=4, text_after = 'Same data as column graph.', \r\n                          options=\"height='500px' \"),])\r\n\r\ngraphpage = XGraphPage([row1, row2, row3])", 
+        "query_ref": null, 
+        "slug": "example-defaults25e50582bd9811e39577080027e16af0"
+    }
+},
+{
+    "pk": 12, 
+    "model": "graphpages.graphpage", 
+    "fields": {
+        "form_ref": null, 
+        "description": "The contains the form and query for ref links demo", 
+        "form": "class GraphForm(forms.Form):\r\n    title = forms.CharField(min_length=3, max_length=80, label='Title')\r\n    number_countries = forms.IntegerField(max_value=50, min_value=5,\r\n                                          label='Number of countries')\r\n\r\ntext_before_form = \"\"\"\r\nText before form\r\n============\r\n\r\nThis is some text before the form.\r\n\r\nIt is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).\r\n\"\"\"\r\n\r\n\r\ntext_after_form = \"\"\"\r\nLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.\r\n\"\"\"", 
+        "title": "Demo 5 reflinks sources: form, query", 
+        "form_page": "", 
+        "created": "2014-03-25T12:45:46.185Z", 
+        "graph_page": "", 
+        "modified": "2014-04-12T19:40:13.563Z", 
+        "graph_page_ref": null, 
+        "form_page_ref": null, 
+        "query": "from test_data.models import CIA\r\n\r\ntitle1 = 'Top {} countries by land area'.format(number_countries)\r\ndata1 = map(list, CIA.objects.order_by('-land_area').values_list('name', 'land_area')[:number_countries])\r\n\r\ntitle2 = 'Top {} countries by population'.format(number_countries)\r\ndata2 = map(list, CIA.objects.order_by('-population').values_list('name', 'population')[:number_countries])\r\n\r\ngraph1 = {'graph':\"{% pie_chart data1 %}\", 'width': 6}\r\ngraph2 = {'graph':\"{% pie_chart data2 %}\", 'width': 6}\r\ngraph3 = {'graph':\"{% column_chart data2 %}\", 'width': 3}\r\ngraph41 = {'graph':\"{% bar_chart data2 %}\", 'width': 4}\r\ngraph42 = {'graph':\"{% pie_chart data2 %}\", 'width': 4}\r\ngraph43 = {'graph':\"{% column_chart data2 %}\", 'width': 4}\r\n\r\nrow1 = (graph1,)\r\nrow2 = (graph2,)\r\nrow3 = (graph3, graph3,  graph3, graph3)\r\nrow4 = (graph1, graph2)\r\nrow5 = (graph41, graph42, graph43)\r\n\r\ngraph_rows = (row1, row2, row3, row4, row5)", 
+        "query_ref": null, 
+        "slug": "example-defaults-duplicate-1abf6b98be5111e39f2c080"
+    }
+},
+{
+    "pk": 13, 
+    "model": "graphpages.graphpage", 
+    "fields": {
+        "form_ref": null, 
+        "description": "Some initial experiments with syslog style data.", 
+        "form": "", 
+        "title": "Demo 8 save queries for a bit xxx syslog: query", 
+        "form_page": "", 
+        "created": "2014-04-10T18:44:55.055Z", 
+        "graph_page": "", 
+        "modified": "2014-05-01T18:19:43.210Z", 
+        "graph_page_ref": null, 
+        "form_page_ref": null, 
+        "query": "from test_data.models import VSyslog\r\nfrom django.db.models import Count, StdDev\r\n\r\n#\r\n# create the graphpage\r\n#\r\ngraphpage = XGraphPage()\r\n\r\n# Put title and some text on the page\r\ngraphpage.text_before = \"\"\"\r\nFirst Syslog Graphs\r\n===============\r\n\r\nCharts from one month of syslog data.\r\n\r\n**Notes**\r\n    * Queries copied from JZ code with extensions to create a richer graph environment.\r\n    * For this demonstration I have chosen to create a single page with ALL of the syslog results graphs.\r\n    * The test data set has only one company so there is no form for company.\r\n    * The test data set has one month of data.  I chose **NOT** to query for a data range since query functionality is already well demonstrated.\r\n<br/>\r\n<br/>\r\n\"\"\"\r\n\r\n#\r\n# Do query and create graphs for syslog count by type and host then put them in a row in the graph\r\n#\r\n\r\n# Do count by type\r\nqs = VSyslog.objects.all().values('message_type').annotate(num_results=Count('id'))\r\ncount_by_type_type = map(list, qs.order_by('message_type').values_list('message_type', 'num_results'))\r\ncount_by_type_count = map(list, qs.order_by('-num_results').values_list('message_type', 'num_results'))\r\ncount_by_type_title = '<h3>All Nodes Count by Type Distribution</h3>'\r\ngraph11 = XGraphCK('column', 'count_by_type_type', width=3, text_before = count_by_type_title)\r\ngraph12 = XGraphCK('pie', 'count_by_type_count', width=3, text_before = count_by_type_title)\r\n\r\n# Do count by host\r\ncount_by_host = map(list, VSyslog.objects.all().order_by('node__host_name').\r\n                    values('node__host_name').annotate(count=Count('node__host_name'))\r\n                    .values_list('node__host_name', 'count'))\r\ncount_by_host_title= '<h3>All Nodes Count by Host Distribution</h3>'\r\ngraph13 = XGraphCK('column', 'count_by_host', width=3, text_before=count_by_host_title)\r\ngraph14 = XGraphCK('pie', 'count_by_host', width=3, text_before=count_by_host_title)\r\ngraphpage.objs.append(XGraphRow([graph11, graph12, graph13, graph14], \r\n                                text_before = '<h1>All Companies All Nodes by Type and Host</h1>'))\r\n\r\n#\r\n# Do query and create graphs for syslog critical & error event count by host then put them in a row in the graph\r\n#\r\n\r\n# Do the critical events\r\ncritical_event_c_by_host = map(list,\r\n    VSyslog.objects.filter(message_type='critical').\r\n    order_by('node__host_name').\r\n    values('node__host_name').\r\n    annotate(count=Count('node__host_name')).\r\n    values_list('node__host_name', 'count'))\r\ncritical_event_c_by_host_title='<h3>All Nodes Critical Event Count by Host Distribution</h3>'\r\ngraph31 = XGraphCK('column', 'critical_event_c_by_host', width=3, text_before=critical_event_c_by_host_title)\r\ngraph32 = XGraphCK('pie', 'critical_event_c_by_host', width=3, text_before=critical_event_c_by_host_title)\r\n\r\n# Do the error events\r\nerror_event_c_by_host = map(list,\r\n    VSyslog.objects.filter(message_type='error').\r\n    order_by('node__host_name').\r\n    values('node__host_name').\r\n    annotate(count=Count('node__host_name')).\r\n    values_list('node__host_name', 'count'))\r\nerror_event_c_by_host_title='<h3>All Nodes Error Event Count by Host Distribution</h3>'\r\ngraph33 = XGraphCK('column', 'error_event_c_by_host', width=3, text_before=error_event_c_by_host_title)\r\ngraph34 = XGraphCK('pie', 'error_event_c_by_host', width=3, text_before=error_event_c_by_host_title)\r\n\r\n# Create the graph row\r\ngraphpage.objs.append(XGraphRow([graph31, graph32, graph33, graph34],\r\n                                 text_before='<h1><br>All Companies All Nodes Critical & Error Events</h1>'))\r\n", 
+        "query_ref": null, 
+        "slug": "syslog"
+    }
+},
+{
+    "pk": 14, 
+    "model": "graphpages.graphpage", 
+    "fields": {
+        "form_ref": null, 
+        "description": "Class based query with default graphpage.  No rows or columns. Graph placed directly in graphpage.", 
+        "form": "", 
+        "title": "Demo 7a: Query", 
+        "form_page": "", 
+        "created": "2014-03-25T12:45:46.185Z", 
+        "graph_page": "", 
+        "modified": "2014-04-12T13:18:31.877Z", 
+        "graph_page_ref": null, 
+        "form_page_ref": null, 
+        "query": "\r\nexchange = {'2001-01-31': 1.064, '2002-01-31': 1.1305,\r\n            '2003-01-31': 0.9417, '2004-01-31': 0.7937,\r\n            '2005-01-31': 0.7609, '2006-01-31': 0.827,\r\n            '2007-01-31': 0.7692, '2008-01-31': 0.6801,\r\n            '2009-01-31': 0.7491, '2010-01-31': 0.7002,\r\n            '2011-01-31': 0.7489, '2012-01-31': 0.7755,\r\n            '2013-01-31': 0.7531,\r\n            }\r\n\r\ngraph1 = XGraphCK('pie', 'exchange', width=6)\r\n\r\ngraphpage = XGraphPage(graph1)", 
+        "query_ref": null, 
+        "slug": "demo-7-example-class-based-graphpage-duplicate-40f"
+    }
+},
+{
+    "pk": 15, 
+    "model": "graphpages.graphpage", 
+    "fields": {
+        "form_ref": null, 
+        "description": "Two graphs in row on graphpage.", 
+        "form": "", 
+        "title": "Demo 7b: Query", 
+        "form_page": "", 
+        "created": "2014-03-25T12:45:46.185Z", 
+        "graph_page": "", 
+        "modified": "2014-05-01T16:16:44.445Z", 
+        "graph_page_ref": null, 
+        "form_page_ref": null, 
+        "query": "from test_data.models import CIA\r\n\r\nexchange = {'2001-01-31': 1.064, '2002-01-31': 1.1305,\r\n            '2003-01-31': 0.9417, '2004-01-31': 0.7937,\r\n            '2005-01-31': 0.7609, '2006-01-31': 0.827,\r\n            '2007-01-31': 0.7692, '2008-01-31': 0.6801,\r\n            '2009-01-31': 0.7491, '2010-01-31': 0.7002,\r\n            '2011-01-31': 0.7489, '2012-01-31': 0.7755,\r\n            '2013-01-31': 0.7531,\r\n            }\r\n\r\ngraph1 = XGraphCK('pie', 'exchange', width=6)\r\ngraph2 = XGraphCK('column', 'exchange', width=6)\r\n\r\nrow1 = XGraphRow([graph1, graph2])\r\n\r\ngraphpage = XGraphPage(row1)", 
+        "query_ref": null, 
+        "slug": "demo-7-example-class-based-graphpage-duplicate-090"
+    }
+},
+{
+    "pk": 16, 
+    "model": "graphpages.graphpage", 
+    "fields": {
+        "form_ref": null, 
+        "description": "Row with two columns.", 
+        "form": "", 
+        "title": "Demo 7c: Query", 
+        "form_page": "", 
+        "created": "2014-03-25T12:45:46.185Z", 
+        "graph_page": "", 
+        "modified": "2014-04-12T14:52:39.416Z", 
+        "graph_page_ref": null, 
+        "form_page_ref": null, 
+        "query": "\r\nexchange = {'2001-01-31': 1.064, '2002-01-31': 1.1305,\r\n                '2003-01-31': 0.9417, '2004-01-31': 0.7937,\r\n                '2005-01-31': 0.7609, '2006-01-31': 0.827,\r\n                '2007-01-31': 0.7692, '2008-01-31': 0.6801,\r\n                '2009-01-31': 0.7491, '2010-01-31': 0.7002,\r\n                '2011-01-31': 0.7489, '2012-01-31': 0.7755,\r\n                '2013-01-31': 0.7531,\r\n                }\r\n\r\ngraph1 = XGraphCK('pie', 'exchange', width=6)\r\ngraph2 = XGraphCK('column', 'exchange', width=6)\r\n\r\ncol1 = XGraphColumn([graph1, graph2])\r\ncol2 = XGraphColumn([graph2, graph1])\r\n\r\nrow1 = XGraphRow([col1, col2])\r\n\r\ngraphpage = XGraphPage(row1)", 
+        "query_ref": null, 
+        "slug": "demo-7-example-class-based-graphpage-duplicate-9d4"
+    }
+},
+{
+    "pk": 17, 
+    "model": "graphpages.graphpage", 
+    "fields": {
+        "form_ref": null, 
+        "description": "Some initial experiments with syslog style data.  No form.  Host and node are defined in query.  Data for node and comparison data all nodes for company.", 
+        "form": "", 
+        "title": "Demo 8a syslog: query", 
+        "form_page": "", 
+        "created": "2014-04-10T18:44:55.055Z", 
+        "graph_page": "", 
+        "modified": "2014-05-03T12:10:29.964Z", 
+        "graph_page_ref": null, 
+        "form_page_ref": null, 
+        "query": "from test_data.models import VSyslog, syslog_query\r\nfrom django.db.models import Count, StdDev\r\n\r\ngraphpage = XGraphPage()\r\n\r\n# set the company and node values, ignour start/end date time for now\r\ncompany = 'BMC_1'\r\nnode = 'A0040CnBPGC1'\r\n\r\n# Put title and some text on the page\r\ngraphpage.text_before = \"\"\"\r\nFirst Syslog Graphs\r\n===============\r\n\r\nCharts from one month of syslog data.\r\n\r\n**Notes** \r\n    * Queries copied from JZ code with extensions to create a richer graph environment.\r\n    * For this demonstration I have chosen to create a single page with ALL of the syslog results graphs.\r\n    * The test data set has only one company so there is no form for company.\r\n    * The test data set has one month of data.  I chose **NOT** to query for a data range since query functionality is already well demonstrated.\r\n<br/>\r\n\"\"\"\r\n\r\n# get the syslog qs for this company/node\r\nqs = syslog_query(company, node)\r\n\r\n# Count them all\r\nall_count_host = qs.count()\r\n\r\n# Count by type\r\nxqs = qs.values('message_type').annotate(num_results=Count('id'))\r\n\r\ncount_by_type_type = map(list, xqs.order_by('message_type').values_list('message_type', 'num_results'))\r\ncount_by_type_count = map(list, xqs.order_by('-num_results').values_list('message_type', 'num_results'))\r\n\r\ngraph11 = XGraphCK('column', 'count_by_type_type', width=6)\r\ngraph12 = XGraphCK('pie', 'count_by_type_count', width=6)\r\n\r\n# Put graphs on page\r\ntext_before =\"\"\"<h3>Company {{company}} Node {{node}} Count by Type Distribution</h3>\r\n<p>Total syslog records {{all_count_host}}</p>\r\n\"\"\"\r\ngraphpage.objs.append(XGraphRow([graph11, graph12], text_before=text_before))\r\n\r\n################################################################################\r\n#\r\n# Display summary for all hosts for this company\r\n#\r\n################################################################################\r\n\r\nqs = syslog_query(company)\r\nall_count = qs.count()\r\n\r\n# Count critical events\r\n\r\ncritical_event_count_by_host = map(list, qs.filter(message_type='critical').\r\n                                         order_by('node__host_name').\r\n                                         values('node__host_name').\r\n                                         annotate(count=Count('node__host_name')).\r\n                                         values_list('node__host_name', 'count'))\r\ncritical_event_count_by_host_title='<h3>Critical Event Count by Host Distribution</h3>'\r\ngraph31 = XGraphCK('column', 'critical_event_count_by_host', \r\n                   width=6, \r\n                   text_before=critical_event_count_by_host_title)\r\ngraph32 = XGraphCK('pie', 'critical_event_count_by_host', \r\n                   width=6, \r\n                   text_before=critical_event_count_by_host_title)\r\ntext_before =\"\"\"<h3>Company {{company}} All Hosts</h3>\r\n<p>Total syslog records {{all_count}}</p>\r\n\"\"\"\r\ngraphpage.objs.append(XGraphRow([graph31, graph32], text_before=text_before))\r\n\r\n# Count error events\r\nerror_event_count_by_host = map(list, qs.filter(message_type='error').\r\n                                  order_by('node__host_name').\r\n                                  values('node__host_name').\r\n                                  annotate(count=Count('node__host_name')).\r\n                                  values_list('node__host_name', 'count'))\r\nerror_event_count_by_host_title='<h3>Error Event Count by Host Distribution</h3>'\r\ngraph33 = XGraphCK('column', 'error_event_count_by_host', \r\n                   width=6, \r\n                   text_before=error_event_count_by_host_title)\r\ngraph34 = XGraphCK('pie', 'error_event_count_by_host', \r\n                   width=6, \r\n                   text_before=error_event_count_by_host_title)\r\n\r\n\r\n# put graphs on page\r\ngraphpage.objs.append(XGraphRow([graph33, graph34]))\r\n", 
+        "query_ref": null, 
+        "slug": "demo-8a-syslog-query-duplicate-e48ea8c4c28111e3a02"
+    }
+},
+{
+    "pk": 19, 
+    "model": "graphpages.graphpage", 
+    "fields": {
+        "form_ref": null, 
+        "description": "Two charts in one <script></script>", 
+        "form": "", 
+        "title": "Demo HC 1: Highchart experiment", 
+        "form_page": "", 
+        "created": "2014-04-16T13:13:18.287Z", 
+        "graph_page": "\r\n<div id=\"chart_1\" style=\"width:100%; height:400px;\"></div>\r\n<div id=\"chart_2\" style=\"width:100%; height:400px;\"></div>\r\n\r\n<script>\r\n$(function () {\r\n  var chart_1;\r\n  $(document).ready(function() {\r\n    chart_1 = new Highcharts.Chart({\r\n      chart: {\r\n        renderTo: 'chart_1',\r\n        type: 'area'\r\n      },\r\n      title: {\r\n        text: 'Sales by source'\r\n      },\r\n      legend: {\r\n        enabled: false,\r\n      },\r\n      xAxis: {\r\n       categories: [],\r\n       \r\n        dateTimeLabelFormats: {\r\n          day: '%m-%d'   \r\n        },\r\n        tickmarkPlacement: 'off',\r\n        title: {\r\n          enabled: false\r\n        }\r\n      },\r\n      yAxis: {\r\n        title: {\r\n          text: 'Visits / Day'\r\n        },\r\n        labels: {\r\n          formatter: function() {\r\n            return this.value;\r\n          }\r\n        }\r\n      },\r\n      tooltip: {\r\n        formatter: function() {\r\n          return ''+\r\n          this.x +': '+ Highcharts.numberFormat(this.y, 0, ',') +' visits';\r\n        }\r\n      },\r\n      plotOptions: {\r\n        area: {\r\n          stacking: 'normal',\r\n          lineColor: '#666666',\r\n          lineWidth: 1,\r\n          marker: {\r\n            lineWidth: 1,\r\n            lineColor: '#666666'\r\n          }\r\n        }\r\n      },\r\n      series: [{\r\n        name: 'Email',\r\n        marker: {enabled: false},\r\n        fillColor: '#71a75b',\r\n        color: '#71a75b',\r\n        data: [561, 388, 1140, 899, 459, 464, 1265, 687, 365, 1287, 1044, 881, 459, 1419, 1076, 400, 323, 251, 887, 786, 1322, 1002, 517, 774, 551, 1249, 563, 1062, 800, 392, 149]\r\n      },{\r\n        name: 'Social',\r\n        marker: {enabled: false},\r\n        fillColor: '#A60F2F',\r\n        color: '#A60F2F',\r\n        data: [133, 103, 95, 68, 51, 62, 104, 58, 65, 82, 44, 31, 64, 61, 91, 51, 64, 91, 41, 77, 108, 83, 55, 69, 65, 137, 54, 84, 73, 63, 28]\r\n      },{\r\n        name: 'Paid',\r\n        marker: {enabled: false},\r\n        fillColor: '#f47f05',\r\n        color: '#f47f05',\r\n        data: [286, 242, 372, 312, 227, 272, 447, 369, 339, 370, 361, 348, 438, 455, 466, 463, 455, 516, 529, 619, 608, 591, 563, 607, 577, 561, 562, 638, 603, 603, 232]\r\n      },{\r\n        name: 'Other Referrals',\r\n        marker: {enabled: false},\r\n        fillColor: '#ae87c4',\r\n        color: '#ae87c4',\r\n        data: [1649, 1590, 1613, 1405, 1431, 1461, 1595, 1572, 1408, 1318, 1160, 1251, 1463, 1513, 1616, 1316, 1294, 1214, 1277, 1411, 1491, 1424, 1564, 1300, 1193, 1430, 1313, 1460, 1311, 1260, 611]\r\n      },{\r\n        name: 'Brand Search',\r\n        marker: {enabled: false},\r\n        fillColor: '#446a9c',\r\n        color: '#446a9c',\r\n        data: [1026, 993, 981, 893, 867, 928, 1009, 916, 786, 891, 787, 759, 905, 1038, 1020, 937, 815, 805, 785, 892, 944, 907, 878, 958, 911, 868, 913, 1045, 1020, 974, 400]\r\n      },{\r\n        name: 'Non-Branded Search',\r\n        marker: {enabled: false},\r\n        fillColor: '#3893c8',\r\n        color: '#3893c8',\r\n        data: [1021, 988, 1204, 987, 928, 1064, 1241, 1155, 1096, 1226, 1193, 1240, 1467, 1614, 1519, 1414, 1323, 1412, 1397, 1665, 1576, 1606, 1532, 1644, 1566, 1591, 1759, 1860, 1742, 1909, 752]\r\n      },{\r\n        name: 'Unknown Keyword Search',\r\n        marker: {enabled: false},\r\n        fillColor: '#7ac4a0',\r\n        color: '#7ac4a0',\r\n        data: [280, 316, 330, 239, 235, 251, 294, 286, 286, 332, 295, 290, 341, 392, 369, 349, 344, 334, 269, 313, 355, 337, 341, 390, 278, 280, 293, 360, 337, 415, 172]\r\n      },{\r\n        name: 'Affiliate',\r\n        marker: {enabled: false},\r\n        fillColor: '#B99306',\r\n        color: '#B99306',\r\n        data: [582, 577, 583, 567, 545, 609, 591, 591, 514, 503, 427, 441, 566, 547, 633, 499, 512, 470, 529, 563, 597, 579, 713, 565, 483, 544, 554, 651, 569, 533, 268]\r\n      },{\r\n        name: 'Direct',\r\n        marker: {enabled: false},\r\n        fillColor: '#c9423f',\r\n        color: '#c9423f',\r\n        data: [833, 844, 970, 773, 662, 786, 885, 761, 752, 804, 757, 680, 689, 847, 825, 744, 746, 696, 678, 774, 849, 844, 884, 792, 732, 665, 769, 865, 796, 735, 362]\r\n        }]\r\n      });\r\n    });\r\n\r\n\r\n  var chart_2;\r\n  $(document).ready(function() {\r\n    chart_2 = new Highcharts.Chart({\r\n      chart: {\r\n        renderTo: 'chart_2',\r\n        type: 'area'\r\n      },\r\n      title: {\r\n        text: 'Traffic by source'\r\n      },\r\n      xAxis: {\r\n       categories: [],\r\n       \r\n       \r\n        tickmarkPlacement: 'off',\r\n        title: {\r\n          enabled: false\r\n        }\r\n      },\r\n      legend: {\r\n        enabled: true,\r\n      },\r\n      yAxis: {\r\n        title: {\r\n          text: 'Visits / Day'\r\n        },\r\n        labels: {\r\n          formatter: function() {\r\n            return this.value;\r\n          }\r\n        }\r\n      },\r\n      tooltip: {\r\n        formatter: function() {\r\n          return ''+\r\n          this.x +': '+ Highcharts.numberFormat(this.y, 0, ',') +' visits';\r\n        }\r\n      },\r\n      plotOptions: {\r\n        area: {\r\n          stacking: 'normal',\r\n          lineColor: '#666666',\r\n          lineWidth: 1,\r\n          marker: {\r\n            lineWidth: 1,\r\n            lineColor: '#666666'\r\n          }\r\n        }\r\n      },\r\n      series: [{\r\n        name: 'Email',\r\n        marker: {enabled: false},\r\n        fillColor: '#71a75b',\r\n        color: '#71a75b',\r\n        data: [561, 388, 1140, 899, 459, 464, 1265, 687, 365, 1287, 1044, 881, 459, 1419, 1076, 400, 323, 251, 887, 786, 1322, 1002, 517, 774, 551, 1249, 563, 1062, 800, 392, 149]\r\n      },{\r\n        name: 'Social',\r\n        marker: {enabled: false},\r\n        fillColor: '#A60F2F',\r\n        color: '#A60F2F',\r\n        data: [133, 103, 95, 68, 51, 62, 104, 58, 65, 82, 44, 31, 64, 61, 91, 51, 64, 91, 41, 77, 108, 83, 55, 69, 65, 137, 54, 84, 73, 63, 28]\r\n      },{\r\n        name: 'Paid',\r\n        marker: {enabled: false},\r\n        fillColor: '#f47f05',\r\n        color: '#f47f05',\r\n        data: [286, 242, 372, 312, 227, 272, 447, 369, 339, 370, 361, 348, 438, 455, 466, 463, 455, 516, 529, 619, 608, 591, 563, 607, 577, 561, 562, 638, 603, 603, 232]\r\n      },{\r\n        name: 'Other Referrals',\r\n        marker: {enabled: false},\r\n        fillColor: '#ae87c4',\r\n        color: '#ae87c4',\r\n        data: [1649, 1590, 1613, 1405, 1431, 1461, 1595, 1572, 1408, 1318, 1160, 1251, 1463, 1513, 1616, 1316, 1294, 1214, 1277, 1411, 1491, 1424, 1564, 1300, 1193, 1430, 1313, 1460, 1311, 1260, 611]\r\n      },{\r\n        name: 'Brand Search',\r\n        marker: {enabled: false},\r\n        fillColor: '#446a9c',\r\n        color: '#446a9c',\r\n        data: [1026, 993, 981, 893, 867, 928, 1009, 916, 786, 891, 787, 759, 905, 1038, 1020, 937, 815, 805, 785, 892, 944, 907, 878, 958, 911, 868, 913, 1045, 1020, 974, 400]\r\n      },{\r\n        name: 'Non-Branded Search',\r\n        marker: {enabled: false},\r\n        fillColor: '#3893c8',\r\n        color: '#3893c8',\r\n        data: [1021, 988, 1204, 987, 928, 1064, 1241, 1155, 1096, 1226, 1193, 1240, 1467, 1614, 1519, 1414, 1323, 1412, 1397, 1665, 1576, 1606, 1532, 1644, 1566, 1591, 1759, 1860, 1742, 1909, 752]\r\n      },{\r\n        name: 'Unknown Keyword Search',\r\n        marker: {enabled: false},\r\n        fillColor: '#7ac4a0',\r\n        color: '#7ac4a0',\r\n        data: [280, 316, 330, 239, 235, 251, 294, 286, 286, 332, 295, 290, 341, 392, 369, 349, 344, 334, 269, 313, 355, 337, 341, 390, 278, 280, 293, 360, 337, 415, 172]\r\n      },{\r\n        name: 'Affiliate',\r\n        marker: {enabled: false},\r\n        fillColor: '#B99306',\r\n        color: '#B99306',\r\n        data: [582, 577, 583, 567, 545, 609, 591, 591, 514, 503, 427, 441, 566, 547, 633, 499, 512, 470, 529, 563, 597, 579, 713, 565, 483, 544, 554, 651, 569, 533, 268]\r\n      },{\r\n        name: 'Direct',\r\n        marker: {enabled: false},\r\n        fillColor: '#c9423f',\r\n        color: '#c9423f',\r\n        data: [833, 844, 970, 773, 662, 786, 885, 761, 752, 804, 757, 680, 689, 847, 825, 744, 746, 696, 678, 774, 849, 844, 884, 792, 732, 665, 769, 865, 796, 735, 362]\r\n        }]\r\n      });\r\n    });\r\n});\r\n\r\n</script>\r\n", 
+        "modified": "2014-04-16T14:06:28.020Z", 
+        "graph_page_ref": null, 
+        "form_page_ref": null, 
+        "query": "", 
+        "query_ref": null, 
+        "slug": "highchart-experiment"
+    }
+},
+{
+    "pk": 20, 
+    "model": "graphpages.graphpage", 
+    "fields": {
+        "form_ref": null, 
+        "description": "Two charts with details of js experiment.", 
+        "form": "", 
+        "title": "Demo HC 2: Highchart experiment", 
+        "form_page": "", 
+        "created": "2014-04-16T13:13:18.287Z", 
+        "graph_page": "\r\n<div id=\"chart_1\" style=\"width:100%; height:400px;\"></div>\r\n<div id=\"chart_2\" style=\"width:100%; height:400px;\"></div>\r\n\r\n<script>\r\n$(function () {\r\n    var chart_1;\r\n    $(document).ready(function() {\r\n        chart_1 = new Highcharts.Chart({\r\n            chart: {\r\n                renderTo: 'chart_1',\r\n                type: 'column'\r\n            },\r\n            title: {\r\n                text: 'Total fruit consumtion, grouped by gender'\r\n            },\r\n            xAxis: {\r\n                categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']\r\n            },\r\n            yAxis: {\r\n                allowDecimals: false,\r\n                min: 0,\r\n                title: {\r\n                    text: 'Number of fruits'\r\n                }\r\n            },\r\n            tooltip: {\r\n                formatter: function() {\r\n                    return '<b>'+ this.x +'</b><br/>'+\r\n                        this.series.name +': '+ this.y +'<br/>'+\r\n                        'Total: '+ this.point.stackTotal;\r\n                }\r\n            },\r\n            plotOptions: {\r\n                column: {\r\n                    stacking: 'normal'\r\n                }\r\n            },\r\n            series: [{\r\n                name: 'John',\r\n                data: [5, 3, 4, 7, 2],\r\n                stack: 'male'\r\n            }, {\r\n                name: 'Joe',\r\n                data: [3, 4, 4, 2, 5],\r\n                stack: 'male'\r\n            }, {\r\n                name: 'Jane',\r\n                data: [2, 5, 6, 2, 1],\r\n                stack: 'female'\r\n            }, {\r\n                name: 'Janet',\r\n                data: [3, 0, 4, 4, 3],\r\n                stack: 'female'\r\n            }]\r\n        });\r\n    });\r\n\r\n  var chart_2;\r\n  $(document).ready(function() {\r\n    chart_2 = new Highcharts.Chart({\r\n      chart: {\r\n        renderTo: 'chart_2',\r\n        type: 'area'\r\n      },\r\n      title: {\r\n        text: 'Traffic by source'\r\n      },\r\n      xAxis: {\r\n       categories: [],\r\n\r\n\r\n        tickmarkPlacement: 'off',\r\n        title: {\r\n          enabled: false\r\n        }\r\n      },\r\n      legend: {\r\n        enabled: true,\r\n      },\r\n      yAxis: {\r\n        title: {\r\n          text: 'Visits / Day'\r\n        },\r\n        labels: {\r\n          formatter: function() {\r\n            return this.value;\r\n          }\r\n        }\r\n      },\r\n      tooltip: {\r\n        formatter: function() {\r\n          return ''+\r\n          this.x +': '+ Highcharts.numberFormat(this.y, 0, ',') +' visits';\r\n        }\r\n      },\r\n      plotOptions: {\r\n        area: {\r\n          stacking: 'normal',\r\n          lineColor: '#666666',\r\n          lineWidth: 1,\r\n          marker: {\r\n            lineWidth: 1,\r\n            lineColor: '#666666'\r\n          }\r\n        }\r\n      },\r\n      series: [{\r\n        name: 'Email',\r\n        marker: {enabled: false},\r\n        fillColor: '#71a75b',\r\n        color: '#71a75b',\r\n        data: [561, 388, 1140, 899, 459, 464, 1265, 687, 365, 1287, 1044, 881, 459, 1419, 1076, 400, 323, 251, 887, 786, 1322, 1002, 517, 774, 551, 1249, 563, 1062, 800, 392, 149]\r\n      },{\r\n        name: 'Social',\r\n        marker: {enabled: false},\r\n        fillColor: '#A60F2F',\r\n        color: '#A60F2F',\r\n        data: [133, 103, 95, 68, 51, 62, 104, 58, 65, 82, 44, 31, 64, 61, 91, 51, 64, 91, 41, 77, 108, 83, 55, 69, 65, 137, 54, 84, 73, 63, 28]\r\n      },{\r\n        name: 'Paid',\r\n        marker: {enabled: false},\r\n        fillColor: '#f47f05',\r\n        color: '#f47f05',\r\n        data: [286, 242, 372, 312, 227, 272, 447, 369, 339, 370, 361, 348, 438, 455, 466, 463, 455, 516, 529, 619, 608, 591, 563, 607, 577, 561, 562, 638, 603, 603, 232]\r\n      },{\r\n        name: 'Other Referrals',\r\n        marker: {enabled: false},\r\n        fillColor: '#ae87c4',\r\n        color: '#ae87c4',\r\n        data: [1649, 1590, 1613, 1405, 1431, 1461, 1595, 1572, 1408, 1318, 1160, 1251, 1463, 1513, 1616, 1316, 1294, 1214, 1277, 1411, 1491, 1424, 1564, 1300, 1193, 1430, 1313, 1460, 1311, 1260, 611]\r\n      },{\r\n        name: 'Brand Search',\r\n        marker: {enabled: false},\r\n        fillColor: '#446a9c',\r\n        color: '#446a9c',\r\n        data: [1026, 993, 981, 893, 867, 928, 1009, 916, 786, 891, 787, 759, 905, 1038, 1020, 937, 815, 805, 785, 892, 944, 907, 878, 958, 911, 868, 913, 1045, 1020, 974, 400]\r\n      },{\r\n        name: 'Non-Branded Search',\r\n        marker: {enabled: false},\r\n        fillColor: '#3893c8',\r\n        color: '#3893c8',\r\n        data: [1021, 988, 1204, 987, 928, 1064, 1241, 1155, 1096, 1226, 1193, 1240, 1467, 1614, 1519, 1414, 1323, 1412, 1397, 1665, 1576, 1606, 1532, 1644, 1566, 1591, 1759, 1860, 1742, 1909, 752]\r\n      },{\r\n        name: 'Unknown Keyword Search',\r\n        marker: {enabled: false},\r\n        fillColor: '#7ac4a0',\r\n        color: '#7ac4a0',\r\n        data: [280, 316, 330, 239, 235, 251, 294, 286, 286, 332, 295, 290, 341, 392, 369, 349, 344, 334, 269, 313, 355, 337, 341, 390, 278, 280, 293, 360, 337, 415, 172]\r\n      },{\r\n        name: 'Affiliate',\r\n        marker: {enabled: false},\r\n        fillColor: '#B99306',\r\n        color: '#B99306',\r\n        data: [582, 577, 583, 567, 545, 609, 591, 591, 514, 503, 427, 441, 566, 547, 633, 499, 512, 470, 529, 563, 597, 579, 713, 565, 483, 544, 554, 651, 569, 533, 268]\r\n      },{\r\n        name: 'Direct',\r\n        marker: {enabled: false},\r\n        fillColor: '#c9423f',\r\n        color: '#c9423f',\r\n        data: [833, 844, 970, 773, 662, 786, 885, 761, 752, 804, 757, 680, 689, 847, 825, 744, 746, 696, 678, 774, 849, 844, 884, 792, 732, 665, 769, 865, 796, 735, 362]\r\n        }]\r\n      });\r\n    });\r\n});\r\n\r\n</script>\r\n", 
+        "modified": "2014-04-16T14:07:20.306Z", 
+        "graph_page_ref": null, 
+        "form_page_ref": null, 
+        "query": "", 
+        "query_ref": null, 
+        "slug": "demo-hc-1-highchart-experiment-duplicate-892b6344c"
+    }
+},
+{
+    "pk": 21, 
+    "model": "graphpages.graphpage", 
+    "fields": {
+        "form_ref": null, 
+        "description": "Two charts in two document ready functions.  Apparently, all graph target divs must proceed the js scripts.", 
+        "form": "", 
+        "title": "Demo HC 3: Highchart experiment", 
+        "form_page": "", 
+        "created": "2014-04-16T13:13:18.287Z", 
+        "graph_page": "\r\n<div id=\"chart_1\" style=\"width:100%; height:400px;\"></div>\r\n<div id=\"chart_2\" style=\"width:100%; height:400px;\"></div>\r\n\r\n<script>\r\n$(function () {\r\n    var chart_1;\r\n    $(document).ready(function() {\r\n        chart_1 = new Highcharts.Chart({\r\n            chart: {\r\n                renderTo: 'chart_1',\r\n                type: 'column'\r\n            },\r\n            title: {\r\n                text: 'Total fruit consumtion, grouped by gender'\r\n            },\r\n            xAxis: {\r\n                categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']\r\n            },\r\n            yAxis: {\r\n                allowDecimals: false,\r\n                min: 0,\r\n                title: {\r\n                    text: 'Number of fruits'\r\n                }\r\n            },\r\n            tooltip: {\r\n                formatter: function() {\r\n                    return '<b>'+ this.x +'</b><br/>'+\r\n                        this.series.name +': '+ this.y +'<br/>'+\r\n                        'Total: '+ this.point.stackTotal;\r\n                }\r\n            },\r\n            plotOptions: {\r\n                column: {\r\n                    stacking: 'normal'\r\n                }\r\n            },\r\n            series: [{\r\n                name: 'John',\r\n                data: [5, 3, 4, 7, 2],\r\n                stack: 'male'\r\n            }, {\r\n                name: 'Joe',\r\n                data: [3, 4, 4, 2, 5],\r\n                stack: 'male'\r\n            }, {\r\n                name: 'Jane',\r\n                data: [2, 5, 6, 2, 1],\r\n                stack: 'female'\r\n            }, {\r\n                name: 'Janet',\r\n                data: [3, 0, 4, 4, 3],\r\n                stack: 'female'\r\n            }]\r\n        });\r\n    });\r\n});\r\n\r\n\r\n\r\n$(function () {\r\n  var chart_2;\r\n  $(document).ready(function() {\r\n    chart_2 = new Highcharts.Chart({\r\n      chart: {\r\n        renderTo: 'chart_2',\r\n        type: 'area'\r\n      },\r\n      title: {\r\n        text: 'Traffic by source'\r\n      },\r\n      xAxis: {\r\n       categories: [],\r\n\r\n\r\n        tickmarkPlacement: 'off',\r\n        title: {\r\n          enabled: false\r\n        }\r\n      },\r\n      legend: {\r\n        enabled: true,\r\n      },\r\n      yAxis: {\r\n        title: {\r\n          text: 'Visits / Day'\r\n        },\r\n        labels: {\r\n          formatter: function() {\r\n            return this.value;\r\n          }\r\n        }\r\n      },\r\n      tooltip: {\r\n        formatter: function() {\r\n          return ''+\r\n          this.x +': '+ Highcharts.numberFormat(this.y, 0, ',') +' visits';\r\n        }\r\n      },\r\n      plotOptions: {\r\n        area: {\r\n          stacking: 'normal',\r\n          lineColor: '#666666',\r\n          lineWidth: 1,\r\n          marker: {\r\n            lineWidth: 1,\r\n            lineColor: '#666666'\r\n          }\r\n        }\r\n      },\r\n      series: [{\r\n        name: 'Email',\r\n        marker: {enabled: false},\r\n        fillColor: '#71a75b',\r\n        color: '#71a75b',\r\n        data: [561, 388, 1140, 899, 459, 464, 1265, 687, 365, 1287, 1044, 881, 459, 1419, 1076, 400, 323, 251, 887, 786, 1322, 1002, 517, 774, 551, 1249, 563, 1062, 800, 392, 149]\r\n      },{\r\n        name: 'Social',\r\n        marker: {enabled: false},\r\n        fillColor: '#A60F2F',\r\n        color: '#A60F2F',\r\n        data: [133, 103, 95, 68, 51, 62, 104, 58, 65, 82, 44, 31, 64, 61, 91, 51, 64, 91, 41, 77, 108, 83, 55, 69, 65, 137, 54, 84, 73, 63, 28]\r\n      },{\r\n        name: 'Paid',\r\n        marker: {enabled: false},\r\n        fillColor: '#f47f05',\r\n        color: '#f47f05',\r\n        data: [286, 242, 372, 312, 227, 272, 447, 369, 339, 370, 361, 348, 438, 455, 466, 463, 455, 516, 529, 619, 608, 591, 563, 607, 577, 561, 562, 638, 603, 603, 232]\r\n      },{\r\n        name: 'Other Referrals',\r\n        marker: {enabled: false},\r\n        fillColor: '#ae87c4',\r\n        color: '#ae87c4',\r\n        data: [1649, 1590, 1613, 1405, 1431, 1461, 1595, 1572, 1408, 1318, 1160, 1251, 1463, 1513, 1616, 1316, 1294, 1214, 1277, 1411, 1491, 1424, 1564, 1300, 1193, 1430, 1313, 1460, 1311, 1260, 611]\r\n      },{\r\n        name: 'Brand Search',\r\n        marker: {enabled: false},\r\n        fillColor: '#446a9c',\r\n        color: '#446a9c',\r\n        data: [1026, 993, 981, 893, 867, 928, 1009, 916, 786, 891, 787, 759, 905, 1038, 1020, 937, 815, 805, 785, 892, 944, 907, 878, 958, 911, 868, 913, 1045, 1020, 974, 400]\r\n      },{\r\n        name: 'Non-Branded Search',\r\n        marker: {enabled: false},\r\n        fillColor: '#3893c8',\r\n        color: '#3893c8',\r\n        data: [1021, 988, 1204, 987, 928, 1064, 1241, 1155, 1096, 1226, 1193, 1240, 1467, 1614, 1519, 1414, 1323, 1412, 1397, 1665, 1576, 1606, 1532, 1644, 1566, 1591, 1759, 1860, 1742, 1909, 752]\r\n      },{\r\n        name: 'Unknown Keyword Search',\r\n        marker: {enabled: false},\r\n        fillColor: '#7ac4a0',\r\n        color: '#7ac4a0',\r\n        data: [280, 316, 330, 239, 235, 251, 294, 286, 286, 332, 295, 290, 341, 392, 369, 349, 344, 334, 269, 313, 355, 337, 341, 390, 278, 280, 293, 360, 337, 415, 172]\r\n      },{\r\n        name: 'Affiliate',\r\n        marker: {enabled: false},\r\n        fillColor: '#B99306',\r\n        color: '#B99306',\r\n        data: [582, 577, 583, 567, 545, 609, 591, 591, 514, 503, 427, 441, 566, 547, 633, 499, 512, 470, 529, 563, 597, 579, 713, 565, 483, 544, 554, 651, 569, 533, 268]\r\n      },{\r\n        name: 'Direct',\r\n        marker: {enabled: false},\r\n        fillColor: '#c9423f',\r\n        color: '#c9423f',\r\n        data: [833, 844, 970, 773, 662, 786, 885, 761, 752, 804, 757, 680, 689, 847, 825, 744, 746, 696, 678, 774, 849, 844, 884, 792, 732, 665, 769, 865, 796, 735, 362]\r\n        }]\r\n      });\r\n    });\r\n});\r\n\r\n</script>", 
+        "modified": "2014-04-16T14:05:44.676Z", 
+        "graph_page_ref": null, 
+        "form_page_ref": null, 
+        "query": "", 
+        "query_ref": null, 
+        "slug": "demo-hc-2-highchart-experiment-duplicate-8463f9aec"
+    }
+},
+{
+    "pk": 22, 
+    "model": "graphpages.graphpage", 
+    "fields": {
+        "form_ref": null, 
+        "description": "Results for all nodes, then individual results for each node.", 
+        "form": "", 
+        "title": "Demo 8b syslog: query", 
+        "form_page": "", 
+        "created": "2014-04-10T18:44:55.055Z", 
+        "graph_page": "", 
+        "modified": "2014-05-03T16:43:46.118Z", 
+        "graph_page_ref": null, 
+        "form_page_ref": null, 
+        "query": "from test_data.models import VSyslog, syslog_query, VNode\r\nfrom django.db.models import Count, StdDev\r\n\r\n# set the company and node values, ignour start/end date time for now\r\ncompany = 'BMC_1'\r\n\r\n# Create graphpage\r\ngraphpage = XGraphPage()\r\n\r\n# Put title and some text on the page\r\ngraphpage.text_before = \"\"\"\r\nCritical and Error Event Summary for {{ company }}\r\n==================================================\r\n\"\"\"\r\n\r\n################################################################################\r\n#\r\n# Display summary for all hosts for this company\r\n#\r\n################################################################################\r\n\r\nqs = syslog_query(company)\r\nall_count = qs.count()\r\n\r\n# Count critical events\r\ncritical_event_count = map(list, qs.filter(message_type='critical').\r\n                           order_by('node__host_name').\r\n                           values('node__host_name').\r\n                           annotate(count=Count('node__host_name')).\r\n                           values_list('node__host_name', 'count'))\r\ncritical_event_count_title = '<h3>Critical Event Count by Host</h3>'\r\ngraph31 = XGraphCK('column', 'critical_event_count',\r\n                   width=3,\r\n                   text_before=critical_event_count_title)\r\ngraph32 = XGraphCK('pie', 'critical_event_count',\r\n                   width=3,\r\n                   text_before=critical_event_count_title)\r\nerror_event_count = map(list, qs.filter(message_type='error').\r\n                        order_by('node__host_name').\r\n                        values('node__host_name').\r\n                        annotate(count=Count('node__host_name')).\r\n                        values_list('node__host_name', 'count'))\r\nerror_event_count_title = '<h3>Error Event Count by Host</h3>'\r\ngraph33 = XGraphCK('column', 'error_event_count',\r\n                   width=3,\r\n                   text_before=error_event_count_title)\r\ngraph34 = XGraphCK('pie', 'error_event_count',\r\n                   width=3,\r\n                   text_before=error_event_count_title)\r\ntext_before = \"\"\"<h3>Company {{company}} All Hosts</h3>\r\n<p>Total syslog records {{all_count}}</p>\r\n\"\"\"\r\ngraphpage.objs.append(XGraphRow([graph31, graph32, graph33, graph34], text_before=text_before))\r\n\r\n\r\n################################################################################\r\n#\r\n# Display summary for each host for this company\r\n#\r\n################################################################################\r\n\r\n# get the hosts for this company and put it on the page\r\nhosts = [n[0] for n in VNode.objects.filter(company__company_name=company).values_list('host_name')]\r\nhosts_text = '<h3>The company has the following hosts: ' + ', '.join(hosts) + '</h3>'\r\ngraphpage.objs.append(XGraphRow(text_before=hosts_text))\r\n\r\n# now create the graph row for each host\r\n#\r\n# >>> 'iWantAVariableWithThisName' in locals()\r\n# False\r\n# >>> junkVar = 'iWantAVariableWithThisName'\r\n# >>> exec(junkVar + '= None')\r\n#\r\ncritical_event_count_host = {}\r\nfor host in hosts:\r\n    # get the syslog qs for this company/node\r\n    qs = syslog_query(company, host)\r\n    \r\n    # count and build title\r\n    count = qs.count()\r\n    host_text = '<h3>Company: {} Host: {}</h3>' \\\r\n                '<p>Total syslog records {}</p>' \\\r\n        .format(company, host, count)\r\n    #\r\n    # Warning Will Rogers, magic_... is a hack pending changes to bind earlier\r\n    #\r\n    \r\n    # Count by type\r\n    xqs = qs.values('message_type').annotate(num_results=Count('id'))\r\n    \r\n    count_by_type_type = map(list, xqs.order_by('message_type').values_list('message_type', 'num_results'))\r\n    graph11 = XGraphCK('column', count_by_type_type, width=6)\r\n\r\n    count_by_type_count = map(list, xqs.order_by('-num_results').values_list('message_type', 'num_results'))\r\n    graph12 = XGraphCK('pie', count_by_type_count, width=6)\r\n    \r\n    # Put graphs on page\r\n    graphpage.objs.append(XGraphRow([graph11, graph12], text_before=host_text))\r\n\r\n", 
+        "query_ref": null, 
+        "slug": "demo-8a-syslog-query-duplicate-402073bcd2bc11e3b4f"
+    }
+}
+]

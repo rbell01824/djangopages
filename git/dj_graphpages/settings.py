@@ -1,38 +1,16 @@
-#!/usr/bin/env python
-# coding=utf-8
-
-""" Some description here
-
-5/7/14 - Initial creation
-
-Django settings for djangopages_demo project.
+"""
+Django settings for dj_graphpages project.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/1.6/topics/settings/
 
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.6/ref/settings/
-
 """
-
-from __future__ import unicode_literals
-import logging
-
-log = logging.getLogger(__name__)
-
-__author__ = 'richabel'
-__date__ = '5/7/14'
-__copyright__ = "Copyright 2013, Richard Bell"
-__credits__ = ["rbell01824"]
-__license__ = "All rights reserved"
-__version__ = "0.1"
-__maintainer__ = "rbell01824"
-__email__ = "rbell01824@gmail.com"
-
-########################################################################################################################
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -40,12 +18,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '2as*)!##mb4*%321=%*y%yu#qiqevn@(9lfnc&mcqju)c^onqw'
+SECRET_KEY = '27@9*07$@h4djs^7=r!b%ijhtc$946n3uzmjm0q&)g$13dz1f$'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
-TEMPLATE_DEBUG = True
+TEMPLATE_DEBUG = DEBUG
 
 ALLOWED_HOSTS = []
 
@@ -53,25 +30,31 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = (
+    # 'django_admin_bootstrapped.bootstrap3',
+    # 'django_admin_bootstrapped',
     'suit',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # 'debug_toolbar',
     'django_extensions',
-    'djangopages_demo',
+    'dj_graphpages',
     'graphpages',
     'chartkick',
     'chartkick_demo',
     'bootstrap3',
+    # 'bootstrapform',
     'test_data',
     'taggit',
     'taggit_suggest',
     'django_ace',
 )
+
+SITE_ID = 1
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -82,9 +65,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'djangopages_demo.urls'
+ROOT_URLCONF = 'dj_graphpages.urls'
 
-WSGI_APPLICATION = 'djangopages_demo.wsgi.application'
+WSGI_APPLICATION = 'dj_graphpages.wsgi.application'
 
 
 # Database
@@ -93,7 +76,7 @@ WSGI_APPLICATION = 'djangopages_demo.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': os.path.join(BASE_DIR, 'db.db'),
     }
 }
 
@@ -105,16 +88,18 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+# USE_TZ = False
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 STATIC_ROOT = ''
 STATIC_URL = '/static/'
 
-# import chartkick        # fixme
+import chartkick
 
 STATICFILES_DIRS = (
-    # chartkick.js(),        # fixme
+    chartkick.js(),
     os.path.join(BASE_DIR, 'static'),
 )
 
@@ -175,19 +160,19 @@ SUIT_CONFIG = {
     # 'LIST_PER_PAGE': 15
 }
 
-# GRAPHPAGE_FORMPAGEHEADER ='{% extends "base.html" %}\n' \        # fixme
-#                           '{% block content %}\n' \        # fixme
-#                           '<div class="container-fluid">\n'        # fixme
-# GRAPHPAGE_FORMPAGEFOOTER = '</div>\n' \        # fixme
-#                            '{% endblock content %}'        # fixme
-# GRAPHPAGE_CONFIG = {        # fixme
-#     'graphpageheader': '{% extends "base.html" %}\n'        # fixme
-#                        '{% load chartkick %}\n'        # fixme
-#                        '{% block content %}\n'        # fixme
-#                        '<div class="container-fluid">\n',        # fixme
-#     'graphpagefooter': '</div>\n'        # fixme
-#                        '{% endblock content %}',        # fixme
-# }        # fixme
+GRAPHPAGE_FORMPAGEHEADER ='{% extends "base.html" %}\n' \
+                          '{% block content %}\n' \
+                          '<div class="container-fluid">\n'
+GRAPHPAGE_FORMPAGEFOOTER = '</div>\n' \
+                           '{% endblock content %}'
+GRAPHPAGE_CONFIG = {
+    'graphpageheader': '{% extends "base.html" %}\n'
+                       '{% load chartkick %}\n'
+                       '{% block content %}\n'
+                       '<div class="container-fluid">\n',
+    'graphpagefooter': '</div>\n'
+                       '{% endblock content %}',
+}
 
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
@@ -195,5 +180,5 @@ LOGIN_REDIRECT_URL = '/'
 # Define template tags to include by default.
 # The tag must be <application>.templatetags.<template tag lib>
 # See https://djangosnippets.org/snippets/342/
-# TEMPLATE_TAGS = ('chartkick.templatetags.chartkick',        # fixme
-#                  'graphpages.templatetags.graphpage_tags')        # fixme
+TEMPLATE_TAGS = ('chartkick.templatetags.chartkick',
+                 'graphpages.templatetags.graphpage_tags')

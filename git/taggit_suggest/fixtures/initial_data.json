@@ -1,0 +1,29 @@
+[
+{
+    "pk": 1, 
+    "model": "taggit_suggest.tagregex", 
+    "fields": {
+        "regex": "(?i)\\bpopulation\\b", 
+        "tag": 6, 
+        "name": "population"
+    }
+},
+{
+    "pk": 2, 
+    "model": "taggit_suggest.tagregex", 
+    "fields": {
+        "regex": "(?i)\\bcountries\\b", 
+        "tag": 5, 
+        "name": "countries"
+    }
+},
+{
+    "pk": 3, 
+    "model": "taggit_suggest.tagregex", 
+    "fields": {
+        "regex": "(?i)\\barea\\b", 
+        "tag": 4, 
+        "name": "area"
+    }
+}
+]

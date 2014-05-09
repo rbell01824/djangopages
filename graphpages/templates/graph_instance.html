@@ -1,0 +1,25 @@
+{% comment %}
+Template to use when rendering an individual graph instance.
+
+This is not actually used.  Leave it in the system for a bit until debug is finished.
+{% endcomment %}
+
+<div class="container-fluid">
+    {% if obj.text_before %}
+        <div class="row">
+            <div class="{{ obj.width }}">
+                {{ obj.text_before | graphpage_markdown }}
+            </div>
+        </div>
+    {% endif %}
+    <div class="row">
+        {{ obj.rendered }}
+    </div>
+    {% if obj.text_after %}
+        <div class="row">
+            <div class="{{ obj.width }}">
+                {{ obj.text_after | graphpage_markdown }}
+            </div>
+        </div>
+    {% endif %}
+</div>

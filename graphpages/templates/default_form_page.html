@@ -1,0 +1,59 @@
+{% comment %}
+
+This is the default template for graphpage forms.
+
+It has the following overall structure:
+
+text_before_form
+
+form
+
+text_after_form
+
+{% endcomment %}
+{% load graphpage_tags %}
+{% load bootstrap3 %}
+{% bootstrap_css %}
+{% bootstrap_messages %}
+
+{% comment %}
+This section holds any content to appear before the form.  The content is passed by the context variable
+"text_before_form".  It may contain markdown and/or of raw HTML.
+{%  endcomment %}
+{% if form_context.text_before_form %}
+    <div class="row">
+        <div class="col-md-12">
+            {{ form_context.text_before_form | graphpage_markdown }}
+        </div>
+    </div>
+{% endif %}
+
+{% comment %}
+This section holds the form.  The form must be named graphform.
+{%  endcomment %}
+<div class="row">
+    <div class="col-md-12">
+        <form method="post" class="bootstrap3 form-horizontal" role="form"
+              action="/graphpages/graphpage/{{graph_pk}}">
+            {% csrf_token %}
+            {% bootstrap_form graphform layout='horizontal' label_class="col-sm-2" field_class="col-sm-8"%}
+            {% buttons layout='horizontal' %}
+                <button type="submit" class="btn btn-primary">
+                    {% bootstrap_icon "star" %} Display Graph
+                </button>
+            {% endbuttons %}
+        </form>
+    </div>
+</div>
+
+{% comment %}
+This section holds any content to appear after the form.  The content is passed by the context variable
+"text_after_form".  It may contain markdown and/or of raw HTML.
+{%  endcomment %}
+{% if form_context.text_after_form %}
+    <div class="row">
+        <div class="col-md-12">
+            {{ form_context.text_after_form | graphpage_markdown }}
+        </div>
+    </div>
+{% endif %}

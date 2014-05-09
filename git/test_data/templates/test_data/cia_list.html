@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>CIA World Factbook</h1>
+
+<ul>
+  {% for cia in object_list %}
+    <li class="contact">{{ cia.name }}
+
+    </li>
+  {% endfor %}
+</ul>
+{% endblock content %}

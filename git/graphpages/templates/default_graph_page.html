@@ -1,0 +1,74 @@
+{% comment %}
+
+This is the default template for graphpage graphs.
+
+It supports BOTH graphpages defined with
+
+    * GraphPage class
+    * Original row design.
+
+{% endcomment %}
+{% load graphpage_tags %}
+{% load bootstrap3 %}
+{% bootstrap_css %}
+{% bootstrap_messages %}
+
+{% comment %}
+This section holds any content defined in graphpage using the GraphPage class interface.
+{% endcomment %}
+{% if graphpage %}
+    {% render_as_template graphpage.render %}
+{% endif %}
+
+{% comment %}
+This section holds any content defined using the original row interface.
+It is supported for the moment but may be removed in the near future.
+
+This interface has the following overall structure:
+
+    text_before_graph
+    graphs
+    text_after_graph
+
+Graphs consists of a series of rows that may contain 1 to 12 graphs in a bootstrap3 layout.
+{% endcomment %}
+{% if graph_rows %}
+
+    {% comment %}
+    This section holds any content to appear before the graphs.  The content is passed by the context variable
+    "text_before_graph".  It may contain markdown and/or of raw HTML.
+    {%  endcomment %}
+    {% if text_before_graph %}
+        <div class="row">
+            <div class="col-md-12">
+                {{ text_before_graph | graphpage_markdown }}
+            </div>
+        </div>
+    {% endif %}
+
+    {% comment %}
+    This section holds the graphs.
+    {%  endcomment %}
+    {% for graph_row in graph_rows %}
+        <div class="row">
+            {% for graph in graph_row %}
+                <div class="col-md-{{ graph.width }}">
+                    {% render_as_template graph.graph %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+
+    {% comment %}
+    This section holds any content to appear after the graph.  The content is passed by the context variable
+    "text_after_graph".  It may contain markdown and/or of raw HTML.
+    {%  endcomment %}
+    {% if text_after_graph %}
+        <div class="row">
+            <div class="col-md-12">
+                {{ text_after_graph | graphpage_markdown }}
+            </div>
+        </div>
+    {% endif %}
+{% endif %}
+

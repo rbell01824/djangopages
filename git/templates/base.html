@@ -1,0 +1,109 @@
+{%  load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}Untitled{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="django graph pages">
+    <meta name="author" content="rbell01824@gmail.com">
+
+    {% load staticfiles %}
+
+    <!-- js Warning: Here be dragons.
+    There is an order dependency to this mess. This works. Other orders not so much.
+    -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+
+{#    <script src="http://www.google.com/jsapi"></script>#}
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+    <script src="http://code.highcharts.com/modules/exporting.js"></script>
+
+    <script src="http://ankane.github.io/chartkick/chartkick.js"></script>
+
+    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+
+    <!-- styles -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+
+    <!-- extrahead  -->
+    {% block extrahead %}
+    {% endblock extrahead %}
+</head>
+
+<body>
+
+<!-- Static navbar -->
+<div class="navbar navbar-default navbar-static-top" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand active" href="/">Graph Pages</a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li>
+                    <a href="/display_graph_pages">
+                        <img src="{% static "img/graphs.png" %}" />
+                        Graphs
+                    </a>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <img src="{% static "img/graphs.png" %}" />Graph Methods <b class="caret"></b>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-header">Graphs implemented as methods</li>
+                        <li><a href="/test_data/demo8a">BMC_1 Critical/Error One Host; Error & critical events all hosts</a></li>
+                        <li><a href="/test_data/demo8b">BMC_1 Critical/Error All Hosts; All events each host</a></li>
+                        <li><a href="/test_data/demo8c">BMC_1 Critical/Error All Hosts; All events each host better charts</a></li>
+                        <li><a href="/test_data/demo8d">BMC_1 Syslogs/hour, all events time series</a></li>
+                        {# <li class="divider"></li>#}
+                    </ul>
+                </li>
+                {#                <li><a href=""><i class="fa fa-plus fa-2x"></i>Add</a></li>#}
+                {#                <li><a href=""><i class="fa fa-pencil-square-o fa-2x"></i>Edit</a></li>#}
+                <li><a href="/demo/chartkick"><img src="{% static "img/column_chart.png" %}" />Chartkick Demo</a></li>
+                {# <li><img src="{% static "img/forms.png" %}" /> </li>#}
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <img src="{% static "img/datatable.png" %}" />Data List <b class="caret"></b>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/admin/test_data/cia/">CIA World Factbook</a></li>
+                        {# <li class="divider"></li>#}
+                        <li><a href="/admin/test_data/countries/">Countries List</a></li>
+                        <li><a href="/admin/test_data/vcompany/">Company</a></li>
+                        <li><a href="/admin/test_data/vnode/">Node</a></li>
+                        <li><a href="/admin/test_data/vsyslog/">Syslog</a></li>
+                        {# <li class="dropdown-header">Nav header</li>#}
+                    </ul>
+                </li>
+                <li><a href="/admin"><img src="{% static "img/gears.png" %}" />Admin</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/admin/logout"><i class="glyphicon glyphicon-log-out fa-2x"></i>Logout {{ request.user }}</a></li>
+                {# <li class="active"><a href="./">Default</a></li>#}
+                {# <li><a href="../navbar-static-top/">Static top</a></li>#}
+                {# <li><a href="../navbar-fixed-top/">Fixed top</a></li>#}
+                {# <li><a href="#contact"><i class="fa fa-envelope fa-2x"></i>Contact</a></li>#}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- content -->
+{% block content %}
+{% endblock %}
+
+</body>
+</html>
+
+
