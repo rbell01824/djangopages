@@ -177,6 +177,7 @@ SUIT_CONFIG = {
 }
 
 DPAGE_DEFAULT_TEMPLATE = 'dpage_default_template.html'
+DPAGE_DEFAULT_CONTENT = 'Congradulations: Now put some content here!'
 
 GRAPHPAGE_FORMPAGEHEADER ='{% extends "base.html" %}\n' \
                           '{% block content %}\n' \

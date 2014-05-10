@@ -24,7 +24,7 @@ __email__ = "rbell01824@gmail.com"
 from django.views.generic import View
 from django.views.generic import ListView
 
-from djangopages.libs import DPage
+from djangopages.libs import DPage, DPageText, DPageMarkdown, DPageHTML
 
 ########################################################################################################################
 #
@@ -44,5 +44,8 @@ class DevTestView(View):
         :param request:
         """
         dpage = DPage()
+        dpage.objs.append(DPageText('This text comes from DPageText'))
+        dpage.objs.append(DPageMarkdown('**Bold Markdown Text**'))
+        dpage.objs.append(DPageHTML('<h3>H3 text from DPageHTML</h3>'))
         return dpage.render()
 

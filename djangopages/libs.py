@@ -66,6 +66,7 @@ class DPage(object):
         :param width: width of cell (Bootstrap3 width, 1 - 12)
         :type width: int
         """
+        # fixme: add title, slug, description, created, madified, tags, and ev (eval result) to the class
         self.template = template if template else settings.DPAGE_DEFAULT_TEMPLATE
         self.objs = []
         self.form = form
@@ -80,7 +81,7 @@ class DPage(object):
         :return: response object
         :rtype: HttpResponse
         """
-        content = 'Congradulations: Now put some content here!'
+        content = ''
 
         # if whatever is in objs is iterable, iterate over the objects and render each according to whatever it is
         # otherwise, just render whatever it is
@@ -93,10 +94,93 @@ class DPage(object):
             content += self.objs.render()
 
         t = loader.get_template(self.template)
+        if len(content) == 0:
+            content = settings.DPAGE_DEFAULT_CONTENT
         c = Context({'content': content})
 
         return render_to_response(self.template,
                                   {'content': content})
+
+########################################################################################################################
+#
+# DPageText, ... classes to add content to DPage
+#
+########################################################################################################################
+
+
+class DPageText(object):
+    """
+    Holds text for inclusion in a DPage.
+    """
+    def __init__(self, text):
+        self.text = text
+        return
+
+    def render(self):
+        """
+        Return render text for the DPageText object.
+        """
+        return self.text
+
+
+class DPageMarkdown(object):
+    """
+    Holds markdown text for inclusion in a DPage.
+    """
+    def __init__(self, markdowntext, extensions=None):
+        """
+        Create a DPageMarkdown object and initialize it.
+
+        :param markdowntext: Text to process as markdown.
+        :type markdowntext: unicode
+        :param extensions: Optional markdown options string.  See python markdown documentation.
+        :type extensions: unicode or None
+        """
+        self.extensions = extensions
+        self.markdowntext = markdowntext
+        # todo: here check text type and deal with file like objects and queryset objects
+        # for now just deal with actual text
+        pass
+
+    def render(self):
+        """
+        Render markdown text.
+
+        :return: html version of markdown text
+        :rtype: unicode
+        """
+        return markdown.markdown(force_unicode(self.markdowntext),
+                                 self.extensions if self.extensions else '',
+                                 output_format='html5',
+                                 safe_mode=False,
+                                 enable_attributes=False)
+
+
+class DPageHTML(object):
+    """
+    Holds HTML text for inclusion in a DPage.  This is a convenience method since DPageMarkdown can be
+    used interchangeably.
+    """
+    def __init__(self, htmltext):
+        """
+        Create a DPageHTML object and initialize it.
+
+        :param htmltext: Text to process as markdown.
+        :type htmltext: unicode
+        """
+        self.htmltext = htmltext
+        # todo: here check text type and deal with file like objects and queryset objects
+        # for now just deal with actual text
+        pass
+
+    def render(self):
+        """
+        Render markdown text.
+
+        :return: html version of markdown text
+        :rtype: unicode
+        """
+        return self.htmltext
 
 ########################################################################################################################
 #
