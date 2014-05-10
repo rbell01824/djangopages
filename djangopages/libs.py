@@ -29,8 +29,74 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.template import add_to_builtins
 from django.utils.encoding import force_unicode
+from django.template import Template, Context, loader
+from django.http import HttpResponse
+from django.shortcuts import render_to_response
 
 from taggit.models import TaggedItem
+
+########################################################################################################################
+#
+# DPage class
+#
+########################################################################################################################
+
+
+class DPage(object):
+    """
+    DPage, aka Django Page class.
+
+    A DPage objects holds a Django Page.  It consists of an optional form and 0 or more DPage clild objects.
+
+    Conceptually, a DPage displays a filter form that a user can use to customize the output of the DPage's
+    objects.
+    """
+
+    def __init__(self, template=None, objs=None, form=None, width=12):
+        """
+        Initialize the DPage.
+
+        :param template: template name to use for this DPage object.  If None, DPageDefaultTemplate specified in
+                         settings is used.
+        :type template: unicode
+        :param objs: The DPage... like object(s) for this DPage.
+        :type objs: list or DjangoPageGrid or DjangoPagePage or DjangoPageRow or DjangoPageColumn or object or ...
+        :param form: DPageForm object holding the form for this DPage
+        :type form: DPageForm
+        :param width: width of cell (Bootstrap3 width, 1 - 12)
+        :type width: int
+        """
+        self.template = template if template else settings.DPAGE_DEFAULT_TEMPLATE
+        self.objs = []
+        self.form = form
+        if objs:
+            self.objs = objs                    # graph objects in this cell
+        self.width = width                      # width of this column
+        pass
+
+    def render(self):
+        """
+        Render this DPage.
+        :return: response object
+        :rtype: HttpResponse
+        """
+        content = 'Congradulations: Now put some content here!'
+
+        # if whatever is in objs is iterable, iterate over the objects and render each according to whatever it is
+        # otherwise, just render whatever it is
+        if isinstance(self.objs, collections.Iterable):
+            # noinspection PyTypeChecker
+            for obj in self.objs:
+                content += obj.render()
+        elif self.objs:
+            # noinspection PyUnresolvedReferences
+            content += self.objs.render()
+
+        t = loader.get_template(self.template)
+        c = Context({'content': content})
+
+        return render_to_response(self.template,
+                                  {'content': content})
 
 ########################################################################################################################
 #

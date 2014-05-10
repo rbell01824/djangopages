@@ -21,6 +21,28 @@ __version__ = "0.1"
 __maintainer__ = "rbell01824"
 __email__ = "rbell01824@gmail.com"
 
+from django.views.generic import View
+from django.views.generic import ListView
+
+from djangopages.libs import DPage
+
+########################################################################################################################
+#
+# Development test class based view
+#
 ########################################################################################################################
 
-# Create your views here.
+
+class DevTestView(View):
+    """
+    View class for dev testing.
+    """
+    # noinspection PyMethodMayBeStatic
+    def get(self, request):
+        """
+        Execute the graph method and display the results.
+        :param request:
+        """
+        dpage = DPage()
+        return dpage.render()
+

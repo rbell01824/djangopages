@@ -176,6 +176,8 @@ SUIT_CONFIG = {
     # 'LIST_PER_PAGE': 15
 }
 
+DPAGE_DEFAULT_TEMPLATE = 'dpage_default_template.html'
+
 GRAPHPAGE_FORMPAGEHEADER ='{% extends "base.html" %}\n' \
                           '{% block content %}\n' \
                           '<div class="container-fluid">\n'

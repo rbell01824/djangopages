@@ -21,11 +21,12 @@ __version__ = "0.1"
 __maintainer__ = "rbell01824"
 __email__ = "rbell01824@gmail.com"
 
+from django.conf.urls import patterns, include, url
+
+from djangopages.views import DevTestView
+
 ########################################################################################################################
 
-try:
-    from django.conf.urls import *
-except ImportError:  # django < 1.4
-    from django.conf.urls.defaults import *
-
-# place app url patterns here
+urlpatterns = patterns('',
+                       url(r'^$', DevTestView.as_view(), name='devtest'),
+                       )

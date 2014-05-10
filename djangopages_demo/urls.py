@@ -36,7 +36,7 @@ from djangopages_demo.views import index
 from graphpages.views import GraphPageListView
 
 urlpatterns = patterns('',
-
+    url(r'^dpages/', include('djangopages.urls')),
     url(r'^test_data/', include('test_data.urls')),
     url(r'^display_graph_pages$', GraphPageListView.as_view(), name=GraphPageListView),
     url(r'^graphpages/', include('graphpages.urls')),
