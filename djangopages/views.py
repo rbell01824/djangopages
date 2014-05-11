@@ -74,7 +74,7 @@ class DevTestView(View):
         page.layout(rc12(x1),
                     rc6(x21, x22),
                     rc(x3),
-                    r(c3(x41), c9(x42)),
+                    r(c3(x41), c9(r(x42))),
                     r(c3(x51), c9(r(x521),
                                   r(x522),
                                   rc4(x5231, x5232, x5233))))
