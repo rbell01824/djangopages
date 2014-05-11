@@ -114,60 +114,6 @@ class DPage(object):
         return render_to_response(self.template,
                                   {'content': content})
 
-    # @staticmethod
-    # def render_rows(row_list):
-    #     content = ''
-    #     for o in row_list:
-    #         if hasattr(o, 'render'):
-    #             content += dpage_row_before + o.render() + dpage_row_after
-    #         elif hasattr(o, '__iter__'):
-    #             content += dpage_row_before + DPage.render_cols(o) + dpage_row_after
-    #             pass
-    #         else:
-    #             raise ValueError('Non iterable object without render method')
-    #     return content
-    #
-    # @staticmethod
-    # def max_col_width(lst):
-    #     mx = 0
-    #     for o in lst:
-    #         if hasattr(o, 'width'):
-    #             mx = max()
-    #     return 9
-    #
-    # @staticmethod
-    # def render_cols(col_list):
-    #     content = ''
-    #     for o in col_list:
-    #         if hasattr(o, 'render'):
-    #             content += o.render()
-    #         elif hasattr(o, '__iter__'):
-    #             width = DPage.max_col_width(o)
-    #             content += '<div class="col-md-{}">'.format(width) + DPage.render_rows(o) + '</div>'
-    #         else:
-    #             raise ValueError('Non iterable object without render method')
-    #     return content
-    #
-    #
-    # @staticmethod
-    # def render_list(col_list):
-    #     """
-    #     Given a list, render each element as a col within a containing row on the page.
-    #     :param col_list:
-    #     """
-    #     content = ''
-    #     for o in col_list:
-    #         if hasattr(o, 'render'):
-    #             content += dpage_row_before + o.render() + dpage_row_after
-    #             # content += o.render()
-    #         elif hasattr(o, '__iter__'):
-    #             # content += dpage_row_before + '<div class="col-md-12">' + DPage.render_list(o) + '</div>' + dpage_row_after
-    #             content += dpage_row_before + DPage.render_list(o) + dpage_row_after
-    #             pass
-    #         else:
-    #             raise ValueError('Non iterable object without render method')
-    #     return content
-
     def render_objs(self):
         """
         Render using the object list
@@ -187,17 +133,8 @@ class DPage(object):
 
 ########################################################################################################################
 #
-# Classes to add content to DPage
-#
-# A DPage contains a list of rows.  Each row may have multiple columns.  Columns have a default or
-# specified width.  Columns can contain anything that has a render method.
-#
-#     row_________________________________________________________________________________________________
-#     col________________________ col__________________________ col_______________________________________
-#     form_______________________ graph________________________ table_____________________________________
-#     text_______________________ markdown_____________________ html______________________________________
-#
-# Classes that add content to a DPage should derive from CellBase and MUST provide a render method.
+# Classes to add content to DPage. Classes that add content to a DPage should derive from CellBase and
+# MUST provide a render method.
 #
 ########################################################################################################################
 
@@ -404,6 +341,16 @@ class HTML(CellBase):
 ########################################################################################################################
 #
 # Layout support methods.  Really just syntactic suggar to make layout easier.
+#
+# A DPage contains a list of rows.  Each row may have multiple columns.  Columns have a default or
+# specified width.  Columns can contain anything that has a render method.  Rows may be nested in columns may be
+# nested in rows ... to whatever deapth amuses.  Past 2 or 3 it's probably not a good idea.
+#
+#     row_________________________________________________________________________________________________
+#     col________________________ col__________________________ col_______________________________________
+#     form_______________________ graph________________________ table_____________________________________
+#     text_______________________ markdown_____________________ html______________________________________
+#
 #
 ########################################################################################################################
 
