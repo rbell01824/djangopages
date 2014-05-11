@@ -176,8 +176,7 @@ SUIT_CONFIG = {
     # 'LIST_PER_PAGE': 15
 }
 
-DPAGE_DEFAULT_TEMPLATE = 'dpage_default_template.html'
-DPAGE_DEFAULT_CONTENT = 'Congradulations: Now put some content here!'
+from djangopages.settings import *
 
 GRAPHPAGE_FORMPAGEHEADER ='{% extends "base.html" %}\n' \
                           '{% block content %}\n' \
