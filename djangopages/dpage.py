@@ -115,6 +115,12 @@ class DPage(object):
         return render_to_response(self.template,
                                   {'content': content})
 
+    def render_self(self):
+        """
+        Render self
+        """
+        return render_to_response(self.template, {'content': self.content})
+
     def render_objs(self):
         """
         Render using the object list
