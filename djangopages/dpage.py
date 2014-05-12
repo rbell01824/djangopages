@@ -23,6 +23,7 @@ __email__ = "rbell01824@gmail.com"
 
 import markdown
 import collections
+import functools
 
 from django.contrib.admin import SimpleListFilter
 from django.utils.translation import ugettext_lazy as _
@@ -373,65 +374,18 @@ def c(*content, **kwargs):
     out = dpage_col_before.format(width) + out + dpage_col_after
     return out
 
-
-# noinspection PyDocstring
-def c1(*content):
-    return c(*content, width=1)
-
-
-# noinspection PyDocstring
-def c2(*content):
-    return c(*content, width=2)
-
-
-# noinspection PyDocstring
-def c3(*content):
-    return c(*content, width=3)
-
-
-# noinspection PyDocstring
-def c4(*content):
-    return c(*content, width=4)
-
-
-# noinspection PyDocstring
-def c5(*content):
-    return c(*content, width=5)
-
-
-# noinspection PyDocstring
-def c6(*content):
-    return c(*content, width=6)
-
-
-# noinspection PyDocstring
-def c7(*content):
-    return c(*content, width=7)
-
-
-# noinspection PyDocstring
-def c8(*content):
-    return c(*content, width=8)
-
-
-# noinspection PyDocstring
-def c9(*content):
-    return c(*content, width=9)
-
-
-# noinspection PyDocstring
-def c10(*content):
-    return c(*content, width=10)
-
-
-# noinspection PyDocstring
-def c11(*content):
-    return c(*content, width=11)
-
-
-# noinspection PyDocstring
-def c12(*content):
-    return c(*content, width=12)
+c1 = functools.partial(c, width=1)
+c2 = functools.partial(c, width=2)
+c3 = functools.partial(c, width=3)
+c4 = functools.partial(c, width=4)
+c5 = functools.partial(c, width=5)
+c6 = functools.partial(c, width=6)
+c7 = functools.partial(c, width=7)
+c8 = functools.partial(c, width=8)
+c9 = functools.partial(c, width=9)
+c10 = functools.partial(c, width=10)
+c11 = functools.partial(c, width=11)
+c12 = functools.partial(c, width=12)
 
 
 def r(*content):
@@ -466,60 +420,19 @@ def rc(*content, **kwargs):
     out = r(out)
     return out
 
+rc1 = functools.partial(rc, width=1)
+rc2 = functools.partial(rc, width=2)
+rc3 = functools.partial(rc, width=3)
+rc4 = functools.partial(rc, width=4)
+rc5 = functools.partial(rc, width=5)
+rc6 = functools.partial(rc, width=6)
+rc7 = functools.partial(rc, width=7)
+rc8 = functools.partial(rc, width=8)
+rc9 = functools.partial(rc, width=9)
+rc10 = functools.partial(rc, width=10)
+rc11 = functools.partial(rc, width=11)
+rc12 = functools.partial(rc, width=12)
 
-# noinspection PyDocstring
-def rc1(*content):
-    return rc(*content, width=1)
-
-
-# noinspection PyDocstring
-def rc2(*content):
-    return rc(*content, width=2)
-
-
-# noinspection PyDocstring
-def rc3(*content):
-    return rc(*content, width=3)
-
-
-# noinspection PyDocstring
-def rc4(*content):
-    return rc(*content, width=4)
-
-
-# noinspection PyDocstring
-def rc5(*content):
-    return rc(*content, width=5)
-
-
-# noinspection PyDocstring
-def rc6(*content):
-    return rc(*content, width=6)
-
-
-# noinspection PyDocstring
-def rc7(*content):
-    return rc(*content, width=7)
-
-
-# noinspection PyDocstring
-def rc8(*content):
-    return rc(*content, width=8)
-
-
-# noinspection PyDocstring
-def rc9(*content):
-    return rc(*content, width=9)
-
-
-# noinspection PyDocstring
-def rc10(*content):
-    return rc(*content, width=10)
-
-
-# noinspection PyDocstring
-def rc12(*content):
-    return rc(*content)
 
 ########################################################################################################################
 #
