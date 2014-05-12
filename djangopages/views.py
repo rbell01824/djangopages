@@ -110,7 +110,7 @@ class DevTest3(DPage):
     """
     Complex render test
     """
-
+    # fixme: use render to actually render and add base method for building page
     def render(self):
         """
         Override
