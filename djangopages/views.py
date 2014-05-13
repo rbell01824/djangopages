@@ -76,17 +76,17 @@ class DevTest1(DPage):
     Class based dpage with render method overridden.  Objs style interface.
     """
 
-    def render(self):
+    def page(self):
         """
-        Override render to generate output from here
+        Actually create the page
         """
+        super(DevTest1, self).__init__()
         self.form = None
         self.objs.append(Text('This text comes from dpage.Text'))
         self.objs.append(Markdown('**Bold Markdown Text**'))
         self.objs.append(HTML('<h3>H3 text from DPageHTML</h3>'))
-        content = self.render_objs()
-        return render_to_response(self.template,
-                                  {'content': content})
+        self.content = self.render_objs()
+        return self
 
 
 class DevTest2(DPage):
@@ -94,7 +94,7 @@ class DevTest2(DPage):
     Basic test of layout facility.
     """
 
-    def render(self):
+    def page(self):
         """
         Override
         """
@@ -102,8 +102,7 @@ class DevTest2(DPage):
         xr2 = Markdown('**Bold Markdown Text**')
         xr3 = HTML('<h3>H3 text from DPageHTML</h3>')
         self.layout(rc12(xr1, xr2, xr3))
-        return render_to_response(self.template,
-                                  {'content': self.content})
+        return self
 
 
 class DevTest3(DPage):
@@ -111,7 +110,7 @@ class DevTest3(DPage):
     Complex render test
     """
     # fixme: use render to actually render and add base method for building page
-    def render(self):
+    def page(self):
         """
         Override
         """
@@ -134,8 +133,11 @@ class DevTest3(DPage):
                     r(c3(x41), c9(r(x42))),
                     r(c3(x51), c9(r(x521),
                                   r(x522),
-                                  rc4(x5231, x5232, x5233))))
-        return self.render_self()
+                                  rc4(x5231, x5232, x5233)
+                                  )
+                      )
+                    )
+        return self
 
 
 class DevTestView(View):
@@ -148,5 +150,5 @@ class DevTestView(View):
         Execute the graph method and display the results.
         :param request:
         """
-        return DevTest3().render()
+        return DevTest3().page().render()
 

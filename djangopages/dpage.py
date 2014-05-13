@@ -90,12 +90,40 @@ class DPage(object):
     def layout(self, *content):
         """
         Save page content from a layout.
+
+        A layout establishes the row column structure using the helper r... and c... methods.  Example:
+
+        self.layout(rc12(x1),
+                    rc6(x21, x22),
+                    rc(x3),
+                    r(c3(x41), c9(r(x42))),
+                    r(c3(x51), c9(r(x521),
+                                  r(x522),
+                                  rc4(x5231, x5232, x5233)
+                                  )
+                      )
+                    )
         """
         out = ''
         for con in content:
             out += con
         self.content = out
         return content
+
+    def page(self):
+        """
+        Define the page.  The subclass must define this method.
+
+        The page method defines the page.  Example:
+
+                def page(self):
+                    xr1 = Text('This text comes from dpage.Text')
+                    xr2 = Markdown('**Bold Markdown Text**')
+                    xr3 = HTML('<h3>H3 text from DPageHTML</h3>')
+                    self.layout(rc12(xr1, xr2, xr3))
+                    return self
+        """
+        raise NotImplementedError("Subclasses should implement this!")
 
     def render(self):
         """
@@ -115,12 +143,6 @@ class DPage(object):
         return render_to_response(self.template,
                                   {'content': content})
 
-    def render_self(self):
-        """
-        Render self
-        """
-        return render_to_response(self.template, {'content': self.content})
-
     def render_objs(self):
         """
         Render using the object list
@@ -136,6 +158,125 @@ class DPage(object):
             # noinspection PyUnresolvedReferences
             content += self.objs.render()
         return content
+
+
+########################################################################################################################
+#
+# Layout support methods.  Really just syntactic sugar to make layout easier.
+#
+# A DPage contains a list of rows.  Each row may have multiple columns.  Columns have a default or
+# specified width.  Columns can contain anything that has a render method.  Rows may be nested in columns may be
+# nested in rows ... to whatever deapth amuses.  Past 2 or 3 it's probably not a good idea.
+#
+#     row_________________________________________________________________________________________________
+#     col________________________ col__________________________ col_______________________________________
+#     form_______________________ graph________________________ table_____________________________________
+#     text_______________________ markdown_____________________ html______________________________________
+#
+# Example:
+#         x1 = Text('Row 1: This text comes from dpage.Text')
+#         x21 = Markdown('Row 2 col 1: **Bold Markdown Text**')
+#         x22 = HTML('<p>Row 2 col 2: </p><h3>H3 text from DPageHTML</h3>')
+#         x3 = HTML('<p>Row 3: Text from loremipsum. {}</p>'.format(get_paragraph()))
+#         x41 = HTML('<p>Row 4 col 1:{}</p>'.format(get_paragraph()))
+#         x42 = HTML('<p>Row 4 col 2:{}</p>'.format(get_paragraph()))
+#         x51 = HTML('<p>Row 5 col 1:{}</p>'.format(get_paragraph()))
+#         x521 = HTML('<p>Row 5 col 2 row 1:{}</p>'.format(get_paragraph()))
+#         x522 = HTML('<p>Row 5 col 2 row 2:{}</p>'.format(get_paragraph()))
+#         x5231 = HTML('<p>Row 5 col 2 row 3 col 1: {}</p>'.format(get_paragraph()))
+#         x5232 = HTML('<p>Row 5 col 2 row 3 col 2: {}</p>'.format(get_paragraph()))
+#         x5233 = HTML('<p>Row 5 col 2 row 3 col 3: {}</p>'.format(get_paragraph()))
+#         # page.layout(r(c3(x41), c9(x42)))
+#         self.layout(rc12(x1),
+#                     rc6(x21, x22),
+#                     rc(x3),
+#                     r(c3(x41), c9(r(x42))),
+#                     r(c3(x51), c9(r(x521),
+#                                   r(x522),
+#                                   rc4(x5231, x5232, x5233)
+#                                   )
+#                       )
+#                     )
+#
+########################################################################################################################
+
+
+def c(*content, **kwargs):
+    """
+    :param content: Content to wrap in a column of width width
+    :type content: object or collections.iterable
+    :param kwargs: keyword args (width: bootstrap width int or unicode, ...)
+    :type kwargs: dict
+    """
+    width = kwargs.pop('width', 12)
+
+    out = ''
+    for con in content:
+        if hasattr(con, 'render'):
+            out += con.render()
+        else:
+            out += con
+    out = dpage_col_before.format(width) + out + dpage_col_after
+    return out
+
+c1 = functools.partial(c, width=1)
+c2 = functools.partial(c, width=2)
+c3 = functools.partial(c, width=3)
+c4 = functools.partial(c, width=4)
+c5 = functools.partial(c, width=5)
+c6 = functools.partial(c, width=6)
+c7 = functools.partial(c, width=7)
+c8 = functools.partial(c, width=8)
+c9 = functools.partial(c, width=9)
+c10 = functools.partial(c, width=10)
+c11 = functools.partial(c, width=11)
+c12 = functools.partial(c, width=12)
+
+
+def r(*content):
+    """
+    Wrap content in a bootstrap 3 row
+    :param content: The html content to wrap
+    :type content: unicode
+    """
+    out = ''
+    for con in content:
+        if hasattr(con, 'render'):
+            con_out = con.render()
+        else:
+            con_out = con
+        out += con_out
+    out = dpage_row_before + out + dpage_row_after
+    return out
+
+
+def rc(*content, **kwargs):
+    """
+    Wrap content in a row and column of width width.
+    :param content: content
+    :type content: unicode or collections.iterable
+    :param kwargs: keyword args (width: bootstrap width int or unicode, ...)
+    :type kwargs: dict
+    """
+    width = kwargs.pop('width', 12)
+    out = ''
+    for con in content:
+        out += c(con, width=width)
+    out = r(out)
+    return out
+
+rc1 = functools.partial(rc, width=1)
+rc2 = functools.partial(rc, width=2)
+rc3 = functools.partial(rc, width=3)
+rc4 = functools.partial(rc, width=4)
+rc5 = functools.partial(rc, width=5)
+rc6 = functools.partial(rc, width=6)
+rc7 = functools.partial(rc, width=7)
+rc8 = functools.partial(rc, width=8)
+rc9 = functools.partial(rc, width=9)
+rc10 = functools.partial(rc, width=10)
+rc11 = functools.partial(rc, width=11)
+rc12 = functools.partial(rc, width=12)
 
 
 ########################################################################################################################
@@ -254,53 +395,59 @@ class HTML(CellBase):
         return self.htmltext
 
 
-# class Graph(CellBase):
-#     """
-#     DPage graph object class that uses Chartkick.
-#     """
-#     # noinspection PyShadowingBuiltins
-#     def __init__(self, graph_type, data,
-#                  width=12, options=None,
-#                  min=None, max=None, height=None, library=None):
-#         """
-#         Create a graph object
-#
-#         :param graph_type: The type of this graph.  Must be line, pie, column, bar, or area.
-#         :type graph_type: unicode
-#         :param data: The name of the context variable holding the graph's data
-#         :type data: unicode or list[dict] or dict
-#         :param width: Bootstrap3 grid width for graph
-#         :type width: int
-#         :param options: 'with' options for the chartkick graph.
-#         :type options: unicode
-#         :param min: Min data value
-#         :type min: int or float
-#         :param max: Max data value
-#         :type max: int or float
-#         :param height: string version of height, ex '500px'
-#         :type height: unicode
-#         :param library: highcharts library values, ex. [('title.text', 'graph title'),...]
-#         :type library: list[tuple] or tuple
-#         """
-#         super(Graph, self).__init__(width=width)
-#
-#         if not graph_type in LEGAL_GRAPH_TYPES:
-#             raise ValueError('In Graph illegal graph type {}'.format(graph_type))
-#
-#         # todo 2: when this is working, remove the unneeded class attributes
-#         # todo 2: since all that's really needed is self.output
-#         self.graph_type = graph_type  # save type of graph
-#         self.data = data  # the data to display
-#         self.options = options  # chartkick with options
-#         self.width = width
-#         self.min = min
-#         self.max = max
-#         self.height = height
-#         self.library = library
-#
-#         #  Generate the html to render this graph with this data
-#         output = ''
-#
+class Graph(CellBase):
+    """
+    DPage graph object class that uses Chartkick.
+    """
+    # noinspection PyShadowingBuiltins
+    def __init__(self, graph_type, data,
+                 width=12, options=None,
+                 min=None, max=None, height=None, library=None,
+                 **kwargs):
+        """
+        Create a graph object
+
+        :param graph_type: The type of this graph.  Must be line, pie, column, bar, or area.
+        :type graph_type: unicode
+        :param data: The name of the context variable holding the graph's data
+        :type data: unicode or list[dict] or dict
+        :param width: Bootstrap3 grid width for graph
+        :type width: int
+        :param options: 'with' options for the chartkick graph.
+        :type options: unicode
+        :param min: Min data value
+        :type min: int or float
+        :param max: Max data value
+        :type max: int or float
+        :param height: string version of height, ex '500px'
+        :type height: unicode
+        :param library: highcharts library values, ex. [('title.text', 'graph title'),...]
+        :type library: list[tuple] or tuple
+        """
+        super(Graph, self).__init__(**kwargs)
+        if not graph_type in LEGAL_GRAPH_TYPES:
+            raise ValueError('In Graph illegal graph type {}'.format(graph_type))
+
+        # todo 2: when this is working, remove the unneeded class attributes
+        # todo 2: since all that's really needed is self.output
+        self.graph_type = graph_type  # save type of graph
+        self.data = data  # the data to display
+        self.options = options  # chartkick with options
+        self.width = width
+        self.min = min
+        self.max = max
+        self.height = height
+        self.library = library
+        pass
+
+    def render(self):
+        """
+        Render the graph
+        """
+
+        #  Generate the html to render this graph with this data
+        output = ''
+
 #         # create a context variable to hold the data if necessary
 #         # Note: because the expr is evaluated and then the value immediately used when the template is rendered
 #         # we do NOT need unique variables.
@@ -309,135 +456,29 @@ class HTML(CellBase):
 #             output += '{{% expr {} as {} %}}'.format(data.__repr__(), name)
 #             data = name
 #
-#         # Output the chartkick graph
-#         if options:
-#             chart = '{}_chart {} with {}'.format(graph_type, data, options)
-#             pass
-#         else:
-#             chart = '{}_chart {}'.format(graph_type, data)
-#             pass
-#         chart = '{% ' + chart + ' %}'
-#         chart = CHARTKICK_BEFORE_HTML + chart + CHARTKICK_AFTER_HTML
-#         # print '===', chart
-#
-#         output += chart
-#
-#         output += GRAPH_AFTER_HTML
-#         self.output = output
-#         pass
-#
-#     def render(self):
-#         """
-#         Render the graph
-#         """
-#         return self.output
-#
-#     # noinspection PyShadowingBuiltins
-#     def options(self, min=None, max=None, height=None, library=None):
-#         """
-#         Set chartkick & highchart options
-#         :param min:
-#         :param max:
-#         :param height:
-#         :param library:
-#         """
-#         # fixme: finish options method for XGraphCK
-#         pass
-#
-
-########################################################################################################################
-#
-# Layout support methods.  Really just syntactic suggar to make layout easier.
-#
-# A DPage contains a list of rows.  Each row may have multiple columns.  Columns have a default or
-# specified width.  Columns can contain anything that has a render method.  Rows may be nested in columns may be
-# nested in rows ... to whatever deapth amuses.  Past 2 or 3 it's probably not a good idea.
-#
-#     row_________________________________________________________________________________________________
-#     col________________________ col__________________________ col_______________________________________
-#     form_______________________ graph________________________ table_____________________________________
-#     text_______________________ markdown_____________________ html______________________________________
-#
-#
-########################################################################################################################
-
-
-def c(*content, **kwargs):
-    """
-    :param content: Content to wrap in a column of width width
-    :type content: object or collections.iterable
-    :param kwargs: keyword args (width: bootstrap width int or unicode, ...)
-    :type kwargs: dict
-    """
-    width = kwargs.pop('width', 12)
-
-    out = ''
-    for con in content:
-        if hasattr(con, 'render'):
-            out += con.render()
+        # Output the chartkick graph
+        if options:
+            chart = '{}_chart {} with {}'.format(graph_type, data, options)
+            pass
         else:
-            out += con
-    out = dpage_col_before.format(width) + out + dpage_col_after
-    return out
+            chart = '{}_chart {}'.format(graph_type, data)
+            pass
+        chart = '{% ' + chart + ' %}'
 
-c1 = functools.partial(c, width=1)
-c2 = functools.partial(c, width=2)
-c3 = functools.partial(c, width=3)
-c4 = functools.partial(c, width=4)
-c5 = functools.partial(c, width=5)
-c6 = functools.partial(c, width=6)
-c7 = functools.partial(c, width=7)
-c8 = functools.partial(c, width=8)
-c9 = functools.partial(c, width=9)
-c10 = functools.partial(c, width=10)
-c11 = functools.partial(c, width=11)
-c12 = functools.partial(c, width=12)
+        output += chart
+        return output
 
-
-def r(*content):
-    """
-    Wrap content in a bootstrap 3 row
-    :param content: The html content to wrap
-    :type content: unicode
-    """
-    out = ''
-    for con in content:
-        if hasattr(con, 'render'):
-            con_out = con.render()
-        else:
-            con_out = con
-        out += con_out
-    out = dpage_row_before + out + dpage_row_after
-    return out
-
-
-def rc(*content, **kwargs):
-    """
-    Wrap content in a row and column of width width.
-    :param content: content
-    :type content: unicode or collections.iterable
-    :param kwargs: keyword args (width: bootstrap width int or unicode, ...)
-    :type kwargs: dict
-    """
-    width = kwargs.pop('width', 12)
-    out = ''
-    for con in content:
-        out += c(con, width=width)
-    out = r(out)
-    return out
-
-rc1 = functools.partial(rc, width=1)
-rc2 = functools.partial(rc, width=2)
-rc3 = functools.partial(rc, width=3)
-rc4 = functools.partial(rc, width=4)
-rc5 = functools.partial(rc, width=5)
-rc6 = functools.partial(rc, width=6)
-rc7 = functools.partial(rc, width=7)
-rc8 = functools.partial(rc, width=8)
-rc9 = functools.partial(rc, width=9)
-rc10 = functools.partial(rc, width=10)
-rc11 = functools.partial(rc, width=11)
-rc12 = functools.partial(rc, width=12)
+    # noinspection PyShadowingBuiltins
+    def options(self, min=None, max=None, height=None, library=None):
+        """
+        Set chartkick & highchart options
+        :param min:
+        :param max:
+        :param height:
+        :param library:
+        """
+        # fixme: finish options method for XGraphCK
+        pass
 
 
 ########################################################################################################################
