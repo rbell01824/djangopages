@@ -80,7 +80,6 @@ class DevTest1(DPage):
         """
         Actually create the page
         """
-        super(DevTest1, self).__init__()
         self.form = None
         self.objs.append(Text('This text comes from dpage.Text'))
         self.objs.append(Markdown('**Bold Markdown Text**'))
