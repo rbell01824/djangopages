@@ -35,7 +35,7 @@ from django_ace import AceWidget
 from .models import GraphPage
 
 from taggit_suggest.utils import suggest_tags
-from djangopages.dpage import TaggitListFilter
+from djangopages.libs import TaggitListFilter
 
 
 class GraphPageAdmin(admin.ModelAdmin):

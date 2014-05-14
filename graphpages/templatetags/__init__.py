@@ -26,5 +26,5 @@ __status__ = "dev"
 
 # fixme: this shouldn't be needed, look into it.  django pages should override
 
-from djangopages.dpage import load_templatetags
+from djangopages.libs import load_templatetags
 load_templatetags()

@@ -27,5 +27,5 @@ __email__ = "rbell01824@gmail.com"
 # This insures that custom template tags are always available to Django's
 # template render process.
 
-from djangopages.dpage import load_templatetags
+from djangopages.libs import load_templatetags
 load_templatetags()
