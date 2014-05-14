@@ -24,6 +24,7 @@ __email__ = "rbell01824@gmail.com"
 import markdown
 import collections
 import functools
+from copy import copy
 
 from django.conf import settings
 from django.template import add_to_builtins
@@ -31,6 +32,8 @@ from django.utils.encoding import force_unicode
 from django.template import Template, Context, loader
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
+
+from djangopages.libs import dict_nested_set
 
 # HTML to create a bootstrap3 row
 dpage_row_before = '<!-- Start of dpage row -->' \
@@ -87,6 +90,8 @@ class DPage(object):
         """
         Save page content from a layout.
 
+        :param content:
+        :type: tuple
         A layout establishes the row column structure using the helper r... and c... methods.  Example:
 
         self.layout(rc12(x1),
@@ -100,11 +105,17 @@ class DPage(object):
                       )
                     )
         """
-        out = ''
-        for con in content:
-            out += con
-        self.content = out
-        return content
+        def _layout(some_content):
+            out = ''
+            for con in some_content:
+                if isinstance(con, tuple) or isinstance(con, list):
+                    out += _layout(con)
+                else:
+                    out += con
+            return out
+
+        self.content = _layout(content)
+        return self.content
 
     def page(self):
         """
@@ -397,8 +408,7 @@ class Graph(CellBase):
     """
     # noinspection PyShadowingBuiltins
     def __init__(self, graph_type, data,
-                 width=12, options=None,
-                 min=None, max=None, height=None, library=None,
+                 options=None,
                  **kwargs):
         """
         Create a graph object
@@ -407,18 +417,8 @@ class Graph(CellBase):
         :type graph_type: unicode
         :param data: The name of the context variable holding the graph's data
         :type data: unicode or list[dict] or dict
-        :param width: Bootstrap3 grid width for graph
-        :type width: int
         :param options: 'with' options for the chartkick graph.
         :type options: unicode
-        :param min: Min data value
-        :type min: int or float
-        :param max: Max data value
-        :type max: int or float
-        :param height: string version of height, ex '500px'
-        :type height: unicode
-        :param library: highcharts library values, ex. [('title.text', 'graph title'),...]
-        :type library: list[tuple] or tuple
         """
         super(Graph, self).__init__(**kwargs)
         if not graph_type in LEGAL_GRAPH_TYPES:
@@ -429,52 +429,59 @@ class Graph(CellBase):
         self.graph_type = graph_type  # save type of graph
         self.data = data  # the data to display
         self.options = options  # chartkick with options
-        self.width = width
-        self.min = min
-        self.max = max
-        self.height = height
-        self.library = library
         pass
 
     def render(self):
         """
         Render the graph
         """
-
-        #  Generate the html to render this graph with this data
-        output = ''
-
-#         # create a context variable to hold the data if necessary
-#         # Note: because the expr is evaluated and then the value immediately used when the template is rendered
-#         # we do NOT need unique variables.
-#         if not isinstance(data, basestring):
-#             name = static_name_generator()
-#             output += '{{% expr {} as {} %}}'.format(data.__repr__(), name)
-#             data = name
-#
-        # Output the chartkick graph
-        if options:
-            chart = '{}_chart {} with {}'.format(graph_type, data, options)
+        # Generate the chartkick graph template text
+        data = self.data
+        if self.options:
+            options = self.set_options()
+            chart = '{}_chart data with {}'.format(self.graph_type, options)
             pass
         else:
-            chart = '{}_chart {}'.format(graph_type, data)
+            chart = '{}_chart data'.format(self.graph_type)
             pass
-        chart = '{% ' + chart + ' %}'
+        t = Template('{% load chartkick %} {% ' + chart + ' %}')
 
-        output += chart
+        # render
+        output = t.render(Context({'data': data}))
+
         return output
 
-    # noinspection PyShadowingBuiltins
-    def options(self, min=None, max=None, height=None, library=None):
+    def set_options(self):
         """
         Set chartkick & highchart options
-        :param min:
-        :param max:
-        :param height:
-        :param library:
+            options = "height='500px' library=" + str(library)
+
         """
-        # fixme: finish options method for XGraphCK
-        pass
+        options = copy(self.options)
+        out = ''
+
+        # deal with height, max, and min
+        height = options.pop('height', None)
+        if height:
+            out += " height='{}'".format(height)
+        xmax = options.pop('max', None)
+        if xmax:
+            out += " max='{}'".format(xmax)
+        xmin = options.pop('min', None)
+        if xmin:
+            out += " min='{}'".format(xmin)
+
+        # Is there anythin left
+        if len(options) < 1:
+            return out
+
+        # These are library options of the form title.text: ...
+        library = {}
+        for key, value in options.iteritems():
+            dict_nested_set(library, key, value)
+        out += " library={}".format(str(library))
+
+        return out
 
 
 ########################################################################################################################

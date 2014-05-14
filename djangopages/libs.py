@@ -23,6 +23,8 @@ __email__ = "rbell01824@gmail.com"
 
 from django.contrib.admin import SimpleListFilter
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
+from django.template import add_to_builtins
 
 from taggit.models import TaggedItem
 
@@ -126,3 +128,29 @@ def load_templatetags():
     except AttributeError:
         pass
 
+########################################################################################################################
+#
+# Dictionary nested set
+#
+########################################################################################################################
+
+
+def dict_nested_set(dic, key, value):
+    """
+    Set value in nested dictionary.
+
+    :param dic: dictionary where value needs to be set
+    :type dic: dict
+    :param key: a.b.c key into dic
+    :type key: unicode
+    :param value:
+    :type value: varies
+    :return: dictionary with value set for specified key
+    :rtype: dict
+    """
+    keys = key.split('.')
+    xdic = dic
+    for k in keys[:-1]:
+        xdic = xdic.setdefault(k, {})
+    xdic[keys[-1]] = value
+    return dic
