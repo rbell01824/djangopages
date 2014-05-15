@@ -210,7 +210,10 @@ class DevTest5(DPage):
     def company_summary(self, company):
         """
         For specified company, display a summary report and details by node.
+        :param company: Company
+        :return: DPage OBJECT!
         """
+        # noinspection PyListCreation
         content = []
         content.append(self.all_hosts_summary(company))
         for host in DevTest5.get_hosts(company):
@@ -222,18 +225,29 @@ class DevTest5(DPage):
         """
         Display bar chart of errors by type for all nodes and a line chart with 4 lines of
         errors by type vs time.
+        :param company: Company
+        :return: HTML
         """
         qs = syslog_query(company)
         return self.do_summary(qs, company, 'All Hosts')
 
     def host_summary(self, company, host):
         """
+        Create summary output for company
+        :param company: Company
+        :param host: Host
+        :return: HTML
         """
         qs = syslog_query(company, host)
         return self.do_summary(qs, company, host)
 
     def do_summary(self, qs, company, host):
         """
+        Do summary for a single host for the company
+        :param qs: Queryset for this company & host
+        :param company: Company
+        :param host: Host
+        :return: HTML
         """
         xqs = qs.values('message_type').annotate(num_results=Count('id'))
         count_by_type_type = map(list, xqs.order_by('message_type').values_list('message_type', 'num_results'))
@@ -247,7 +261,8 @@ class DevTest5(DPage):
         # check just a node
         if host != 'All Hosts':
             cbt.options['height'] = '400px'
-            return r(c4(cbt), c8(errbt))
+            xxx = r(c4(cbt), c8(errbt))
+            return panel(xxx, title='{}:{}'.format(company, host))
 
         # all nodes so make critical and error events by node
         # critical event by node
@@ -272,8 +287,14 @@ class DevTest5(DPage):
 
         return rc4(cbt, cecbn, eecbn) + rc(errbt)
 
-    def time_chart(self, qs, company, host):
+    @staticmethod
+    def time_chart(qs, company, host):
         """
+        Create basic time chart summary
+        :param qs: Query set for company & host
+        :param company: Company
+        :param host: Host
+        :return: graph OBJECT!
         """
         # total, critical, error events by time
         date_start = datetime.date(2012, 12, 1)
@@ -303,11 +324,12 @@ class DevTest5(DPage):
         data = [{'name': 'All', 'data': data_total},
                 {'name': 'Critical', 'data': data_critical},
                 {'name': 'Error', 'data': data_error}]
-        errbt = Graph('line', data)
-        errbt.options = {'height': '400px',
+        errbt = Graph('area', data)
+        errbt.options = {'height': '440px',
                          'title.text': '{} Syslog Events By Hour'.format(company),
                          'subtitle.text': '{}:{}'.format(company, host)
-                                          + ' - {} to {}'.format(date_start, date_end)
+                                          + ' - {} to {}'.format(date_start, date_end),
+                         'plotOptions.area.stacking': 'normal'
                          }
         return errbt
 

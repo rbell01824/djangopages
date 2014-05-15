@@ -154,3 +154,21 @@ def dict_nested_set(dic, key, value):
         xdic = xdic.setdefault(k, {})
     xdic[keys[-1]] = value
     return dic
+
+########################################################################################################################
+#
+# Static name generator.  Generates names for ID's etc.
+#
+########################################################################################################################
+
+
+def static_name_generator(base_name='x'):
+    """
+    Returns a unique name of the form base_name_counter
+
+    :param base_name:
+    """
+    if not hasattr(static_name_generator, "counter"):
+        static_name_generator.counter = 0  # it doesn't exist yet, so initialize it
+    static_name_generator.counter += 1
+    return '{}_{}'.format(base_name, static_name_generator.counter)

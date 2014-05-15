@@ -208,7 +208,7 @@ class DPage(object):
 ########################################################################################################################
 
 
-def c(*content, **kwargs):
+def column(*content, **kwargs):
     """
     :param content: Content to wrap in a column of width width
     :type content: object or collections.iterable
@@ -225,22 +225,22 @@ def c(*content, **kwargs):
             out += con
     out = dpage_col_before.format(width) + out + dpage_col_after
     return out
+c = functools.partial(column)
+c1 = functools.partial(column, width=1)
+c2 = functools.partial(column, width=2)
+c3 = functools.partial(column, width=3)
+c4 = functools.partial(column, width=4)
+c5 = functools.partial(column, width=5)
+c6 = functools.partial(column, width=6)
+c7 = functools.partial(column, width=7)
+c8 = functools.partial(column, width=8)
+c9 = functools.partial(column, width=9)
+c10 = functools.partial(column, width=10)
+c11 = functools.partial(column, width=11)
+c12 = functools.partial(column, width=12)
 
-c1 = functools.partial(c, width=1)
-c2 = functools.partial(c, width=2)
-c3 = functools.partial(c, width=3)
-c4 = functools.partial(c, width=4)
-c5 = functools.partial(c, width=5)
-c6 = functools.partial(c, width=6)
-c7 = functools.partial(c, width=7)
-c8 = functools.partial(c, width=8)
-c9 = functools.partial(c, width=9)
-c10 = functools.partial(c, width=10)
-c11 = functools.partial(c, width=11)
-c12 = functools.partial(c, width=12)
 
-
-def r(*content):
+def row(*content):
     """
     Wrap content in a bootstrap 3 row
     :param content: The html content to wrap
@@ -255,9 +255,10 @@ def r(*content):
         out += con_out
     out = dpage_row_before + out + dpage_row_after
     return out
+r = functools.partial(row)
 
 
-def rc(*content, **kwargs):
+def rowcolumn(*content, **kwargs):
     """
     Wrap content in a row and column of width width.
     :param content: content
@@ -268,23 +269,104 @@ def rc(*content, **kwargs):
     width = kwargs.pop('width', 12)
     out = ''
     for con in content:
-        out += c(con, width=width)
-    out = r(out)
+        out += column(con, width=width)
+    out = row(out)
+    return out
+rc = functools.partial(rowcolumn)
+rc1 = functools.partial(rowcolumn, width=1)
+rc2 = functools.partial(rowcolumn, width=2)
+rc3 = functools.partial(rowcolumn, width=3)
+rc4 = functools.partial(rowcolumn, width=4)
+rc5 = functools.partial(rowcolumn, width=5)
+rc6 = functools.partial(rowcolumn, width=6)
+rc7 = functools.partial(rowcolumn, width=7)
+rc8 = functools.partial(rowcolumn, width=8)
+rc9 = functools.partial(rowcolumn, width=9)
+rc10 = functools.partial(rowcolumn, width=10)
+rc11 = functools.partial(rowcolumn, width=11)
+rc12 = functools.partial(rowcolumn, width=12)
+
+
+########################################################################################################################
+#
+# Collapsed panel
+#
+########################################################################################################################
+
+
+def panel(content, title=None, btn_type='btn-primary'):
+    """
+    Create a collapsable panel on a button.
+
+    :param content: Content
+    :type content: unicode
+    :param title: Button title
+    :type title: unicode
+    :param btn_type: Button type.  Defaults to btn-primary.
+    :type btn_type: unicode
+    :return: HTML for panel
+    :rtype: unicode
+    """
+    name = static_name_generator('btn_collapse')
+    template = '<!-- Start of collapsible panel -->\n' \
+               '    <button type="button" class="btn {btn_type}" data-toggle="collapse" data-target="#{name}">\n' \
+               '        {title}\n ' \
+               '    </button>\n ' \
+               '    <div id="{name}" class="collapse">\n' \
+               '        {content}\n' \
+               '    </div>\n' \
+               '<!-- End of collapsable panel -->\n'
+    out = template.format(btn_type=btn_type, name=name, title=title, content=content)
     return out
 
-rc1 = functools.partial(rc, width=1)
-rc2 = functools.partial(rc, width=2)
-rc3 = functools.partial(rc, width=3)
-rc4 = functools.partial(rc, width=4)
-rc5 = functools.partial(rc, width=5)
-rc6 = functools.partial(rc, width=6)
-rc7 = functools.partial(rc, width=7)
-rc8 = functools.partial(rc, width=8)
-rc9 = functools.partial(rc, width=9)
-rc10 = functools.partial(rc, width=10)
-rc11 = functools.partial(rc, width=11)
-rc12 = functools.partial(rc, width=12)
+########################################################################################################################
+#
+# Accordion support
+#
+########################################################################################################################
 
+
+def accordion(*content):
+    """
+
+    """
+    accordion_id = static_name_generator('accordion_id')
+    a_template = '<!-- Start of accordion -->\n' \
+                 '<div class="panel-group" id="{accordion_id}">\n'.format(accordion_id=accordion_id) + \
+                 '    {panels}\n' \
+                 '</div>\n' \
+                 '<!-- End of accordion -->\n'
+    out = ''
+
+    return out
+
+
+# from djangopages.libs import static_name_generator
+#
+# def panel(content, title=None, default=False):
+#     """
+#     Create an accordion panel
+#
+#     :param content: Content for the panel
+#     :type content: unicode
+#     :param title: Panel title.  Defaults to ''.
+#     :type title: unicode
+#     :param default: If True make this the default panel.
+#     :type default: bool
+#     """
+#     name = static_name_generator('collapse')
+#     out = ''
+#     out += '<!-- start of panel -->\n' \
+#            '    <div class="panel{}">\n'.format(' panel-default' if default else '') + \
+#            '        <div class="panel-heading">\n' \
+#            '            <h4 class="panel-title">\n' \
+#            '                <a data-toggle="collapse" data-parent="#accordion" href="{}">\n'.format(name) + \
+#            '                    {}\n'.format(title if title else '') + \
+#            '                </a>\n' \
+#            '            </h4>\n' \
+#            '        </div>\n'
+#
+#     return out
 
 ########################################################################################################################
 #
