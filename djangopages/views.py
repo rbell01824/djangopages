@@ -22,12 +22,14 @@ __maintainer__ = "rbell01824"
 __email__ = "rbell01824@gmail.com"
 
 from loremipsum import get_paragraph
+import datetime, qsstats
 
 from django.views.generic import View
 from django.views.generic import ListView
 from django.db.models import Count
 
 from djangopages.dpage import *
+
 from test_data.models import syslog_query, VNode
 
 
@@ -210,60 +212,113 @@ class DevTest5(DPage):
         For specified company, display a summary report and details by node.
         """
         content = []
-        content.append(self.all_hosts_summary())
+        content.append(self.all_hosts_summary(company))
         for host in DevTest5.get_hosts(company):
-            content.append(self.host_summary(host))
+            content.append(self.host_summary(company, host))
         self.layout(content)
         return self
 
-    def all_hosts_summary(self):
+    def all_hosts_summary(self, company):
         """
+        Display bar chart of errors by type for all nodes and a line chart with 4 lines of
+        errors by type vs time.
         """
-        return rc(Text('Row 1'))
+        qs = syslog_query(company)
+        return self.do_summary(qs, company, 'All Hosts')
 
-    def host_summary(self, host):
+    def host_summary(self, company, host):
         """
         """
-        return rc(Text('Company {}'.format(host)))
+        qs = syslog_query(company, host)
+        return self.do_summary(qs, company, host)
+
+    def do_summary(self, qs, company, host):
+        """
+        """
+        xqs = qs.values('message_type').annotate(num_results=Count('id'))
+        count_by_type_type = map(list, xqs.order_by('message_type').values_list('message_type', 'num_results'))
+        cbt = Graph('column', count_by_type_type)
+        cbt.options = {'title.text': 'Syslog Messages by Type',
+                       'subtitle.text': '{}:{}'.format(company, host)}
+
+        # make the time chart
+        errbt = self.time_chart(qs, company, host)
+
+        # check just a node
+        if host != 'All Hosts':
+            cbt.options['height'] = '400px'
+            return r(c4(cbt), c8(errbt))
+
+        # all nodes so make critical and error events by node
+        # critical event by node
+        critical_event_count_by_node = map(list, qs.filter(message_type='critical').
+                                       order_by('node__host_name').
+                                       values('node__host_name').
+                                       annotate(count=Count('node__host_name')).
+                                       values_list('node__host_name', 'count'))
+        cecbn = Graph('column', critical_event_count_by_node)
+        cecbn.options = {'title.text': 'Critical Events by Host',
+                         'subtitle.text': '{}:{}'.format(company, host)}
+
+        # error event by node
+        error_event_count_by_node = map(list, qs.filter(message_type='error').
+                                    order_by('node__host_name').
+                                    values('node__host_name').
+                                    annotate(count=Count('node__host_name')).
+                                    values_list('node__host_name', 'count'))
+        eecbn = Graph('column', error_event_count_by_node)
+        eecbn.options = {'title.text': 'Error Events by Host',
+                         'subtitle.text': '{}:{}'.format(company, host)}
+
+        return rc4(cbt, cecbn, eecbn) + rc(errbt)
+
+    def time_chart(self, qs, company, host):
+        """
+        """
+        # total, critical, error events by time
+        date_start = datetime.date(2012, 12, 1)
+        date_end = datetime.date(2013, 2, 9)
+
+        # setup the qss object & build time series
+        qss = qsstats.QuerySetStats(qs, 'time')
+        time_series = qss.time_series(date_start, date_end, 'hours')
+
+        # format for chartkick
+        data_total = [[t[0].strftime('%Y-%m-%d %H'), t[1]] for t in time_series]
+
+        # get critical
+        xqs = qs.filter(message_type='critical')
+        qss = qsstats.QuerySetStats(xqs, 'time')
+        time_series = qss.time_series(date_start, date_end, 'hours')
+        data_critical = [[t[0].strftime('%Y-%m-%d %H'), t[1]] for t in time_series]
+
+        # get error
+        xqs = qs.filter(message_type='error')
+        qss = qsstats.QuerySetStats(xqs, 'time')
+        time_series = qss.time_series(date_start, date_end, 'hours')
+        data_error = [[t[0].strftime('%Y-%m-%d %H'), t[1]] for t in time_series]
+
+
+        # make the graph
+        data = [{'name': 'All', 'data': data_total},
+                {'name': 'Critical', 'data': data_critical},
+                {'name': 'Error', 'data': data_error}]
+        errbt = Graph('line', data)
+        errbt.options = {'height': '400px',
+                         'title.text': '{} Syslog Events By Hour'.format(company),
+                         'subtitle.text': '{}:{}'.format(company, host)
+                                          + ' - {} to {}'.format(date_start, date_end)
+                         }
+        return errbt
 
     @staticmethod
     def get_hosts(company):
         """
         Get list of this companies hosts.
+        :param company:
         """
         hosts = [n[0] for n in VNode.objects.filter(company__company_name=company).values_list('host_name')]
         return hosts
-
-        # qs = syslog_query(company)
-        # all_count = qs.count()
-        #
-        # # Count critical events
-        # critical_event_count = map(list, qs.filter(message_type='critical').
-        #                            order_by('node__host_name').
-        #                            values('node__host_name').
-        #                            annotate(count=Count('node__host_name')).
-        #                            values_list('node__host_name', 'count'))
-        # critical_event_count_title = '<h3>Critical Event Count by Host</h3>'
-        # graph31 = XGraphCK('column', 'critical_event_count',
-        #                    width=3,
-        #                    text_before=critical_event_count_title)
-        # graph32 = XGraphCK('pie', 'critical_event_count',
-        #                    width=3,
-        #                    text_before=critical_event_count_title)
-        # error_event_count = map(list, qs.filter(message_type='error').
-        #                         order_by('node__host_name').
-        #                         values('node__host_name').
-        #                         annotate(count=Count('node__host_name')).
-        #                         values_list('node__host_name', 'count'))
-        # error_event_count_title = '<h3>Error Event Count by Host</h3>'
-        # graph33 = XGraphCK('column', 'error_event_count',
-        #                    width=3,
-        #                    text_before=error_event_count_title)
-        # graph34 = XGraphCK('pie', 'error_event_count',
-        #                    width=3,
-        #                    text_before=error_event_count_title)
-        # text_before = '<h3>{{company}} All Hosts, Total Syslog Records: {{all_count}}</h3>'
-        # graphpage.objs.append(XGraphRow([graph31, graph32, graph33, graph34], text_before=text_before))
 
 
 class DevTestView(View):
