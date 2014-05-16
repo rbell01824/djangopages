@@ -504,6 +504,57 @@ class AccordionPanel(object):
         return out
 
 
+class AccordionPanelN(object):
+    """
+    Panel within an Accordion
+    """
+    def __init__(self, *content, **kwargs):
+        """
+        Define accordion panel.
+        :param kwargs: title='', default=False
+        :type kwargs: dict
+        """
+        self.content = content
+        self.title = kwargs.pop('title', '')
+        self.panel_collapsed = kwargs.pop('collapsed', True)
+        return
+
+    def render(self, **kwargs):
+        """
+        Render the accordion panel.
+        :param kwargs: accordion_id=accordion_id, Accordion id
+        :type: dict
+        :return: Rendered HTML
+        :rtype: html
+        """
+        accordion_id = kwargs['accordion_id']
+
+        panel_id = static_name_generator('panel_id')
+        template = '<!-- start of panel -->\n' \
+                   '    <div class="panel panel-default">\n' \
+                   '        <div class="panel-heading">\n' \
+                   '            <h4 class="panel-title">\n' \
+                   '                <a data-toggle="collapse" data-target="#{panel_id}" ' \
+                   '                    href="#{panel_id}">\n' \
+                   '                    {panel_title}\n' \
+                   '                </a>\n' \
+                   '            </h4>\n' \
+                   '        </div>\n' \
+                   '        <div id="{panel_id}" class="panel-collapse collapse {panel_collapsed}">\n' \
+                   '            <div class="panel-body">\n' \
+                   '                {panel_content}\n ' \
+                   '            </div>\n' \
+                   '        </div>\n' \
+                   '    </div>\n' \
+                   '<!-- end of panel -->\n'
+        content = render_objects(self.content)
+        out = template.format(accordion_id=accordion_id,
+                              panel_collapsed='' if self.panel_collapsed else 'in',
+                              panel_id=panel_id,
+                              panel_title=self.title,
+                              panel_content=content)
+        return out
+
 ########################################################################################################################
 #
 # Classes to add content to DPage. Classes that add content to a DPage should derive from CellBase and

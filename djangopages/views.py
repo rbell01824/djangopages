@@ -185,8 +185,10 @@ class DevTest5(DPage):
         # noinspection PyListCreation
         content = []
         content.append(self.all_hosts_summary(company))
+        panels = []
         for host in DevTest5.get_hosts(company):
-            content.append(self.host_summary(company, host))
+            panels.append(self.host_summary(company, host))
+        content.append(Accordion(panels))
         self.content = content
         return self
 
@@ -198,42 +200,48 @@ class DevTest5(DPage):
         :return: HTML
         """
         qs = syslog_query(company)
-        return self.do_summary(qs, company, 'All Hosts')
+        errbt = self.time_chart(qs, company, 'All Nodes')
+        cbt = self.message_type_graph(qs, company, 'All Nodes')
+        cecbn = self.critical_event_graph(qs, company)
+        eecbn = self.error_event_graph(qs, company)
+        return (RC4(cbt, cecbn, eecbn), RC(errbt))
 
-    def host_summary(self, company, host):
+    def host_summary(self, company, node):
         """
         Create summary output for company
         :param company: Company
-        :param host: Host
+        :param node: node
         :return: HTML
         """
-        qs = syslog_query(company, host)
-        return self.do_summary(qs, company, host)
+        qs = syslog_query(company, node)
+        errbt = self.time_chart(qs, company, node)
+        cbt = self.message_type_graph(qs, company, node)
+        cbt.options['height'] = '400px'
+        xxx = R(C4(cbt), C8(errbt))
+        return AccordionPanelN(xxx, title='{}:{}'.format(company, node))
 
-    def do_summary(self, qs, company, host):
+    def message_type_graph(self, qs, company, node):
         """
-        Do summary for a single host for the company
-        :param qs: Queryset for this company & host
-        :param company: Company
-        :param host: Host
-        :return: HTML
+
+        :param qs:
+        :param company:
+        :param node:
+        :return: :rtype:
         """
         xqs = qs.values('message_type').annotate(num_results=Count('id'))
         count_by_type_type = map(list, xqs.order_by('message_type').values_list('message_type', 'num_results'))
         cbt = Graph('column', count_by_type_type)
         cbt.options = {'title.text': 'Syslog Messages by Type',
-                       'subtitle.text': '{}:{}'.format(company, host)}
+                       'subtitle.text': '{}:{}'.format(company, node)}
+        return cbt
 
-        # make the time chart
-        errbt = self.time_chart(qs, company, host)
-
-        # check just a node
-        if host != 'All Hosts':
-            cbt.options['height'] = '400px'
-            xxx = R(C4(cbt), C8(errbt))
-            return Panel(xxx, title='{}:{}'.format(company, host))
-
-        # all nodes so make critical and error events by node
+    # noinspection PyMethodMayBeStatic
+    def critical_event_graph(self, qs, company):
+        """
+        Critical event by node, all nodes
+        :param qs:
+        :param company:
+        """
         # critical event by node
         critical_event_count_by_node = map(list, qs.filter(message_type='critical').
                                        order_by('node__host_name').
@@ -242,8 +250,16 @@ class DevTest5(DPage):
                                        values_list('node__host_name', 'count'))
         cecbn = Graph('column', critical_event_count_by_node)
         cecbn.options = {'title.text': 'Critical Events by Host',
-                         'subtitle.text': '{}:{}'.format(company, host)}
+                         'subtitle.text': '{}:All Nodes'.format(company)}
+        return cecbn
 
+    # noinspection PyMethodMayBeStatic
+    def error_event_graph(self, qs, company):
+        """
+        Error event by node all nodes
+        :param qs:
+        :param company:
+        """
         # error event by node
         error_event_count_by_node = map(list, qs.filter(message_type='error').
                                     order_by('node__host_name').
@@ -252,9 +268,8 @@ class DevTest5(DPage):
                                     values_list('node__host_name', 'count'))
         eecbn = Graph('column', error_event_count_by_node)
         eecbn.options = {'title.text': 'Error Events by Host',
-                         'subtitle.text': '{}:{}'.format(company, host)}
-
-        return (RC4(cbt, cecbn, eecbn), RC(errbt))
+                         'subtitle.text': '{}:All Nodes'.format(company)}
+        return eecbn
 
     @staticmethod
     def time_chart(qs, company, host):
@@ -339,5 +354,5 @@ class DevTestView(View):
         Execute the graph method and display the results.
         :param request:
         """
-        return DevTest6().page().render()
+        return DevTest5().page().render()
 
