@@ -27,9 +27,9 @@ import functools
 from copy import copy
 
 from django.conf import settings
-from django.template import add_to_builtins
 from django.utils.encoding import force_unicode
-from django.template import Template, Context, loader
+from django.template import Template
+from django.template import Context
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 
@@ -84,37 +84,6 @@ class DPage(object):
             self.objs = objs  # graph objects in this cell
         self.width = width  # width of this column
         pass
-
-    # def layout(self, *content):
-    #     """
-    #     Save page content from a layout.
-    #
-    #     :param content:
-    #     :type: tuple
-    #     A layout establishes the row column structure using the helper r... and c... methods.  Example:
-    #
-    #     self.layout(RC12(x1),
-    #                 RC6(x21, x22),
-    #                 RC(x3),
-    #                 R(C3(x41), C9(R(x42))),
-    #                 R(C3(x51), C9(R(x521),
-    #                               R(x522),
-    #                               RC4(x5231, x5232, x5233)
-    #                               )
-    #                   )
-    #                 )
-    #     """
-    #     def _layout(some_content):
-    #         out = ''
-    #         for con in some_content:
-    #             if isinstance(con, tuple) or isinstance(con, list):
-    #                 out += _layout(con)
-    #             else:
-    #                 out += con
-    #         return out
-    #
-    #     self.content = _layout(content)
-    #     return self.content
 
     def page(self):
         """
@@ -383,7 +352,7 @@ class Panel(object):
     """
     Collapsible panel
     """
-    def __init__(self, *content, **kwargs ):
+    def __init__(self, *content, **kwargs):
         """
         Create a collapsible panel on a button.
 
@@ -751,42 +720,13 @@ class Graph(CellBase):
         out += " library={}".format(str(library))
 
         return out
-
-
-########################################################################################################################
-#
-# DjangoPage Content classes.
-#
-# These classes have a render method that returns HTML text appropriate to their type/content.
-#
-########################################################################################################################
-
-
-########################################################################################################################
-
-# This text is used as a wrapper for all DjangoPage graphs
-GRAPH_BEFORE_HTML = """
-<!-- Start of graph -->
-<div class="col-xs-WIDTH col-sm-WIDTH col-md-WIDTH col-lg-WIDTH">
-"""
-
-GRAPH_AFTER_HTML = """
-</div>
-<!-- End of graph -->
-"""
-
-# This text is used as a wrapper for chartkick template tags
-CHARTKICK_BEFORE_HTML = """
-<!-- Start of chartkick graph -->
-<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-"""
-
-CHARTKICK_AFTER_HTML = """
-</div>
-<!-- End of chartkick graph -->
-"""
-
 LEGAL_GRAPH_TYPES = ['line', 'pie', 'column', 'bar', 'area']
+
+########################################################################################################################
+#
+# Support Routines
+#
+########################################################################################################################
 
 
 def static_name_generator(base_name='x'):
@@ -799,200 +739,4 @@ def static_name_generator(base_name='x'):
     static_name_generator.counter += 1
     return '{}_{}'.format(base_name, static_name_generator.counter)
 
-
-class XGraphCK(object):
-    """
-    Graph object class for Chartkick.  Class that actually holds the graph object definition.
-    """
-    # noinspection PyShadowingBuiltins
-    def __init__(self, graph_type, data, options=None,
-                 width=12,
-                 min=None, max=None, height=None, library=None,
-                 text_before=None, text_after=None):
-        """
-        Create a graph object
-
-        :param graph_type: The type of this graph.  Must be line, pie, column, bar, or area.
-        :type graph_type: unicode
-        :param data: The name of the context variable holding the graph's data
-        :type data: unicode or list[dict] or dict
-        :param options: 'with' options for the chartkick graph.
-        :type options: unicode
-        :param width: Bootstrap3 grid width for graph
-        :type width: int
-        :param min: Min data value
-        :type min: int or float
-        :param max: Max data value
-        :type max: int or float
-        :param height: string version of height, ex '500px'
-        :type height: unicode
-        :param library: highcharts library values, ex. [('title.text', 'graph title'),...]
-        :type library: list[tuple] or tuple
-        :param text_before: Markdown text to display before the graph.
-        :type text_before: unicode
-        :param text_after: Markdown text to display after the graph.
-        :type text_after: unicode
-        """
-
-        if not graph_type in LEGAL_GRAPH_TYPES:
-            raise ValueError('In Graph illegal graph type {}'.format(graph_type))
-
-        # todo 2: when this is working, remove the unneeded class attributes
-        # todo 2: since all that's really needed is self.output
-        self.graph_type = graph_type  # save type of graph
-        self.data = data  # the data to display
-        self.options = options  # chartkick with options
-        self.width = width
-        self.min = min
-        self.max = max
-        self.height = height
-        self.library = library
-        self.text_before = text_before  # markdown text to display before the graph
-        self.text_after = text_after  # markdown text to display after the graph
-
-        #
-        #  Generate the html to render this graph with this data
-        #
-
-        # Generate the row for the graph within it's containing col
-        output = GRAPH_BEFORE_HTML.replace('WIDTH', str(width))
-
-        # Output text_before if there is any
-        if text_before:
-            output += MARKDOWN_TEXT_TEMPLATE.render(Context({'markdown_text': xgraph_markdown(text_before)}))
-            pass
-
-        # create a context variable to hold the data if necessary
-        # Note: because the expr is evaluated and then the value immediately used when the template is rendered
-        # we do NOT need unique variables.
-        if not isinstance(data, basestring):
-            name = static_name_generator()
-            output += '{{% expr {} as {} %}}'.format(data.__repr__(), name)
-            data = name
-
-        # Output the chartkick graph
-        if options:
-            chart = '{}_chart {} with {}'.format(graph_type, data, options)
-            pass
-        else:
-            chart = '{}_chart {}'.format(graph_type, data)
-            pass
-        chart = '{% ' + chart + ' %}'
-        chart = CHARTKICK_BEFORE_HTML + chart + CHARTKICK_AFTER_HTML
-        # print '===', chart
-
-        output += chart
-
-        # Output text_after if there is any
-        if text_after:
-            output += MARKDOWN_TEXT_TEMPLATE.render(Context({'markdown_text': xgraph_markdown(text_after)}))
-
-        output += GRAPH_AFTER_HTML
-        self.output = output
-        pass
-
-    def render(self):
-        """
-        Render the graph
-        """
-        return self.output
-
-    # noinspection PyShadowingBuiltins
-    def options(self, min=None, max=None, height=None, library=None):
-        """
-        Set chartkick & highchart options
-        :param min:
-        :param max:
-        :param height:
-        :param library:
-        """
-        # fixme: finish options method for XGraphCK
-        pass
-
-
 ########################################################################################################################
-
-
-class XGraphHC(object):
-    """
-    Graph object class for Hichcharts.  Class that actually holds the graph object definition.
-    """
-
-    def __init__(self, graph_type, data, options=None,
-                 width=12, text_before=None, text_after=None):
-        """
-        Create a graph object
-
-        :param graph_type: The type of this graph.  Must be line, pie, column, bar, or area.
-        :type graph_type: unicode
-        :param data: The name of the context variable holding the graph's data
-        :type data: unicode
-        :param options: 'with' options for the chartkick graph.
-        :type options: unicode
-        :param width: Bootstrap3 grid width for graph
-        :type width: int
-        :param text_before: Markdown text to display before the graph.
-        :type text_before: unicode
-        :param text_after: Markdown text to display after the graph.
-        :type text_after: unicode
-        """
-
-        # if not graph_type in LEGAL_GRAPH_TYPES:
-        #     raise ValueError('In Graph illegal graph type {}'.format(graph_type))
-        #
-        # # todo 2: when this is working, remove the unneeded class attributes
-        # # todo 2: since all that's really needed is self.output
-        # self.graph_type = graph_type                    # save type of graph
-        # self.data = data                                # the data to display
-        # self.options = options                          # chartkick with options
-        # self.width = width
-        # self.text_before = text_before                  # markdown text to display before the graph
-        # self.text_after = text_after                    # markdown text to display after the graph
-        #
-        # #
-        # #  Generate the html to render this graph with this data
-        # #
-        #
-        # # Generate the row for the graph within it's containing col
-        # output = GRAPH_BEFORE_HTML.replace('WIDTH', str(width))
-        #
-        # # Output text_before if there is any
-        # if text_before:
-        #     output += MARKDOWN_TEXT_TEMPLATE.render(Context({'markdown_text': xgraph_markdown(text_before)}))
-        #     pass
-        #
-        # # Output the chartkick graph
-        # if options:
-        #     chart = '{}_chart {} with {}'.format(graph_type, data, options)
-        #     pass
-        # else:
-        #     chart = '{}_chart {}'.format(graph_type, data)
-        #     pass
-        # chart = '{% ' + chart + ' %}'
-        # chart = CHARTKICK_BEFORE_HTML + chart + CHARTKICK_AFTER_HTML
-        #
-        # output += chart
-        #
-        # # Output text_after if there is any
-        # if text_after:
-        #     output += MARKDOWN_TEXT_TEMPLATE.render(Context({'markdown_text': xgraph_markdown(text_after)}))
-        #
-        # output += GRAPH_AFTER_HTML
-        # self.output = output
-        pass
-
-    def render(self):
-        """
-        Render the graph
-        """
-        # return self.output
-        pass
-
-
-#############
-#############
-#############
-#############
-#############
-#############
-#############
