@@ -22,7 +22,8 @@ __maintainer__ = "rbell01824"
 __email__ = "rbell01824@gmail.com"
 
 from loremipsum import get_paragraph
-import datetime, qsstats
+import datetime
+import qsstats
 
 from django.views.generic import View
 from django.views.generic import ListView
@@ -204,6 +205,7 @@ class DevTest5(DPage):
         cbt = self.message_type_graph(qs, company, 'All Nodes')
         cecbn = self.critical_event_graph(qs, company)
         eecbn = self.error_event_graph(qs, company)
+        # noinspection PyRedundantParentheses
         return (RC4(cbt, cecbn, eecbn), RC(errbt))
 
     def host_summary(self, company, node):
@@ -220,6 +222,7 @@ class DevTest5(DPage):
         xxx = R(C4(cbt), C8(errbt))
         return AccordionPanelN(xxx, title='{}:{}'.format(company, node))
 
+    # noinspection PyMethodMayBeStatic
     def message_type_graph(self, qs, company, node):
         """
 
@@ -244,10 +247,10 @@ class DevTest5(DPage):
         """
         # critical event by node
         critical_event_count_by_node = map(list, qs.filter(message_type='critical').
-                                       order_by('node__host_name').
-                                       values('node__host_name').
-                                       annotate(count=Count('node__host_name')).
-                                       values_list('node__host_name', 'count'))
+                                           order_by('node__host_name').
+                                           values('node__host_name').
+                                           annotate(count=Count('node__host_name')).
+                                           values_list('node__host_name', 'count'))
         cecbn = Graph('column', critical_event_count_by_node)
         cecbn.options = {'title.text': 'Critical Events by Host',
                          'subtitle.text': '{}:All Nodes'.format(company)}
@@ -262,10 +265,10 @@ class DevTest5(DPage):
         """
         # error event by node
         error_event_count_by_node = map(list, qs.filter(message_type='error').
-                                    order_by('node__host_name').
-                                    values('node__host_name').
-                                    annotate(count=Count('node__host_name')).
-                                    values_list('node__host_name', 'count'))
+                                        order_by('node__host_name').
+                                        values('node__host_name').
+                                        annotate(count=Count('node__host_name')).
+                                        values_list('node__host_name', 'count'))
         eecbn = Graph('column', error_event_count_by_node)
         eecbn.options = {'title.text': 'Error Events by Host',
                          'subtitle.text': '{}:All Nodes'.format(company)}
@@ -302,7 +305,6 @@ class DevTest5(DPage):
         qss = qsstats.QuerySetStats(xqs, 'time')
         time_series = qss.time_series(date_start, date_end, 'hours')
         data_error = [[t[0].strftime('%Y-%m-%d %H'), t[1]] for t in time_series]
-
 
         # make the graph
         data = [{'name': 'All', 'data': data_total},
@@ -348,11 +350,10 @@ class DevTestView(View):
     """
     View class for dev testing.
     """
-    # noinspection PyMethodMayBeStatic
+    # noinspection PyMethodMayBeStatic,PyUnusedLocal
     def get(self, request):
         """
         Execute the graph method and display the results.
         :param request:
         """
         return DevTest5().page().render()
-
