@@ -40,35 +40,6 @@ from test_data.models import syslog_query, VNode
 ########################################################################################################################
 
 
-def devtest():
-    """
-    Example of programmatic dpage.
-    """
-    # test layout facility
-    page = DPage()
-    x1 = Text('Row 1: This text comes from dpage.Text')
-    x21 = Markdown('Row 2 col 1: **Bold Markdown Text**')
-    x22 = HTML('<p>Row 2 col 2: </p><h3>H3 text from DPageHTML</h3>')
-    x3 = HTML('<p>Row 3: Text from loremipsum. {}</p>'.format(get_paragraph()))
-    x41 = HTML('<p>Row 4 col 1:{}</p>'.format(get_paragraph()))
-    x42 = HTML('<p>Row 4 col 2:{}</p>'.format(get_paragraph()))
-    x51 = HTML('<p>Row 5 col 1:{}</p>'.format(get_paragraph()))
-    x521 = HTML('<p>Row 5 col 2 row 1:{}</p>'.format(get_paragraph()))
-    x522 = HTML('<p>Row 5 col 2 row 2:{}</p>'.format(get_paragraph()))
-    x5231 = HTML('<p>Row 5 col 2 row 3 col 1: {}</p>'.format(get_paragraph()))
-    x5232 = HTML('<p>Row 5 col 2 row 3 col 2: {}</p>'.format(get_paragraph()))
-    x5233 = HTML('<p>Row 5 col 2 row 3 col 3: {}</p>'.format(get_paragraph()))
-    # page.layout(r(c3(x41), c9(x42)))
-    page.layout(rc12(x1),
-                rc6(x21, x22),
-                rc(x3),
-                r(c3(x41), c9(r(x42))),
-                r(c3(x51), c9(r(x521),
-                              r(x522),
-                              rc4(x5231, x5232, x5233))))
-    return page.render()
-
-
 class DevTest0(DPage):
     """
     Example of class based dpage
@@ -86,10 +57,9 @@ class DevTest1(DPage):
         Actually create the page
         """
         self.form = None
-        self.objs.append(Text('This text comes from dpage.Text'))
-        self.objs.append(Markdown('**Bold Markdown Text**'))
-        self.objs.append(HTML('<h3>H3 text from DPageHTML</h3>'))
-        self.content = self.render_objs()
+        self.content.append(Text('This text comes from dpage.Text'))
+        self.content.append(Markdown('**Bold Markdown Text**'))
+        self.content.append(HTML('<h3>H3 text from DPageHTML</h3>'))
         return self
 
 
@@ -105,7 +75,7 @@ class DevTest2(DPage):
         xr1 = Text('This text comes from dpage.Text')
         xr2 = Markdown('**Bold Markdown Text**')
         xr3 = HTML('<h3>H3 text from DPageHTML</h3>')
-        self.layout(rc12(xr1, xr2, xr3))
+        self.content = RC12(xr1, xr2, xr3)
         return self
 
 
@@ -113,7 +83,6 @@ class DevTest3(DPage):
     """
     Complex render test
     """
-    # fixme: use render to actually render and add base method for building page
     def page(self):
         """
         Override
@@ -130,17 +99,17 @@ class DevTest3(DPage):
         x5231 = HTML('<p>Row 5 col 2 row 3 col 1: {}</p>'.format(get_paragraph()))
         x5232 = HTML('<p>Row 5 col 2 row 3 col 2: {}</p>'.format(get_paragraph()))
         x5233 = HTML('<p>Row 5 col 2 row 3 col 3: {}</p>'.format(get_paragraph()))
-        # page.layout(r(c3(x41), c9(x42)))
-        self.layout(rc12(x1),
-                    rc6(x21, x22),
-                    rc(x3),
-                    r(c3(x41), c9(r(x42))),
-                    r(c3(x51), c9(r(x521),
-                                  r(x522),
-                                  rc4(x5231, x5232, x5233)
-                                  )
-                      )
-                    )
+        # page.layout(R(C3(x41), C9(x42)))
+        self.content = (RC12(x1),
+                        RC6(x21, x22),
+                        RC(x3),
+                        R(C3(x41), C9(R(x42))),
+                        R(C3(x51), C9(R(x521),
+                                      R(x522),
+                                      RC4(x5231, x5232, x5233)
+                                      )
+                          )
+                        )
         return self
 
 
@@ -190,9 +159,9 @@ class DevTest4(DPage):
                                '{}\n\n'.format(get_paragraph()) +
                                '{}\n\n'.format(get_paragraph()))
 
-        self.layout(rc(text_top),
-                    rc6(col_graph, pie_graph),
-                    rc(text_bottom))
+        self.content = (RC(text_top),
+                        RC6(col_graph, pie_graph),
+                        RC(text_bottom))
         return self
 
 
@@ -218,7 +187,7 @@ class DevTest5(DPage):
         content.append(self.all_hosts_summary(company))
         for host in DevTest5.get_hosts(company):
             content.append(self.host_summary(company, host))
-        self.layout(content)
+        self.content = content
         return self
 
     def all_hosts_summary(self, company):
@@ -261,8 +230,8 @@ class DevTest5(DPage):
         # check just a node
         if host != 'All Hosts':
             cbt.options['height'] = '400px'
-            xxx = r(c4(cbt), c8(errbt))
-            return panel(xxx, title='{}:{}'.format(company, host))
+            xxx = R(C4(cbt), C8(errbt))
+            return Panel(xxx, title='{}:{}'.format(company, host))
 
         # all nodes so make critical and error events by node
         # critical event by node
@@ -285,7 +254,7 @@ class DevTest5(DPage):
         eecbn.options = {'title.text': 'Error Events by Host',
                          'subtitle.text': '{}:{}'.format(company, host)}
 
-        return rc4(cbt, cecbn, eecbn) + rc(errbt)
+        return (RC4(cbt, cecbn, eecbn), RC(errbt))
 
     @staticmethod
     def time_chart(qs, company, host):

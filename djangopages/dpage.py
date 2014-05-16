@@ -78,44 +78,43 @@ class DPage(object):
         """
         # fixme: add title, slug, description, created, madified, tags, and ev (eval result) to the class
         self.template = template if template else settings.DPAGE_DEFAULT_TEMPLATE
-        self.objs = []
-        self.content = ''
+        self.content = []
         self.form = form
         if objs:
             self.objs = objs  # graph objects in this cell
         self.width = width  # width of this column
         pass
 
-    def layout(self, *content):
-        """
-        Save page content from a layout.
-
-        :param content:
-        :type: tuple
-        A layout establishes the row column structure using the helper r... and c... methods.  Example:
-
-        self.layout(rc12(x1),
-                    rc6(x21, x22),
-                    rc(x3),
-                    r(c3(x41), c9(r(x42))),
-                    r(c3(x51), c9(r(x521),
-                                  r(x522),
-                                  rc4(x5231, x5232, x5233)
-                                  )
-                      )
-                    )
-        """
-        def _layout(some_content):
-            out = ''
-            for con in some_content:
-                if isinstance(con, tuple) or isinstance(con, list):
-                    out += _layout(con)
-                else:
-                    out += con
-            return out
-
-        self.content = _layout(content)
-        return self.content
+    # def layout(self, *content):
+    #     """
+    #     Save page content from a layout.
+    #
+    #     :param content:
+    #     :type: tuple
+    #     A layout establishes the row column structure using the helper r... and c... methods.  Example:
+    #
+    #     self.layout(RC12(x1),
+    #                 RC6(x21, x22),
+    #                 RC(x3),
+    #                 R(C3(x41), C9(R(x42))),
+    #                 R(C3(x51), C9(R(x521),
+    #                               R(x522),
+    #                               RC4(x5231, x5232, x5233)
+    #                               )
+    #                   )
+    #                 )
+    #     """
+    #     def _layout(some_content):
+    #         out = ''
+    #         for con in some_content:
+    #             if isinstance(con, tuple) or isinstance(con, list):
+    #                 out += _layout(con)
+    #             else:
+    #                 out += con
+    #         return out
+    #
+    #     self.content = _layout(content)
+    #     return self.content
 
     def page(self):
         """
@@ -127,7 +126,7 @@ class DPage(object):
                     xr1 = Text('This text comes from dpage.Text')
                     xr2 = Markdown('**Bold Markdown Text**')
                     xr3 = HTML('<h3>H3 text from DPageHTML</h3>')
-                    self.layout(rc12(xr1, xr2, xr3))
+                    self.layout(RC12(xr1, xr2, xr3))
                     return self
         """
         raise NotImplementedError("Subclasses should implement this!")
@@ -139,10 +138,7 @@ class DPage(object):
         :rtype: HttpResponse
         """
         # if there is a layout, use it to render
-        if len(self.content) > 0:
-            content = self.content
-        else:
-            content = self.render_objs()
+        content = self.render_objs()
 
         if len(content) == 0:
             content = settings.DPAGE_DEFAULT_CONTENT
@@ -156,16 +152,32 @@ class DPage(object):
         """
         # if whatever is in objs is iterable, iterate over the objects and render each according to whatever it is
         # otherwise, just render whatever it is
-        content = ''
-        if isinstance(self.objs, collections.Iterable):
-            # noinspection PyTypeChecker
-            for obj in self.objs:
-                content += obj.render()
-        elif self.objs:
-            # noinspection PyUnresolvedReferences
-            content += self.objs.render()
-        return content
+        return render_objects(self.content)
 
+
+def render_objects(objects, **kwargs):
+    """
+    Render the object list.
+
+    :param objects: list of objects or object to render
+    :type: list or object
+    :param kwargs: extra arguments for render
+    :type kwargs: dict
+    :return: Rendered output of objects
+    :rtype: unicode
+    """
+    # if whatever is in objs is iterable, iterate over the objects and render each according to whatever it is
+    # otherwise, just render whatever it is
+    content = ''
+    if isinstance(objects, collections.Iterable):
+        for obj in objects:
+            if isinstance(obj, collections.Iterable):
+                content += render_objects(obj, **kwargs)
+            else:
+                content += obj.render(**kwargs)
+        return content
+    else:
+        return objects.render()
 
 ########################################################################################################################
 #
@@ -193,19 +205,52 @@ class DPage(object):
 #         x5231 = HTML('<p>Row 5 col 2 row 3 col 1: {}</p>'.format(get_paragraph()))
 #         x5232 = HTML('<p>Row 5 col 2 row 3 col 2: {}</p>'.format(get_paragraph()))
 #         x5233 = HTML('<p>Row 5 col 2 row 3 col 3: {}</p>'.format(get_paragraph()))
-#         # page.layout(r(c3(x41), c9(x42)))
-#         self.layout(rc12(x1),
-#                     rc6(x21, x22),
-#                     rc(x3),
-#                     r(c3(x41), c9(r(x42))),
-#                     r(c3(x51), c9(r(x521),
-#                                   r(x522),
-#                                   rc4(x5231, x5232, x5233)
+#         # page.layout(R(C3(x41), C9(x42)))
+#         self.layout(RC12(x1),
+#                     RC6(x21, x22),
+#                     RC(x3),
+#                     R(C3(x41), C9(R(x42))),
+#                     R(C3(x51), C9(R(x521),
+#                                   R(x522),
+#                                   RC4(x5231, x5232, x5233)
 #                                   )
 #                       )
 #                     )
 #
 ########################################################################################################################
+
+
+class Column(object):
+    """
+    Wrap content in a column.
+    """
+    def __init__(self, *content, **kwargs):
+        """
+        Wrap *content objects in column of width width=nn.
+
+        :param content: Content to wrap in a column of width width
+        :type content: object or collections.iterable
+        :param kwargs: keyword args (width: bootstrap width int or unicode, ...)
+        :type kwargs: dict
+        :return: Column object
+        :rtype: Column object
+        """
+        self.objs = content
+        self.width = kwargs.pop('width', 12)
+        return
+
+    def render(self):
+        """
+        Render objects in column
+
+        :return: HTML
+        :rtype: unicode
+        """
+        out = ''
+        for obj in self.objs:
+            out += obj.render()
+        out = dpage_col_before.format(self.width) + out + dpage_col_after
+        return out
 
 
 def column(*content, **kwargs):
@@ -215,29 +260,49 @@ def column(*content, **kwargs):
     :param kwargs: keyword args (width: bootstrap width int or unicode, ...)
     :type kwargs: dict
     """
-    width = kwargs.pop('width', 12)
-
-    out = ''
-    for con in content:
-        if hasattr(con, 'render'):
-            out += con.render()
-        else:
-            out += con
-    out = dpage_col_before.format(width) + out + dpage_col_after
-    return out
-c = functools.partial(column)
-c1 = functools.partial(column, width=1)
-c2 = functools.partial(column, width=2)
-c3 = functools.partial(column, width=3)
-c4 = functools.partial(column, width=4)
-c5 = functools.partial(column, width=5)
-c6 = functools.partial(column, width=6)
-c7 = functools.partial(column, width=7)
-c8 = functools.partial(column, width=8)
-c9 = functools.partial(column, width=9)
+    return Column(*content, **kwargs)
+C1 = functools.partial(column, width=1)
+C2 = functools.partial(column, width=2)
+C3 = functools.partial(column, width=3)
+C4 = functools.partial(column, width=4)
+C5 = functools.partial(column, width=5)
+C6 = functools.partial(column, width=6)
+C7 = functools.partial(column, width=7)
+C8 = functools.partial(column, width=8)
+C9 = functools.partial(column, width=9)
 c10 = functools.partial(column, width=10)
 c11 = functools.partial(column, width=11)
-c12 = functools.partial(column, width=12)
+C12 = functools.partial(column, width=12)
+
+
+class Row(object):
+    """
+    Wrap content in a row.
+    """
+    def __init__(self, *content):
+        """
+        Wrap *content objects in row.
+
+        :param content: Content to wrap in a row
+        :type content: object or collections.iterable
+        :return: Row object
+        :rtype: Row object
+        """
+        self.content = content
+        return
+
+    def render(self):
+        """
+        Render objects in row
+
+        :return: HTML
+        :rtype: unicode
+        """
+        out = ''
+        for con in self.content:
+            out += con.render()
+        out = dpage_row_before + out + dpage_row_after
+        return out
 
 
 def row(*content):
@@ -246,45 +311,66 @@ def row(*content):
     :param content: The html content to wrap
     :type content: unicode
     """
-    out = ''
-    for con in content:
-        if hasattr(con, 'render'):
-            con_out = con.render()
-        else:
-            con_out = con
-        out += con_out
-    out = dpage_row_before + out + dpage_row_after
-    return out
-r = functools.partial(row)
+    return Row(*content)
+R = functools.partial(row)
+
+
+class RowColumn(object):
+    """
+    Wrap content in a row with columns of width width.
+    """
+    def __init__(self, *content, **kwargs):
+        """
+        Wrap *content objects in column of width width=nn.
+
+        :param content: Content to wrap in a row with multiple columns of width width
+        :type content: object or collections.iterable
+        :param kwargs: keyword args (width: bootstrap width int or unicode, ...)
+        :type kwargs: dict
+        :return: RowColumn object
+        :rtype: RowColumn object
+        """
+        self.content = content
+        self.width = kwargs.pop('width', 12)
+        pass
+
+    def render(self):
+        """
+        Render objects in row/column
+
+        :return: HTML
+        :rtype: unicode
+        """
+        out = ''
+        for con in self.content:
+            out += Column(con, width=self.width).render()
+        out = dpage_row_before + out + dpage_row_after
+        return out
 
 
 def rowcolumn(*content, **kwargs):
     """
     Wrap content in a row and column of width width.
+
     :param content: content
     :type content: unicode or collections.iterable
     :param kwargs: keyword args (width: bootstrap width int or unicode, ...)
     :type kwargs: dict
     """
-    width = kwargs.pop('width', 12)
-    out = ''
-    for con in content:
-        out += column(con, width=width)
-    out = row(out)
-    return out
-rc = functools.partial(rowcolumn)
-rc1 = functools.partial(rowcolumn, width=1)
-rc2 = functools.partial(rowcolumn, width=2)
-rc3 = functools.partial(rowcolumn, width=3)
-rc4 = functools.partial(rowcolumn, width=4)
-rc5 = functools.partial(rowcolumn, width=5)
-rc6 = functools.partial(rowcolumn, width=6)
-rc7 = functools.partial(rowcolumn, width=7)
-rc8 = functools.partial(rowcolumn, width=8)
-rc9 = functools.partial(rowcolumn, width=9)
-rc10 = functools.partial(rowcolumn, width=10)
-rc11 = functools.partial(rowcolumn, width=11)
-rc12 = functools.partial(rowcolumn, width=12)
+    return RowColumn(*content, **kwargs)
+RC = functools.partial(rowcolumn, width=12)
+RC1 = functools.partial(rowcolumn, width=1)
+RC2 = functools.partial(rowcolumn, width=2)
+RC3 = functools.partial(rowcolumn, width=3)
+RC4 = functools.partial(rowcolumn, width=4)
+RC5 = functools.partial(rowcolumn, width=5)
+RC6 = functools.partial(rowcolumn, width=6)
+RC7 = functools.partial(rowcolumn, width=7)
+RC8 = functools.partial(rowcolumn, width=8)
+RC9 = functools.partial(rowcolumn, width=9)
+RC10 = functools.partial(rowcolumn, width=10)
+RC11 = functools.partial(rowcolumn, width=11)
+RC12 = functools.partial(rowcolumn, width=12)
 
 
 ########################################################################################################################
@@ -293,80 +379,127 @@ rc12 = functools.partial(rowcolumn, width=12)
 #
 ########################################################################################################################
 
-
-def panel(content, title=None, btn_type='btn-primary'):
+class Panel(object):
     """
-    Create a collapsable panel on a button.
-
-    :param content: Content
-    :type content: unicode
-    :param title: Button title
-    :type title: unicode
-    :param btn_type: Button type.  Defaults to btn-primary.
-    :type btn_type: unicode
-    :return: HTML for panel
-    :rtype: unicode
+    Collapsible panel
     """
-    name = static_name_generator('btn_collapse')
-    template = '<!-- Start of collapsible panel -->\n' \
-               '    <button type="button" class="btn {btn_type}" data-toggle="collapse" data-target="#{name}">\n' \
-               '        {title}\n ' \
-               '    </button>\n ' \
-               '    <div id="{name}" class="collapse">\n' \
-               '        {content}\n' \
-               '    </div>\n' \
-               '<!-- End of collapsable panel -->\n'
-    out = template.format(btn_type=btn_type, name=name, title=title, content=content)
-    return out
+    def __init__(self, *content, **kwargs ):
+        """
+        Create a collapsible panel on a button.
+
+        :param content: Content
+        :type content: list
+        :param kwargs: Keyword arguments. title=None, btn_type='btn-primary'
+        :type kwargs: dict
+        :return: HTML for panel
+        :rtype: unicode
+        """
+        self.content = content
+        self.title = kwargs.pop('title', '')
+        self.btn_type = kwargs.pop('button', 'btn-primary')
+        pass
+
+    def render(self):
+        """
+        Render collapsible panel.
+        """
+        name = static_name_generator('btn_collapse')
+        template = '<!-- Start of collapsible panel -->\n' \
+                   '    <button type="button" class="btn {btn_type}" data-toggle="collapse" data-target="#{name}">\n' \
+                   '        {title}\n ' \
+                   '    </button>\n ' \
+                   '    <div id="{name}" class="collapse">\n' \
+                   '        {content}\n' \
+                   '    </div>\n' \
+                   '<!-- End of collapsable panel -->\n'
+        content = render_objects(self.content)
+        out = template.format(btn_type=self.btn_type, name=name, title=self.title, content=content)
+        return out
 
 ########################################################################################################################
 #
-# Accordion support
+# Panel and Accordion support
 #
 ########################################################################################################################
 
 
-def accordion(*content):
+class Accordion(object):
     """
-
+    Accordion support
     """
-    accordion_id = static_name_generator('accordion_id')
-    a_template = '<!-- Start of accordion -->\n' \
-                 '<div class="panel-group" id="{accordion_id}">\n'.format(accordion_id=accordion_id) + \
-                 '    {panels}\n' \
-                 '</div>\n' \
-                 '<!-- End of accordion -->\n'
-    out = ''
+    def __init__(self, *content):
+        """
+        Create accordion object.
 
-    return out
+        :param content: Accordion content.  Must AccordionPanel or list of AccordionRow.
+        :type content: list or AccordionPanel
+        """
+        # todo: check that content is AccordionPanel or list of AccordionPanel
+        self.content = content
+        return
+
+    def render(self):
+        """
+        Render accordion.
+        """
+        accordion_id = static_name_generator('accordion_id')
+        template = '<!-- Start of accordion -->\n' \
+                   '<div class="panel-group" id="{accordion_id}">\n' \
+                   '    {content}\n' \
+                   '</div>\n' \
+                   '<!-- End of accordion -->\n'
+        content = render_objects(self.content, accordion_id=accordion_id)
+        return template.format(accordion_id=accordion_id, content=content)
 
 
-# from djangopages.libs import static_name_generator
-#
-# def panel(content, title=None, default=False):
-#     """
-#     Create an accordion panel
-#
-#     :param content: Content for the panel
-#     :type content: unicode
-#     :param title: Panel title.  Defaults to ''.
-#     :type title: unicode
-#     :param default: If True make this the default panel.
-#     :type default: bool
-#     """
-#     name = static_name_generator('collapse')
-#     out = ''
-#     out += '<!-- start of panel -->\n' \
-#            '    <div class="panel{}">\n'.format(' panel-default' if default else '') + \
-#            '        <div class="panel-heading">\n' \
-#            '            <h4 class="panel-title">\n' \
-#            '                <a data-toggle="collapse" data-parent="#accordion" href="{}">\n'.format(name) + \
-#            '                    {}\n'.format(title if title else '') + \
-#            '                </a>\n' \
-#            '            </h4>\n' \
-#            '        </div>\n'
-#
-#     return out
+class AccordionPanel(object):
+    """
+    Panel within an Accordion
+    """
+    def __init__(self, *content, **kwargs):
+        """
+        Define accordion panel.
+        :param kwargs: title='', default=False
+        :type kwargs: dict
+        """
+        self.content = content
+        self.title = kwargs.pop('title', '')
+        self.default = kwargs.pop('default', False)
+        return
+
+    def render(self, **kwargs):
+        """
+        Render the accordion panel.
+        :param kwargs: accordion_id=accordion_id, Accordion id
+        :type: dict
+        :return: Rendered HTML
+        :rtype: html
+        """
+        accordion_id = kwargs['accordion_id']
+
+        panel_id = static_name_generator('panel_id')
+        template = '<!-- start of panel -->\n' \
+                   '    <div class="panel{default}">\n' \
+                   '        <div class="panel-heading">\n' \
+                   '            <h4 class="panel-title">\n' \
+                   '                <a data-toggle="collapse" data-parent="#{accordion_id}" ' \
+                   '                    href="#{panel_id}">\n' \
+                   '                    {panel_title}\n' \
+                   '                </a>\n' \
+                   '            </h4>\n' \
+                   '        </div>\n' \
+                   '    <div id="{panel_id}" class="panel-collapse collapse in">\n' \
+                   '        <div class="panel-body">\n' \
+                   '            {panel_content}\n ' \
+                   '        </div>\n' \
+                   '    </div>\n' \
+                   '</div>\n'
+        content = render_objects(self.content)
+        return template.format(accordion_id=accordion_id,
+                               panel_id=panel_id,
+                               panel_title=self.title,
+                               panel_content=content)
+
 
 ########################################################################################################################
 #
