@@ -312,6 +312,23 @@ class DevTest5(DPage):
         return hosts
 
 
+class DevTest6(DPage):
+    """
+    Test accordion
+    """
+    def page(self):
+        """
+        Create simple accordion page
+        """
+
+        x1 = AccordionPanel(Text('This text comes from dpage.Text'), title='Row 1')
+        # self.content = Accordion(x1)
+        x2 = AccordionPanel(Markdown('**Bold Markdown Text**'), title='Row 2')
+        x3 = AccordionPanel(HTML('<h3>H3 text from DPageHTML</h3>'), title='Row 3')
+        self.content = Accordion(x1, x2, x3)
+        return self
+
+
 class DevTestView(View):
     """
     View class for dev testing.
@@ -322,5 +339,5 @@ class DevTestView(View):
         Execute the graph method and display the results.
         :param request:
         """
-        return DevTest5().page().render()
+        return DevTest6().page().render()
 
