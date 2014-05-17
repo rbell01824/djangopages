@@ -63,10 +63,13 @@ class DPage(object):
     objects.
     """
 
-    def __init__(self, request=None, template=None, objs=None, form=None, width=12):
+    def __init__(self, request=None, context=None, template=None, objs=None, form=None, width=12):
         """
         Initialize the DPage.
 
+        :param request: The request object
+        :param context: Context values for the page
+        :type context: dict
         :param template: template name to use for this DPage object.  If None, DPageDefaultTemplate specified in
                          settings is used.
         :type template: unicode
@@ -79,6 +82,7 @@ class DPage(object):
         """
         # fixme: add title, slug, description, created, madified, tags, and ev (eval result) to the class
         self.request = request
+        self.context = context
         self.template = template if template else settings.DPAGE_DEFAULT_TEMPLATE
         self.objects = objs if objs else []
         self.form = form                                    # todo: don't think I need this, leave for a bit

@@ -53,9 +53,11 @@ class DevTest1(DPage):
     Class based dpage with render method overridden.  Objs style interface.
     """
 
-    def page(self):
+    def page(self, *args, **kwargs):
         """
         Actually create the page
+        :param args:
+        :param kwargs:
         """
         self.form = None
         self.content.append(Text('This text comes from dpage.Text'))
@@ -69,9 +71,11 @@ class DevTest2(DPage):
     Basic test of layout facility.
     """
 
-    def page(self):
+    def page(self, *args, **kwargs):
         """
         Override
+        :param args:
+        :param kwargs:
         """
         xr1 = Text('This text comes from dpage.Text')
         # self.content = RC12(xr1)
@@ -85,9 +89,11 @@ class DevTest3(DPage):
     """
     Complex render test
     """
-    def page(self):
+    def page(self, *args, **kwargs):
         """
         Override
+        :param args:
+        :param kwargs:
         """
         x1 = Text('Row 1: This text comes from dpage.Text')
         x21 = Markdown('Row 2 col 1: **Bold Markdown Text**')
@@ -119,9 +125,11 @@ class DevTest4(DPage):
     """
     Basic test of Graph facility with two graphs in a row.
     """
-    def page(self):
+    def page(self, *args, **kwargs):
         """
         Override
+        :param args:
+        :param kwargs:
         """
         # set the company and node since no form yet
         company = 'BMC_1'
@@ -171,9 +179,11 @@ class DevTest5(DPage):
     """
     Multiple graphs on page with multiple kinds of graphs
     """
-    def page(self):
+    def page(self, *args, **kwargs):
         """
         For specified company, display a summary report and details by node.
+        :param args:
+        :param kwargs:
         """
         self.company_summary('BMC_1')
         return self
@@ -334,9 +344,11 @@ class DevTest6(DPage):
     """
     Test accordion
     """
-    def page(self):
+    def page(self, *args, **kwargs):
         """
         Create simple accordion page
+        :param args:
+        :param kwargs:
         """
 
         x1 = AccordionPanel(Text('This text comes from dpage.Text'), title='Row 1')
@@ -351,9 +363,12 @@ class DevTest7(DPage):
     """
     Test form support
     """
-    def page(self, initial=None):
+    def page(self, initial=None, *args, **kwargs):
         """
         Override
+        :param initial:
+        :param args:
+        :param kwargs:
         """
         # noinspection PyDocstring
         class TestForm(forms.Form):
@@ -365,8 +380,8 @@ class DevTest7(DPage):
         xr2 = Markdown('\n\nThe form message is **{}**\n\n'.format(initial['message']))
         xr3 = Markdown('\n\n**After the form**\n\n'
                        'Graphs, tables, and other stuff go here')
-        self.content = RC12(xr1, xrform, xr2, xr3)
-        # self.content = RC12(xrform)
+        xr4 = HTML('<a class="btn btn-success form-control" href="/">Done playing.</a>')
+        self.content = (RC12(xr1), RC4(xrform), RC12(xr2, xr3), RC3(xr4))
         return self
 
 
@@ -374,19 +389,22 @@ class DevTestView(View):
     """
     View class for dev testing.
     """
-    # noinspection PyMethodMayBeStatic,PyUnusedLocal
+    # noinspection PyMethodMayBeStatic
     def get(self, request):
         """
         Execute the graph method and display the results.
         :param request:
         """
-        dpage = DevTest7(request)
-        page = dpage.page({'message': 'Enter your message here.'})
+        dpage = DevTest7(request).page({'message': 'Enter your message here.'})
         return dpage.render()
 
+    # noinspection PyMethodMayBeStatic,PyUnusedLocal
     def post(self, request, *args, **kwargs):
         """
         Send the post data to the page and rerender.
+        :param request:
+        :param args:
+        :param kwargs:
         """
         dpage = DevTest7(request).page(request.POST)
         return dpage.render()
