@@ -26,8 +26,8 @@ import datetime
 import qsstats
 
 from django.views.generic import View
-from django.views.generic import ListView
 from django.db.models import Count
+from django import forms
 
 from djangopages.dpage import *
 
@@ -74,6 +74,7 @@ class DevTest2(DPage):
         Override
         """
         xr1 = Text('This text comes from dpage.Text')
+        # self.content = RC12(xr1)
         xr2 = Markdown('**Bold Markdown Text**')
         xr3 = HTML('<h3>H3 text from DPageHTML</h3>')
         self.content = RC12(xr1, xr2, xr3)
@@ -220,7 +221,7 @@ class DevTest5(DPage):
         cbt = self.message_type_graph(qs, company, node)
         cbt.options['height'] = '400px'
         xxx = R(C4(cbt), C8(errbt))
-        return AccordionPanelN(xxx, title='{}:{}'.format(company, node))
+        return AccordionPanelN(xxx, title='{}:{} Details'.format(company, node))
 
     # noinspection PyMethodMayBeStatic
     def message_type_graph(self, qs, company, node):
@@ -346,6 +347,29 @@ class DevTest6(DPage):
         return self
 
 
+class DevTest7(DPage):
+    """
+    Test form support
+    """
+    def page(self, initial=None):
+        """
+        Override
+        """
+        # noinspection PyDocstring
+        class TestForm(forms.Form):
+            message = forms.CharField()
+
+        xrform = Form(self, TestForm, 'Update the display', initial=initial)
+        xr1 = Markdown('# Test of form support\n\n'
+                       'Here is the form')
+        xr2 = Markdown('\n\nThe form message is **{}**\n\n'.format(initial['message']))
+        xr3 = Markdown('\n\n**After the form**\n\n'
+                       'Graphs, tables, and other stuff go here')
+        self.content = RC12(xr1, xrform, xr2, xr3)
+        # self.content = RC12(xrform)
+        return self
+
+
 class DevTestView(View):
     """
     View class for dev testing.
@@ -356,4 +380,13 @@ class DevTestView(View):
         Execute the graph method and display the results.
         :param request:
         """
-        return DevTest5().page().render()
+        dpage = DevTest7(request)
+        page = dpage.page({'message': 'Enter your message here.'})
+        return dpage.render()
+
+    def post(self, request, *args, **kwargs):
+        dpage = DevTest7(request).page(request.POST)
+        form = dpage.form(request.POST)
+        if form.is_valid():
+            return dpage.render()
+        return dpage.render()

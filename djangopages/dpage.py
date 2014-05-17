@@ -32,6 +32,7 @@ from django.template import Template
 from django.template import Context
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
+from django.core.context_processors import csrf
 
 from djangopages.libs import dict_nested_set
 
@@ -62,7 +63,7 @@ class DPage(object):
     objects.
     """
 
-    def __init__(self, template=None, objs=None, form=None, width=12):
+    def __init__(self, request=None, template=None, objs=None, form=None, width=12):
         """
         Initialize the DPage.
 
@@ -77,12 +78,12 @@ class DPage(object):
         :type width: int
         """
         # fixme: add title, slug, description, created, madified, tags, and ev (eval result) to the class
+        self.request = request
         self.template = template if template else settings.DPAGE_DEFAULT_TEMPLATE
+        self.objects = objs if objs else []
+        self.form = form                                    # todo: don't think I need this, leave for a bit
+        self.width = width  # width of page                 # todo: don't think I need this, leave for a bit
         self.content = []
-        self.form = form
-        if objs:
-            self.objs = objs  # graph objects in this cell
-        self.width = width  # width of this column
         pass
 
     def page(self):
@@ -100,14 +101,15 @@ class DPage(object):
         """
         raise NotImplementedError("Subclasses should implement this!")
 
-    def render(self):
+    def render(self, **kwargs):
         """
         Render this DPage.
+
         :return: response object
         :rtype: HttpResponse
         """
         # if there is a layout, use it to render
-        content = self.render_objs()
+        content = render_objects(self.content, request=self.request, **kwargs)
 
         if len(content) == 0:
             content = settings.DPAGE_DEFAULT_CONTENT
@@ -115,38 +117,20 @@ class DPage(object):
         return render_to_response(self.template,
                                   {'content': content})
 
-    def render_objs(self):
-        """
-        Render using the object list
-        """
-        # if whatever is in objs is iterable, iterate over the objects and render each according to whatever it is
-        # otherwise, just render whatever it is
-        return render_objects(self.content)
-
-
-def render_objects(objects, **kwargs):
-    """
-    Render the object list.
-
-    :param objects: list of objects or object to render
-    :type: list or object
-    :param kwargs: extra arguments for render
-    :type kwargs: dict
-    :return: Rendered output of objects
-    :rtype: unicode
-    """
-    # if whatever is in objs is iterable, iterate over the objects and render each according to whatever it is
-    # otherwise, just render whatever it is
-    content = ''
-    if isinstance(objects, collections.Iterable):
-        for obj in objects:
-            if isinstance(obj, collections.Iterable):
-                content += render_objects(obj, **kwargs)
-            else:
-                content += obj.render(**kwargs)
-        return content
-    else:
-        return objects.render()
+    # class _Text(object):
+    #     def __init__(self, text):
+    #         self.text = text
+    #         pass
+    #     def render(self):
+    #         return self.text
+    #
+    # def Text(self, text):
+    #     """
+    #     Create a text object on the page
+    #     """
+    #     obj = self._Text(text)
+    #     self.objects.append(obj)
+    #     return obj
 
 ########################################################################################################################
 #
@@ -208,7 +192,7 @@ class Column(object):
         self.width = kwargs.pop('width', 12)
         return
 
-    def render(self):
+    def render(self, **kwargs):
         """
         Render objects in column
 
@@ -260,7 +244,7 @@ class Row(object):
         self.content = content
         return
 
-    def render(self):
+    def render(self, **kwargs):
         """
         Render objects in row
 
@@ -274,13 +258,13 @@ class Row(object):
         return out
 
 
-def row(*content):
+def row(*content, **kwargs):
     """
     Wrap content in a bootstrap 3 row
     :param content: The html content to wrap
     :type content: unicode
     """
-    return Row(*content)
+    return Row(*content, **kwargs)
 R = functools.partial(row)
 
 
@@ -303,7 +287,7 @@ class RowColumn(object):
         self.width = kwargs.pop('width', 12)
         pass
 
-    def render(self):
+    def render(self, **kwargs):
         """
         Render objects in row/column
 
@@ -348,6 +332,7 @@ RC12 = functools.partial(rowcolumn, width=12)
 #
 ########################################################################################################################
 
+
 class Panel(object):
     """
     Collapsible panel
@@ -368,7 +353,7 @@ class Panel(object):
         self.btn_type = kwargs.pop('button', 'btn-primary')
         pass
 
-    def render(self):
+    def render(self, **kwargs):
         """
         Render collapsible panel.
         """
@@ -381,8 +366,8 @@ class Panel(object):
                    '        {content}\n' \
                    '    </div>\n' \
                    '<!-- End of collapsable panel -->\n'
-        content = render_objects(self.content)
-        out = template.format(btn_type=self.btn_type, name=name, title=self.title, content=content)
+        content = render_objects(self.content, **kwargs)
+        out = template.format(btn_tpe=self.btn_type, name=name, title=self.title, content=content)
         return out
 
 ########################################################################################################################
@@ -407,7 +392,7 @@ class Accordion(object):
         self.content = content
         return
 
-    def render(self):
+    def render(self, **kwargs):
         """
         Render accordion.
         """
@@ -417,7 +402,7 @@ class Accordion(object):
                    '    {content}\n' \
                    '</div>\n' \
                    '<!-- End of accordion -->\n'
-        content = render_objects(self.content, accordion_id=accordion_id)
+        content = render_objects(self.content, accordion_id=accordion_id, **kwargs)
         return template.format(accordion_id=accordion_id, content=content)
 
 
@@ -464,7 +449,7 @@ class AccordionPanel(object):
                    '        </div>\n' \
                    '    </div>\n' \
                    '<!-- end of panel -->\n'
-        content = render_objects(self.content)
+        content = render_objects(self.content, **kwargs)
         out = template.format(accordion_id=accordion_id,
                               panel_collapsed='' if self.panel_collapsed else 'in',
                               panel_id=panel_id,
@@ -516,7 +501,7 @@ class AccordionPanelN(object):
                    '        </div>\n' \
                    '    </div>\n' \
                    '<!-- end of panel -->\n'
-        content = render_objects(self.content)
+        content = render_objects(self.content, **kwargs)
         out = template.format(accordion_id=accordion_id,
                               panel_collapsed='' if self.panel_collapsed else 'in',
                               panel_id=panel_id,
@@ -526,30 +511,29 @@ class AccordionPanelN(object):
 
 ########################################################################################################################
 #
-# Classes to add content to DPage. Classes that add content to a DPage should derive from CellBase and
+# Classes to add content to DPage. Classes that add content to a DPage should derive from ContentBase and
 # MUST provide a render method.
 #
 ########################################################################################################################
 
 
-class CellBase(object):
+class ContentBase(object):
     """
-    Base class for all cell objects
+    Base class for all objects that render actual content as opposed to formating (aka row/column/etc).
     """
 
     def __init__(self, **kwargs):
-        """
-        """
+        self.request = kwargs.pop('request', None)
         return
 
-    def render(self):
+    def render(self, **kwargs):
         """
         This method should return the HTML to render the object.
         """
-        raise NotImplementedError("Subclasses should implement this!")
+        raise NotImplementedError("Subclasses should implement render method!")
 
 
-class Text(CellBase):
+class Text(ContentBase):
     """
     Holds text for inclusion in the page
     """
@@ -567,14 +551,14 @@ class Text(CellBase):
         self.text = text
         return
 
-    def render(self):
+    def render(self, **kwargs):
         """
         Render the Text object
         """
         return self.text
 
 
-class Markdown(CellBase):
+class Markdown(ContentBase):
     """
     Holds markdown text for inclusion in a DPage.
     """
@@ -597,7 +581,7 @@ class Markdown(CellBase):
         # for now just deal with actual text
         pass
 
-    def render(self):
+    def render(self, **kwargs):
         """
         Render markdown text.
 
@@ -611,7 +595,7 @@ class Markdown(CellBase):
                                  enable_attributes=False)
 
 
-class HTML(CellBase):
+class HTML(ContentBase):
     """
     Holds HTML text for inclusion in a DPage.  This is a convenience method since DPageMarkdown can be
     used interchangeably.
@@ -630,9 +614,9 @@ class HTML(CellBase):
         # for now just deal with actual text
         pass
 
-    def render(self):
+    def render(self, **kwargs):
         """
-        Render markdown text.
+        Render HTML text.
 
         :return: html version of markdown text
         :rtype: unicode
@@ -640,14 +624,12 @@ class HTML(CellBase):
         return self.htmltext
 
 
-class Graph(CellBase):
+class Graph(ContentBase):
     """
     DPage graph object class that uses Chartkick.
     """
     # noinspection PyShadowingBuiltins
-    def __init__(self, graph_type, data,
-                 options=None,
-                 **kwargs):
+    def __init__(self, graph_type, data, options=None, **kwargs):
         """
         Create a graph object
 
@@ -669,7 +651,7 @@ class Graph(CellBase):
         self.options = options  # chartkick with options
         pass
 
-    def render(self):
+    def render(self, **kwargs):
         """
         Render the graph
         """
@@ -722,6 +704,51 @@ class Graph(CellBase):
         return out
 LEGAL_GRAPH_TYPES = ['line', 'pie', 'column', 'bar', 'area']
 
+
+class Form(ContentBase):
+    """
+    Provide form support
+    """
+    def __init__(self, dpage, form, submit='Submit', initial=None, action_url=None, **kwargs):
+        super(Form, self).__init__(**kwargs)
+        self.dpage = dpage
+        self.form = form
+        self.submit = submit
+        self.initial = initial
+        self.action_url = action_url
+        dpage.form = form
+        pass
+
+    def render(self, **kwargs):
+        """
+        Create and render the form
+        """
+        if self.initial:
+            the_form = self.form(self.initial)
+        else:
+            the_form = self.form()
+        request = self.dpage.request
+        template = '{% load bootstrap3 %}\n' \
+                   '<!-- start of django bootstrap3 form -->\n' \
+                   '    <form action="{action_url}" method="post" class="form">\n' \
+                   '        <!-- csrf should be here -->{% csrf_token %}<!-- -->\n' \
+                   '        {% bootstrap_form the_form %}\n' \
+                   '        {% buttons %}\n' \
+                   '            <button type="submit" class="btn btn-primary">\n' \
+                   '                {% bootstrap_icon "star" %} Submit\n' \
+                   '            </button>\n' \
+                   '        {% endbuttons %}\n' \
+                   '    </form>\n' \
+                   '<!-- end of django bootstrap3 form -->\n'
+        # Do NOT use format here since the template contains {% ... %}
+        template = template.replace('{action_url}', self.action_url if self.action_url else '/dpages/')
+        t = Template(template)
+        c = {'the_form': the_form}
+        c.update(csrf(request))
+        output = t.render(Context(c))
+        return output
+        # return template
+
 ########################################################################################################################
 #
 # Support Routines
@@ -739,4 +766,29 @@ def static_name_generator(base_name='x'):
     static_name_generator.counter += 1
     return '{}_{}'.format(base_name, static_name_generator.counter)
 
-########################################################################################################################
+
+def render_objects(objects, **kwargs):
+    """
+    Render the object list.
+
+    Note: kwargs should/must contain the request object!!!
+
+    :param objects: list of objects or object to render
+    :type: list or object
+    :param kwargs: extra arguments for render
+    :type kwargs: dict
+    :return: Rendered output of objects
+    :rtype: unicode
+    """
+    # if whatever is in objs is iterable, iterate over the objects and render each according to whatever it is
+    # otherwise, just render whatever it is
+    content = ''
+    if isinstance(objects, collections.Iterable):
+        for obj in objects:
+            if isinstance(obj, collections.Iterable):
+                content += render_objects(obj, **kwargs)
+            else:
+                content += obj.render(**kwargs)
+        return content
+    else:
+        return objects.render(**kwargs)
