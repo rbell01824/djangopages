@@ -716,7 +716,6 @@ class Form(ContentBase):
         self.submit = submit
         self.initial = initial
         self.action_url = action_url
-        dpage.form = form
         pass
 
     def render(self, **kwargs):

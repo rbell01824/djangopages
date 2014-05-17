@@ -385,8 +385,8 @@ class DevTestView(View):
         return dpage.render()
 
     def post(self, request, *args, **kwargs):
+        """
+        Send the post data to the page and rerender.
+        """
         dpage = DevTest7(request).page(request.POST)
-        form = dpage.form(request.POST)
-        if form.is_valid():
-            return dpage.render()
         return dpage.render()
