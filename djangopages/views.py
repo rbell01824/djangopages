@@ -40,15 +40,7 @@ from test_data.models import syslog_query, VNode
 #
 ########################################################################################################################
 
-
-class DevTest0(DPage):
-    """
-    Example of class based dpage
-    """
-    pass
-
-
-class DevTest1(DPage):
+class Test1(DPage):
     """
     Class based dpage with render method overridden.  Objs style interface.
     """
@@ -66,7 +58,7 @@ class DevTest1(DPage):
         return self
 
 
-class DevTest2(DPage):
+class Test2(DPage):
     """
     Basic test of layout facility.
     """
@@ -85,7 +77,7 @@ class DevTest2(DPage):
         return self
 
 
-class DevTest3(DPage):
+class Test3(DPage):
     """
     Complex render test
     """
@@ -121,7 +113,7 @@ class DevTest3(DPage):
         return self
 
 
-class DevTest4(DPage):
+class Test4(DPage):
     """
     Basic test of Graph facility with two graphs in a row.
     """
@@ -175,7 +167,7 @@ class DevTest4(DPage):
         return self
 
 
-class DevTest5(DPage):
+class Test5(DPage):
     """
     Multiple graphs on page with multiple kinds of graphs
     """
@@ -198,7 +190,7 @@ class DevTest5(DPage):
         content = []
         content.append(self.all_hosts_summary(company))
         panels = []
-        for host in DevTest5.get_hosts(company):
+        for host in self.get_hosts(company):
             panels.append(self.host_summary(company, host))
         content.append(Accordion(panels))
         self.content = content
@@ -340,7 +332,7 @@ class DevTest5(DPage):
         return hosts
 
 
-class DevTest6(DPage):
+class Test6(DPage):
     """
     Test accordion
     """
@@ -359,7 +351,7 @@ class DevTest6(DPage):
         return self
 
 
-class DevTest7(DPage):
+class Test7(DPage):
     """
     Test form support
     """
@@ -389,13 +381,24 @@ class DevTestView(View):
     """
     View class for dev testing.
     """
+    test = 'test1'
+    testmap = {'test1': Test1,
+               'test2': Test2,
+               'test3': Test3,
+               'test4': Test4,
+               'test5': Test5,
+               'test6': Test6,
+               'test7': Test7,
+               }
+
     # noinspection PyMethodMayBeStatic
     def get(self, request):
         """
         Execute the graph method and display the results.
         :param request:
         """
-        dpage = DevTest7(request).page({'message': 'Enter your message here.'})
+        dt = self.testmap[self.test]
+        dpage = dt(request).page({'message': 'Enter your message here.'})
         return dpage.render()
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal
@@ -408,3 +411,4 @@ class DevTestView(View):
         """
         dpage = DevTest7(request).page(request.POST)
         return dpage.render()
+
