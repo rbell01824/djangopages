@@ -1,8 +1,11 @@
 {% extends "base.html" %}
+{% load django_tables2 %}
+{#{% load render_as_template from djangopages_tags %}#}
 
 {% block content %}
     <!-- Start of dpage page -->
     <div class="container-fluid">
+        {# {% render_as_template content %}#}
         {{ content|safe }}
     </div>
 {% endblock content %}

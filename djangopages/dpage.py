@@ -112,29 +112,39 @@ class DPage(object):
         :return: response object
         :rtype: HttpResponse
         """
-        # if there is a layout, use it to render
+        # init context if nothing in it
+        if not self.context:
+            self.context = {}
+
+        # render all our objects
         content = render_objects(self.content, request=self.request, **kwargs)
 
+        # if there was nothing, use the default content
         if len(content) == 0:
             content = settings.DPAGE_DEFAULT_CONTENT
 
-        return render_to_response(self.template,
-                                  {'content': content})
+        self.context['content'] = content
 
-    # class _Text(object):
-    #     def __init__(self, text):
-    #         self.text = text
-    #         pass
-    #     def render(self):
-    #         return self.text
-    #
-    # def Text(self, text):
-    #     """
-    #     Create a text object on the page
-    #     """
-    #     obj = self._Text(text)
-    #     self.objects.append(obj)
-    #     return obj
+        return render_to_response(self.template, self.context)
+
+        # # build out template & pour in the content   # fixme: read from the file
+        # template = '{% extends "base.html" %}\n' \
+        #            '{% load django_tables2 %}\n' \
+        #            '{% block content %}\n' \
+        #            '<!-- Start of dpage page -->\n' \
+        #            '    <div class="container-fluid">\n' \
+        #            '        insert_the_content_here\n' \
+        #            '    </div>\n' \
+        #            '<!-- End of dpage page -->\n' \
+        #            '{% endblock content %}\n'
+        # output = template.replace('insert_the_content_here', content)
+        #
+        # # create template and context objects
+        # t = Template(output)
+        # c = Context(self.context)
+        #
+        # return HttpResponse(t.render(c))
+
 
 ########################################################################################################################
 #
@@ -859,13 +869,21 @@ class Table(ContentBase):
         Generate html for table
         """
         template = '<!-- start of table -->\n' \
-                   '    {% load render_table from django_tables2 %}\n' \
-                   '    {% render_table x_the_table %}\n' \
+                   '    {% load django_tables2 %}\n' \
+                   '    {% render_table insert_the_table %}\n' \
                    '<!-- end of table -->\n'
         t = Template(template)
-        c = {'x_the_table': self.qs, 'request': self.dpage.request}
+        c = {'insert_the_table': self.qs, 'request': self.dpage.request}
         output = t.render(Context(c))
         return output
+        # output = ''
+        # name = static_name_generator('table')
+        # self.dpage.context[name] = self.qs
+        # template = '<!-- start of table -->\n' \
+        #            '    {% render_table x_the_table_object %}\n' \
+        #            '<!-- end of table -->\n'
+        # output = template.replace('x_the_table_object', name)
+        # return output
 
 ########################################################################################################################
 #
