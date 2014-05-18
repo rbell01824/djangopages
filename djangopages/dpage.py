@@ -790,7 +790,7 @@ class Form(ContentBase):
         request = self.dpage.request
         template = '{% load bootstrap3 %}\n' \
                    '<!-- start of django bootstrap3 form -->\n' \
-                   '    <form action="{action_url}" method="post" class="form">\n' \
+                   '    <form role="form" action="{action_url}" method="post" class="form">\n' \
                    '        <!-- csrf should be here -->{% csrf_token %}<!-- -->\n' \
                    '        {% bootstrap_form the_form %}\n' \
                    '        {% buttons %}\n' \
@@ -808,6 +808,37 @@ class Form(ContentBase):
         output = t.render(Context(c))
         return output
         # return template
+
+# todo: allow form to specify custom template
+# todo: support rest of bootstrap 3 form attributes
+# todo: syntactic suggar for Form
+
+# Alternate form template
+#
+# <form method="post" class="bootstrap3" action="/graphpages/graphpage/{{ graph_pk }}"> {% csrf_token %}
+#     {# Include the hidden fields #}
+#     {% for hidden in graphform.hidden_fields %}
+#         {{ hidden }}
+#     {% endfor %}
+#     {# Include the visible fields #}
+#     {% for field in graphform.visible_fields %}
+#         {% if field.errors %}
+#             <div class="row bg-danger">
+#                 <div class="col-md-3 text-right"></div>
+#                 <div class="col-md-7">{{ field.errors }}</div>
+#             </div>
+#         {% endif %}
+#         <div class="row">
+#             <div class="col-md-3 text-right">{{ field.label_tag }}</div>
+#             <div class="col-md-7">{{ field }}</div>
+#         </div>
+#     {% endfor %}
+#     <div class="row">
+#         <div class='col-md-3 text-right'>
+#             <input type="submit" value="Display graph" class="btn btn-primary"/>
+#         </div>
+#     </div>
+# </form>
 
 ########################################################################################################################
 #
