@@ -15,7 +15,7 @@
     -->
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 
-{#    <script src="http://www.google.com/jsapi"></script>#}
+    {#    <script src="http://www.google.com/jsapi"></script>#}
     <script src="http://code.highcharts.com/highcharts.js"></script>
     <script src="http://code.highcharts.com/modules/exporting.js"></script>
 
@@ -27,7 +27,7 @@
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
-
+    <link rel="stylesheet" href="{{ STATIC_URL }}django_tables2/themes/paleblue/css/screen.css" />
     <!-- extrahead  -->
     {% block extrahead %}
     {% endblock extrahead %}
@@ -57,7 +57,7 @@
                 </li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <img src="{% static "img/graphs.png" %}" />Graph Methods <b class="caret"></b>
+                        <img src="{% static "img/djangopages.png" %}" />Django Pages<b class="caret"></b>
                     </a>
                     <ul class="dropdown-menu">
                         <li class="dropdown-header">Graphs implemented as methods</li>
@@ -65,12 +65,29 @@
                         <li><a href="/test_data/demo8b">BMC_1 Critical/Error All Hosts; All events each host</a></li>
                         <li><a href="/test_data/demo8c">BMC_1 Critical/Error All Hosts; All events each host better charts</a></li>
                         <li><a href="/test_data/demo8d">BMC_1 Syslogs/hour, all events time series</a></li>
-                        {# <li class="divider"></li>#}
+                        <li class="divider"></li>
+                        <li><a href="/dpages/test1">Django pages: Basic text widgets</a></li>
+                        <li><a href="/dpages/test2">Django pages: Text widgets with row/column layout</a></li>
+                        <li><a href="/dpages/test3">Django pages: Complex row/column layout</a></li>
+                        <li><a href="/dpages/test4">Django pages: Data driven graphs with highchart customization and layout</a></li>
+                        <li><a href="/dpages/test5">Django pages: Syslog analysis with panels</a></li>
+                        <li><a href="/dpages/test6">Django pages: Accordion demo</a></li>
+                        <li><a href="/dpages/test7">Django pages: Form demo with off page link</a></li>
                     </ul>
                 </li>
                 {#                <li><a href=""><i class="fa fa-plus fa-2x"></i>Add</a></li>#}
                 {#                <li><a href=""><i class="fa fa-pencil-square-o fa-2x"></i>Edit</a></li>#}
-                <li><a href="/chartkick"><img src="{% static "img/column_chart.png" %}" />Chartkick Demo</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <img src="{% static "img/demo.png" %}" />Demos<b class="caret"></b>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-header">Underlying technology demos</li>
+                        <li><a href="/chartkick"><img src="{% static "img/graphs.png" %}" />Chartkick</a></li>
+                        <li><a href="/table2"><img src="{% static "img/datatable.png" %}" />Django-table 2</a></li>
+                        {# <li class="divider"></li>#}
+                    </ul>
+                </li>
                 {# <li><img src="{% static "img/forms.png" %}" /> </li>#}
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">

@@ -31,7 +31,9 @@ from django import forms
 
 from djangopages.dpage import *
 
-from test_data.models import syslog_query, VNode
+import django_tables2 as tables
+
+from test_data.models import syslog_query, VNode, VCompany
 
 
 ########################################################################################################################
@@ -377,6 +379,36 @@ class Test7(DPage):
         return self
 
 
+class Test8(DPage):
+    """
+    Test form support
+    """
+    def page(self, initial=None, *args, **kwargs):
+        """
+        Override
+        :param initial:
+        :param args:
+        :param kwargs:
+        """
+
+        # # setup the table
+        # class VNodeTable(tables.Table):
+        #     class Meta:
+        #         model = Vnode
+
+        xr1 = Markdown('# Test of table support\n\n')
+
+        # get a queryset to show in the table
+        qs_node = VNode.objects.all()
+        t_node = Table(self, qs_node)
+        qs_company = VCompany.objects.all()
+        t_company = Table(self, qs_company)
+
+        xr3 = Markdown('\n\n**After the table**\n\n')
+        self.content = (RC(xr1), R1C6(t_company, t_node), RC(xr3))
+        return self
+
+
 class DevTestView(View):
     """
     View class for dev testing.
@@ -389,6 +421,7 @@ class DevTestView(View):
                'test5': Test5,
                'test6': Test6,
                'test7': Test7,
+               'test8': Test8,
                }
 
     # noinspection PyMethodMayBeStatic

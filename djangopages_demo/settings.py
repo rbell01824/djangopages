@@ -62,16 +62,27 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     # 'debug_toolbar',
     'django_extensions',
-    'djangopages_demo',
-    'djangopages',
-    'graphpages',
-    'chartkick',
-    'chartkick_demo',
+    #
+    # apps to support djangopages
+    #
     'bootstrap3',
-    'test_data',
+    'chartkick',
+    'django_tables2',
     'taggit',
     'taggit_suggest',
     'django_ace',
+    #
+    # djangopages proper
+    #
+    'djangopages',
+    'graphpages',                   # fixme: depracated but leave for time being
+    #
+    # start of demo applications
+    #
+    'djangopages_demo',
+    'chartkick_demo',
+    'django_tables2_demo',
+    'test_data',
 )
 
 MIDDLEWARE_CLASSES = (

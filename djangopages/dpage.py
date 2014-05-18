@@ -765,6 +765,10 @@ class Graph(ContentBase):
         return out
 LEGAL_GRAPH_TYPES = ['line', 'pie', 'column', 'bar', 'area']
 
+# todo: allow form to specify custom template
+# todo: support rest of bootstrap 3 form attributes
+# todo: syntactic suggar for Form
+
 
 class Form(ContentBase):
     """
@@ -783,6 +787,34 @@ class Form(ContentBase):
         """
         Create and render the form
         """
+        #
+        #  Alternate form template
+        #
+        # <form method="post" class="bootstrap3" action="/graphpages/graphpage/{{ graph_pk }}"> {% csrf_token %}
+        #     {# Include the hidden fields #}
+        #     {% for hidden in graphform.hidden_fields %}
+        #         {{ hidden }}
+        #     {% endfor %}
+        #     {# Include the visible fields #}
+        #     {% for field in graphform.visible_fields %}
+        #         {% if field.errors %}
+        #             <div class="row bg-danger">
+        #                 <div class="col-md-3 text-right"></div>
+        #                 <div class="col-md-7">{{ field.errors }}</div>
+        #             </div>
+        #         {% endif %}
+        #         <div class="row">
+        #             <div class="col-md-3 text-right">{{ field.label_tag }}</div>
+        #             <div class="col-md-7">{{ field }}</div>
+        #         </div>
+        #     {% endfor %}
+        #     <div class="row">
+        #         <div class='col-md-3 text-right'>
+        #             <input type="submit" value="Display graph" class="btn btn-primary"/>
+        #         </div>
+        #     </div>
+        # </form>
+        #
         if self.initial:
             the_form = self.form(self.initial)
         else:
@@ -809,36 +841,31 @@ class Form(ContentBase):
         return output
         # return template
 
-# todo: allow form to specify custom template
-# todo: support rest of bootstrap 3 form attributes
-# todo: syntactic suggar for Form
 
-# Alternate form template
-#
-# <form method="post" class="bootstrap3" action="/graphpages/graphpage/{{ graph_pk }}"> {% csrf_token %}
-#     {# Include the hidden fields #}
-#     {% for hidden in graphform.hidden_fields %}
-#         {{ hidden }}
-#     {% endfor %}
-#     {# Include the visible fields #}
-#     {% for field in graphform.visible_fields %}
-#         {% if field.errors %}
-#             <div class="row bg-danger">
-#                 <div class="col-md-3 text-right"></div>
-#                 <div class="col-md-7">{{ field.errors }}</div>
-#             </div>
-#         {% endif %}
-#         <div class="row">
-#             <div class="col-md-3 text-right">{{ field.label_tag }}</div>
-#             <div class="col-md-7">{{ field }}</div>
-#         </div>
-#     {% endfor %}
-#     <div class="row">
-#         <div class='col-md-3 text-right'>
-#             <input type="submit" value="Display graph" class="btn btn-primary"/>
-#         </div>
-#     </div>
-# </form>
+class Table(ContentBase):
+    """
+    Provide table support
+    """
+    def __init__(self, dpage, qs):
+        """
+        Initialize a Table object
+        """
+        self.dpage = dpage
+        self.qs = qs
+        pass
+
+    def render(self, **kwargs):
+        """
+        Generate html for table
+        """
+        template = '<!-- start of table -->\n' \
+                   '    {% load render_table from django_tables2 %}\n' \
+                   '    {% render_table x_the_table %}\n' \
+                   '<!-- end of table -->\n'
+        t = Template(template)
+        c = {'x_the_table': self.qs, 'request': self.dpage.request}
+        output = t.render(Context(c))
+        return output
 
 ########################################################################################################################
 #
