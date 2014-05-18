@@ -100,13 +100,13 @@ class Test3(DPage):
         x5232 = HTML('<p>Row 5 col 2 row 3 col 2: {}</p>'.format(get_paragraph()))
         x5233 = HTML('<p>Row 5 col 2 row 3 col 3: {}</p>'.format(get_paragraph()))
         # page.layout(R(C3(x41), C9(x42)))
-        self.content = (RC12(x1),
-                        RC6(x21, x22),
-                        RC(x3),
+        self.content = (R1C12(x1),
+                        R1C6(x21, x22),
+                        R1C(x3),
                         R(C3(x41), C9(R(x42))),
                         R(C3(x51), C9(R(x521),
                                       R(x522),
-                                      RC4(x5231, x5232, x5233)
+                                      R1C4(x5231, x5232, x5233)
                                       )
                           )
                         )
@@ -161,9 +161,9 @@ class Test4(DPage):
                                '{}\n\n'.format(get_paragraph()) +
                                '{}\n\n'.format(get_paragraph()))
 
-        self.content = (RC(text_top),
-                        RC6(col_graph, pie_graph),
-                        RC(text_bottom))
+        self.content = (R1C(text_top),
+                        R1C6(col_graph, pie_graph),
+                        R1C(text_bottom))
         return self
 
 
@@ -209,7 +209,7 @@ class Test5(DPage):
         cecbn = self.critical_event_graph(qs, company)
         eecbn = self.error_event_graph(qs, company)
         # noinspection PyRedundantParentheses
-        return (RC4(cbt, cecbn, eecbn), RC(errbt))
+        return (R1C4(cbt, cecbn, eecbn), RC(errbt))
 
     def host_summary(self, company, node):
         """
@@ -366,14 +366,14 @@ class Test7(DPage):
         class TestForm(forms.Form):
             message = forms.CharField()
 
-        xrform = Form(self, TestForm, 'Update the display', initial=initial)
+        xrform = Form(self, TestForm, 'Update the display', initial=initial, action_url='/dpages/test7')
         xr1 = Markdown('# Test of form support\n\n'
                        'Here is the form')
         xr2 = Markdown('\n\nThe form message is **{}**\n\n'.format(initial['message']))
         xr3 = Markdown('\n\n**After the form**\n\n'
                        'Graphs, tables, and other stuff go here')
         xr4 = HTML('<a class="btn btn-success form-control" href="/">Done playing.</a>')
-        self.content = (RC12(xr1), RC4(xrform), RC12(xr2, xr3), RC3(xr4))
+        self.content = (R1C12(xr1), R1C4(xrform), RC12(xr2, xr3), R1C3(xr4))
         return self
 
 
@@ -409,6 +409,7 @@ class DevTestView(View):
         :param args:
         :param kwargs:
         """
-        dpage = DevTest7(request).page(request.POST)
+        dt = self.testmap[self.test]
+        dpage = dt(request).page(request.POST)
         return dpage.render()
 

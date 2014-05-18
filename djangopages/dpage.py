@@ -300,8 +300,7 @@ class RowColumn(object):
         """
         out = ''
         for con in self.content:
-            out += Column(con, width=self.width).render()
-        out = dpage_row_before + out + dpage_row_after
+            out += dpage_row_before + Column(con, width=self.width).render() + dpage_row_after
         return out
 
 
@@ -328,6 +327,64 @@ RC9 = functools.partial(rowcolumn, width=9)
 RC10 = functools.partial(rowcolumn, width=10)
 RC11 = functools.partial(rowcolumn, width=11)
 RC12 = functools.partial(rowcolumn, width=12)
+
+
+class Row1Column(object):
+    """
+    Wrap content in a row with columns of width width.
+    """
+    def __init__(self, *content, **kwargs):
+        """
+        Wrap *content objects in column of width width=nn.
+
+        :param content: Content to wrap in a row with multiple columns of width width
+        :type content: object or collections.iterable
+        :param kwargs: keyword args (width: bootstrap width int or unicode, ...)
+        :type kwargs: dict
+        :return: RowColumn object
+        :rtype: RowColumn object
+        """
+        self.content = content
+        self.width = kwargs.pop('width', 12)
+        pass
+
+    def render(self, **kwargs):
+        """
+        Render objects in row/column
+
+        :return: HTML
+        :rtype: unicode
+        """
+        out = ''
+        for con in self.content:
+            out += Column(con, width=self.width).render()
+        out = dpage_row_before + out + dpage_row_after
+        return out
+
+
+def row1column(*content, **kwargs):
+    """
+    Wrap content in a row and column of width width.
+
+    :param content: content
+    :type content: unicode or collections.iterable
+    :param kwargs: keyword args (width: bootstrap width int or unicode, ...)
+    :type kwargs: dict
+    """
+    return Row1Column(*content, **kwargs)
+R1C = functools.partial(row1column, width=12)
+R1C1 = functools.partial(row1column, width=1)
+R1C2 = functools.partial(row1column, width=2)
+R1C3 = functools.partial(row1column, width=3)
+R1C4 = functools.partial(row1column, width=4)
+R1C5 = functools.partial(row1column, width=5)
+R1C6 = functools.partial(row1column, width=6)
+R1C7 = functools.partial(row1column, width=7)
+R1C8 = functools.partial(row1column, width=8)
+R1C9 = functools.partial(row1column, width=9)
+R1C10 = functools.partial(row1column, width=10)
+R1C11 = functools.partial(row1column, width=11)
+R1C12 = functools.partial(row1column, width=12)
 
 
 ########################################################################################################################

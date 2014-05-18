@@ -23,12 +23,11 @@ __email__ = "rbell01824@gmail.com"
 
 from django.conf.urls import patterns, include, url
 
-from djangopages.views import DevTestView, DevTestViewTest
+from djangopages.views import DevTestView
 
 ########################################################################################################################
 
 urlpatterns = patterns('',
-                       url(r'^$', DevTestViewTest.as_view(), name='devtest'),
                        url(r'^test1$', DevTestView.as_view(test='test1'), name='devtest1'),
                        url(r'^test2$', DevTestView.as_view(test='test2'), name='devtest2'),
                        url(r'^test3$', DevTestView.as_view(test='test3'), name='devtest3'),
