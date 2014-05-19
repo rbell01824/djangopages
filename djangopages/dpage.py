@@ -127,7 +127,8 @@ class DPage(object):
 
         return render(self.request, self.template, self.context)
 
-        # # build out template & pour in the content   # fixme: read from the file
+        # todo: consider coding the template here and simplifing the base, alternately read from file
+        # # build out template & pour in the content
         # template = '{% extends "base.html" %}\n' \
         #            '{% load django_tables2 %}\n' \
         #            '{% block content %}\n' \

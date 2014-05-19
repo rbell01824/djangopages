@@ -53,7 +53,9 @@ class Test1(DPage):
         :param args:
         :param kwargs:
         """
-        self.form = None
+        ###################
+        # Put some content on the page
+        ###################
         self.content.append(Text('This text comes from dpage.Text'))
         self.content.append(Markdown('**Bold Markdown Text**'))
         self.content.append(HTML('<h3>H3 text from DPageHTML</h3>'))
@@ -71,10 +73,15 @@ class Test2(DPage):
         :param args:
         :param kwargs:
         """
+        ###################
+        # Create some page content
+        ###################
         xr1 = Text('This text comes from dpage.Text')
-        # self.content = RC12(xr1)
         xr2 = Markdown('**Bold Markdown Text**')
         xr3 = HTML('<h3>H3 text from DPageHTML</h3>')
+        ###################
+        # Layout the content on the page
+        ###################
         self.content = RC12(xr1, xr2, xr3)
         return self
 
@@ -89,6 +96,9 @@ class Test3(DPage):
         :param args:
         :param kwargs:
         """
+        ###################
+        # Create some page content
+        ###################
         x1 = Text('Row 1: This text comes from dpage.Text')
         x21 = Markdown('Row 2 col 1: **Bold Markdown Text**')
         x22 = HTML('<p>Row 2 col 2: </p><h3>H3 text from DPageHTML</h3>')
@@ -101,7 +111,11 @@ class Test3(DPage):
         x5231 = HTML('<p>Row 5 col 2 row 3 col 1: {}</p>'.format(get_paragraph()))
         x5232 = HTML('<p>Row 5 col 2 row 3 col 2: {}</p>'.format(get_paragraph()))
         x5233 = HTML('<p>Row 5 col 2 row 3 col 3: {}</p>'.format(get_paragraph()))
-        # page.layout(R(C3(x41), C9(x42)))
+        ###################
+        # Layout the content on the page
+        #
+        # This layout generates roughly 200 lines of Bootstrap 3 html!
+        ###################
         self.content = (R1C12(x1),
                         R1C6(x21, x22),
                         R1C(x3),
@@ -125,6 +139,10 @@ class Test4(DPage):
         :param args:
         :param kwargs:
         """
+        ###################
+        # Get the DB data we need
+        ###################
+
         # set the company and node since no form yet
         company = 'BMC_1'
         node = 'A0040CnBPGC1'
@@ -142,6 +160,9 @@ class Test4(DPage):
         # Sort data for pie chart
         count_by_type_sorted_by_count = sorted(count_by_type, lambda x, y: cmp(x[1], y[1]), None, True)
 
+        ###################
+        # Create the charts
+        ###################
         # create the column chart and set it's title
         col_graph = Graph('column', count_by_type)
         col_graph.options = {'height': '400px',
@@ -153,7 +174,9 @@ class Test4(DPage):
         pie_graph.options = {'height': '400px',
                              'title.text': 'Syslog records by type',
                              'subtitle.text': '{} node {}'.format(company, node)}
-
+        ###################
+        # Create title and other page content
+        ###################
         # put some explanation text above and below the charts
         text_top = Markdown('### Error count by type for {} Node {} '.format(company, node) +
                             'Total errors {}'.format(all_count_host))
@@ -162,7 +185,9 @@ class Test4(DPage):
                                '{}\n\n'.format(get_paragraph()) +
                                '{}\n\n'.format(get_paragraph()) +
                                '{}\n\n'.format(get_paragraph()))
-
+        ###################
+        # Layout the content on the page
+        ###################
         self.content = (R1C(text_top),
                         R1C6(col_graph, pie_graph),
                         R1C(text_bottom))
@@ -179,6 +204,9 @@ class Test5(DPage):
         :param args:
         :param kwargs:
         """
+        ###################
+        # Create summary for company
+        ###################
         self.company_summary('BMC_1')
         return self
 
@@ -188,10 +216,16 @@ class Test5(DPage):
         :param company: Company
         :return: DPage OBJECT!
         """
+        ###################
+        # Use methods to build content
+        ###################
         # noinspection PyListCreation
         content = []
         content.append(self.all_hosts_summary(company))
         panels = []
+        ###################
+        # Iterate over hosts and build content for each one
+        ###################
         for host in self.get_hosts(company):
             panels.append(self.host_summary(company, host))
         content.append(Accordion(panels))
@@ -205,13 +239,21 @@ class Test5(DPage):
         :param company: Company
         :return: HTML
         """
+        ###################
+        # Get data from DB
+        ###################
         qs = syslog_query(company)
+        ###################
+        # Build the graphs we want on the page
+        ###################
         errbt = self.time_chart(qs, company, 'All Nodes')
         cbt = self.message_type_graph(qs, company, 'All Nodes')
         cecbn = self.critical_event_graph(qs, company)
         eecbn = self.error_event_graph(qs, company)
-        # noinspection PyRedundantParentheses
-        return (R1C4(cbt, cecbn, eecbn), RC(errbt))
+        ###################
+        # Layout the content on the page
+        ###################
+        return (R1C4(cbt, cecbn, eecbn), RC(errbt),)
 
     def host_summary(self, company, node):
         """
@@ -220,11 +262,23 @@ class Test5(DPage):
         :param node: node
         :return: HTML
         """
+        ###################
+        # Get the DB data
+        ###################
         qs = syslog_query(company, node)
+        ###################
+        # Make the charts we want
+        ###################
         errbt = self.time_chart(qs, company, node)
         cbt = self.message_type_graph(qs, company, node)
         cbt.options['height'] = '400px'
+        ###################
+        # Layout the content on the page
+        ###################
         xxx = R(C4(cbt), C8(errbt))
+        ###################
+        # Put the layout in an accordion multi panel
+        ###################
         return AccordionMultiPanel(xxx, title='{}:{} Details'.format(company, node))
 
     # noinspection PyMethodMayBeStatic
@@ -236,8 +290,14 @@ class Test5(DPage):
         :param node:
         :return: :rtype:
         """
+        ###################
+        # Get DB data we want on graph
+        ###################
         xqs = qs.values('message_type').annotate(num_results=Count('id'))
         count_by_type_type = map(list, xqs.order_by('message_type').values_list('message_type', 'num_results'))
+        ###################
+        # Create the graph
+        ###################
         cbt = Graph('column', count_by_type_type)
         cbt.options = {'title.text': 'Syslog Messages by Type',
                        'subtitle.text': '{}:{}'.format(company, node)}
@@ -250,12 +310,18 @@ class Test5(DPage):
         :param qs:
         :param company:
         """
+        ###################
+        # Get DB data we want on graph
+        ###################
         # critical event by node
         critical_event_count_by_node = map(list, qs.filter(message_type='critical').
                                            order_by('node__host_name').
                                            values('node__host_name').
                                            annotate(count=Count('node__host_name')).
                                            values_list('node__host_name', 'count'))
+        ###################
+        # Create the graph
+        ###################
         cecbn = Graph('column', critical_event_count_by_node)
         cecbn.options = {'title.text': 'Critical Events by Host',
                          'subtitle.text': '{}:All Nodes'.format(company)}
@@ -268,12 +334,18 @@ class Test5(DPage):
         :param qs:
         :param company:
         """
+        ###################
+        # Get DB data we want on graph
+        ###################
         # error event by node
         error_event_count_by_node = map(list, qs.filter(message_type='error').
                                         order_by('node__host_name').
                                         values('node__host_name').
                                         annotate(count=Count('node__host_name')).
                                         values_list('node__host_name', 'count'))
+        ###################
+        # Create the graph
+        ###################
         eecbn = Graph('column', error_event_count_by_node)
         eecbn.options = {'title.text': 'Error Events by Host',
                          'subtitle.text': '{}:All Nodes'.format(company)}
@@ -288,6 +360,9 @@ class Test5(DPage):
         :param host: Host
         :return: graph OBJECT!
         """
+        ###################
+        # Get the graph data together
+        ###################
         # total, critical, error events by time
         date_start = datetime.date(2012, 12, 1)
         date_end = datetime.date(2013, 2, 9)
@@ -299,22 +374,34 @@ class Test5(DPage):
         # format for chartkick
         data_total = [[t[0].strftime('%Y-%m-%d %H'), t[1]] for t in time_series]
 
+        ###################
+        # Get data from DB
+        ###################
         # get critical
         xqs = qs.filter(message_type='critical')
         qss = qsstats.QuerySetStats(xqs, 'time')
         time_series = qss.time_series(date_start, date_end, 'hours')
         data_critical = [[t[0].strftime('%Y-%m-%d %H'), t[1]] for t in time_series]
 
+        ###################
+        # Get data from DB
+        ###################
         # get error
         xqs = qs.filter(message_type='error')
         qss = qsstats.QuerySetStats(xqs, 'time')
         time_series = qss.time_series(date_start, date_end, 'hours')
         data_error = [[t[0].strftime('%Y-%m-%d %H'), t[1]] for t in time_series]
 
+        ###################
+        # Format for graph
+        ###################
         # make the graph
         data = [{'name': 'All', 'data': data_total},
                 {'name': 'Critical', 'data': data_critical},
                 {'name': 'Error', 'data': data_error}]
+        ###################
+        # Create the graph
+        ###################
         errbt = Graph('area', data)
         errbt.options = {'height': '440px',
                          'title.text': '{} Syslog Events By Hour'.format(company),
@@ -330,6 +417,9 @@ class Test5(DPage):
         Get list of this companies hosts.
         :param company:
         """
+        ###################
+        # Get hosts for this company
+        ###################
         hosts = [n[0] for n in VNode.objects.filter(company__company_name=company).values_list('host_name')]
         return hosts
 
@@ -344,11 +434,16 @@ class Test6(DPage):
         :param args:
         :param kwargs:
         """
-
+        ###################
+        # Put some data in accordion panels
+        ###################
         x1 = AccordionPanel(Text('This text comes from dpage.Text'), title='Row 1')
         # self.content = Accordion(x1)
         x2 = AccordionPanel(Markdown('**Bold Markdown Text**'), title='Row 2')
         x3 = AccordionPanel(HTML('<h3>H3 text from DPageHTML</h3>'), title='Row 3')
+        ###################
+        # Put into a layout
+        ###################
         self.content = Accordion(x1, x2, x3)
         return self
 
@@ -364,18 +459,27 @@ class Test7(DPage):
         :param args:
         :param kwargs:
         """
+        ###################
+        # Create a form
+        ###################
         # noinspection PyDocstring
         class TestForm(forms.Form):
             message = forms.CharField()
 
         xrform = Form(self, TestForm, 'Update the display', initial=initial, action_url='/dpages/test7')
+        ###################
+        # Create some other content that uses form data
+        ###################
         xr1 = Markdown('# Test of form support\n\n'
                        'Here is the form')
-        xr2 = Markdown('\n\nThe form message is **{}**\n\n'.format(initial['message']))
+        xr2 = Markdown('## The form message is \n\n**{}**\n\n'.format(initial['message']))
         xr3 = Markdown('\n\n**After the form**\n\n'
                        'Graphs, tables, and other stuff go here')
         xr4 = HTML('<a class="btn btn-success form-control" href="/">Done playing.</a>')
-        self.content = (R1C12(xr1), R1C4(xrform), RC12(xr2, xr3), R1C3(xr4))
+        ###################
+        # Put into a layout
+        ###################
+        self.content = (R1C12(xr1), R(C4(xrform), C6(xr2)), RC(xr3), R1C3(xr4))
         return self
 
 
@@ -390,23 +494,36 @@ class Test8(DPage):
         :param args:
         :param kwargs:
         """
-
+        ###################
+        # Create some page content
+        ###################
         # Title for the page
         xr1 = Markdown('# Test of table support\n\n')
 
+        ###################
+        # Get DB data and put in Table
+        ###################
         # Node: create title, get queryset, create the table
         node_tit = Markdown('## Node table')
         node_qs = VNode.objects.all()
         node_tbl = Table(self, node_qs)
 
+        ###################
+        # Get DB data and put in Table
+        ###################
         # Company: create title, get queryset, create the table
         company_tit = Markdown('## Company table')
         company_qs = VCompany.objects.all()
         company_tbl = Table(self, company_qs)
 
+        ###################
+        # Create some page content
+        ###################
         # Some stuff after the page
         xr3 = Markdown('\n\n**After the table**\n\n')
-
+        ###################
+        # Put content on page
+        ###################
         # Define the content layout
         self.content = (RC(xr1),
                         R(C2(node_tit, company_tbl),
