@@ -31,7 +31,7 @@ from django.utils.encoding import force_unicode
 from django.template import Template
 from django.template import Context
 from django.http import HttpResponse
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, render
 from django.core.context_processors import csrf
 
 from djangopages.libs import dict_nested_set
@@ -125,7 +125,7 @@ class DPage(object):
 
         self.context['content'] = content
 
-        return render_to_response(self.template, self.context)
+        return render(self.request, self.template, self.context)
 
         # # build out template & pour in the content   # fixme: read from the file
         # template = '{% extends "base.html" %}\n' \
