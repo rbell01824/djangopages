@@ -391,21 +391,28 @@ class Test8(DPage):
         :param kwargs:
         """
 
-        # # setup the table
-        # class VNodeTable(tables.Table):
-        #     class Meta:
-        #         model = Vnode
-
+        # Title for the page
         xr1 = Markdown('# Test of table support\n\n')
 
-        # get a queryset to show in the table
-        qs_node = VNode.objects.all()
-        t_node = Table(self, qs_node)
-        qs_company = VCompany.objects.all()
-        t_company = Table(self, qs_company)
+        # Node: create title, get queryset, create the table
+        node_tit = Markdown('## Node table')
+        node_qs = VNode.objects.all()
+        node_tbl = Table(self, node_qs)
 
+        # Company: create title, get queryset, create the table
+        company_tit = Markdown('## Company table')
+        company_qs = VCompany.objects.all()
+        company_tbl = Table(self, company_qs)
+
+        # Some stuff after the page
         xr3 = Markdown('\n\n**After the table**\n\n')
-        self.content = (RC(xr1), R1C6(t_company, t_node), RC(xr3))
+
+        # Define the content layout
+        self.content = (RC(xr1),
+                        R(C2(node_tit, company_tbl),
+                          C6(node_tit, node_tbl)),
+                        RC(xr3))
+        # self.content = t_node
         return self
 
 

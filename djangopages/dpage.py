@@ -37,14 +37,14 @@ from django.core.context_processors import csrf
 from djangopages.libs import dict_nested_set
 
 # HTML to create a bootstrap3 row
-dpage_row_before = '<!-- Start of dpage row -->' \
-                   '<div class="row">'
-dpage_row_after = '</div>' \
-                  '<!-- End of dpage row -->'
-dpage_col_before = '<!-- Start of dpage col -->' \
-                   '<div class="col-md-{}">'
-dpage_col_after = '</div>' \
-                  '<!-- End of dpage col -->'
+dpage_row_before = '<!-- Start of dpage row -->\n' \
+                   '<div class="row">\n'
+dpage_row_after = '</div>\n' \
+                  '<!-- End of dpage row -->\n'
+dpage_col_before = '<!-- Start of dpage col -->\n' \
+                   '<div class="col-md-{}">\n'
+dpage_col_after = '</div>\n' \
+                  '<!-- End of dpage col -->\n'
 
 ########################################################################################################################
 #
