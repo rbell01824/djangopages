@@ -404,9 +404,9 @@ R1C12 = functools.partial(row1column, width=12)
 ########################################################################################################################
 
 
-class Panel(object):
+class ButtonPanel(object):
     """
-    Collapsible panel
+    Collapsible button panel
     """
     def __init__(self, *content, **kwargs):
         """
@@ -416,7 +416,7 @@ class Panel(object):
         :type content: list
         :param kwargs: Keyword arguments. title=None, btn_type='btn-primary'
         :type kwargs: dict
-        :return: HTML for panel
+        :return: HTML for button panel
         :rtype: unicode
         """
         self.content = content
@@ -426,17 +426,17 @@ class Panel(object):
 
     def render(self, **kwargs):
         """
-        Render collapsible panel.
+        Render button collapsible panel.
         """
         name = static_name_generator('btn_collapse')
-        template = '<!-- Start of collapsible panel -->\n' \
+        template = '<!-- Start of button collapsible panel -->\n' \
                    '    <button type="button" class="btn {btn_type}" data-toggle="collapse" data-target="#{name}">\n' \
                    '        {title}\n ' \
                    '    </button>\n ' \
                    '    <div id="{name}" class="collapse">\n' \
                    '        {content}\n' \
                    '    </div>\n' \
-                   '<!-- End of collapsable panel -->\n'
+                   '<!-- End of button collapsible panel -->\n'
         content = render_objects(self.content, **kwargs)
         out = template.format(btn_tpe=self.btn_type, name=name, title=self.title, content=content)
         return out
@@ -529,7 +529,7 @@ class AccordionPanel(object):
         return out
 
 
-class AccordionPanelN(object):
+class AccordionMultiPanel(object):
     """
     Panel within an Accordion
     """

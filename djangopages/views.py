@@ -225,7 +225,7 @@ class Test5(DPage):
         cbt = self.message_type_graph(qs, company, node)
         cbt.options['height'] = '400px'
         xxx = R(C4(cbt), C8(errbt))
-        return AccordionPanelN(xxx, title='{}:{} Details'.format(company, node))
+        return AccordionMultiPanel(xxx, title='{}:{} Details'.format(company, node))
 
     # noinspection PyMethodMayBeStatic
     def message_type_graph(self, qs, company, node):
