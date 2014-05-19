@@ -504,7 +504,7 @@ class Test8(DPage):
         # Get DB data and put in Table
         ###################
         # Node: create title, get queryset, create the table
-        node_tit = Markdown('## Node table')
+        node_tit = Markdown('### Node table')
         node_qs = VNode.objects.all()
         node_tbl = Table(self, node_qs)
 
@@ -512,7 +512,7 @@ class Test8(DPage):
         # Get DB data and put in Table
         ###################
         # Company: create title, get queryset, create the table
-        company_tit = Markdown('## Company table')
+        company_tit = Markdown('### Company table')
         company_qs = VCompany.objects.all()
         company_tbl = Table(self, company_qs)
 
@@ -526,7 +526,7 @@ class Test8(DPage):
         ###################
         # Define the content layout
         self.content = (RC(xr1),
-                        R(C2(node_tit, company_tbl),
+                        R(C3(company_tit, company_tbl),
                           C6(node_tit, node_tbl)),
                         RC(xr3))
         # self.content = t_node
