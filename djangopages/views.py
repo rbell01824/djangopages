@@ -46,6 +46,9 @@ class Test1(DPage):
     """
     Class based dpage with render method overridden.  Objs style interface.
     """
+    title = 'DjangoPages_Test1'
+    description = 'Demonstrate basic text widgets'
+    tags = []
 
     def page(self, *args, **kwargs):
         """
@@ -66,6 +69,9 @@ class Test2(DPage):
     """
     Basic test of layout facility.
     """
+    title = 'DjangoPages_Test2'
+    description = 'Demonstrate row/column layout of text objects'
+    tags = []
 
     def page(self, *args, **kwargs):
         """
@@ -90,6 +96,10 @@ class Test3(DPage):
     """
     Complex render test
     """
+    title = 'DjangoPages_Test3'
+    description = 'Demonstrate complex row/column layout'
+    tags = []
+
     def page(self, *args, **kwargs):
         """
         Override
@@ -133,6 +143,10 @@ class Test4(DPage):
     """
     Basic test of Graph facility with two graphs in a row.
     """
+    title = 'DjangoPages_Test4'
+    description = 'Demonstrate DB driven graphs with highcharts customization'
+    tags = []
+
     def page(self, *args, **kwargs):
         """
         Override
@@ -198,6 +212,10 @@ class Test5(DPage):
     """
     Multiple graphs on page with multiple kinds of graphs
     """
+    title = 'DjangoPages_Test5'
+    description = 'Demonstrate syslog graphs and multi-panels'
+    tags = []
+
     def page(self, *args, **kwargs):
         """
         For specified company, display a summary report and details by node.
@@ -428,6 +446,10 @@ class Test6(DPage):
     """
     Test accordion
     """
+    title = 'DjangoPages_Test6'
+    description = 'Demonstrate accordion with text widgets'
+    tags = []
+
     def page(self, *args, **kwargs):
         """
         Create simple accordion page
@@ -452,6 +474,10 @@ class Test7(DPage):
     """
     Test form support
     """
+    title = 'DjangoPages_Test7'
+    description = 'Demonstrate basic form widgets with off page link'
+    tags = []
+
     def page(self, initial=None, *args, **kwargs):
         """
         Override
@@ -487,6 +513,10 @@ class Test8(DPage):
     """
     Test form support
     """
+    title = 'DjangoPages_Test8'
+    description = 'Demonstrate DB driven table2 widget'
+    tags = []
+
     def page(self, initial=None, *args, **kwargs):
         """
         Override

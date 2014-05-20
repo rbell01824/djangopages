@@ -20,7 +20,10 @@ __status__ = "dev"
 
 # work list
 """
-Start work on djangopages
+Add connection to register and dispatch
+Move layout objects to their own module
+Move content objects to their own module
+Restructure RC and content objects properly
 Define tests
 Set login required everywhere (current scheme only applies to a few urls, not all and there are issues with class views)
 Define default graph page template

@@ -48,6 +48,11 @@ dpage_col_after = '</div>\n' \
 
 ########################################################################################################################
 #
+# Register classes
+#
+########################################################################################################################
+########################################################################################################################
+#
 # DPage class
 #
 ########################################################################################################################
@@ -63,11 +68,12 @@ class DPage(object):
     objects.
     """
 
-    def __init__(self, request=None, context=None, template=None, objs=None, form=None, width=12):
+    def __init__(self, request=None, context=None, template=None, objs=None):
         """
         Initialize the DPage.
 
         :param request: The request object
+        :type request: WSGIRequest
         :param context: Context values for the page
         :type context: dict
         :param template: template name to use for this DPage object.  If None, DPageDefaultTemplate specified in
@@ -75,18 +81,13 @@ class DPage(object):
         :type template: unicode
         :param objs: The DPage... like object(s) for this DPage.
         :type objs: list or DjangoPageGrid or DjangoPagePage or DjangoPageRow or DjangoPageColumn or object or ...
-        :param form: DPageForm object holding the form for this DPage
-        :type form: DPageForm
         :param width: width of cell (Bootstrap3 width, 1 - 12)
         :type width: int
         """
-        # fixme: add title, slug, description, created, madified, tags, and ev (eval result) to the class
         self.request = request
         self.context = context
         self.template = template if template else settings.DPAGE_DEFAULT_TEMPLATE
         self.objects = objs if objs else []
-        self.form = form                                    # todo: don't think I need this, leave for a bit
-        self.width = width  # width of page                 # todo: don't think I need this, leave for a bit
         self.content = []
         pass
 
