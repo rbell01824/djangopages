@@ -33,7 +33,9 @@ from djangopages.dpage import *
 
 import django_tables2 as tables
 
-from test_data.models import syslog_query, VNode, VCompany
+from test_data.models import syslog_query, syslog_companies, syslog_hosts,\
+    syslog_event_graph, \
+    VNode, VCompany
 
 
 ########################################################################################################################
@@ -459,14 +461,19 @@ class Test6(DPage):
         ###################
         # Put some data in accordion panels
         ###################
-        x1 = AccordionPanel(Text('This text comes from dpage.Text'), title='Row 1')
-        # self.content = Accordion(x1)
-        x2 = AccordionPanel(Markdown('**Bold Markdown Text**'), title='Row 2')
-        x3 = AccordionPanel(HTML('<h3>H3 text from DPageHTML</h3>'), title='Row 3')
+        xcritical = AccordionPanel(syslog_event_graph(), title='Critical events: all companies/nodes')
+        xerror = AccordionPanel(syslog_event_graph(message_type='error'),
+                                title='Error events: all companies/nodes')
+        xco = []
+        for co in ['BMC_1', 'Smart_1']:
+            xco.append(AccordionPanel(syslog_event_graph(company=co),
+                                      title='Critical events: {} all nodes'.format(co)))
+            xco.append(AccordionPanel(syslog_event_graph(company=co, message_type='error'),
+                                      title='Error events: {} all nodes'.format(co)))
         ###################
         # Put into a layout
         ###################
-        self.content = Accordion(x1, x2, x3)
+        self.content = Accordion(xcritical, xerror, xco)
         return self
 
 
@@ -511,7 +518,7 @@ class Test7(DPage):
 
 class Test8(DPage):
     """
-    Test form support
+    Test table2 support
     """
     title = 'DjangoPages_Test8'
     description = 'Demonstrate DB driven table2 widget'
@@ -551,6 +558,7 @@ class Test8(DPage):
         ###################
         # Some stuff after the page
         xr3 = Markdown('\n\n**After the table**\n\n')
+
         ###################
         # Put content on page
         ###################
@@ -559,6 +567,48 @@ class Test8(DPage):
                         R(C3(company_tit, company_tbl),
                           C6(node_tit, node_tbl)),
                         RC(xr3))
+        # self.content = t_node
+        return self
+
+
+class Test9(DPage):
+    """
+    Test button pannels
+    """
+    title = 'DjangoPages_Test9'
+    description = 'Demonstrate button panel'
+    tags = []
+
+    def page(self, initial=None, *args, **kwargs):
+        """
+        Override
+        :param initial:
+        :param args:
+        :param kwargs:
+        """
+        ###################
+        # Get node DB data and put in Table
+        ###################
+        # Node: create title, get queryset, create the table
+        node_tit = Markdown('### Node table')
+        node_qs = VNode.objects.all()
+        node_tbl = Table(self, node_qs)
+
+        ###################
+        # Get company DB data and put in Table
+        ###################
+        # Company: create title, get queryset, create the table
+        company_tit = Markdown('### Company table')
+        company_qs = VCompany.objects.all()
+        company_tbl = Table(self, company_qs)
+
+        ###################
+        # Put content on page
+        ###################
+        # Define the content layout
+        self.content = (ButtonPanel(R(C3(company_tit, company_tbl)), title='Show Companies'),
+                        ButtonPanel(R(C6(node_tit, node_tbl)), title='Show Nodes'),
+                        )
         # self.content = t_node
         return self
 
@@ -576,6 +626,7 @@ class DevTestView(View):
                'test6': Test6,
                'test7': Test7,
                'test8': Test8,
+               'test9': Test9,
                }
 
     # noinspection PyMethodMayBeStatic

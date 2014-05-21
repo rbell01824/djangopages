@@ -440,7 +440,7 @@ class ButtonPanel(object):
                    '    </div>\n' \
                    '<!-- End of button collapsible panel -->\n'
         content = render_objects(self.content, **kwargs)
-        out = template.format(btn_tpe=self.btn_type, name=name, title=self.title, content=content)
+        out = template.format(btn_type=self.btn_type, name=name, title=self.title, content=content)
         return out
 
 ########################################################################################################################

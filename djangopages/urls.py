@@ -36,4 +36,5 @@ urlpatterns = patterns('',
                        url(r'^test6$', DevTestView.as_view(test='test6'), name='devtest6'),
                        url(r'^test7$', DevTestView.as_view(test='test7'), name='devtest7'),
                        url(r'^test8$', DevTestView.as_view(test='test8'), name='devtest8'),
+                       url(r'^test9$', DevTestView.as_view(test='test9'), name='devtest9'),
                        )

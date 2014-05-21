@@ -21,6 +21,9 @@ __email__ = "rbell01824@gmail.com"
 __status__ = "dev"
 
 from django.db import models
+from django.db.models import Count
+
+from djangopages.dpage import Graph
 
 
 class CIA(models.Model):
@@ -189,8 +192,6 @@ class VSyslog(models.Model):
 #
 ########################################################################################################################
 
-from django.db.models import Q
-
 
 def syslog_query(company=None, node=None, start_time=None, end_time=None):
     """
@@ -238,3 +239,50 @@ def syslog_query(company=None, node=None, start_time=None, end_time=None):
     if end_time:
         qs = qs.filter(time__lte=end_time)
     return qs
+
+
+def syslog_companies():
+    """
+    Get list of companies.
+    """
+    ###################
+    # Get companies
+    ###################
+    companies = [n[0] for n in VCompany.objects.all().values_list('company_name')]
+    return companies
+
+
+def syslog_hosts(company):
+    """
+    Get list of this companies hosts.
+    :param company:
+    """
+    ###################
+    # Get hosts for this company
+    ###################
+    hosts = [n[0] for n in VNode.objects.filter(company__company_name=company).values_list('host_name')]
+    return hosts
+
+
+def syslog_event_graph(company=None, node=None, graph='column', message_type='critical', qs=None):
+    """
+    Return error event graph for company, node.
+    :param company:
+    :param node:
+    :param graph:
+    :param message_type:
+    :param qs:
+    """
+    if not qs:
+        qs = syslog_query(company, node)
+    event_count_by_node = map(list, qs.filter(message_type=message_type).
+                              order_by('node__host_name').
+                              values('node__host_name').
+                              annotate(count=Count('node__host_name')).
+                              values_list('node__host_name', 'count'))
+    graph = Graph(graph, event_count_by_node)
+    graph.options = {'title.text': 'Error Events',
+                     'subtitle.text': '{} {}'.format(company if company else 'All Companies',
+                                                     node if node else 'All Nodes')}
+    return graph
+
