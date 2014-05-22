@@ -497,9 +497,14 @@ class Test7(DPage):
         ###################
         # noinspection PyDocstring
         class TestForm(forms.Form):
-            message = forms.CharField()
+            message = forms.CharField(initial='Enter your message here.')
 
-        xrform = Form(self, TestForm, 'Update the display', initial=initial, action_url='/dpages/test7')
+        if not initial:
+            initial = {'message': 'Enter your message here.'}
+
+        xrform = Form(self, TestForm, 'Update the display',
+                      initial=initial,
+                      action_url='/dpages/test7')
         ###################
         # Create some other content that uses form data
         ###################
@@ -636,7 +641,7 @@ class DevTestView(View):
         :param request:
         """
         dt = self.testmap[self.test]
-        dpage = dt(request).page({'message': 'Enter your message here.'})
+        dpage = dt(request).page()
         return dpage.render()
 
     # noinspection PyMethodMayBeStatic,PyUnusedLocal

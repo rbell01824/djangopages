@@ -41,6 +41,7 @@ dpage_row_before = '<!-- Start of dpage row -->\n' \
                    '<div class="row">\n'
 dpage_row_after = '</div>\n' \
                   '<!-- End of dpage row -->\n'
+# fixme add xs sm support
 dpage_col_before = '<!-- Start of dpage col -->\n' \
                    '<div class="col-md-{}">\n'
 dpage_col_after = '</div>\n' \
@@ -312,7 +313,7 @@ class RowColumn(object):
         """
         out = ''
         for con in self.content:
-            out += dpage_row_before + Column(con, width=self.width).render() + dpage_row_after
+            out += dpage_row_before + Column(con, width=self.width).render() + dpage_row_after      # fixme: call ROW
         return out
 
 
@@ -370,7 +371,7 @@ class Row1Column(object):
         out = ''
         for con in self.content:
             out += Column(con, width=self.width).render()
-        out = dpage_row_before + out + dpage_row_after
+        out = dpage_row_before + out + dpage_row_after      # fixme: call row
         return out
 
 
