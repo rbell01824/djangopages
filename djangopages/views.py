@@ -500,13 +500,9 @@ class Test7(DPage):
         class TestForm(forms.Form):
             message = forms.CharField(initial='Enter your message here.')
 
-        if not initial:
-            initial = {'message': 'Enter your message here.'}
-        else:
-            initial = self.request.POST['message']
-
         xrform = Form(self, TestForm, 'Update the display',
                       action_url='/dpages/test7')
+
         ###################
         # Create some other content that uses form data
         ###################
