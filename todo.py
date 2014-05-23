@@ -23,6 +23,7 @@ __status__ = "dev"
 Add connection to register and dispatch
 Move layout objects to their own module
 Move content objects to their own module
+Add kwargs and attributes to layout & content objects
 Restructure RC and content objects properly
 Define tests
 Set login required everywhere (current scheme only applies to a few urls, not all and there are issues with class views)
@@ -39,6 +40,7 @@ Check options on markdown wrt line wraps.
 # todo 1: modify Graph... classes to accommodate type() to decide how to render objects
 # todo 1: create class for forms creation
 
+# todo 2: add html template option to content objects universally
 # todo 2: get local versions of jquery and ALL the bootstrap cruft
 # todo 2: look into macros for graph page, see https://github.com/twidi/django-templates-macros
 # todo 2: look into hosting services - python anywhere https://www.pythonanywhere.com/

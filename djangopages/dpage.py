@@ -69,7 +69,7 @@ class DPage(object):
     objects.
     """
 
-    def __init__(self, request=None, context=None, template=None, objs=None):
+    def __init__(self, request=None, context=None, template=None, objs=None, **kwargs):
         """
         Initialize the DPage.
 
@@ -82,14 +82,15 @@ class DPage(object):
         :type template: unicode
         :param objs: The DPage... like object(s) for this DPage.
         :type objs: list or DjangoPageGrid or DjangoPagePage or DjangoPageRow or DjangoPageColumn or object or ...
-        :param width: width of cell (Bootstrap3 width, 1 - 12)
-        :type width: int
+        :param kwargs: RFU
+        :type kwargs: dict
         """
         self.request = request
         self.context = context
         self.template = template if template else settings.DPAGE_DEFAULT_TEMPLATE
         self.objects = objs if objs else []
         self.content = []
+        self.kwargs = kwargs
         pass
 
     def page(self):
@@ -153,7 +154,9 @@ class DPage(object):
 #
 # Layout support methods.  Really just syntactic sugar to make layout easier.
 #
-# A DPage contains a list of rows.  Each row may have multiple columns.  Columns have a default or
+########################################################################################################################
+#
+#  A DPage contains a list of rows.  Each row may have multiple columns.  Columns have a default or
 # specified width.  Columns can contain anything that has a render method.  Rows may be nested in columns may be
 # nested in rows ... to whatever deapth amuses.  Past 2 or 3 it's probably not a good idea.
 #
@@ -207,6 +210,7 @@ class Column(object):
         """
         self.objs = content
         self.width = kwargs.pop('width', 12)
+        self.kwargs = kwargs
         return
 
     def render(self, **kwargs):
@@ -249,16 +253,19 @@ class Row(object):
     """
     Wrap content in a row.
     """
-    def __init__(self, *content):
+    def __init__(self, *content, **kwargs):
         """
         Wrap *content objects in row.
 
         :param content: Content to wrap in a row
         :type content: object or collections.iterable
+        :param kwargs: RFU
+        :type kwargs: dict
         :return: Row object
         :rtype: Row object
         """
         self.content = content
+        self.kwargs = kwargs
         return
 
     def render(self, **kwargs):
@@ -295,13 +302,14 @@ class RowColumn(object):
 
         :param content: Content to wrap in a row with multiple columns of width width
         :type content: object or collections.iterable
-        :param kwargs: keyword args (width: bootstrap width int or unicode, ...)
+        :param kwargs: Optional arguments, bootstrap 'width' RFU
         :type kwargs: dict
         :return: RowColumn object
         :rtype: RowColumn object
         """
         self.content = content
         self.width = kwargs.pop('width', 12)
+        self.kwargs = kwargs
         pass
 
     def render(self, **kwargs):
@@ -352,13 +360,14 @@ class Row1Column(object):
 
         :param content: Content to wrap in a row with multiple columns of width width
         :type content: object or collections.iterable
-        :param kwargs: keyword args (width: bootstrap width int or unicode, ...)
+        :param kwargs: Bootstrap 3 width, rest RFU
         :type kwargs: dict
         :return: RowColumn object
         :rtype: RowColumn object
         """
         self.content = content
         self.width = kwargs.pop('width', 12)
+        self.kwargs = kwargs
         pass
 
     def render(self, **kwargs):
@@ -402,6 +411,20 @@ R1C12 = functools.partial(row1column, width=12)
 
 ########################################################################################################################
 #
+# Content classes/objects
+#
+########################################################################################################################
+
+########################################################################################################################
+#
+# Panel
+#
+########################################################################################################################
+
+# todo 1: add panel object with support for header, footer, and panel class
+
+########################################################################################################################
+#
 # Collapsed panel
 #
 ########################################################################################################################
@@ -411,6 +434,7 @@ class ButtonPanel(object):
     """
     Collapsible button panel
     """
+    # todo: add panel heading and footer to buttonpanel
     def __init__(self, *content, **kwargs):
         """
         Create a collapsible panel on a button.
@@ -425,6 +449,8 @@ class ButtonPanel(object):
         self.content = content
         self.title = kwargs.pop('title', '')
         self.btn_type = kwargs.pop('button', 'btn-primary')
+        self.kwargs = kwargs
+        # todo 2: add header, footer, and panel class attributes here
         pass
 
     def render(self, **kwargs):
@@ -455,15 +481,19 @@ class Accordion(object):
     """
     Accordion support
     """
-    def __init__(self, *content):
+    def __init__(self, *content, **kwargs):
         """
         Create accordion object.
 
         :param content: Accordion content.  Must AccordionPanel or list of AccordionRow.
         :type content: list or AccordionPanel
+        :param kwargs: RFU
+        :type kwargs: dict
         """
-        # todo: check that content is AccordionPanel or list of AccordionPanel
+        # todo 2: check that content is AccordionPanel or list of AccordionPanel
+        # todo 2: add other accordion options in kwargs
         self.content = content
+        self.kwargs = kwargs
         return
 
     def render(self, **kwargs):
@@ -493,6 +523,7 @@ class AccordionPanel(object):
         self.content = content
         self.title = kwargs.pop('title', '')
         self.panel_collapsed = kwargs.pop('collapsed', True)
+        # todo 2: add other accordion panel options here
         return
 
     def render(self, **kwargs):
@@ -545,6 +576,7 @@ class AccordionMultiPanel(object):
         self.content = content
         self.title = kwargs.pop('title', '')
         self.panel_collapsed = kwargs.pop('collapsed', True)
+        # todo 2: add other options here
         return
 
     def render(self, **kwargs):
@@ -596,11 +628,10 @@ class ContentBase(object):
     Base class for all objects that render actual content as opposed to formating (aka row/column/etc).
     """
 
-    def __init__(self, **kwargs):
-        self.request = kwargs.pop('request', None)
+    def __init__(self):
         return
 
-    def render(self, **kwargs):
+    def render(self):
         """
         This method should return the HTML to render the object.
         """
@@ -617,12 +648,13 @@ class Text(ContentBase):
         Create text object and initialize it.
         :param text: The text.
         :type text: unicode
-        :param kwargs: additional arguments for base class
-        :type kwargs:
+        :param kwargs: RFU
+        :type kwargs: dict
 
         """
-        super(Text, self).__init__(**kwargs)
         self.text = text
+        self.kwargs = kwargs
+        # todo 2: add text options here and render text in a span
         return
 
     def render(self, **kwargs):
@@ -645,14 +677,15 @@ class Markdown(ContentBase):
         :type markdowntext: unicode
         :param extensions: Optional markdown options string.  See python markdown documentation.
         :type extensions: unicode or None
-        :param kwargs: additional arguments for base class
-        :type kwargs:
+        :param kwargs: RFU
+        :type kwargs: dict
         """
-        super(Markdown, self).__init__(**kwargs)
         self.extensions = extensions
         self.markdown_text = markdown_text
-        # todo: here check text type and deal with file like objects and queryset objects
+        self.kwargs = kwargs
+        # todo 3: here check text type and deal with file like objects and queryset objects
         # for now just deal with actual text
+        # todo 2: add markdown kwargs options here
         pass
 
     def render(self, **kwargs):
@@ -681,9 +714,11 @@ class HTML(ContentBase):
 
         :param htmltext: Text to process as markdown.
         :type htmltext: unicode
+        :param kwargs: RFU
+        :type kwargs: dict
         """
-        super(HTML, self).__init__(**kwargs)
         self.htmltext = htmltext
+        self.kwargs = kwargs
         # todo: here check text type and deal with file like objects and queryset objects
         # for now just deal with actual text
         pass
@@ -713,8 +748,9 @@ class Graph(ContentBase):
         :type data: unicode or list[dict] or dict
         :param options: 'with' options for the chartkick graph.
         :type options: unicode
+        :param kwargs: RFU
+        :type kwargs: dict
         """
-        super(Graph, self).__init__(**kwargs)
         if not graph_type in LEGAL_GRAPH_TYPES:
             raise ValueError('In Graph illegal graph type {}'.format(graph_type))
 
@@ -723,6 +759,7 @@ class Graph(ContentBase):
         self.graph_type = graph_type  # save type of graph
         self.data = data  # the data to display
         self.options = options  # chartkick with options
+        self.kwargs = kwargs
         pass
 
     def render(self, **kwargs):
@@ -778,9 +815,10 @@ class Graph(ContentBase):
         return out
 LEGAL_GRAPH_TYPES = ['line', 'pie', 'column', 'bar', 'area']
 
-# todo: allow form to specify custom template
-# todo: support rest of bootstrap 3 form attributes
-# todo: syntactic suggar for Form
+# todo 3: allow form to specify custom template
+# todo 2: support rest of bootstrap 3 form attributes
+# todo 2: syntactic suggar for Form
+# todo 1: add form with submit on field change
 
 
 class Form(ContentBase):
@@ -788,12 +826,29 @@ class Form(ContentBase):
     Provide form support
     """
     def __init__(self, dpage, form, submit='Submit', initial=None, action_url=None, **kwargs):
-        super(Form, self).__init__(**kwargs)
+        """
+        Create a form object.
+
+        :param dpage: dpage object
+        :type dpage: DPage
+        :param form: form object
+        :type form: forms.Form
+        :param submit: text for submit button
+        :type submit: unicode
+        :param initial: initial bound values
+        :type initial: dict or None
+        :param action_url: submit action url
+        :type action_url: unicode
+        :param kwargs: RFU
+        :type kwargs: dict
+        """
         self.dpage = dpage
         self.form = form
         self.submit = submit
         self.initial = initial
         self.action_url = action_url
+        self.kwargs = kwargs
+        # todo 2: add other kwargs options here
         pass
 
     def render(self, **kwargs):
@@ -828,8 +883,10 @@ class Form(ContentBase):
         #     </div>
         # </form>
         #
-        if self.initial:
+        if self.initial:            # fixme: modify to get initial from request.POST ? or not?
             the_form = self.form(self.initial)
+        elif len(self.dpage.request.POST) > 0:
+            the_form = self.form(self.dpage.request.POST)
         else:
             the_form = self.form()
         request = self.dpage.request
@@ -840,13 +897,14 @@ class Form(ContentBase):
                    '        {% bootstrap_form the_form %}\n' \
                    '        {% buttons %}\n' \
                    '            <button type="submit" class="btn btn-primary">\n' \
-                   '                {% bootstrap_icon "star" %} Submit\n' \
+                   '                {% bootstrap_icon "star" %} {submit_text}\n' \
                    '            </button>\n' \
                    '        {% endbuttons %}\n' \
                    '    </form>\n' \
                    '<!-- end of django bootstrap3 form -->\n'
         # Do NOT use format here since the template contains {% ... %}
         template = template.replace('{action_url}', self.action_url if self.action_url else '/dpages/')
+        template = template.replace('{submit_text}', self.submit)
         t = Template(template)
         c = {'the_form': the_form}
         c.update(csrf(request))
@@ -859,12 +917,21 @@ class Table(ContentBase):
     """
     Provide table support
     """
-    def __init__(self, dpage, qs):
+    def __init__(self, dpage, qs, **kwargs):
         """
         Initialize a Table object
+
+        :param dpage: dpage object
+        :type dpage: DPage
+        :param qs: Queryset
+        :type qs:
+        :param kwargs: RFU
+        :type kwargs: dict
         """
         self.dpage = dpage
         self.qs = qs
+        self.kwargs = kwargs
+        # todo 2: add other kwargs options here
         pass
 
     def render(self, **kwargs):

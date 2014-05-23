@@ -375,6 +375,7 @@ class Test5(DPage):
     def time_chart(qs, company, host):
         """
         Create basic time chart summary
+
         :param qs: Query set for company & host
         :param company: Company
         :param host: Host
@@ -501,16 +502,19 @@ class Test7(DPage):
 
         if not initial:
             initial = {'message': 'Enter your message here.'}
+        else:
+            initial = self.request.POST['message']
 
         xrform = Form(self, TestForm, 'Update the display',
-                      initial=initial,
                       action_url='/dpages/test7')
         ###################
         # Create some other content that uses form data
         ###################
         xr1 = Markdown('# Test of form support\n\n'
                        'Here is the form')
-        xr2 = Markdown('## The form message is \n\n**{}**\n\n'.format(initial['message']))
+
+        message = self.request.POST.get('message', 'No message yet!')
+        xr2 = Markdown('## The form message is \n\n**{}**\n\n'.format(message))
         xr3 = Markdown('\n\n**After the form**\n\n'
                        'Graphs, tables, and other stuff go here')
         xr4 = HTML('<a class="btn btn-success form-control" href="/">Done playing.</a>')
@@ -653,6 +657,5 @@ class DevTestView(View):
         :param kwargs:
         """
         dt = self.testmap[self.test]
-        dpage = dt(request).page(request.POST)
+        dpage = dt(request).page(request.POST)      # fixme: remove request.POST
         return dpage.render()
-
