@@ -437,7 +437,7 @@ class ButtonPanel(object):
     """
     Collapsible button panel
     """
-    # todo: add panel heading and footer to buttonpanel
+    # todo 2: add panel heading and footer to buttonpanel
     def __init__(self, *content, **kwargs):
         """
         Create a collapsible panel on a button.
@@ -722,8 +722,6 @@ class HTML(ContentBase):
         """
         self.htmltext = htmltext
         self.kwargs = kwargs
-        # todo: here check text type and deal with file like objects and queryset objects
-        # for now just deal with actual text
         pass
 
     def render(self, **kwargs):
@@ -818,6 +816,8 @@ class Graph(ContentBase):
         return out
 LEGAL_GRAPH_TYPES = ['line', 'pie', 'column', 'bar', 'area']
 
+# todo 3: add class to deal with file like objects and queryset objects
+
 # todo 3: allow form to specify custom template
 # todo 2: support rest of bootstrap 3 form attributes
 # todo 2: syntactic suggar for Form
@@ -836,7 +836,7 @@ class Form(ContentBase):
         :type dpage: DPage
         :param form: form object
         :type form: forms.Form
-        :param submit: text for submit button
+        :param submit: text for submit button.  If None, no submit button.
         :type submit: unicode
         :param initial: initial bound values
         :type initial: dict or None
@@ -886,28 +886,39 @@ class Form(ContentBase):
         #     </div>
         # </form>
         #
-        if self.initial:            # fixme: modify to get initial from request.POST ? or not?
+        # Technique to submit on channge: widget=forms.Select(attrs={'onChange': 'this.form.submit()'}),
+        if self.initial:
             the_form = self.form(self.initial)
         elif len(self.dpage.request.POST) > 0:
             the_form = self.form(self.dpage.request.POST)
         else:
             the_form = self.form()
         request = self.dpage.request
-        template = '{% load bootstrap3 %}\n' \
-                   '<!-- start of django bootstrap3 form -->\n' \
-                   '    <form role="form" action="{action_url}" method="post" class="form">\n' \
-                   '        <!-- csrf should be here -->{% csrf_token %}<!-- -->\n' \
-                   '        {% bootstrap_form the_form %}\n' \
-                   '        {% buttons %}\n' \
-                   '            <button type="submit" class="btn btn-primary">\n' \
-                   '                {% bootstrap_icon "star" %} {submit_text}\n' \
-                   '            </button>\n' \
-                   '        {% endbuttons %}\n' \
-                   '    </form>\n' \
-                   '<!-- end of django bootstrap3 form -->\n'
+        form_class_name = self.form.__name__
+        template_top = '{% load bootstrap3 %}\n' \
+                       '<!-- start of django bootstrap3 form -->\n' \
+                       '    <form role="form" action="{action_url}" method="post" class="form">\n' \
+                       '        <!-- csrf should be here -->{% csrf_token %}<!-- -->\n' \
+                       '        <!-- our form class name -->' \
+                       '            <input type="hidden" name="form_class_name" value="{form_class_name}" >\n' \
+                       '        {% bootstrap_form the_form %}\n'
+        template_button = '        {% buttons %}\n' \
+                          '            <button type="submit" class="btn btn-primary">\n' \
+                          '                {% bootstrap_icon "star" %} {submit_text}\n' \
+                          '            </button>\n' \
+                          '        {% endbuttons %}\n'
+        template_bottom = '    </form>\n' \
+                          '<!-- end of django bootstrap3 form -->\n'
+        template = template_top
+        if self.submit:
+            template += template_button
+        template += template_bottom
+
         # Do NOT use format here since the template contains {% ... %}
         template = template.replace('{action_url}', self.action_url if self.action_url else '/dpages/')
-        template = template.replace('{submit_text}', self.submit)
+        template = template.replace('{form_class_name}', form_class_name)
+        if self.submit:
+            template = template.replace('{submit_text}', self.submit)
         t = Template(template)
         c = {'the_form': the_form}
         c.update(csrf(request))
@@ -915,14 +926,11 @@ class Form(ContentBase):
         return output
         # return template
 
-# todo 1: django-tables2 forms do not play nice with bootstrap3
 # todo 1: add support for normal bootstrap 3 forms
 # todo 1: add support for table sorter: http://mottie.github.io/tablesorter/docs/index.html
 # http://mottie.github.io/tablesorter/docs/example-widget-bootstrap-theme.html
 # looks good: http://mottie.github.io/tablesorter/docs/example-widget-bootstrap-theme.html
 # https://github.com/Mottie/tablesorter/wiki
-# todo 1: add feature to register dpage in table to simplify
-
 
 class Table2(ContentBase):
     """

@@ -495,27 +495,28 @@ class Test7(DPage):
         # Create a form
         ###################
         # noinspection PyDocstring
-        class TestForm(forms.Form):
-            message = forms.CharField(initial='Enter your message here.')
+        class TestFormButton(forms.Form):
+            message = forms.CharField(initial='Enter your message here.', required=False,
+                                      # widget=forms.TextInput(attrs={'onChange': 'this.form.submit()'})
+                                      )
 
-        xrform = Form(self, TestForm, 'Update the display',
+        xrform = Form(self, TestFormButton, 'Update the display',
                       action_url='/dpages/test7')
-
         ###################
         # Create some other content that uses form data
         ###################
-        xr1 = Markdown('# Test of form support\n\n'
-                       'Here is the form')
+        xr1 = Markdown('# Test of form support\n\n')
 
-        message = self.request.POST.get('message', 'No message yet!')
-        xr2 = Markdown('## The form message is \n\n**{}**\n\n'.format(message))
-        xr3 = Markdown('\n\n**After the form**\n\n'
-                       'Graphs, tables, and other stuff go here')
+        message = self.request.POST.get('message', 'No message yet')
+
+        xr2 = Markdown('**The form button message is: << {} >>**\n\n'.format(message))
         xr4 = HTML('<a class="btn btn-success form-control" href="/">Done playing.</a>')
         ###################
         # Put into a layout
         ###################
-        self.content = (R1C12(xr1), R(C4(xrform), C6(xr2)), RC(xr3), R1C3(xr4))
+        self.content = (R1C12(xr1),
+                        R(C4(xrform), C6(xr2)),
+                        R1C3(xr4))
         return self
 
 
@@ -651,5 +652,5 @@ class DevTestView(View):
         :param kwargs:
         """
         dt = self.testmap[self.test]
-        dpage = dt(request).page(request.POST)      # fixme: remove request.POST
+        dpage = dt(request).page()
         return dpage.render()
