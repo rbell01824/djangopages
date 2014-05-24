@@ -45,19 +45,22 @@ class DjangoPageAdmin(admin.ModelAdmin):
     DjangoPage admin
     """
     model = DjangoPage
-    search_fields = ('title', 'description',)
+    search_fields = ('title', 'description', )
     list_display_links = ('title',)
-    list_display = ('display_graph', 'title', 'description', 'tags_slug',)
-    readonly_fields = ('tags_suggest',)
+    list_display = ('display_graph', 'title', 'description', 'tags_slug', 'slug',)
+    readonly_fields = ('tags_suggest', 'slug')
     fieldsets = (
         (None, {'classes': ('suit-tab suit-tab-general',),
-                'fields': ('title', 'description', ('tags', 'tags_suggest'))}),
-        ('Query', {'classes': ('suit-tab suit-tab-query',),
-                   'fields': ('template', 'djangopage',)}),
+                'fields': ('title',
+                           'description',
+                           ('tags', 'tags_suggest'),
+                           'slug',)}),
+        ('page', {'classes': ('suit-tab suit-tab-page',),
+                  'fields': ('template', 'djangopage',)}),
     )
     list_filter = (TaggitListFilter,)
     suit_form_tabs = (('general', 'General'),
-                      ('query', 'Query'),
+                      ('page', 'Page'),
                       )
     save_on_top = True
     ordering = ('title',)

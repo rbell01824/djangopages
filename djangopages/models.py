@@ -42,7 +42,6 @@ class DjangoPage(TitleSlugDescriptionModel, TimeStampedModel):
     """
     tags = TaggableManager(blank=True)
     template = models.TextField(blank=True)
-    # The Django/python to get the form data
     djangopage = models.TextField(blank=True)
 
     class Meta:

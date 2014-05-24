@@ -36,17 +36,6 @@ from django.core.context_processors import csrf
 
 from djangopages.libs import dict_nested_set
 
-# HTML to create a bootstrap3 row
-dpage_row_before = '<!-- Start of dpage row -->\n' \
-                   '<div class="row">\n'
-dpage_row_after = '</div>\n' \
-                  '<!-- End of dpage row -->\n'
-# fixme add xs sm support
-dpage_col_before = '<!-- Start of dpage col -->\n' \
-                   '<div class="col-md-{}">\n'
-dpage_col_after = '</div>\n' \
-                  '<!-- End of dpage col -->\n'
-
 ########################################################################################################################
 #
 # Register classes
@@ -220,10 +209,15 @@ class Column(object):
         :return: HTML
         :rtype: unicode
         """
+        dpage_col_before = '<!-- Start of dpage col -->\n' \
+                           '<div class="col-md-{width}">\n'
+        dpage_col_after = '</div>\n' \
+                          '<!-- End of dpage col -->\n'
+
         out = ''
         for obj in self.objs:
             out += obj.render()
-        out = dpage_col_before.format(self.width) + out + dpage_col_after
+        out = dpage_col_before.format(width=self.width) + out + dpage_col_after
         return out
 
 
@@ -275,9 +269,18 @@ class Row(object):
         :return: HTML
         :rtype: unicode
         """
+        # HTML to create a bootstrap3 row
+        dpage_row_before = '<!-- Start of dpage row -->\n' \
+                           '<div class="row">\n'
+        dpage_row_after = '</div>\n' \
+                          '<!-- End of dpage row -->\n'
+
         out = ''
         for con in self.content:
-            out += con.render()
+            if hasattr(con, 'render'):
+                out += con.render()
+            else:
+                out += con
         out = dpage_row_before + out + dpage_row_after
         return out
 
@@ -321,7 +324,7 @@ class RowColumn(object):
         """
         out = ''
         for con in self.content:
-            out += dpage_row_before + Column(con, width=self.width).render() + dpage_row_after      # fixme: call ROW
+            out += Row(Column(con, width=self.width).render()).render()
         return out
 
 
@@ -380,7 +383,7 @@ class Row1Column(object):
         out = ''
         for con in self.content:
             out += Column(con, width=self.width).render()
-        out = dpage_row_before + out + dpage_row_after      # fixme: call row
+        out = Row(out).render()
         return out
 
 
@@ -912,10 +915,18 @@ class Form(ContentBase):
         return output
         # return template
 
+# todo 1: django-tables2 forms do not play nice with bootstrap3
+# todo 1: add support for normal bootstrap 3 forms
+# todo 1: add support for table sorter: http://mottie.github.io/tablesorter/docs/index.html
+# http://mottie.github.io/tablesorter/docs/example-widget-bootstrap-theme.html
+# looks good: http://mottie.github.io/tablesorter/docs/example-widget-bootstrap-theme.html
+# https://github.com/Mottie/tablesorter/wiki
+# todo 1: add feature to register dpage in table to simplify
 
-class Table(ContentBase):
+
+class Table2(ContentBase):
     """
-    Provide table support
+    Provide django-tables2 support
     """
     def __init__(self, dpage, qs, **kwargs):
         """

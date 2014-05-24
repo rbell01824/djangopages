@@ -31,8 +31,6 @@ from django import forms
 
 from djangopages.dpage import *
 
-import django_tables2 as tables
-
 from test_data.models import syslog_query, syslog_companies, syslog_hosts,\
     syslog_event_graph, \
     VNode, VCompany
@@ -548,7 +546,7 @@ class Test8(DPage):
         # Node: create title, get queryset, create the table
         node_tit = Markdown('### Node table')
         node_qs = VNode.objects.all()
-        node_tbl = Table(self, node_qs)
+        node_tbl = Table2(self, node_qs)
 
         ###################
         # Get DB data and put in Table
@@ -556,7 +554,7 @@ class Test8(DPage):
         # Company: create title, get queryset, create the table
         company_tit = Markdown('### Company table')
         company_qs = VCompany.objects.all()
-        company_tbl = Table(self, company_qs)
+        company_tbl = Table2(self, company_qs)
 
         ###################
         # Create some page content
@@ -597,7 +595,7 @@ class Test9(DPage):
         # Node: create title, get queryset, create the table
         node_tit = Markdown('### Node table')
         node_qs = VNode.objects.all()
-        node_tbl = Table(self, node_qs)
+        node_tbl = Table2(self, node_qs)
 
         ###################
         # Get company DB data and put in Table
@@ -605,7 +603,7 @@ class Test9(DPage):
         # Company: create title, get queryset, create the table
         company_tit = Markdown('### Company table')
         company_qs = VCompany.objects.all()
-        company_tbl = Table(self, company_qs)
+        company_tbl = Table2(self, company_qs)
 
         ###################
         # Put content on page
