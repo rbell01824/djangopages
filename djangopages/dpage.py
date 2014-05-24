@@ -418,6 +418,39 @@ R1C12 = functools.partial(row1column, width=12)
 #
 ########################################################################################################################
 
+
+########################################################################################################################
+#
+# Model
+#
+########################################################################################################################
+# todo 1: add model support http://getbootstrap.com/javascript/#modals
+# fixme: create pure modal and panel, pure link and button, content objects to connect the two via the id
+
+class Modal(object):
+    """
+    Modal object
+    """
+    def __init__(self, body, header=None, footer=None, trigger=None, **kwargs):
+        self.body = body
+        self.header = header
+        self.footer = footer
+        self.trigger = trigger
+        self.id = kwargs.pop('id', static_name_generator('modal'))
+        self.kwargs = kwargs
+        return
+
+    def render(self):
+        out = ''
+        return out
+
+########################################################################################################################
+#
+# Carousel
+#
+########################################################################################################################
+# todo 1: add carousel support http://getbootstrap.com/javascript/#carousel
+
 ########################################################################################################################
 #
 # Panel
@@ -425,13 +458,18 @@ R1C12 = functools.partial(row1column, width=12)
 ########################################################################################################################
 
 # todo 1: add panel object with support for header, footer, and panel class
+class Panel(object):
+    def __init__(self):
+        pass
+    def render(self):
+        pass
 
 ########################################################################################################################
 #
-# Collapsed panel
+# Collapsed button panel
 #
 ########################################################################################################################
-
+# todo 1: modify Button Panel so that panel and button are separated
 
 class ButtonPanel(object):
     """
@@ -452,6 +490,7 @@ class ButtonPanel(object):
         self.content = content
         self.title = kwargs.pop('title', '')
         self.btn_type = kwargs.pop('button', 'btn-primary')
+        self.id = kwargs.pop('id', static_name_generator('btn_collapse'))
         self.kwargs = kwargs
         # todo 2: add header, footer, and panel class attributes here
         pass
@@ -460,17 +499,16 @@ class ButtonPanel(object):
         """
         Render button collapsible panel.
         """
-        name = static_name_generator('btn_collapse')
         template = '<!-- Start of button collapsible panel -->\n' \
-                   '    <button type="button" class="btn {btn_type}" data-toggle="collapse" data-target="#{name}">\n' \
+                   '    <button type="button" class="btn {btn_type}" data-toggle="collapse" data-target="#{bp_id}">\n' \
                    '        {title}\n ' \
                    '    </button>\n ' \
-                   '    <div id="{name}" class="collapse">\n' \
+                   '    <div id="{bp_id}" class="collapse">\n' \
                    '        {content}\n' \
                    '    </div>\n' \
                    '<!-- End of button collapsible panel -->\n'
         content = render_objects(self.content, **kwargs)
-        out = template.format(btn_type=self.btn_type, name=name, title=self.title, content=content)
+        out = template.format(btn_type=self.btn_type, bp_id=self.id, title=self.title, content=content)
         return out
 
 ########################################################################################################################
@@ -496,6 +534,7 @@ class Accordion(object):
         # todo 2: check that content is AccordionPanel or list of AccordionPanel
         # todo 2: add other accordion options in kwargs
         self.content = content
+        self.id = kwargs.pop('id', static_name_generator('accordion_id'))
         self.kwargs = kwargs
         return
 
@@ -503,14 +542,13 @@ class Accordion(object):
         """
         Render accordion.
         """
-        accordion_id = static_name_generator('accordion_id')
         template = '<!-- Start of accordion -->\n' \
                    '<div class="panel-group" id="{accordion_id}">\n' \
                    '    {content}\n' \
                    '</div>\n' \
                    '<!-- End of accordion -->\n'
-        content = render_objects(self.content, accordion_id=accordion_id, **kwargs)
-        return template.format(accordion_id=accordion_id, content=content)
+        content = render_objects(self.content, accordion_id=self.id, **kwargs)
+        return template.format(accordion_id=self.id, content=content)
 
 
 class AccordionPanel(object):
@@ -524,8 +562,10 @@ class AccordionPanel(object):
         :type kwargs: dict
         """
         self.content = content
+        self.accordion_id = kwargs.pop('accordion_id', None)
         self.title = kwargs.pop('title', '')
         self.panel_collapsed = kwargs.pop('collapsed', True)
+        self.id = kwargs.pop('id', static_name_generator('panel_id'))
         # todo 2: add other accordion panel options here
         return
 
@@ -537,9 +577,12 @@ class AccordionPanel(object):
         :return: Rendered HTML
         :rtype: html
         """
-        accordion_id = kwargs['accordion_id']
+        # Accordion panels can not get their accordion parent id until the parent
+        # is created, possibly after the panel is created.  So we may need to fetch
+        # the accordion_id here.
+        if not self.accordion_id:
+            kwargs.pop('accordion_id')
 
-        panel_id = static_name_generator('panel_id')
         template = '<!-- start of panel -->\n' \
                    '    <div class="panel panel-default">\n' \
                    '        <div class="panel-heading">\n' \
@@ -558,9 +601,9 @@ class AccordionPanel(object):
                    '    </div>\n' \
                    '<!-- end of panel -->\n'
         content = render_objects(self.content, **kwargs)
-        out = template.format(accordion_id=accordion_id,
+        out = template.format(accordion_id=self.accordion_id,
                               panel_collapsed='' if self.panel_collapsed else 'in',
-                              panel_id=panel_id,
+                              panel_id=self.id,
                               panel_title=self.title,
                               panel_content=content)
         return out
@@ -577,8 +620,10 @@ class AccordionMultiPanel(object):
         :type kwargs: dict
         """
         self.content = content
+        self.accordion_id = kwargs.pop('accordion_id', None)
         self.title = kwargs.pop('title', '')
         self.panel_collapsed = kwargs.pop('collapsed', True)
+        self.id = kwargs.pop('id', static_name_generator('panel_id'))
         # todo 2: add other options here
         return
 
@@ -590,9 +635,12 @@ class AccordionMultiPanel(object):
         :return: Rendered HTML
         :rtype: html
         """
-        accordion_id = kwargs['accordion_id']
+        # Accordion panels can not get their accordion parent id until the parent
+        # is created, possibly after the panel is created.  So we may need to fetch
+        # the accordion_id here.
+        if not self.accordion_id:
+            kwargs.pop('accordion_id')
 
-        panel_id = static_name_generator('panel_id')
         template = '<!-- start of panel -->\n' \
                    '    <div class="panel panel-default">\n' \
                    '        <div class="panel-heading">\n' \
@@ -611,9 +659,9 @@ class AccordionMultiPanel(object):
                    '    </div>\n' \
                    '<!-- end of panel -->\n'
         content = render_objects(self.content, **kwargs)
-        out = template.format(accordion_id=accordion_id,
+        out = template.format(accordion_id=self.accordion_id,
                               panel_collapsed='' if self.panel_collapsed else 'in',
-                              panel_id=panel_id,
+                              panel_id=self.id,
                               panel_title=self.title,
                               panel_content=content)
         return out
@@ -817,11 +865,12 @@ class Graph(ContentBase):
 LEGAL_GRAPH_TYPES = ['line', 'pie', 'column', 'bar', 'area']
 
 # todo 3: add class to deal with file like objects and queryset objects
+# todo 3: add support for select2 https://github.com/applegrew/django-select2
+# todo 3: https://github.com/digi604/django-smart-selects provides chained selects for django models
 
 # todo 3: allow form to specify custom template
 # todo 2: support rest of bootstrap 3 form attributes
 # todo 2: syntactic suggar for Form
-# todo 1: add form with submit on field change
 
 
 class Form(ContentBase):
