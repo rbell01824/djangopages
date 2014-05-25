@@ -37,10 +37,16 @@ from test_data.models import syslog_query, syslog_companies, syslog_hosts,\
 
 
 ########################################################################################################################
+
+def gp():
+    return get_paragraph()
+
+########################################################################################################################
 #
 # Development test class based view
 #
 ########################################################################################################################
+
 
 class Test1(DPage):
     """
@@ -598,16 +604,16 @@ class Test9(DPage):
         # Put content on page
         ###################
         # Define the content layout
-        self.content = (
-            RC(get_paragraph()),
-            Panel(R(C3(company_tit, company_tbl)), button='Show Companies'),
-            Panel(R(C6(node_tit, node_tbl)), button='Show Nodes'),
-            RC(get_paragraph()),
-            RC(Markdown('#Button Panel')),
-            R1C6(('The button is in the left column.', bpn, bpc, 'The panel is in the right column', get_paragraph()),
-                 (get_paragraph(), Markdown('#### Node panel will appear here'), pn,
-                  get_paragraph(), Markdown('#### Company panel will appear here'), pc))
-            )
+        self.content = (RC(get_paragraph()),
+                        Panel(R(C3(company_tit, company_tbl)), button='Show Companies'),
+                        Panel(R(C6(node_tit, node_tbl)), button='Show Nodes'),
+                        RC(get_paragraph()),
+                        RC(Markdown('#Button Panel')),
+                        R1C6(('The button is in the left column.', bpn, bpc,
+                              'The panel is in the right column', get_paragraph()),
+                             (get_paragraph(), Markdown('#### Node panel will appear here'), pn,
+                              get_paragraph(), Markdown('#### Company panel will appear here'), pc))
+                        )
         # self.content = t_node
         return self
 
@@ -654,14 +660,35 @@ class Test11(DPage):
         """
         Build modal test page
         """
-        mdl1 = Modal(RC(Markdown('#This is modal 1'),get_paragraph(), get_paragraph()))
+        mdl1 = Modal(RC(Markdown('#This is modal 1'), get_paragraph(), get_paragraph()))
         b1 = ButtonModal('Click to display modal 1', mdl1)
-        mdl2 = Modal(RC(Markdown('#This is modal 2'),get_paragraph(), get_paragraph()))
+        mdl2 = Modal(RC(Markdown('#This is modal 2'), get_paragraph(), get_paragraph()))
         b2 = ButtonModal('Click to display modal 2', mdl2)
         mdl3 = Modal(get_paragraph(), get_paragraph(),
                      button='Modal 3 button',
                      header=Markdown('####Markdown header for modal 3'),
                      footer=(Button('A button'), 'This is the footer for modal 3',))
+        self.content = (RC(get_paragraph()),
+                        R(C(b1, b2)),
+                        RC(get_paragraph()),
+                        RC(mdl3),
+                        RC(get_paragraph()))
+        return self
+
+
+class Test12(DPage):
+    """
+    Test modal
+    """
+    title = 'DjangoPages_Test12'
+    description = 'Demonstrate carousel'
+    tags = []
+
+    def page(self):
+        """
+        Build carousel test page
+        """
+        c1 = Carousel()
         self.content = (RC(get_paragraph()),
                         R(C(b1, b2)),
                         RC(get_paragraph()),
@@ -686,6 +713,7 @@ class DevTestView(View):
                'test9': Test9,
                'test10': Test10,
                'test11': Test11,
+               'test12': Test12,
                }
 
     # noinspection PyMethodMayBeStatic

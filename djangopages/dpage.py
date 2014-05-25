@@ -953,24 +953,6 @@ class AccordionMultiPanel(object):
                               panel_content=content)
         return out
 
-########################################################################################################################
-#
-# Carousel
-#
-########################################################################################################################
-# todo 1: add carousel support http://getbootstrap.com/javascript/#carousel
-
-########################################################################################################################
-#
-# Panel and Accordion support
-#
-########################################################################################################################
-
-
-########################################################################################################################
-
-########################################################################################################################
-
 
 class Form(object):
     """
@@ -1075,10 +1057,6 @@ class Form(object):
         # return template
 
 # todo 1: add support for normal bootstrap 3 forms
-# todo 1: add support for table sorter: http://mottie.github.io/tablesorter/docs/index.html
-# http://mottie.github.io/tablesorter/docs/example-widget-bootstrap-theme.html
-# looks good: http://mottie.github.io/tablesorter/docs/example-widget-bootstrap-theme.html
-# https://github.com/Mottie/tablesorter/wiki
 
 
 class Table2(object):
@@ -1122,6 +1100,30 @@ class Table2(object):
         #            '<!-- end of table -->\n'
         # output = template.replace('x_the_table_object', name)
         # return output
+
+# todo 1: add support for table sorter: http://mottie.github.io/tablesorter/docs/index.html
+# http://mottie.github.io/tablesorter/docs/example-widget-bootstrap-theme.html
+# looks good: http://mottie.github.io/tablesorter/docs/example-widget-bootstrap-theme.html
+# https://github.com/Mottie/tablesorter/wiki
+
+########################################################################################################################
+#
+# Carousel
+#
+########################################################################################################################
+
+
+class Carousel(object):
+    """
+    Carousel
+    """
+    def __init__(self):
+        return
+
+    def render(self):
+        out = 'carousel goes here'
+        return out
+
 
 ########################################################################################################################
 #
