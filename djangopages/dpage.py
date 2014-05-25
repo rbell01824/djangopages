@@ -141,7 +141,7 @@ class DPage(object):
 
 ########################################################################################################################
 #
-# Layout support methods.  Really just syntactic sugar to make layout easier.
+# Layout support classes and methods.  Really just syntactic sugar to make layout easier.
 #
 ########################################################################################################################
 #
@@ -229,6 +229,7 @@ def column(*content, **kwargs):
     :type kwargs: dict
     """
     return Column(*content, **kwargs)
+C = functools.partial(column)
 C1 = functools.partial(column, width=1)
 C2 = functools.partial(column, width=2)
 C3 = functools.partial(column, width=3)
@@ -414,9 +415,288 @@ R1C12 = functools.partial(row1column, width=12)
 
 ########################################################################################################################
 #
-# Content classes/objects
+# Content classes and methods
+#
+# Classes to add content to DPage. Classes that add content to a DPage should derive from ContentBase and
+# MUST provide a render method.
 #
 ########################################################################################################################
+# todo 3: add class to deal with file like objects and queryset objects
+# todo 3: add support for select2 https://github.com/applegrew/django-select2
+# todo 3: https://github.com/digi604/django-smart-selects provides chained selects for django models
+
+# todo 3: allow form to specify custom template
+# todo 2: support rest of bootstrap 3 form attributes
+# todo 2: syntactic suggar for Form
+
+
+class ContentBase(object):
+    """
+    Base class for all objects that render actual content as opposed to formating (aka row/column/etc).
+    """
+
+    def __init__(self):
+        return
+
+    def render(self):
+        """
+        This method should return the HTML to render the object.
+        """
+        raise NotImplementedError("Subclasses should implement render method!")
+
+
+class Text(ContentBase):
+    """
+    Holds text for inclusion in the page
+    """
+
+    def __init__(self, *content, **kwargs):
+        """
+        Create text object and initialize it.
+        :param content: The text.
+        :type content: unicode
+        :param kwargs: RFU
+        :type kwargs: dict
+
+        """
+        self.content = content
+        self.kwargs = kwargs
+        # todo 2: add text options here and render text in a span
+        return
+
+    def render(self, **kwargs):
+        """
+        Render the Text object
+        """
+        out = ''
+        for obj in self.content:
+            if hasattr(obj, 'render'):
+                out += render_objects(obj, **kwargs)
+            else:
+                out += obj
+        return out
+
+
+class Markdown(ContentBase):
+    """
+    Holds markdown text for inclusion in a DPage.
+    """
+
+    def __init__(self, *content, **kwargs):
+        """
+        Create a markdown object and initialize it.
+
+        :param content: Text to process as markdown.
+        :type content: unicode
+        :param kwargs: extensions, RFU
+        :type kwargs: dict
+        """
+        self.content = content
+        self.extensions = kwargs.pop('extensions', None)
+        self.kwargs = kwargs
+        # todo 3: here check text type and deal with file like objects and queryset objects
+        # for now just deal with actual text
+        # todo 2: add markdown kwargs options here
+        pass
+
+    def render(self, **kwargs):
+        """
+        Render markdown text.
+        """
+        out = ''
+        for obj in self.content:
+            if hasattr(obj, 'render'):
+                out += render_objects(obj, **kwargs)
+            else:
+                out += markdown.markdown(force_unicode(obj),
+                                         self.extensions if self.extensions else '',
+                                         output_format='html5',
+                                         safe_mode=False,
+                                         enable_attributes=False)
+        return out
+
+
+class HTML(ContentBase):
+    """
+    Holds HTML text for inclusion in a DPage.  This is a convenience method since DPageMarkdown can be
+    used interchangeably.
+    """
+
+    def __init__(self, *content, **kwargs):
+        """
+        Create a DPageHTML object and initialize it.
+
+        :param content: Text to process as html.
+        :type content: unicode
+        :param kwargs: RFU
+        :type kwargs: dict
+        """
+        self.content = content
+        self.kwargs = kwargs
+        pass
+
+    def render(self, **kwargs):
+        """
+        Render HTML text.
+        """
+        out = ''
+        for obj in self.content:
+            if hasattr(obj, 'render'):
+                out += render_objects(obj)
+            else:
+                out += obj
+        return out
+
+
+LEGAL_GRAPH_TYPES = ['line', 'pie', 'column', 'bar', 'area']
+
+
+class Graph(ContentBase):
+    """
+    DPage graph object class that uses Chartkick.
+    """
+    # noinspection PyShadowingBuiltins
+    def __init__(self, graph_type, data, options=None, **kwargs):
+        """
+        Create a graph object
+
+        :param graph_type: The type of this graph.  Must be line, pie, column, bar, or area.
+        :type graph_type: unicode
+        :param data: The name of the context variable holding the graph's data
+        :type data: unicode or list[dict] or dict
+        :param options: 'with' options for the chartkick graph.
+        :type options: unicode
+        :param kwargs: RFU
+        :type kwargs: dict
+        """
+        if not graph_type in LEGAL_GRAPH_TYPES:
+            raise ValueError('In Graph illegal graph type {}'.format(graph_type))
+
+        # todo 2: when this is working, remove the unneeded class attributes
+        # todo 2: since all that's really needed is self.output
+        self.graph_type = graph_type  # save type of graph
+        self.data = data  # the data to display
+        self.options = options  # chartkick with options
+        self.kwargs = kwargs
+        pass
+
+    def render(self, **kwargs):
+        """
+        Render the graph
+        """
+        # Generate the chartkick graph template text
+        data = self.data
+        if self.options:
+            options = self.set_options()
+            chart = '{}_chart data with {}'.format(self.graph_type, options)
+            pass
+        else:
+            chart = '{}_chart data'.format(self.graph_type)
+            pass
+        t = Template('{% load chartkick %} {% ' + chart + ' %}')
+
+        # render
+        output = t.render(Context({'data': data}))
+
+        return output
+
+    def set_options(self):
+        """
+        Set chartkick & highchart options
+            options = "height='500px' library=" + str(library)
+
+        """
+        options = copy(self.options)
+        out = ''
+
+        # deal with height, max, and min
+        height = options.pop('height', None)
+        if height:
+            out += " height='{}'".format(height)
+        xmax = options.pop('max', None)
+        if xmax:
+            out += " max='{}'".format(xmax)
+        xmin = options.pop('min', None)
+        if xmin:
+            out += " min='{}'".format(xmin)
+
+        # Is there anythin left
+        if len(options) < 1:
+            return out
+
+        # These are library options of the form title.text: ...
+        library = {}
+        for key, value in options.iteritems():
+            dict_nested_set(library, key, value)
+        out += " library={}".format(str(library))
+
+        return out
+
+
+class Button(ContentBase):
+    """
+    DPage button class
+    """
+    def __init__(self, btn_text, btn_type='btn-default', **kwargs):
+        """
+        """
+        self.btn_text = btn_text
+        self.btn_type = btn_type
+        self.kwargs = kwargs
+        return
+
+    def render(self):
+        template = '<!-- start of button -->\n' \
+                   '    <button type="button" class="btn {btn_type}">\n' \
+                   '        {btn_text}\n' \
+                   '    </button>\n' \
+                   '<!-- end of button -->\n'
+        out = template.format(btn_text=self.btn_text, btn_type=self.btn_type)
+        return out
+
+
+class Modal(object):
+    """
+    Modal object
+    """
+    def __init__(self, *content, **kwargs):
+        self.body = body
+        self.header = kwargs.pop('header', None)
+        self.footer = kwargs.pop('footer', None)
+        self.trigger = kwargs.pop('trigger', None)
+        self.id = kwargs.pop('id', static_name_generator('modal'))
+        self.modal_label = kwargs.pop('modal_label', static_name_generator('modal_label'))
+        self.kwargs = kwargs
+        return
+
+    def render(self):
+        out = ''
+        template_xxx = '<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#{id}">' \
+                       '    Launch demo modal ' \
+                       '</button>'.format(id=self.id)
+        template_top = '<!-- modal start -->\n' \
+                       '<div class="modal fade" id="{id}" tabindex="-1" role="dialog" \n' \
+                       '     aria-labelledby="{modal_label}" aria-hidden="true">\n' \
+                       '    <div class="modal-dialog">\n' \
+                       '        <div class="modal-content">\n'.format(id=self.id, modal_label=self.modal_label)
+        template_hdr = '            <div class="modal-header">\n' \
+                       '                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n' \
+                       '                <h4 class="modal-title" id="{modal_label}">Modal title</h4>\n' \
+                       '            </div>\n'.format(modal_label=self.modal_label)
+        body = render_objects(self.body, self.kwargs)
+        template_bdy = '            <div class="modal-body">\n' \
+                       '                {body}\n' \
+                       '            </div>\n'.format(body=body)
+        template_ftr = '            <div class="modal-footer">\n' \
+                       '                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n' \
+                       '                <button type="button" class="btn btn-primary">Save changes</button>\n' \
+                       '           </div>\n'
+        template_btm = '        </div>\n' \
+                       '    </div>\n' \
+                       '</div>\n' \
+                       '<!-- modal end -->\n'
+        out = template_xxx + template_top + template_hdr + template_bdy + template_ftr + template_btm
+        return out
 
 
 ########################################################################################################################
@@ -427,22 +707,7 @@ R1C12 = functools.partial(row1column, width=12)
 # todo 1: add model support http://getbootstrap.com/javascript/#modals
 # fixme: create pure modal and panel, pure link and button, content objects to connect the two via the id
 
-class Modal(object):
-    """
-    Modal object
-    """
-    def __init__(self, body, header=None, footer=None, trigger=None, **kwargs):
-        self.body = body
-        self.header = header
-        self.footer = footer
-        self.trigger = trigger
-        self.id = kwargs.pop('id', static_name_generator('modal'))
-        self.kwargs = kwargs
-        return
 
-    def render(self):
-        out = ''
-        return out
 
 ########################################################################################################################
 #
@@ -667,210 +932,9 @@ class AccordionMultiPanel(object):
         return out
 
 ########################################################################################################################
-#
-# Classes to add content to DPage. Classes that add content to a DPage should derive from ContentBase and
-# MUST provide a render method.
-#
+
 ########################################################################################################################
 
-
-class ContentBase(object):
-    """
-    Base class for all objects that render actual content as opposed to formating (aka row/column/etc).
-    """
-
-    def __init__(self):
-        return
-
-    def render(self):
-        """
-        This method should return the HTML to render the object.
-        """
-        raise NotImplementedError("Subclasses should implement render method!")
-
-
-class Text(ContentBase):
-    """
-    Holds text for inclusion in the page
-    """
-
-    def __init__(self, text, **kwargs):
-        """
-        Create text object and initialize it.
-        :param text: The text.
-        :type text: unicode
-        :param kwargs: RFU
-        :type kwargs: dict
-
-        """
-        self.text = text
-        self.kwargs = kwargs
-        # todo 2: add text options here and render text in a span
-        return
-
-    def render(self, **kwargs):
-        """
-        Render the Text object
-        """
-        return self.text
-
-
-class Markdown(ContentBase):
-    """
-    Holds markdown text for inclusion in a DPage.
-    """
-
-    def __init__(self, markdown_text, extensions=None, **kwargs):
-        """
-        Create a markdown object and initialize it.
-
-        :param markdowntext: Text to process as markdown.
-        :type markdowntext: unicode
-        :param extensions: Optional markdown options string.  See python markdown documentation.
-        :type extensions: unicode or None
-        :param kwargs: RFU
-        :type kwargs: dict
-        """
-        self.extensions = extensions
-        self.markdown_text = markdown_text
-        self.kwargs = kwargs
-        # todo 3: here check text type and deal with file like objects and queryset objects
-        # for now just deal with actual text
-        # todo 2: add markdown kwargs options here
-        pass
-
-    def render(self, **kwargs):
-        """
-        Render markdown text.
-
-        :return: html version of markdown text
-        :rtype: unicode
-        """
-        return markdown.markdown(force_unicode(self.markdown_text),
-                                 self.extensions if self.extensions else '',
-                                 output_format='html5',
-                                 safe_mode=False,
-                                 enable_attributes=False)
-
-
-class HTML(ContentBase):
-    """
-    Holds HTML text for inclusion in a DPage.  This is a convenience method since DPageMarkdown can be
-    used interchangeably.
-    """
-
-    def __init__(self, htmltext, **kwargs):
-        """
-        Create a DPageHTML object and initialize it.
-
-        :param htmltext: Text to process as markdown.
-        :type htmltext: unicode
-        :param kwargs: RFU
-        :type kwargs: dict
-        """
-        self.htmltext = htmltext
-        self.kwargs = kwargs
-        pass
-
-    def render(self, **kwargs):
-        """
-        Render HTML text.
-
-        :return: html version of markdown text
-        :rtype: unicode
-        """
-        return self.htmltext
-
-
-class Graph(ContentBase):
-    """
-    DPage graph object class that uses Chartkick.
-    """
-    # noinspection PyShadowingBuiltins
-    def __init__(self, graph_type, data, options=None, **kwargs):
-        """
-        Create a graph object
-
-        :param graph_type: The type of this graph.  Must be line, pie, column, bar, or area.
-        :type graph_type: unicode
-        :param data: The name of the context variable holding the graph's data
-        :type data: unicode or list[dict] or dict
-        :param options: 'with' options for the chartkick graph.
-        :type options: unicode
-        :param kwargs: RFU
-        :type kwargs: dict
-        """
-        if not graph_type in LEGAL_GRAPH_TYPES:
-            raise ValueError('In Graph illegal graph type {}'.format(graph_type))
-
-        # todo 2: when this is working, remove the unneeded class attributes
-        # todo 2: since all that's really needed is self.output
-        self.graph_type = graph_type  # save type of graph
-        self.data = data  # the data to display
-        self.options = options  # chartkick with options
-        self.kwargs = kwargs
-        pass
-
-    def render(self, **kwargs):
-        """
-        Render the graph
-        """
-        # Generate the chartkick graph template text
-        data = self.data
-        if self.options:
-            options = self.set_options()
-            chart = '{}_chart data with {}'.format(self.graph_type, options)
-            pass
-        else:
-            chart = '{}_chart data'.format(self.graph_type)
-            pass
-        t = Template('{% load chartkick %} {% ' + chart + ' %}')
-
-        # render
-        output = t.render(Context({'data': data}))
-
-        return output
-
-    def set_options(self):
-        """
-        Set chartkick & highchart options
-            options = "height='500px' library=" + str(library)
-
-        """
-        options = copy(self.options)
-        out = ''
-
-        # deal with height, max, and min
-        height = options.pop('height', None)
-        if height:
-            out += " height='{}'".format(height)
-        xmax = options.pop('max', None)
-        if xmax:
-            out += " max='{}'".format(xmax)
-        xmin = options.pop('min', None)
-        if xmin:
-            out += " min='{}'".format(xmin)
-
-        # Is there anythin left
-        if len(options) < 1:
-            return out
-
-        # These are library options of the form title.text: ...
-        library = {}
-        for key, value in options.iteritems():
-            dict_nested_set(library, key, value)
-        out += " library={}".format(str(library))
-
-        return out
-LEGAL_GRAPH_TYPES = ['line', 'pie', 'column', 'bar', 'area']
-
-# todo 3: add class to deal with file like objects and queryset objects
-# todo 3: add support for select2 https://github.com/applegrew/django-select2
-# todo 3: https://github.com/digi604/django-smart-selects provides chained selects for django models
-
-# todo 3: allow form to specify custom template
-# todo 2: support rest of bootstrap 3 form attributes
-# todo 2: syntactic suggar for Form
 
 
 class Form(ContentBase):
@@ -981,6 +1045,7 @@ class Form(ContentBase):
 # looks good: http://mottie.github.io/tablesorter/docs/example-widget-bootstrap-theme.html
 # https://github.com/Mottie/tablesorter/wiki
 
+
 class Table2(ContentBase):
     """
     Provide django-tables2 support
@@ -1059,10 +1124,16 @@ def render_objects(objects, **kwargs):
     content = ''
     if isinstance(objects, collections.Iterable):
         for obj in objects:
-            if isinstance(obj, collections.Iterable):
+            if hasattr(obj, 'render'):
+                content += obj.render(**kwargs)
+            elif isinstance(obj, unicode):
+                content += obj
+            elif isinstance(obj, collections.Iterable):
                 content += render_objects(obj, **kwargs)
             else:
-                content += obj.render(**kwargs)
+                content += obj
         return content
-    else:
+    elif hasattr(objects, 'render'):
         return objects.render(**kwargs)
+    else:
+        return objects

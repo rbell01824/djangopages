@@ -50,18 +50,17 @@ class Test1(DPage):
     description = 'Demonstrate basic text widgets'
     tags = []
 
-    def page(self, *args, **kwargs):
+    def page(self):
         """
         Actually create the page
-        :param args:
-        :param kwargs:
         """
         ###################
         # Put some content on the page
         ###################
-        self.content.append(Text('This text comes from dpage.Text'))
-        self.content.append(Markdown('**Bold Markdown Text**'))
-        self.content.append(HTML('<h3>H3 text from DPageHTML</h3>'))
+        self.content.append(Text('This text comes from dpage.Text.', ' So does this'))
+        self.content.append(Markdown('#Header markdown text', '**Bold Markdown Text**'))
+        self.content.append(HTML('<h3>H3 text from DPageHTML</h3>',
+                                 '<strong>Strong text from HTML content</strong>'))
         return self
 
 
@@ -73,22 +72,20 @@ class Test2(DPage):
     description = 'Demonstrate row/column layout of text objects'
     tags = []
 
-    def page(self, *args, **kwargs):
+    def page(self):
         """
         Override
-        :param args:
-        :param kwargs:
         """
         ###################
         # Create some page content
         ###################
-        xr1 = Text('This text comes from dpage.Text')
-        xr2 = Markdown('**Bold Markdown Text**')
-        xr3 = HTML('<h3>H3 text from DPageHTML</h3>')
+        xr1 = HTML('<h3>Text on row 1</h3>')
+        xr2 = Markdown('**Text on row 2**')
+        xr3 = Text('Text on row 3', Button('a button'), 'Some more text in row 3')
         ###################
         # Layout the content on the page
         ###################
-        self.content = RC12(xr1, xr2, xr3)
+        self.content = (RC12(xr1, xr2), RC(xr3),)
         return self
 
 
@@ -100,11 +97,9 @@ class Test3(DPage):
     description = 'Demonstrate complex row/column layout'
     tags = []
 
-    def page(self, *args, **kwargs):
+    def page(self):
         """
         Override
-        :param args:
-        :param kwargs:
         """
         ###################
         # Create some page content
@@ -147,11 +142,9 @@ class Test4(DPage):
     description = 'Demonstrate DB driven graphs with highcharts customization'
     tags = []
 
-    def page(self, *args, **kwargs):
+    def page(self):
         """
         Override
-        :param args:
-        :param kwargs:
         """
         ###################
         # Get the DB data we need
@@ -216,11 +209,9 @@ class Test5(DPage):
     description = 'Demonstrate syslog graphs and multi-panels'
     tags = []
 
-    def page(self, *args, **kwargs):
+    def page(self):
         """
         For specified company, display a summary report and details by node.
-        :param args:
-        :param kwargs:
         """
         ###################
         # Create summary for company
@@ -451,11 +442,9 @@ class Test6(DPage):
     description = 'Demonstrate accordion with text widgets'
     tags = []
 
-    def page(self, *args, **kwargs):
+    def page(self):
         """
         Create simple accordion page
-        :param args:
-        :param kwargs:
         """
         ###################
         # Put some data in accordion panels
@@ -484,12 +473,9 @@ class Test7(DPage):
     description = 'Demonstrate basic form widgets with off page link'
     tags = []
 
-    def page(self, initial=None, *args, **kwargs):
+    def page(self):
         """
         Override
-        :param initial:
-        :param args:
-        :param kwargs:
         """
         ###################
         # Create a form
@@ -528,12 +514,9 @@ class Test8(DPage):
     description = 'Demonstrate DB driven table2 widget'
     tags = []
 
-    def page(self, initial=None, *args, **kwargs):
+    def page(self):
         """
         Override
-        :param initial:
-        :param args:
-        :param kwargs:
         """
         ###################
         # Create some page content
@@ -583,12 +566,9 @@ class Test9(DPage):
     description = 'Demonstrate button panel'
     tags = []
 
-    def page(self, initial=None, *args, **kwargs):
+    def page(self):
         """
         Override
-        :param initial:
-        :param args:
-        :param kwargs:
         """
         ###################
         # Get node DB data and put in Table
@@ -617,6 +597,49 @@ class Test9(DPage):
         return self
 
 
+class Test10(DPage):
+    """
+    Test buttons
+    """
+    title = 'DjangoPages_Test10'
+    description = 'Demonstrate basic buttons'
+    tags = []
+
+    def page(self):
+        """
+        Build button test page
+        """
+        b1 = Button('Default')
+        b2 = Button('Primary', 'btn-primary')
+        b3 = Button('Success', 'btn-success')
+        b4 = Button('Info', 'btn-info')
+        b5 = Button('Warning', 'btn-warning')
+        b6 = Button('Danger', 'btn-danger')
+        b7 = Button('Link', 'btn-link')
+        self.content = R(C12(b1, b2, b3, b4, b5, b6, b7))
+        return self
+
+
+class Test11(DPage):
+    """
+    Test modal
+    """
+    title = 'DjangoPages_Test11'
+    description = 'Demonstrate modal linked to button'
+    tags = []
+
+    def page(self):
+        """
+        Build modal test page
+        """
+        b1 = Button('Show Modal 1', 'btn-primary')
+        b2 = Button('Show Modal 2', 'btn-primary')
+        # mdl = Modal(RC(get_paragraph()), RC6(get_paragraph(), get_paragraph()))
+        mdl = Modal(RC(get_paragraph()))
+        self.content = RC(mdl)
+        return self
+
+
 class DevTestView(View):
     """
     View class for dev testing.
@@ -631,6 +654,8 @@ class DevTestView(View):
                'test7': Test7,
                'test8': Test8,
                'test9': Test9,
+               'test10': Test10,
+               'test11': Test11,
                }
 
     # noinspection PyMethodMayBeStatic
