@@ -688,12 +688,18 @@ class Test12(DPage):
         """
         Build carousel test page
         """
-        c1 = Carousel()
-        self.content = (RC(get_paragraph()),
-                        R(C(b1, b2)),
-                        RC(get_paragraph()),
-                        RC(mdl3),
-                        RC(get_paragraph()))
+        c1 = Markdown('#### Content 1')
+        c2 = Markdown('#### Content 2')
+        c3 = Markdown('#### Content 3')
+        c4 = Markdown('#### Content 4')
+        crsl1 = Carousel(c1, c2, c3, c4)
+        crsl2 = Carousel(c1, c2, c3, c4)
+        self.content = (RC(gp()),
+                        R(C3(Markdown('One')), C9(crsl1)),
+                        RC(gp()),
+                        R(C3(Markdown('Two')), C9(crsl2)),
+                        RC(gp())
+                        )
         return self
 
 

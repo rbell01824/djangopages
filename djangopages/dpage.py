@@ -1057,6 +1057,7 @@ class Form(object):
         # return template
 
 # todo 1: add support for normal bootstrap 3 forms
+# todo 1: add id to Form
 
 
 class Table2(object):
@@ -1117,11 +1118,118 @@ class Carousel(object):
     """
     Carousel
     """
-    def __init__(self):
+    def __init__(self, *content, **kwargs):
+        self.content = content
+        self.id = kwargs.pop('id', static_name_generator('carousel_id'))
+        self.data_interval = kwargs.pop('data-interval', 'false')
+        self.indicators = kwargs.pop('indicators', None)
+        self.background_color = kwargs.pop('background-color', '#D8D8D8')
         return
 
     def render(self):
-        out = 'carousel goes here'
+        t_ind = '<!-- Start Bottom Carousel Indicators -->\n' \
+                '<ol class="carousel-indicators">\n' \
+                '    <li data-target="#{carousel_id}" data-slide-to="0" class="active"></li>\n' \
+                '    <li data-target="#{carousel_id}" data-slide-to="1"></li>\n' \
+                '    <li data-target="#{carousel_id}" data-slide-to="2"></li>\n' \
+                '</ol>\n<!-- End Bottom Carousel Indicators -->\n'
+        out = """
+                  <div class="carousel slide" data-ride="carousel" id="{carousel_id}" data-interval="{data_interval}">
+
+                    <!-- Carousel Slides / Quotes -->
+                    <div class="carousel-inner" style="background-color: {background_color};">
+
+                      <!-- Quote 1 -->
+                      <div class="item active">
+                          <div class="row">
+                            <div class="col-sm-9">
+                              <p>Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit!</p>
+                              <small>Someone famous</small>
+                              <p>1 Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit!</p>
+                              <p>2 Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit!</p>
+                              <p>3 Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit!</p>
+                              <p>4 Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit!</p>
+                              <p>5 Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit!</p>
+                              <p>6 Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit!</p>
+                              <p>7 Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit!</p>
+                            </div>
+                          </div>
+                      </div>
+                      <!-- Quote 2 -->
+                      <div class="item">
+                          <div class="row">
+                            <div class="col-sm-9">
+                              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam auctor nec lacus ut tempor. Mauris.</p>
+                            </div>
+                          </div>
+                      </div>
+                      <!-- Quote 3 -->
+                      <div class="item">
+                          <div class="row">
+                            <div class="col-sm-9">
+                              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut rutrum elit in arcu blandit, eget pretium nisl accumsan. Sed ultricies commodo tortor, eu pretium mauris.</p>
+                            </div>
+                          </div>
+                      </div>
+                    </div>
+
+                    <!-- Carousel Buttons Next/Prev -->
+                    <a data-slide="prev" href="#{carousel_id}" class="left carousel-control">
+                        <i class="fa fa-chevron-left"></i>
+                    </a>
+                    <a data-slide="next" href="#{carousel_id}" class="right carousel-control">
+                        <i class="fa fa-chevron-right"></i>
+                    </a>
+
+
+                  </div>
+            """
+        t_jsf = """
+                    <!-- Controls buttons -->
+                    <div style="text-align:center;">
+                      <input type="button" class="btn start-slide" value="Start">
+                      <input type="button" class="btn pause-slide" value="Pause">
+                      <input type="button" class="btn prev-slide" value="Previous Slide">
+                      <input type="button" class="btn next-slide" value="Next Slide">
+                      <input type="button" class="btn slide-one" value="Slide 1">
+                      <input type="button" class="btn slide-two" value="Slide 2">
+                      <input type="button" class="btn slide-three" value="Slide 3">
+                    </div>
+                  <script>
+                     $(function(){
+                        // Initializes the carousel
+                        $(".start-slide").click(function(){
+                           $("#{carousel_id}").carousel('cycle');
+                        });
+                        // Stops the carousel
+                        $(".pause-slide").click(function(){
+                           $("#{carousel_id}").carousel('pause');
+                        });
+                        // Cycles to the previous item
+                        $(".prev-slide").click(function(){
+                           $("#{carousel_id}").carousel('prev');
+                        });
+                        // Cycles to the next item
+                        $(".next-slide").click(function(){
+                           $("#{carousel_id}").carousel('next');
+                        });
+                        // Cycles the carousel to a particular frame
+                        $(".slide-one").click(function(){
+                           $("#{carousel_id}").carousel(0);
+                        });
+                        $(".slide-two").click(function(){
+                           $("#{carousel_id}").carousel(1);
+                        });
+                        $(".slide-three").click(function(){
+                           $("#{carousel_id}").carousel(2);
+                        });
+                     });
+                  </script>
+                """
+        out = out.format(carousel_id=self.id,
+                         data_interval=self.data_interval,
+                         background_color=self.background_color)
+        # out += t_jsf.replace('{carousel_id}', self.id)
         return out
 
 
