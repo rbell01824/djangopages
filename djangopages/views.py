@@ -635,7 +635,7 @@ class Test11(DPage):
         b1 = Button('Show Modal 1', 'btn-primary')
         b2 = Button('Show Modal 2', 'btn-primary')
         # mdl = Modal(RC(get_paragraph()), RC6(get_paragraph(), get_paragraph()))
-        mdl = Modal(RC(get_paragraph()))
+        mdl = Modal(RC(get_paragraph(), get_paragraph()))
         self.content = RC(mdl)
         return self
 

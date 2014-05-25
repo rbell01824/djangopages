@@ -197,7 +197,7 @@ class Column(object):
         :return: Column object
         :rtype: Column object
         """
-        self.objs = content
+        self.content = content
         self.width = kwargs.pop('width', 12)
         self.kwargs = kwargs
         return
@@ -206,17 +206,15 @@ class Column(object):
         """
         Render objects in column
 
-        :return: HTML
-        :rtype: unicode
+        :param kwargs: RFU
+        :type kwargs: dict
         """
         dpage_col_before = '<!-- Start of dpage col -->\n' \
                            '<div class="col-md-{width}">\n'
         dpage_col_after = '</div>\n' \
                           '<!-- End of dpage col -->\n'
 
-        out = ''
-        for obj in self.objs:
-            out += obj.render()
+        out = render_objects(self.content)
         out = dpage_col_before.format(width=self.width) + out + dpage_col_after
         return out
 
@@ -267,8 +265,8 @@ class Row(object):
         """
         Render objects in row
 
-        :return: HTML
-        :rtype: unicode
+        :param kwargs: RFU
+        :type kwargs: dict
         """
         # HTML to create a bootstrap3 row
         dpage_row_before = '<!-- Start of dpage row -->\n' \
@@ -291,6 +289,8 @@ def row(*content, **kwargs):
     Wrap content in a bootstrap 3 row
     :param content: The html content to wrap
     :type content: unicode
+    :param kwargs: RFU
+    :type kwargs: dict
     """
     return Row(*content, **kwargs)
 R = functools.partial(row)
@@ -320,12 +320,15 @@ class RowColumn(object):
         """
         Render objects in row/column
 
-        :return: HTML
-        :rtype: unicode
+        :param kwargs: RFU
+        :type kwargs: dict
         """
+        # out = render_objects(self.content)
         out = ''
         for con in self.content:
-            out += Row(Column(con, width=self.width).render()).render()
+            outcol = Column(con, width=self.width).render()
+            outrow = Row(outcol).render()
+            out += outrow
         return out
 
 
@@ -417,8 +420,7 @@ R1C12 = functools.partial(row1column, width=12)
 #
 # Content classes and methods
 #
-# Classes to add content to DPage. Classes that add content to a DPage should derive from ContentBase and
-# MUST provide a render method.
+# Classes to add content to DPage. Classes that add content to a DPage MUST provide a render method.
 #
 ########################################################################################################################
 # todo 3: add class to deal with file like objects and queryset objects
@@ -430,22 +432,7 @@ R1C12 = functools.partial(row1column, width=12)
 # todo 2: syntactic suggar for Form
 
 
-class ContentBase(object):
-    """
-    Base class for all objects that render actual content as opposed to formating (aka row/column/etc).
-    """
-
-    def __init__(self):
-        return
-
-    def render(self):
-        """
-        This method should return the HTML to render the object.
-        """
-        raise NotImplementedError("Subclasses should implement render method!")
-
-
-class Text(ContentBase):
+class Text(object):
     """
     Holds text for inclusion in the page
     """
@@ -467,6 +454,9 @@ class Text(ContentBase):
     def render(self, **kwargs):
         """
         Render the Text object
+
+        :param kwargs: RFU
+        :type kwargs: dict
         """
         out = ''
         for obj in self.content:
@@ -477,7 +467,7 @@ class Text(ContentBase):
         return out
 
 
-class Markdown(ContentBase):
+class Markdown(object):
     """
     Holds markdown text for inclusion in a DPage.
     """
@@ -516,7 +506,7 @@ class Markdown(ContentBase):
         return out
 
 
-class HTML(ContentBase):
+class HTML(object):
     """
     Holds HTML text for inclusion in a DPage.  This is a convenience method since DPageMarkdown can be
     used interchangeably.
@@ -551,7 +541,7 @@ class HTML(ContentBase):
 LEGAL_GRAPH_TYPES = ['line', 'pie', 'column', 'bar', 'area']
 
 
-class Graph(ContentBase):
+class Graph(object):
     """
     DPage graph object class that uses Chartkick.
     """
@@ -633,7 +623,7 @@ class Graph(ContentBase):
         return out
 
 
-class Button(ContentBase):
+class Button(object):
     """
     DPage button class
     """
@@ -660,7 +650,7 @@ class Modal(object):
     Modal object
     """
     def __init__(self, *content, **kwargs):
-        self.body = body
+        self.content = content
         self.header = kwargs.pop('header', None)
         self.footer = kwargs.pop('footer', None)
         self.trigger = kwargs.pop('trigger', None)
@@ -683,7 +673,7 @@ class Modal(object):
                        '                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n' \
                        '                <h4 class="modal-title" id="{modal_label}">Modal title</h4>\n' \
                        '            </div>\n'.format(modal_label=self.modal_label)
-        body = render_objects(self.body, self.kwargs)
+        body = render_objects(self.content)
         template_bdy = '            <div class="modal-body">\n' \
                        '                {body}\n' \
                        '            </div>\n'.format(body=body)
@@ -721,6 +711,7 @@ class Modal(object):
 # Panel
 #
 ########################################################################################################################
+
 
 # todo 1: add panel object with support for header, footer, and panel class
 class Panel(object):
@@ -936,8 +927,7 @@ class AccordionMultiPanel(object):
 ########################################################################################################################
 
 
-
-class Form(ContentBase):
+class Form(object):
     """
     Provide form support
     """
@@ -1046,7 +1036,7 @@ class Form(ContentBase):
 # https://github.com/Mottie/tablesorter/wiki
 
 
-class Table2(ContentBase):
+class Table2(object):
     """
     Provide django-tables2 support
     """
@@ -1121,18 +1111,18 @@ def render_objects(objects, **kwargs):
     """
     # if whatever is in objs is iterable, iterate over the objects and render each according to whatever it is
     # otherwise, just render whatever it is
-    content = ''
+    out = ''
     if isinstance(objects, collections.Iterable):
         for obj in objects:
             if hasattr(obj, 'render'):
-                content += obj.render(**kwargs)
-            elif isinstance(obj, unicode):
-                content += obj
+                out += obj.render(**kwargs)
+            elif isinstance(obj, basestring):
+                out += obj
             elif isinstance(obj, collections.Iterable):
-                content += render_objects(obj, **kwargs)
+                out += render_objects(obj, **kwargs)
             else:
-                content += obj
-        return content
+                out += obj
+        return out
     elif hasattr(objects, 'render'):
         return objects.render(**kwargs)
     else:
