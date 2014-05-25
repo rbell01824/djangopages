@@ -627,21 +627,53 @@ class Button(object):
     """
     DPage button class
     """
-    def __init__(self, btn_text, btn_type='btn-default', **kwargs):
+    def __init__(self, btn_text, btn_type='btn-default', btn_size=None, btn_extra=None, **kwargs):
         """
+        Create a button object.
+
+        :param btn_text: The text to display in the button.
+        :type btn_text: unicode
+        :param btn_type: The type of button to display per Bootstrap 3
+        :type btn_type: unicode
+        :param btn_size: The size of the button to display per Bootstrap 3
+        :type btn_size: unicode
+        :param btn_extra: Extra text for <button ...>.  Used to create buttons for Modal and Panel
+        :type btn_extra: unicode
         """
         self.btn_text = btn_text
         self.btn_type = btn_type
+        self.btn_size = btn_size if btn_size else ''
+        self.btn_extra = btn_extra if btn_extra else ''
         self.kwargs = kwargs
         return
 
     def render(self):
         template = '<!-- start of button -->\n' \
-                   '    <button type="button" class="btn {btn_type}">\n' \
+                   '    <button type="button" class="btn {btn_type} {btn_size}" {btn_extra}>\n' \
                    '        {btn_text}\n' \
                    '    </button>\n' \
                    '<!-- end of button -->\n'
-        out = template.format(btn_text=self.btn_text, btn_type=self.btn_type)
+        out = template.format(btn_text=self.btn_text,
+                              btn_type=self.btn_type,
+                              btn_size=self.btn_size,
+                              btn_extra=self.btn_extra)
+        return out
+
+
+class ButtonModal(Button):
+    """
+    Button to control modal object
+    """
+    def __init__(self, btn_text, modal, btn_type='btn-default', btn_size=None, **kwargs):
+        self.modal = modal
+        btn_extra = 'data-toggle="modal" data-target="#{modal_id}" '.format(modal_id=modal.id)
+        super(ButtonModal, self).__init__(btn_text, btn_type, btn_size, btn_extra=btn_extra, **kwargs)
+        return
+
+    def render(self):
+        out = ''
+        out += super(ButtonModal, self).render()
+        out += self.modal.render()
         return out
 
 
@@ -651,9 +683,9 @@ class Modal(object):
     """
     def __init__(self, *content, **kwargs):
         self.content = content
+        self.button = kwargs.pop('button', None)
         self.header = kwargs.pop('header', None)
         self.footer = kwargs.pop('footer', None)
-        self.trigger = kwargs.pop('trigger', None)
         self.id = kwargs.pop('id', static_name_generator('modal'))
         self.modal_label = kwargs.pop('modal_label', static_name_generator('modal_label'))
         self.kwargs = kwargs
@@ -661,33 +693,57 @@ class Modal(object):
 
     def render(self):
         out = ''
-        template_xxx = '<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#{id}">' \
-                       '    Launch demo modal ' \
-                       '</button>'.format(id=self.id)
-        template_top = '<!-- modal start -->\n' \
-                       '<div class="modal fade" id="{id}" tabindex="-1" role="dialog" \n' \
-                       '     aria-labelledby="{modal_label}" aria-hidden="true">\n' \
-                       '    <div class="modal-dialog">\n' \
-                       '        <div class="modal-content">\n'.format(id=self.id, modal_label=self.modal_label)
-        template_hdr = '            <div class="modal-header">\n' \
-                       '                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n' \
-                       '                <h4 class="modal-title" id="{modal_label}">Modal title</h4>\n' \
-                       '            </div>\n'.format(modal_label=self.modal_label)
+        t_btn = '<button class="btn btn-primary" data-toggle="modal" data-target="#{id}">' \
+                '    {btn_text}' \
+                '</button>'
+        t_top = '<!-- modal start -->\n' \
+                '<div class="modal fade" id="{id}" tabindex="-1" role="dialog" \n' \
+                '     aria-labelledby="{modal_label}" aria-hidden="true">\n' \
+                '    <div class="modal-dialog">\n' \
+                '        <div class="modal-content">\n'
+        t_hdr = '            <div class="modal-header">\n' \
+                '                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">' \
+                '                    &times;' \
+                '                </button>\n' \
+                '                <h4 class="modal-title" id="{modal_label}">{modal_header}</h4>\n' \
+                '            </div>\n'
+        t_bdy = '            <div class="modal-body">\n' \
+                '                {body}\n' \
+                '            </div>\n'
+        t_ftr = '            <div class="modal-footer">\n' \
+                '                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n' \
+                '                <button type="button" class="btn btn-primary">Save changes</button>\n' \
+                '           </div>\n'
+        t_btm = '        </div>\n' \
+                '    </div>\n' \
+                '</div>\n' \
+                '<!-- modal end -->\n'
+        out = ''
         body = render_objects(self.content)
-        template_bdy = '            <div class="modal-body">\n' \
-                       '                {body}\n' \
-                       '            </div>\n'.format(body=body)
-        template_ftr = '            <div class="modal-footer">\n' \
-                       '                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n' \
-                       '                <button type="button" class="btn btn-primary">Save changes</button>\n' \
-                       '           </div>\n'
-        template_btm = '        </div>\n' \
-                       '    </div>\n' \
-                       '</div>\n' \
-                       '<!-- modal end -->\n'
-        out = template_xxx + template_top + template_hdr + template_bdy + template_ftr + template_btm
+        if self.button:
+            out += t_btn.format(id=self.id, btn_text=self.button)
+        out += t_top.format(id=self.id, modal_label=self.modal_label)
+        if self.header:
+            out += t_hdr.format(modal_label=self.modal_label, modal_header=self.header)
+        out += t_bdy.format(body=body)
+        if self.footer:
+            out += t_ftr
+        out += t_btm
         return out
 
+
+# class ButtonModal(object):
+#     """
+#     Modal object with a button to activate
+#     """
+#     def __init__(self, button, *content, **kwargs):
+#         self.button = button
+#         self.modal = Modal(*content, **kwargs)
+#         return
+#
+#     def render(self):
+#         out = ''
+#         return
 
 ########################################################################################################################
 #

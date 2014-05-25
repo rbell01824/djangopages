@@ -616,7 +616,14 @@ class Test10(DPage):
         b5 = Button('Warning', 'btn-warning')
         b6 = Button('Danger', 'btn-danger')
         b7 = Button('Link', 'btn-link')
-        self.content = R(C12(b1, b2, b3, b4, b5, b6, b7))
+        b8 = Button('Link', 'btn-primary', 'btn-lg')
+        b9 = Button('Link', 'btn-primary', '')
+        b10 = Button('Link', 'btn-primary', 'btn-sm')
+        b11 = Button('Link', 'btn-primary', 'btn-xs')
+        self.content = (RC12(Markdown('Buttons come in different colors/styles')),
+                        R(C12(b1, b2, b3, b4, b5, b6, b7)),
+                        RC12(Markdown('Buttons come in sizes')),
+                        R(C12(b8, b9, b10, b11)),)
         return self
 
 
@@ -632,11 +639,19 @@ class Test11(DPage):
         """
         Build modal test page
         """
-        b1 = Button('Show Modal 1', 'btn-primary')
-        b2 = Button('Show Modal 2', 'btn-primary')
-        # mdl = Modal(RC(get_paragraph()), RC6(get_paragraph(), get_paragraph()))
-        mdl = Modal(RC(get_paragraph(), get_paragraph()))
-        self.content = RC(mdl)
+        mdl1 = Modal(RC(Markdown('#This is modal 1'),get_paragraph(), get_paragraph()))
+        b1 = ButtonModal('Click to display modal 1', mdl1)
+        mdl2 = Modal(RC(Markdown('#This is modal 2'),get_paragraph(), get_paragraph()))
+        b2 = ButtonModal('Click to display modal 2', mdl2)
+        mdl3 = Modal(get_paragraph(), get_paragraph(),
+                     button='Modal 3 button',
+                     header='This is the header for modal 3',
+                     footer='This is the footer for modal 3')
+        self.content = (RC(get_paragraph()),
+                        R(C(b1, b2)),
+                        RC(get_paragraph()),
+                        RC(mdl3),
+                        RC(get_paragraph()))
         return self
 
 
