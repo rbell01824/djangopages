@@ -587,12 +587,27 @@ class Test9(DPage):
         company_tbl = Table2(self, company_qs)
 
         ###################
+        # Create a button panel
+        ###################
+        pn = Panel(node_tit, node_tbl)
+        bpn = ButtonPanel('Open the node panel', pn)
+        pc = Panel(company_tit, company_tbl)
+        bpc = ButtonPanel('Open the company panel', pc)
+
+        ###################
         # Put content on page
         ###################
         # Define the content layout
-        self.content = (ButtonPanel(R(C3(company_tit, company_tbl)), title='Show Companies'),
-                        ButtonPanel(R(C6(node_tit, node_tbl)), title='Show Nodes'),
-                        )
+        self.content = (
+            RC(get_paragraph()),
+            Panel(R(C3(company_tit, company_tbl)), button='Show Companies'),
+            Panel(R(C6(node_tit, node_tbl)), button='Show Nodes'),
+            RC(get_paragraph()),
+            RC(Markdown('#Button Panel')),
+            R1C6(('The button is in the left column.', bpn, bpc, 'The panel is in the right column', get_paragraph()),
+                 (get_paragraph(), Markdown('#### Node panel will appear here'), pn,
+                  get_paragraph(), Markdown('#### Company panel will appear here'), pc))
+            )
         # self.content = t_node
         return self
 
@@ -645,8 +660,8 @@ class Test11(DPage):
         b2 = ButtonModal('Click to display modal 2', mdl2)
         mdl3 = Modal(get_paragraph(), get_paragraph(),
                      button='Modal 3 button',
-                     header='This is the header for modal 3',
-                     footer='This is the footer for modal 3')
+                     header=Markdown('####Markdown header for modal 3'),
+                     footer=(Button('A button'), 'This is the footer for modal 3',))
         self.content = (RC(get_paragraph()),
                         R(C(b1, b2)),
                         RC(get_paragraph()),

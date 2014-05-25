@@ -693,9 +693,11 @@ class Modal(object):
 
     def render(self):
         out = ''
-        t_btn = '<button class="btn btn-primary" data-toggle="modal" data-target="#{id}">' \
-                '    {btn_text}' \
-                '</button>'
+        t_btn = '<!-- modal button start -->\n' \
+                '<button class="btn btn-primary" data-toggle="modal" data-target="#{id}">\n' \
+                '    {btn_text}\n' \
+                '</button>\n' \
+                '<!-- modal button end -->'
         t_top = '<!-- modal start -->\n' \
                 '<div class="modal fade" id="{id}" tabindex="-1" role="dialog" \n' \
                 '     aria-labelledby="{modal_label}" aria-hidden="true">\n' \
@@ -705,14 +707,13 @@ class Modal(object):
                 '                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">' \
                 '                    &times;' \
                 '                </button>\n' \
-                '                <h4 class="modal-title" id="{modal_label}">{modal_header}</h4>\n' \
+                '                {modal_header}\n' \
                 '            </div>\n'
         t_bdy = '            <div class="modal-body">\n' \
                 '                {body}\n' \
                 '            </div>\n'
         t_ftr = '            <div class="modal-footer">\n' \
-                '                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n' \
-                '                <button type="button" class="btn btn-primary">Save changes</button>\n' \
+                '                {modal_footer}\n' \
                 '           </div>\n'
         t_btm = '        </div>\n' \
                 '    </div>\n' \
@@ -724,85 +725,33 @@ class Modal(object):
             out += t_btn.format(id=self.id, btn_text=self.button)
         out += t_top.format(id=self.id, modal_label=self.modal_label)
         if self.header:
-            out += t_hdr.format(modal_label=self.modal_label, modal_header=self.header)
+            hdr = render_objects(self.header)
+            out += t_hdr.format(modal_label=self.modal_label, modal_header=hdr)
         out += t_bdy.format(body=body)
         if self.footer:
-            out += t_ftr
+            ftr = render_objects(self.footer)
+            out += t_ftr.format(modal_footer=ftr)
         out += t_btm
         return out
 
 
-# class ButtonModal(object):
-#     """
-#     Modal object with a button to activate
-#     """
-#     def __init__(self, button, *content, **kwargs):
-#         self.button = button
-#         self.modal = Modal(*content, **kwargs)
-#         return
-#
-#     def render(self):
-#         out = ''
-#         return
-
-########################################################################################################################
-#
-# Model
-#
-########################################################################################################################
-# todo 1: add model support http://getbootstrap.com/javascript/#modals
-# fixme: create pure modal and panel, pure link and button, content objects to connect the two via the id
-
-
-
-########################################################################################################################
-#
-# Carousel
-#
-########################################################################################################################
-# todo 1: add carousel support http://getbootstrap.com/javascript/#carousel
-
-########################################################################################################################
-#
-# Panel
-#
-########################################################################################################################
-
-
-# todo 1: add panel object with support for header, footer, and panel class
 class Panel(object):
-    def __init__(self):
-        pass
-    def render(self):
-        pass
-
-########################################################################################################################
-#
-# Collapsed button panel
-#
-########################################################################################################################
-# todo 1: modify Button Panel so that panel and button are separated
-
-class ButtonPanel(object):
     """
     Collapsible button panel
     """
     # todo 2: add panel heading and footer to buttonpanel
     def __init__(self, *content, **kwargs):
         """
-        Create a collapsible panel on a button.
+        Create a collapsible panel.
 
         :param content: Content
         :type content: list
-        :param kwargs: Keyword arguments. title=None, btn_type='btn-primary'
+        :param kwargs: Keyword arguments. button=None
         :type kwargs: dict
-        :return: HTML for button panel
-        :rtype: unicode
         """
         self.content = content
-        self.title = kwargs.pop('title', '')
-        self.btn_type = kwargs.pop('button', 'btn-primary')
-        self.id = kwargs.pop('id', static_name_generator('btn_collapse'))
+        self.button = kwargs.pop('button', None)
+        self.id = kwargs.pop('id', static_name_generator('panel'))
         self.kwargs = kwargs
         # todo 2: add header, footer, and panel class attributes here
         pass
@@ -811,23 +760,49 @@ class ButtonPanel(object):
         """
         Render button collapsible panel.
         """
-        template = '<!-- Start of button collapsible panel -->\n' \
-                   '    <button type="button" class="btn {btn_type}" data-toggle="collapse" data-target="#{bp_id}">\n' \
-                   '        {title}\n ' \
-                   '    </button>\n ' \
-                   '    <div id="{bp_id}" class="collapse">\n' \
-                   '        {content}\n' \
-                   '    </div>\n' \
-                   '<!-- End of button collapsible panel -->\n'
+        t_btn = '<!-- panel button start -->\n' \
+                '<button class="btn btn-primary" data-toggle="collapse" data-target="#{id}">\n' \
+                '    {btn_text}\n' \
+                '</button>\n' \
+                '<!-- panel button end -->'
+        t_bdy = '<!-- panel start -->\n' \
+                '    <div id="{id}" class="collapse">\n' \
+                '        {content}\n' \
+                '    </div>\n' \
+                '<!-- panel end -->\n'
+
+        out = ''
         content = render_objects(self.content, **kwargs)
-        out = template.format(btn_type=self.btn_type, bp_id=self.id, title=self.title, content=content)
+
+        if self.button:
+            out += t_btn.format(id=self.id, btn_text=self.button)
+        out += t_bdy.format(id=self.id, content=content)
         return out
 
-########################################################################################################################
-#
-# Panel and Accordion support
-#
-########################################################################################################################
+
+class ButtonPanel(Button):
+    """
+    Button to control panel object
+    """
+    def __init__(self, btn_text, panel, btn_type='btn-default', btn_size=None, **kwargs):
+        """
+        Create a button panel.
+
+        :param btn_text: Text of the button
+        :param panel: Panel to attach.  Must be declared before button.
+        :param btn_type: Button type per Button.
+        :param btn_size: Button size per Button
+        :param kwargs: RFU
+        """
+        self.panel = panel
+        btn_extra = 'data-toggle="collapse" data-target="#{panel_id}" '.format(panel_id=panel.id)
+        super(ButtonPanel, self).__init__(btn_text, btn_type, btn_size, btn_extra=btn_extra, **kwargs)
+        return
+
+    def render(self):
+        out = ''
+        out += super(ButtonPanel, self).render()
+        return out
 
 
 class Accordion(object):
@@ -977,6 +952,20 @@ class AccordionMultiPanel(object):
                               panel_title=self.title,
                               panel_content=content)
         return out
+
+########################################################################################################################
+#
+# Carousel
+#
+########################################################################################################################
+# todo 1: add carousel support http://getbootstrap.com/javascript/#carousel
+
+########################################################################################################################
+#
+# Panel and Accordion support
+#
+########################################################################################################################
+
 
 ########################################################################################################################
 
