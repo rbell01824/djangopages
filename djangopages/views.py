@@ -48,11 +48,11 @@ def gp():
 ########################################################################################################################
 
 
-class Test1(DPage):
+class Test01(DPage):
     """
     Class based dpage with render method overridden.  Objs style interface.
     """
-    title = 'DjangoPages_Test1'
+    title = 'DjangoPages_Test01'
     description = 'Demonstrate basic text widgets'
     tags = []
 
@@ -70,11 +70,11 @@ class Test1(DPage):
         return self
 
 
-class Test2(DPage):
+class Test02(DPage):
     """
     Basic test of layout facility.
     """
-    title = 'DjangoPages_Test2'
+    title = 'DjangoPages_Test02'
     description = 'Demonstrate row/column layout of text objects'
     tags = []
 
@@ -85,9 +85,9 @@ class Test2(DPage):
         ###################
         # Create some page content
         ###################
-        xr1 = HTML('<h3>Text on row 1</h3>')
-        xr2 = Markdown('**Text on row 2**')
-        xr3 = Text('Text on row 3', Button('a button'), 'Some more text in row 3')
+        xr1 = HTML('<h3> H3 Text on row 1</h3>')
+        xr2 = Markdown('**Markdown bold text on row 2.**  Followed by regular text. ')
+        xr3 = Text('Text on row 3 with', Button('embeded non functional button'), 'Some more text in row 3')
         ###################
         # Layout the content on the page
         ###################
@@ -95,11 +95,11 @@ class Test2(DPage):
         return self
 
 
-class Test3(DPage):
+class Test03(DPage):
     """
     Complex render test
     """
-    title = 'DjangoPages_Test3'
+    title = 'DjangoPages_Test03'
     description = 'Demonstrate complex row/column layout'
     tags = []
 
@@ -140,11 +140,11 @@ class Test3(DPage):
         return self
 
 
-class Test4(DPage):
+class Test04(DPage):
     """
     Basic test of Graph facility with two graphs in a row.
     """
-    title = 'DjangoPages_Test4'
+    title = 'DjangoPages_Test04'
     description = 'Demonstrate DB driven graphs with highcharts customization'
     tags = []
 
@@ -207,11 +207,11 @@ class Test4(DPage):
         return self
 
 
-class Test5(DPage):
+class Test05(DPage):
     """
     Multiple graphs on page with multiple kinds of graphs
     """
-    title = 'DjangoPages_Test5'
+    title = 'DjangoPages_Test05'
     description = 'Demonstrate syslog graphs and multi-panels'
     tags = []
 
@@ -440,11 +440,11 @@ class Test5(DPage):
         return hosts
 
 
-class Test6(DPage):
+class Test06(DPage):
     """
     Test accordion
     """
-    title = 'DjangoPages_Test6'
+    title = 'DjangoPages_Test06'
     description = 'Demonstrate accordion with text widgets'
     tags = []
 
@@ -471,11 +471,11 @@ class Test6(DPage):
         return self
 
 
-class Test7(DPage):
+class Test07(DPage):
     """
     Test form support
     """
-    title = 'DjangoPages_Test7'
+    title = 'DjangoPages_Test07'
     description = 'Demonstrate basic form widgets with off page link'
     tags = []
 
@@ -512,11 +512,11 @@ class Test7(DPage):
         return self
 
 
-class Test8(DPage):
+class Test08(DPage):
     """
     Test table2 support
     """
-    title = 'DjangoPages_Test8'
+    title = 'DjangoPages_Test08'
     description = 'Demonstrate DB driven table2 widget'
     tags = []
 
@@ -564,11 +564,11 @@ class Test8(DPage):
         return self
 
 
-class Test9(DPage):
+class Test09(DPage):
     """
     Test button pannels
     """
-    title = 'DjangoPages_Test9'
+    title = 'DjangoPages_Test09'
     description = 'Demonstrate button panel'
     tags = []
 
@@ -702,44 +702,62 @@ class Test12(DPage):
                         )
         return self
 
+########################################################################################################################
+#
+# List the available DPages.
+#
+########################################################################################################################
 
-class DevTestView(View):
+
+class DPagesList(DPage):
+    """
+    Page to list DPages
+    """
+    title = 'DjangoPages_List'
+    description = 'This page: list the available DPages'
+    tags = []
+
+    def page(self):
+        """
+        List available pages
+        """
+        pages = DPage.pages_list
+        pages = sorted(pages, key=lambda x: x['name'])
+        out = []
+        template = '<a href="/dpages/{name}" class="btn btn-primary btn-xs">Show</a>'
+        for page in pages:
+            cls = page['cls']
+            xxx = template.format(name=cls.__name__)
+            line = R(C2(xxx + ' ' + cls.title), C6(cls.description))
+            out.append(line)
+        self.content = out
+        return self
+
+########################################################################################################################
+#
+# Display and process a DPage
+#
+########################################################################################################################
+
+
+class DPagesView(View):
     """
     View class for dev testing.
     """
-    test = 'test1'
-    testmap = {'test1': Test1,
-               'test2': Test2,
-               'test3': Test3,
-               'test4': Test4,
-               'test5': Test5,
-               'test6': Test6,
-               'test7': Test7,
-               'test8': Test8,
-               'test9': Test9,
-               'test10': Test10,
-               'test11': Test11,
-               'test12': Test12,
-               }
-
-    # noinspection PyMethodMayBeStatic
-    def get(self, request):
+    def get(self, request, name):
         """
         Execute the graph method and display the results.
         :param request:
         """
-        dt = self.testmap[self.test]
+        dt = DPage.pages_dict[name]
         dpage = dt(request).page()
         return dpage.render()
 
-    # noinspection PyMethodMayBeStatic,PyUnusedLocal
-    def post(self, request, *args, **kwargs):
+    def post(self, request, name):
         """
         Send the post data to the page and rerender.
         :param request:
-        :param args:
-        :param kwargs:
         """
-        dt = self.testmap[self.test]
+        dt = DPage.pages_dict[name]
         dpage = dt(request).page()
         return dpage.render()

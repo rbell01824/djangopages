@@ -41,6 +41,19 @@ from djangopages.libs import dict_nested_set
 # Register classes
 #
 ########################################################################################################################
+
+
+class DPageRegister(type):
+    def __init__(cls, name, base, attrs):
+        if not hasattr(cls, 'pages_list'):
+            # Executed when processing DPageRegister class itself.
+            # Use class variables so there is only one copy
+            cls.pages_list = []          # List of subclasses to allow listing
+            cls.pages_dict = {}          # Dictionary of subclasses to allow quick name lookup
+        else:
+            cls.pages_list.append({'cls': cls, 'name': name})   # Put in list
+            cls.pages_dict[name] = cls   # Put in dict
+
 ########################################################################################################################
 #
 # DPage class
@@ -57,6 +70,7 @@ class DPage(object):
     Conceptually, a DPage displays a filter form that a user can use to customize the output of the DPage's
     objects.
     """
+    __metaclass__ = DPageRegister
 
     def __init__(self, request=None, context=None, template=None, objs=None, **kwargs):
         """
@@ -137,7 +151,6 @@ class DPage(object):
         # c = Context(self.context)
         #
         # return HttpResponse(t.render(c))
-
 
 ########################################################################################################################
 #

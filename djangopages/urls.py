@@ -22,22 +22,13 @@ __maintainer__ = "rbell01824"
 __email__ = "rbell01824@gmail.com"
 
 from django.conf.urls import patterns, include, url
+from django.views.generic import RedirectView
 
-from djangopages.views import DevTestView
+from djangopages.views import DPagesView
 
 ########################################################################################################################
 
 urlpatterns = patterns('',
-                       url(r'^test1$', DevTestView.as_view(test='test1'), name='devtest1'),
-                       url(r'^test2$', DevTestView.as_view(test='test2'), name='devtest2'),
-                       url(r'^test3$', DevTestView.as_view(test='test3'), name='devtest3'),
-                       url(r'^test4$', DevTestView.as_view(test='test4'), name='devtest4'),
-                       url(r'^test5$', DevTestView.as_view(test='test5'), name='devtest5'),
-                       url(r'^test6$', DevTestView.as_view(test='test6'), name='devtest6'),
-                       url(r'^test7$', DevTestView.as_view(test='test7'), name='devtest7'),
-                       url(r'^test8$', DevTestView.as_view(test='test8'), name='devtest8'),
-                       url(r'^test9$', DevTestView.as_view(test='test9'), name='devtest9'),
-                       url(r'^test10$', DevTestView.as_view(test='test10'), name='devtest10'),
-                       url(r'^test11$', DevTestView.as_view(test='test11'), name='devtest11'),
-                       url(r'^test12$', DevTestView.as_view(test='test12'), name='devtest12'),
+                       url(r'^dpages$', RedirectView.as_view(url='/dpages/DPagesList'), name='dpages_list_view'),
+                       url(r'^(.*$)', DPagesView.as_view(), name='dpagesview'),
                        )
