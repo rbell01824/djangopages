@@ -20,7 +20,11 @@ __status__ = "dev"
 
 # work list
 """
-Add connection to register and dispatch
+add link button
+add bootstrap 3 tables
+add syntactic suggar for Forms
+django pandas
+django rest pandas
 Move layout objects to their own module
 Move content objects to their own module
 Add kwargs and attributes to layout & content objects

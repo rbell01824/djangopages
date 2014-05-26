@@ -702,6 +702,22 @@ class Test12(DPage):
                         )
         return self
 
+
+class Test13(DPage):
+    title = 'DjangoPages_Test13'
+    description = 'Demonstrate links'
+    tags = []
+
+    def page(self):
+        self.content = (RC(Link('/dpages/DPagesList', 'Link to list page')),
+                        RC(Link('/dpages/Test07', 'Link to the form test page')),
+                        RC(Markdown('#### Link buttons')),
+                        R1C((LinkButton('/dpages/DPagesList', 'Link to list page'), ' ',
+                             LinkButton('/dpages/Test07', 'Link to the form test page'),)
+                        ))
+        return self
+
+
 ########################################################################################################################
 #
 # List the available DPages.

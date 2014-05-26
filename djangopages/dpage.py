@@ -38,6 +38,56 @@ from djangopages.libs import dict_nested_set
 
 ########################################################################################################################
 #
+# Support Routines
+#
+########################################################################################################################
+
+
+def static_name_generator(base_name='x'):
+    """
+    Returns a unique name of the form base_name_counter
+    :param base_name:
+    """
+    if not hasattr(static_name_generator, "counter"):
+        static_name_generator.counter = 0  # it doesn't exist yet, so initialize it
+    static_name_generator.counter += 1
+    return '{}_{}'.format(base_name, static_name_generator.counter)
+
+
+def render_objects(objects, **kwargs):
+    """
+    Render the object list.
+
+    Note: kwargs should/must contain the request object!!!
+
+    :param objects: list of objects or object to render
+    :type: list or object
+    :param kwargs: extra arguments for render
+    :type kwargs: dict
+    :return: Rendered output of objects
+    :rtype: unicode
+    """
+    # if whatever is in objs is iterable, iterate over the objects and render each according to whatever it is
+    # otherwise, just render whatever it is
+    out = ''
+    if isinstance(objects, collections.Iterable):
+        for obj in objects:
+            if hasattr(obj, 'render'):
+                out += obj.render(**kwargs)
+            elif isinstance(obj, basestring):
+                out += obj
+            elif isinstance(obj, collections.Iterable):
+                out += render_objects(obj, **kwargs)
+            else:
+                out += obj
+        return out
+    elif hasattr(objects, 'render'):
+        return objects.render(**kwargs)
+    else:
+        return objects
+
+########################################################################################################################
+#
 # Register classes
 #
 ########################################################################################################################
@@ -551,88 +601,46 @@ class HTML(object):
         return out
 
 
-LEGAL_GRAPH_TYPES = ['line', 'pie', 'column', 'bar', 'area']
-
-
-class Graph(object):
-    """
-    DPage graph object class that uses Chartkick.
-    """
-    # noinspection PyShadowingBuiltins
-    def __init__(self, graph_type, data, options=None, **kwargs):
+class Link(object):
+    def __init__(self, href, *content, **kwargs):
         """
-        Create a graph object
+        Create a DPage Link object and initialize it.
 
-        :param graph_type: The type of this graph.  Must be line, pie, column, bar, or area.
-        :type graph_type: unicode
-        :param data: The name of the context variable holding the graph's data
-        :type data: unicode or list[dict] or dict
-        :param options: 'with' options for the chartkick graph.
-        :type options: unicode
-        :param kwargs: RFU
-        :type kwargs: dict
+        :param href: Link href
+        :type href: unicode
+        :param content: Content the link wraps
+        :type content:
+        :param kwargs:
         """
-        if not graph_type in LEGAL_GRAPH_TYPES:
-            raise ValueError('In Graph illegal graph type {}'.format(graph_type))
-
-        # todo 2: when this is working, remove the unneeded class attributes
-        # todo 2: since all that's really needed is self.output
-        self.graph_type = graph_type  # save type of graph
-        self.data = data  # the data to display
-        self.options = options  # chartkick with options
+        self.href = href
+        self.content = content
+        self.target = kwargs.pop('target', None)
+        self.link_class = kwargs.pop('link_class', None)
         self.kwargs = kwargs
         pass
 
-    def render(self, **kwargs):
-        """
-        Render the graph
-        """
-        # Generate the chartkick graph template text
-        data = self.data
-        if self.options:
-            options = self.set_options()
-            chart = '{}_chart data with {}'.format(self.graph_type, options)
-            pass
-        else:
-            chart = '{}_chart data'.format(self.graph_type)
-            pass
-        t = Template('{% load chartkick %} {% ' + chart + ' %}')
-
-        # render
-        output = t.render(Context({'data': data}))
-
-        return output
-
-    def set_options(self):
-        """
-        Set chartkick & highchart options
-            options = "height='500px' library=" + str(library)
-
-        """
-        options = copy(self.options)
+    def render(self):
         out = ''
+        body = render_objects(self.content)
+        target = ''
+        if self.target:
+            target = 'target="{target}" '.format(self.target)
+        link_class = ''
+        if self.link_class:
+            link_class = 'class="{link_class}" '.format(link_class=self.link_class)
+        template = '<a href="{href}" {target} {link_class}>{body}</a>'
+        out = template.format(href=self.href, target=target, link_class=link_class, body=body)
+        return out
 
-        # deal with height, max, and min
-        height = options.pop('height', None)
-        if height:
-            out += " height='{}'".format(height)
-        xmax = options.pop('max', None)
-        if xmax:
-            out += " max='{}'".format(xmax)
-        xmin = options.pop('min', None)
-        if xmin:
-            out += " min='{}'".format(xmin)
 
-        # Is there anythin left
-        if len(options) < 1:
-            return out
+class LinkButton(Link):
+    def __init__(self, href, *content, **kwargs):
+        link_class = kwargs.pop('link_class', 'btn btn-success btn-xs')
+        super(LinkButton, self).__init__(href, *content, link_class=link_class, **kwargs)
+        return
 
-        # These are library options of the form title.text: ...
-        library = {}
-        for key, value in options.iteritems():
-            dict_nested_set(library, key, value)
-        out += " library={}".format(str(library))
-
+    def render(self):
+        out = super(LinkButton, self).render()
         return out
 
 
@@ -684,8 +692,7 @@ class ButtonModal(Button):
         return
 
     def render(self):
-        out = ''
-        out += super(ButtonModal, self).render()
+        out = super(ButtonModal, self).render()
         out += self.modal.render()
         return out
 
@@ -748,6 +755,31 @@ class Modal(object):
         return out
 
 
+class ButtonPanel(Button):
+    """
+    Button to control panel object
+    """
+    def __init__(self, btn_text, panel, btn_type='btn-default', btn_size=None, **kwargs):
+        """
+        Create a button panel.
+
+        :param btn_text: Text of the button
+        :param panel: Panel to attach.  Must be declared before button.
+        :param btn_type: Button type per Button.
+        :param btn_size: Button size per Button
+        :param kwargs: RFU
+        """
+        self.panel = panel
+        btn_extra = 'data-toggle="collapse" data-target="#{panel_id}" '.format(panel_id=panel.id)
+        super(ButtonPanel, self).__init__(btn_text, btn_type, btn_size, btn_extra=btn_extra, **kwargs)
+        return
+
+    def render(self):
+        out = ''
+        out += super(ButtonPanel, self).render()
+        return out
+
+
 class Panel(object):
     """
     Collapsible button panel
@@ -790,31 +822,6 @@ class Panel(object):
         if self.button:
             out += t_btn.format(id=self.id, btn_text=self.button)
         out += t_bdy.format(id=self.id, content=content)
-        return out
-
-
-class ButtonPanel(Button):
-    """
-    Button to control panel object
-    """
-    def __init__(self, btn_text, panel, btn_type='btn-default', btn_size=None, **kwargs):
-        """
-        Create a button panel.
-
-        :param btn_text: Text of the button
-        :param panel: Panel to attach.  Must be declared before button.
-        :param btn_type: Button type per Button.
-        :param btn_size: Button size per Button
-        :param kwargs: RFU
-        """
-        self.panel = panel
-        btn_extra = 'data-toggle="collapse" data-target="#{panel_id}" '.format(panel_id=panel.id)
-        super(ButtonPanel, self).__init__(btn_text, btn_type, btn_size, btn_extra=btn_extra, **kwargs)
-        return
-
-    def render(self):
-        out = ''
-        out += super(ButtonPanel, self).render()
         return out
 
 
@@ -964,6 +971,89 @@ class AccordionMultiPanel(object):
                               panel_id=self.id,
                               panel_title=self.title,
                               panel_content=content)
+        return out
+
+
+# fixme: finish table
+class Table(object):
+    """
+    Table support
+    """
+    def __init__(self, heading, *content, **kwargs):
+        """
+        """
+        pass
+
+    def render(self):
+        out = ''
+        return out
+
+
+class TableRow(object):
+    """
+    Table row support
+
+      <tr>
+         <td>January</td>
+         <td>$100</td>
+      </tr>
+      <tr>
+         <td>February</td>
+         <td>$80</td>
+      </tr>
+
+    """
+    def __init__(self, *content, **kwargs):
+        """
+        """
+        pass
+
+    def render(self):
+        out = ''
+        return out
+
+
+class TableHead(object):
+    """
+    Table head support
+
+     <thead>
+      <tr>
+         <th>Month</th>
+         <th>Savings</th>
+      </tr>
+     </thead>
+
+    """
+    def __init__(self, *content, **kwargs):
+        """
+        """
+        pass
+
+    def render(self):
+        out = ''
+        return out
+
+
+class TableFoot(object):
+    """
+    Table foot support
+
+     <tfoot>
+      <tr>
+         <td>Sum</td>
+         <td>$180</td>
+      </tr>
+     </tfoot>
+
+    """
+    def __init__(self, *content, **kwargs):
+        """
+        """
+        pass
+
+    def render(self):
+        out = ''
         return out
 
 
@@ -1248,50 +1338,90 @@ class Carousel(object):
 
 ########################################################################################################################
 #
-# Support Routines
+# Graph routines
 #
 ########################################################################################################################
 
+LEGAL_GRAPH_TYPES = ['line', 'pie', 'column', 'bar', 'area']
 
-def static_name_generator(base_name='x'):
+
+class Graph(object):
     """
-    Returns a unique name of the form base_name_counter
-    :param base_name:
+    DPage graph object class that uses Chartkick.
     """
-    if not hasattr(static_name_generator, "counter"):
-        static_name_generator.counter = 0  # it doesn't exist yet, so initialize it
-    static_name_generator.counter += 1
-    return '{}_{}'.format(base_name, static_name_generator.counter)
+    # noinspection PyShadowingBuiltins
+    def __init__(self, graph_type, data, options=None, **kwargs):
+        """
+        Create a graph object
 
+        :param graph_type: The type of this graph.  Must be line, pie, column, bar, or area.
+        :type graph_type: unicode
+        :param data: The name of the context variable holding the graph's data
+        :type data: unicode or list[dict] or dict
+        :param options: 'with' options for the chartkick graph.
+        :type options: unicode
+        :param kwargs: RFU
+        :type kwargs: dict
+        """
+        if not graph_type in LEGAL_GRAPH_TYPES:
+            raise ValueError('In Graph illegal graph type {}'.format(graph_type))
 
-def render_objects(objects, **kwargs):
-    """
-    Render the object list.
+        # todo 2: when this is working, remove the unneeded class attributes
+        # todo 2: since all that's really needed is self.output
+        self.graph_type = graph_type  # save type of graph
+        self.data = data  # the data to display
+        self.options = options  # chartkick with options
+        self.kwargs = kwargs
+        pass
 
-    Note: kwargs should/must contain the request object!!!
+    def render(self, **kwargs):
+        """
+        Render the graph
+        """
+        # Generate the chartkick graph template text
+        data = self.data
+        if self.options:
+            options = self.set_options()
+            chart = '{}_chart data with {}'.format(self.graph_type, options)
+            pass
+        else:
+            chart = '{}_chart data'.format(self.graph_type)
+            pass
+        t = Template('{% load chartkick %} {% ' + chart + ' %}')
 
-    :param objects: list of objects or object to render
-    :type: list or object
-    :param kwargs: extra arguments for render
-    :type kwargs: dict
-    :return: Rendered output of objects
-    :rtype: unicode
-    """
-    # if whatever is in objs is iterable, iterate over the objects and render each according to whatever it is
-    # otherwise, just render whatever it is
-    out = ''
-    if isinstance(objects, collections.Iterable):
-        for obj in objects:
-            if hasattr(obj, 'render'):
-                out += obj.render(**kwargs)
-            elif isinstance(obj, basestring):
-                out += obj
-            elif isinstance(obj, collections.Iterable):
-                out += render_objects(obj, **kwargs)
-            else:
-                out += obj
+        # render
+        output = t.render(Context({'data': data}))
+
+        return output
+
+    def set_options(self):
+        """
+        Set chartkick & highchart options
+            options = "height='500px' library=" + str(library)
+
+        """
+        options = copy(self.options)
+        out = ''
+
+        # deal with height, max, and min
+        height = options.pop('height', None)
+        if height:
+            out += " height='{}'".format(height)
+        xmax = options.pop('max', None)
+        if xmax:
+            out += " max='{}'".format(xmax)
+        xmin = options.pop('min', None)
+        if xmin:
+            out += " min='{}'".format(xmin)
+
+        # Is there anythin left
+        if len(options) < 1:
+            return out
+
+        # These are library options of the form title.text: ...
+        library = {}
+        for key, value in options.iteritems():
+            dict_nested_set(library, key, value)
+        out += " library={}".format(str(library))
+
         return out
-    elif hasattr(objects, 'render'):
-        return objects.render(**kwargs)
-    else:
-        return objects
