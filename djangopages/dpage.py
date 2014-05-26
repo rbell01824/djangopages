@@ -635,7 +635,7 @@ class Link(object):
 
 class LinkButton(Link):
     def __init__(self, href, *content, **kwargs):
-        link_class = kwargs.pop('link_class', 'btn btn-success btn-xs')
+        link_class = kwargs.pop('link_class', 'btn btn-primary btn-sm')
         super(LinkButton, self).__init__(href, *content, link_class=link_class, **kwargs)
         return
 

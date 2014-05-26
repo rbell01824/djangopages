@@ -743,8 +743,8 @@ class DPagesList(DPage):
         template = '<a href="/dpages/{name}" class="btn btn-primary btn-xs">Show</a>'
         for page in pages:
             cls = page['cls']
-            xxx = template.format(name=cls.__name__)
-            line = R(C2(xxx + ' ' + cls.title), C6(cls.description))
+            lnk = LinkButton('/dpages/{name}'.format(name=cls.__name__), 'Show me')
+            line = R(C3((lnk, ' ', cls.title,)), C6(cls.description))
             out.append(line)
         self.content = out
         return self
