@@ -737,6 +737,7 @@ class DPagesList(DPage):
         """
         List available pages
         """
+        # noinspection PyUnresolvedReferences
         pages = DPage.pages_list
         pages = sorted(pages, key=lambda x: x['name'])
         out = []

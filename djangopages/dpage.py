@@ -978,14 +978,25 @@ class AccordionMultiPanel(object):
 class Table(object):
     """
     Table support
+
+    table-responsive
+    table-condensed
+    table-hover
+    table-bordered
+    table-striped
     """
     def __init__(self, heading, *content, **kwargs):
-        """
-        """
+        self.heading = heading
+        self.content = content
+        self.tresponsive = kwargs.pop('tbl_class', None)
+        self.kwargs = kwargs
         pass
 
     def render(self):
         out = ''
+        # Build table class
+        cls = 'table'
+
         return out
 
 
@@ -997,20 +1008,63 @@ class TableRow(object):
          <td>January</td>
          <td>$100</td>
       </tr>
-      <tr>
-         <td>February</td>
-         <td>$80</td>
-      </tr>
-
     """
     def __init__(self, *content, **kwargs):
-        """
-        """
+        self.content = content
+        self.tr_class = kwargs.pop('tr_class', None)
+        self.kwargs = kwargs
         pass
 
     def render(self):
         out = ''
+        for con in self.content:
+            if isinstance(con, TableCell):
+                out += render_objects(con)
+            else:
+                out += '<td>' + render_objects(con) + '</td>'
+        tr_start = '<tr>'
+        if self.tr_class:
+            tr_start = '<tr class="{tr_class}" >'.format(self.tr_class)
+        out = tr_start + out + '</tr>'
         return out
+
+
+def TR(*content, **kwargs):
+    tr = TableRow(content, kwargs)
+    return tr
+
+
+class TableCell(object):
+    """
+    Table cell support
+    """
+    def __init__(self, *content, **kwargs):
+        """
+        Initialize a td table element
+
+        :param content: content
+        :type content: object or list
+        :param kwargs: RFU
+        :type: dict
+        """
+        self.content = content
+        self.td_class = kwargs.pop('td_class', None)
+        self.kwargs = kwargs
+        pass
+
+    def render(self):
+        td_start = '<td>'
+        if self.td_class:
+            td_start = '<td class="{td_class}" >'.format(td_class=td_class)
+        out = ''
+        for con in self.content:
+            out += td_start + render_objects(con) + '</td>\n'
+        return out
+
+
+def TD(*content, **kwargs):
+    td = TableCell(content, kwargs)
+    return td
 
 
 class TableHead(object):
@@ -1056,6 +1110,53 @@ class TableFoot(object):
         out = ''
         return out
 
+
+class Table2(object):
+    """
+    Provide django-tables2 support
+    """
+    def __init__(self, dpage, qs, **kwargs):
+        """
+        Initialize a Table object
+
+        :param dpage: dpage object
+        :type dpage: DPage
+        :param qs: Queryset
+        :type qs:
+        :param kwargs: RFU
+        :type kwargs: dict
+        """
+        self.dpage = dpage
+        self.qs = qs
+        self.kwargs = kwargs
+        # todo 2: add other kwargs options here
+        pass
+
+    def render(self, **kwargs):
+        """
+        Generate html for table
+        """
+        template = '<!-- start of table -->\n' \
+                   '    {% load django_tables2 %}\n' \
+                   '    {% render_table insert_the_table %}\n' \
+                   '<!-- end of table -->\n'
+        t = Template(template)
+        c = {'insert_the_table': self.qs, 'request': self.dpage.request}
+        output = t.render(Context(c))
+        return output
+        # output = ''
+        # name = static_name_generator('table')
+        # self.dpage.context[name] = self.qs
+        # template = '<!-- start of table -->\n' \
+        #            '    {% render_table x_the_table_object %}\n' \
+        #            '<!-- end of table -->\n'
+        # output = template.replace('x_the_table_object', name)
+        # return output
+
+# todo 1: add support for table sorter: http://mottie.github.io/tablesorter/docs/index.html
+# http://mottie.github.io/tablesorter/docs/example-widget-bootstrap-theme.html
+# looks good: http://mottie.github.io/tablesorter/docs/example-widget-bootstrap-theme.html
+# https://github.com/Mottie/tablesorter/wiki
 
 class Form(object):
     """
@@ -1161,54 +1262,6 @@ class Form(object):
 
 # todo 1: add support for normal bootstrap 3 forms
 # todo 1: add id to Form
-
-
-class Table2(object):
-    """
-    Provide django-tables2 support
-    """
-    def __init__(self, dpage, qs, **kwargs):
-        """
-        Initialize a Table object
-
-        :param dpage: dpage object
-        :type dpage: DPage
-        :param qs: Queryset
-        :type qs:
-        :param kwargs: RFU
-        :type kwargs: dict
-        """
-        self.dpage = dpage
-        self.qs = qs
-        self.kwargs = kwargs
-        # todo 2: add other kwargs options here
-        pass
-
-    def render(self, **kwargs):
-        """
-        Generate html for table
-        """
-        template = '<!-- start of table -->\n' \
-                   '    {% load django_tables2 %}\n' \
-                   '    {% render_table insert_the_table %}\n' \
-                   '<!-- end of table -->\n'
-        t = Template(template)
-        c = {'insert_the_table': self.qs, 'request': self.dpage.request}
-        output = t.render(Context(c))
-        return output
-        # output = ''
-        # name = static_name_generator('table')
-        # self.dpage.context[name] = self.qs
-        # template = '<!-- start of table -->\n' \
-        #            '    {% render_table x_the_table_object %}\n' \
-        #            '<!-- end of table -->\n'
-        # output = template.replace('x_the_table_object', name)
-        # return output
-
-# todo 1: add support for table sorter: http://mottie.github.io/tablesorter/docs/index.html
-# http://mottie.github.io/tablesorter/docs/example-widget-bootstrap-theme.html
-# looks good: http://mottie.github.io/tablesorter/docs/example-widget-bootstrap-theme.html
-# https://github.com/Mottie/tablesorter/wiki
 
 ########################################################################################################################
 #
