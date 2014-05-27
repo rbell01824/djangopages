@@ -45,8 +45,11 @@ from djangopages.libs import dict_nested_set
 
 def static_name_generator(base_name='x'):
     """
-    Returns a unique name of the form base_name_counter
+    Returns a unique name of the form base_name_counter.  Used internally to create id and other names.
+
     :param base_name:
+    :return: Unique name
+    :rtype: unicode
     """
     if not hasattr(static_name_generator, "counter"):
         static_name_generator.counter = 0  # it doesn't exist yet, so initialize it
@@ -56,9 +59,7 @@ def static_name_generator(base_name='x'):
 
 def render_objects(objects, **kwargs):
     """
-    Render the object list.
-
-    Note: kwargs should/must contain the request object!!!
+    Render the object or objects.
 
     :param objects: list of objects or object to render
     :type: list or object
@@ -70,20 +71,20 @@ def render_objects(objects, **kwargs):
     # if whatever is in objs is iterable, iterate over the objects and render each according to whatever it is
     # otherwise, just render whatever it is
     out = ''
-    if isinstance(objects, collections.Iterable):
+    if isinstance(objects, collections.Iterable):           # if iterable, iterate over objects
         for obj in objects:
-            if hasattr(obj, 'render'):
+            if hasattr(obj, 'render'):                      # use render method if available
                 out += obj.render(**kwargs)
-            elif isinstance(obj, basestring):
+            elif isinstance(obj, basestring):               # basestring just renders itself
                 out += obj
-            elif isinstance(obj, collections.Iterable):
+            elif isinstance(obj, collections.Iterable):     # this object is iterable so recurse
                 out += render_objects(obj, **kwargs)
-            else:
+            else:                                           # everything else just render itself
                 out += obj
         return out
-    elif hasattr(objects, 'render'):
+    elif hasattr(objects, 'render'):                        # non iterable with render, so render it
         return objects.render(**kwargs)
-    else:
+    else:                                                   # everything else just render itself
         return objects
 
 ########################################################################################################################
@@ -93,7 +94,10 @@ def render_objects(objects, **kwargs):
 ########################################################################################################################
 
 
-class DPageRegister(type):
+class _DPageRegister(type):
+    """
+    Internal metaclass to register DPage child objects.  Do not mess with this!
+    """
     def __init__(cls, name, base, attrs):
         if not hasattr(cls, 'pages_list'):
             # Executed when processing DPageRegister class itself.
@@ -101,8 +105,8 @@ class DPageRegister(type):
             cls.pages_list = []          # List of subclasses to allow listing
             cls.pages_dict = {}          # Dictionary of subclasses to allow quick name lookup
         else:
-            cls.pages_list.append({'cls': cls, 'name': name})   # Put in list
-            cls.pages_dict[name] = cls   # Put in dict
+            cls.pages_list.append({'cls': cls, 'name': name})       # Put in list
+            cls.pages_dict[name] = cls                              # Put in dict
 
 ########################################################################################################################
 #
@@ -113,35 +117,43 @@ class DPageRegister(type):
 
 class DPage(object):
     """
-    DPage, aka Django Page class.
+    DPage, aka Django Page class.  DPage child classes derive from DPage.
 
-    A DPage objects holds a Django Page.  It consists of an optional form and 0 or more DPage clild objects.
+    Basic example:
 
-    Conceptually, a DPage displays a filter form that a user can use to customize the output of the DPage's
-    objects.
+        class Example(DPage):
+            title = 'DjangoPages_Example'               # You must define a class title.  It must be unique.
+            description = 'Demonstrate links'           # You should provide a class description.  It may be any
+                                                        # length.
+            tags = []                                   # RFU
+
+            def page(self):                             # You must override the page class.
+                self.content = ...                      # page must define the content
+                return self                             # You must return self
+
+    See the source for additional child class examples.
+
     """
-    __metaclass__ = DPageRegister
+    __metaclass__ = _DPageRegister              # use DPageRegister to register child classes
 
-    def __init__(self, request=None, context=None, template=None, objs=None, **kwargs):
+    def __init__(self, request=None, context=None, template=None, **kwargs):
         """
-        Initialize the DPage.
+        Initialize the DPage.  As a general rule, you need not perform initialization in the DPage child class.
+        However, several advanced techniques are possible.   should you wish
 
         :param request: The request object
         :type request: WSGIRequest
-        :param context: Context values for the page
+        :param context: Additional context values for the page
         :type context: dict
         :param template: template name to use for this DPage object.  If None, DPageDefaultTemplate specified in
                          settings is used.
         :type template: unicode
-        :param objs: The DPage... like object(s) for this DPage.
-        :type objs: list or DjangoPageGrid or DjangoPagePage or DjangoPageRow or DjangoPageColumn or object or ...
         :param kwargs: RFU
         :type kwargs: dict
         """
         self.request = request
         self.context = context
         self.template = template if template else settings.DPAGE_DEFAULT_TEMPLATE
-        self.objects = objs if objs else []
         self.content = []
         self.kwargs = kwargs
         pass
@@ -156,7 +168,7 @@ class DPage(object):
                     xr1 = Text('This text comes from dpage.Text')
                     xr2 = Markdown('**Bold Markdown Text**')
                     xr3 = HTML('<h3>H3 text from DPageHTML</h3>')
-                    self.layout(RC12(xr1, xr2, xr3))
+                    self.content(RC12(xr1, xr2, xr3))
                     return self
         """
         raise NotImplementedError("Subclasses should implement this!")
@@ -173,7 +185,7 @@ class DPage(object):
             self.context = {}
 
         # render all our objects
-        content = render_objects(self.content, request=self.request, **kwargs)
+        content = render_objects(self.content, **kwargs)
 
         # if there was nothing, use the default content
         if len(content) == 0:
@@ -183,7 +195,7 @@ class DPage(object):
 
         return render(self.request, self.template, self.context)
 
-        # todo: consider coding the template here and simplifing the base, alternately read from file
+        # note: could code the template here and simplifing the base
         # # build out template & pour in the content
         # template = '{% extends "base.html" %}\n' \
         #            '{% load django_tables2 %}\n' \
@@ -247,15 +259,27 @@ class DPage(object):
 
 class Column(object):
     """
-    Wrap content in a column.
+    Wrap *content objects in column of width width=nn.  Content is rendered and wrapped in a single
+    bootstrap 3 column of width width.
+
+    kwargs:
+        width: column bootstrap width, defaults to 12
+
+    ex: Column('some content', 'more content', 'still more content', width=6)
+
+    Generally it is much more convenient to use the Cn functions to create columns.
+
+    ex. C6( 'column 1 content', 'column 2 content' )            # defines two 6 wide columns
+
+    The following Cn functiona are available: C, C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12.
+
     """
     def __init__(self, *content, **kwargs):
         """
-        Wrap *content objects in column of width width=nn.
-
+        Initialize Column object.
         :param content: Content to wrap in a column of width width
         :type content: object or collections.iterable
-        :param kwargs: keyword args (width: bootstrap width int or unicode, ...)
+        :param kwargs: RFU and width
         :type kwargs: dict
         :return: Column object
         :rtype: Column object
@@ -284,6 +308,8 @@ class Column(object):
 
 def column(*content, **kwargs):
     """
+    Convenience method to allow functools.partial synonyms for Column.
+
     :param content: Content to wrap in a column of width width
     :type content: object or collections.iterable
     :param kwargs: keyword args (width: bootstrap width int or unicode, ...)
@@ -337,13 +363,7 @@ class Row(object):
         dpage_row_after = '</div>\n' \
                           '<!-- End of dpage row -->\n'
 
-        out = ''
-        for con in self.content:
-            if hasattr(con, 'render'):
-                out += con.render()
-            else:
-                out += con
-        out = dpage_row_before + out + dpage_row_after
+        out = dpage_row_before + render_objects(self.content) + dpage_row_after
         return out
 
 
