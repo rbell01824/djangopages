@@ -36,6 +36,18 @@ from django.core.context_processors import csrf
 
 from djangopages.libs import dict_nested_set
 
+# todo 3: add class to deal with file like objects and queryset objects
+# todo 3: add support for select2 https://github.com/applegrew/django-select2
+# todo 3: https://github.com/digi604/django-smart-selects provides chained selects for django models
+
+# todo 3: allow form to specify custom template
+# todo 2: support rest of bootstrap 3 form attributes
+# todo 2: syntactic suggar for Form
+
+        # todo 3: here check text type and deal with file like objects and queryset objects
+        # for now just deal with actual text
+        # todo 2: add markdown kwargs options here
+
 ########################################################################################################################
 #
 # Support Routines
@@ -279,15 +291,22 @@ class Column(Content):
 
 
 class ColumnX(Column):
+    """
+    Render objects in a single column of width width.
+    """
     def render(self, **kwargs):
         """
-        Render objects in a single column of width width
+        Render objects in a single column of width width.
+        :param kwargs:
         """
         out = self.template.format(width=self.width, content=render_objects(self.content))
         return out
 
 
 def column(*content, **kwargs):
+    """
+    Convenience function for Column.
+    """
     return Column(*content, **kwargs)
 C = functools.partial(column)
 C1 = functools.partial(column, width=1)
@@ -305,6 +324,9 @@ C12 = functools.partial(column, width=12)
 
 
 def columnX(*content, **kwargs):
+    """
+    Convenience function for ColumnX.
+    """
     return ColumnX(*content, **kwargs)
 CX = functools.partial(columnX)
 C1X = functools.partial(columnX, width=1)
@@ -370,11 +392,17 @@ class RowX(Row):
 
 
 def row(*content, **kwargs):
+    """
+    Convenience function for Row.
+    """
     return Row(*content, **kwargs)
 R = functools.partial(row)
 
 
 def rowX(*content, **kwargs):
+    """
+    Convenience function for RowX.
+    """
     return RowX(*content, **kwargs)
 RX = functools.partial(rowX)
 
@@ -419,6 +447,7 @@ class RowColumnX(Row, ColumnX):
     def render(self, **kwargs):
         """
         Render RowColumnX
+        :param kwargs:
         """
         out = ''
         out = ColumnX(*self.content, template=self.col_template, **self.kwargs).render()
@@ -440,6 +469,7 @@ class RowXColumn(RowX, Column):
     def render(self, **kwargs):
         """
         Render RowColumnX
+        :param kwargs:
         """
         out = ''
         out = Column(*self.content, template=self.col_template, **self.kwargs).render()
@@ -461,6 +491,7 @@ class RowXColumnX(RowX, ColumnX):
     def render(self, **kwargs):
         """
         Render RowColumnX
+        :param kwargs:
         """
         out = ''
         out = ColumnX(*self.content, template=self.col_template, **self.kwargs).render()
@@ -470,12 +501,7 @@ class RowXColumnX(RowX, ColumnX):
 
 def rowcolumn(*content, **kwargs):
     """
-    Wrap content in a row and column of width width.
-
-    :param content: content
-    :type content: unicode or collections.iterable
-    :param kwargs: keyword args (width: bootstrap width int or unicode, ...)
-    :type kwargs: dict
+    Convenience function for RowColumn.
     """
     return RowColumn(*content, **kwargs)
 RC = functools.partial(rowcolumn, width=12)
@@ -495,12 +521,7 @@ RC12 = functools.partial(rowcolumn, width=12)
 
 def rowXcolumn(*content, **kwargs):
     """
-    Wrap content in a row and column of width width.
-
-    :param content: content
-    :type content: unicode or collections.iterable
-    :param kwargs: keyword args (width: bootstrap width int or unicode, ...)
-    :type kwargs: dict
+    Convenience function for RowXColumn.
     """
     return RowXColumn(*content, **kwargs)
 RXC = functools.partial(rowXcolumn, width=12)
@@ -520,12 +541,7 @@ RXC12 = functools.partial(rowXcolumn, width=12)
 
 def rowcolumnX(*content, **kwargs):
     """
-    Wrap content in a row and column of width width.
-
-    :param content: content
-    :type content: unicode or collections.iterable
-    :param kwargs: keyword args (width: bootstrap width int or unicode, ...)
-    :type kwargs: dict
+    Convenience function for RowColumnX
     """
     return RowColumnX(*content, **kwargs)
 RCX = functools.partial(rowcolumnX, width=12)
@@ -545,12 +561,7 @@ RC12X = functools.partial(rowcolumnX, width=12)
 
 def rowXcolumnX(*content, **kwargs):
     """
-    Wrap content in a row and column of width width.
-
-    :param content: content
-    :type content: unicode or collections.iterable
-    :param kwargs: keyword args (width: bootstrap width int or unicode, ...)
-    :type kwargs: dict
+    Convenience function for RowXColumnX
     """
     return RowXColumnX(*content, **kwargs)
 RXCX = functools.partial(rowXcolumnX, width=12)
@@ -569,23 +580,15 @@ RXC12X = functools.partial(rowXcolumnX, width=12)
 
 ########################################################################################################################
 #
-# Content classes and methods
-#
-# Classes to add content to DPage. Classes that add content to a DPage MUST provide a render method.
+# Basic Text, Markdown, and HTML classes.
 #
 ########################################################################################################################
-# todo 3: add class to deal with file like objects and queryset objects
-# todo 3: add support for select2 https://github.com/applegrew/django-select2
-# todo 3: https://github.com/digi604/django-smart-selects provides chained selects for django models
-
-# todo 3: allow form to specify custom template
-# todo 2: support rest of bootstrap 3 form attributes
-# todo 2: syntactic suggar for Form
 
 
-class Text(object):
+class Text(Content):
     """
-    Holds text for inclusion in the page
+    Renders content to the page.  Text can also be included by passing a str in the
+    content.
     """
 
     def __init__(self, *content, **kwargs):
@@ -599,28 +602,25 @@ class Text(object):
         """
         self.content = content
         self.kwargs = kwargs
-        # todo 2: add text options here and render text in a span
         return
 
     def render(self, **kwargs):
         """
         Render the Text object
-
-        :param kwargs: RFU
-        :type kwargs: dict
+        :param kwargs:
         """
         out = ''
         for obj in self.content:
-            if hasattr(obj, 'render'):
-                out += render_objects(obj, **kwargs)
-            else:
+            if isinstance(obj, basestring):
                 out += obj
+            else:
+                out += render_objects(obj, **kwargs)
         return out
 
 
 class Markdown(object):
     """
-    Holds markdown text for inclusion in a DPage.
+    Holds markdown text for inclusion in a DPage.  Markdown can also hold Text and HTML.
     """
 
     def __init__(self, *content, **kwargs):
@@ -635,25 +635,23 @@ class Markdown(object):
         self.content = content
         self.extensions = kwargs.pop('extensions', None)
         self.kwargs = kwargs
-        # todo 3: here check text type and deal with file like objects and queryset objects
-        # for now just deal with actual text
-        # todo 2: add markdown kwargs options here
         pass
 
     def render(self, **kwargs):
         """
         Render markdown text.
+        :param kwargs:
         """
         out = ''
         for obj in self.content:
-            if hasattr(obj, 'render'):
-                out += render_objects(obj, **kwargs)
-            else:
+            if isinstance(obj, basestring):
                 out += markdown.markdown(force_unicode(obj),
                                          self.extensions if self.extensions else '',
                                          output_format='html5',
                                          safe_mode=False,
                                          enable_attributes=False)
+            else:
+                out += render_objects(obj, **kwargs)
         return out
 
 
@@ -679,17 +677,34 @@ class HTML(object):
     def render(self, **kwargs):
         """
         Render HTML text.
+        :param kwargs:
         """
         out = ''
         for obj in self.content:
-            if hasattr(obj, 'render'):
-                out += render_objects(obj)
-            else:
+            if isinstance(obj, basestring):
                 out += obj
+            else:
+                out += render_objects(obj)
         return out
+
+########################################################################################################################
+#
+# Various Bootstrap 3 widgets.
+#
+# todo: add heading small support
+# todo: add lead body copy support
+# todo: add small, bold, italics
+# todo: add alignment, abbreviations, initialism, addresses, blockquote, etc
+# todo: add ordered and unordered lists
+# todo: gr through bootstrap CSS and add full support
+#
+########################################################################################################################
 
 
 class Link(object):
+    """
+    Link text support
+    """
     def __init__(self, href, *content, **kwargs):
         """
         Create a DPage Link object and initialize it.
@@ -708,6 +723,9 @@ class Link(object):
         pass
 
     def render(self):
+        """
+        Render link.
+        """
         out = ''
         body = render_objects(self.content)
         target = ''
