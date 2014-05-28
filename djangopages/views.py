@@ -38,7 +38,7 @@ from test_data.models import syslog_query, syslog_companies, syslog_hosts,\
 
 ########################################################################################################################
 
-def gp():
+def GP():
     return get_paragraph()
 
 ########################################################################################################################
@@ -127,14 +127,14 @@ class Test03(DPage):
         #
         # This layout generates roughly 200 lines of Bootstrap 3 html!
         ###################
-        self.content = (R1C12(x1),
-                        R1C6(x21, x22),
-                        R1C(x3),
-                        R(C3(x41), C9(R(x42))),
-                        R(C3(x51), C9(R(x521),
-                                      R(x522),
-                                      R1C4(x5231, x5232, x5233)
-                                      )
+        self.content = (RC(x1),
+                        RC6(x21, x22),
+                        RC(x3),
+                        RX(C3(x41), C9(x42)),
+                        RX(C3(x51), C9(RC(x521),
+                                       RC(x522),
+                                       RX(C4(x5231), C4(x5232), C4(x5233))
+                                       )
                           )
                         )
         return self
@@ -201,9 +201,9 @@ class Test04(DPage):
         ###################
         # Layout the content on the page
         ###################
-        self.content = (R1C(text_top),
-                        R1C6(col_graph, pie_graph),
-                        R1C(text_bottom))
+        self.content = (RXC(text_top),
+                        RXC6(col_graph, pie_graph),
+                        RXC(text_bottom))
         return self
 
 
@@ -268,7 +268,7 @@ class Test05(DPage):
         ###################
         # Layout the content on the page
         ###################
-        return (R1C4(cbt, cecbn, eecbn), RC(errbt),)
+        return (RC4(cbt, cecbn, eecbn), RC(errbt),)
 
     def host_summary(self, company, node):
         """
@@ -290,7 +290,7 @@ class Test05(DPage):
         ###################
         # Layout the content on the page
         ###################
-        xxx = R(C4(cbt), C8(errbt))
+        xxx = RX(C4(cbt), C8(errbt))
         ###################
         # Put the layout in an accordion multi panel
         ###################
@@ -506,9 +506,9 @@ class Test07(DPage):
         ###################
         # Put into a layout
         ###################
-        self.content = (R1C12(xr1),
+        self.content = (RXC12(xr1),
                         R(C4(xrform), C6(xr2)),
-                        R1C3(xr4))
+                        RXC3(xr4))
         return self
 
 
@@ -561,8 +561,8 @@ class Test08(DPage):
         #                   C6(X(node_tit, node_tbl))),
         #                 RC(xr3))
         self.content = (RC(xr1),
-                        R(C3X(company_tit, company_tbl),
-                          C6(X(node_tit, node_tbl))),
+                        RX(C3X(company_tit, company_tbl),
+                           C6(X(node_tit, node_tbl))),
                         RC(xr3))
         # self.content = t_node
         return self
@@ -609,14 +609,15 @@ class Test09(DPage):
         ###################
         # Define the content layout
         self.content = (RC(get_paragraph()),
-                        Panel(R(C3(company_tit, company_tbl)), button='Show Companies'),
-                        Panel(R(C6(node_tit, node_tbl)), button='Show Nodes'),
+                        Panel(RX(C3(company_tit, company_tbl)), button='Show Companies'),
+                        Panel(RX(C6(node_tit, node_tbl)), button='Show Nodes'),
                         RC(get_paragraph()),
                         RC(Markdown('#Button Panel')),
-                        R1C6(('The button is in the left column.', bpn, bpc,
+                        RXC6(('The button is in the left column.', bpn, bpc,
                               'The panel is in the right column', get_paragraph()),
                              (get_paragraph(), Markdown('#### Node panel will appear here'), pn,
-                              get_paragraph(), Markdown('#### Company panel will appear here'), pc))
+                              get_paragraph(), Markdown('#### Company panel will appear here'), pc)
+                             )
                         )
         # self.content = t_node
         return self
@@ -673,9 +674,9 @@ class Test11(DPage):
                      header=Markdown('####Markdown header for modal 3'),
                      footer=(Button('A button'), 'This is the footer for modal 3',))
         self.content = (RC(get_paragraph()),
-                        R(C(b1, b2)),
+                        RCX('Text before buttons ', b1, b2, ' Text after buttons'),
                         RC(get_paragraph()),
-                        RC(mdl3),
+                        RC(X('Text before button ', mdl3, ' Text after button')),
                         RC(get_paragraph()))
         return self
 
@@ -692,17 +693,21 @@ class Test12(DPage):
         """
         Build carousel test page
         """
-        c1 = Markdown('#### Content 1')
-        c2 = Markdown('#### Content 2')
-        c3 = Markdown('#### Content 3')
-        c4 = Markdown('#### Content 4')
-        crsl1 = Carousel(c1, c2, c3, c4)
-        crsl2 = Carousel(c1, c2, c3, c4)
-        self.content = (RC(gp()),
-                        R(C3(Markdown('One')), C9(crsl1)),
-                        RC(gp()),
-                        R(C3(Markdown('Two')), C9(crsl2)),
-                        RC(gp())
+        c1r = Markdown('#### Content 1', GP())
+        c2r = Markdown('#### Content 2', GP())
+        c3r = Markdown('#### Content 3', GP())
+        c4r = Markdown('#### Content 4', GP())
+        c1l = Markdown('#### Content 1', GP())
+        c2l = Markdown('#### Content 2', GP())
+        c3l = Markdown('#### Content 3', GP())
+        c4l = Markdown('#### Content 4', GP())
+        crsl1 = Carousel(c1r, c2r, c3r, c4r)
+        crsl2 = Carousel(c1l, c2l, c3l, c4l)
+        self.content = (RC(GP()),
+                        RX(C3(Markdown('**Panel on left**')), C9(crsl1)),
+                        RC(GP()),
+                        RX(C9(crsl2), C3(Markdown('**Panel on right**')) ),
+                        RC(GP())
                         )
         return self
 
@@ -716,7 +721,7 @@ class Test13(DPage):
         self.content = (RC(Link('/dpages/DPagesList', 'Link to list page')),
                         RC(Link('/dpages/Test07', 'Link to the form test page')),
                         RC(Markdown('#### Link buttons')),
-                        R1C((LinkButton('/dpages/DPagesList', 'Link to list page'), ' ',
+                        RXC((LinkButton('/dpages/DPagesList', 'Link to list page'), ' ',
                              LinkButton('/dpages/Test07', 'Link to the form test page'),)
                         ))
         return self
@@ -749,7 +754,7 @@ class DPagesList(DPage):
         for page in pages:
             cls = page['cls']
             lnk = LinkButton('/dpages/{name}'.format(name=cls.__name__), 'Show me')
-            line = R(C3((lnk, ' ', cls.title,)), C6(cls.description))
+            line = RX(C3((lnk, ' ', cls.title,)), C6(cls.description))
             out.append(line)
         self.content = out
         return self

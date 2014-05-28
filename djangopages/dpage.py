@@ -83,8 +83,8 @@ def render_objects(*content, **kwargs):
         elif isinstance(con, collections.Iterable):         # collections are walked
             for con1 in con:
                 out += render_objects(con1, **kwargs)       # recurse to render this collection item
-        else:
-            raise ValueError                                # this should never happen
+        else:                                               # this should never happen
+            raise ValueError('Unknown content type in render_objects {}'.format(con))
     return out
 X = functools.partial(render_objects)                       # convenience method for render objects
 
@@ -198,7 +198,7 @@ class DPage(object):
 
 ########################################################################################################################
 #
-# Content classes.
+# Content classes and methods
 #
 ########################################################################################################################
 
@@ -220,7 +220,7 @@ class Content(object):
 
 ########################################################################################################################
 #
-# Layout support classes and methods.  Really just syntactic sugar to make layout easier.
+# Layout support classes and methods.  Really just syntactic sugar to make layout much easier.
 #
 ########################################################################################################################
 
@@ -230,6 +230,13 @@ class Column(Content):
     Wrap *content objects in column of width width=nn.  Content is rendered and wrapped in a single
     bootstrap 3 column of width width.
     """
+    template = '<!-- Start of dpage col -->\n' \
+               '<div class="col-md-{width}">\n' \
+               '    {content} '  \
+               '</div>\n' \
+               '<!-- End of dpage col -->\n'
+    width = 12
+
     def __init__(self, *content, **kwargs):
         """
         Initialize Column object.  Wraps content objects in a column of width width.  Width defaults to 12.
@@ -256,21 +263,14 @@ class Column(Content):
         :rtype: Column object
         """
         self.content = content
-        self.width = kwargs.pop('width', 12)
-        self.template = kwargs.pop('template', '<!-- Start of dpage col -->\n'
-                                               '<div class="col-md-{width}">\n'
-                                               '    {content} '
-                                               '</div>\n'
-                                               '<!-- End of dpage col -->\n')
+        self.width = kwargs.pop('width', Column.width)
+        self.template = kwargs.pop('template', Column.template)
         self.kwargs = kwargs
         return
 
     def render(self, **kwargs):
         """
         Render objects in column of width width
-
-        :param kwargs: RFU
-        :type kwargs: dict
         """
         out = ''
         for con in self.content:
@@ -282,9 +282,6 @@ class ColumnX(Column):
     def render(self, **kwargs):
         """
         Render objects in a single column of width width
-
-        :param kwargs: RFU
-        :type kwargs: dict
         """
         out = self.template.format(width=self.width, content=render_objects(self.content))
         return out
@@ -328,6 +325,12 @@ class Row(Content):
     """
     Wrap each content in a row.
     """
+    template = '<!-- Start of dpage row -->\n' \
+               '<div class="row">\n' \
+               '    {content}\n' \
+               '</div>\n' \
+               '<!-- End of dpage row -->\n'
+
     def __init__(self, *content, **kwargs):
         """
         Wrap *content objects in row.
@@ -340,20 +343,13 @@ class Row(Content):
         :rtype: Row object
         """
         self.content = content
-        self.template = kwargs.pop('template', '<!-- Start of dpage row -->\n'
-                                               '<div class="row">\n'
-                                               '    {content}\n'
-                                               '</div>\n'
-                                               '<!-- End of dpage row -->\n')
+        self.template = kwargs.pop('template', Row.template)
         self.kwargs = kwargs
         return
 
     def render(self, **kwargs):
         """
         Render each object in row
-
-        :param kwargs: RFU
-        :type kwargs: dict
         """
         out = ''
         for con in self.content:
@@ -368,9 +364,6 @@ class RowX(Row):
     def render(self, **kwargs):
         """
         Render all objects in a row
-
-        :param kwargs: RFU
-        :type kwargs: dict
         """
         out = self.template.format(content=render_objects(self.content))
         return out
@@ -386,40 +379,92 @@ def rowX(*content, **kwargs):
 RX = functools.partial(rowX)
 
 
-
-class ZRowColumn(object):
+class RowColumn(Row, Column):
     """
-    Wrap content in a row with columns of width width.
+    Create a rowcolumn class.  Wrap content in a row wrapping a column.  Equivalent to
+    Row(Column(content).render()).render()
     """
     def __init__(self, *content, **kwargs):
         """
-        Wrap *content objects in column of width width=nn.
-
-        :param content: Content to wrap in a row with multiple columns of width width
-        :type content: object or collections.iterable
-        :param kwargs: Optional arguments, bootstrap 'width' RFU
-        :type kwargs: dict
-        :return: RowColumn object
-        :rtype: RowColumn object
+        Initialize RowColumn object.
         """
-        self.content = content
-        self.width = kwargs.pop('width', 12)
+        self.row_template = kwargs.pop('row_template', Row.template)
+        self.col_template = kwargs.pop('col_template', Column.template)
         self.kwargs = kwargs
+        self.content = content
         pass
 
     def render(self, **kwargs):
         """
-        Render objects in row/column
-
-        :param kwargs: RFU
-        :type kwargs: dict
+        Render RowColumn
+        :param kwargs:
         """
-        # out = render_objects(self.content)
         out = ''
-        for con in self.content:
-            outcol = Column(con, width=self.width).render()
-            outrow = Row(outcol).render()
-            out += outrow
+        out = Column(*self.content, template=self.col_template, **self.kwargs).render()
+        out = Row(out, template=self.row_template, **self.kwargs).render()
+        return out
+
+
+class RowColumnX(Row, ColumnX):
+    def __init__(self, *content, **kwargs):
+        """
+        Initialize RowColumnX object.
+        """
+        self.row_template = kwargs.pop('row_template', Row.template)
+        self.col_template = kwargs.pop('col_template', Column.template)
+        self.kwargs = kwargs
+        self.content = content
+        pass
+
+    def render(self, **kwargs):
+        """
+        Render RowColumnX
+        """
+        out = ''
+        out = ColumnX(*self.content, template=self.col_template, **self.kwargs).render()
+        out = Row(out, template=self.row_template, **self.kwargs).render()
+        return out
+
+
+class RowXColumn(RowX, Column):
+    def __init__(self, *content, **kwargs):
+        """
+        Initialize RowColumnX object.
+        """
+        self.row_template = kwargs.pop('row_template', Row.template)
+        self.col_template = kwargs.pop('col_template', Column.template)
+        self.kwargs = kwargs
+        self.content = content
+        pass
+
+    def render(self, **kwargs):
+        """
+        Render RowColumnX
+        """
+        out = ''
+        out = Column(*self.content, template=self.col_template, **self.kwargs).render()
+        out = RowX(out, template=self.row_template, **self.kwargs).render()
+        return out
+
+
+class RowXColumnX(RowX, ColumnX):
+    def __init__(self, *content, **kwargs):
+        """
+        Initialize RowColumnX object.
+        """
+        self.row_template = kwargs.pop('row_template', Row.template)
+        self.col_template = kwargs.pop('col_template', Column.template)
+        self.kwargs = kwargs
+        self.content = content
+        pass
+
+    def render(self, **kwargs):
+        """
+        Render RowColumnX
+        """
+        out = ''
+        out = ColumnX(*self.content, template=self.col_template, **self.kwargs).render()
+        out = RowX(out, template=self.row_template, **self.kwargs).render()
         return out
 
 
@@ -448,41 +493,7 @@ RC11 = functools.partial(rowcolumn, width=11)
 RC12 = functools.partial(rowcolumn, width=12)
 
 
-class Row1Column(object):
-    """
-    Wrap content in a row with columns of width width.
-    """
-    def __init__(self, *content, **kwargs):
-        """
-        Wrap *content objects in column of width width=nn.
-
-        :param content: Content to wrap in a row with multiple columns of width width
-        :type content: object or collections.iterable
-        :param kwargs: Bootstrap 3 width, rest RFU
-        :type kwargs: dict
-        :return: RowColumn object
-        :rtype: RowColumn object
-        """
-        self.content = content
-        self.width = kwargs.pop('width', 12)
-        self.kwargs = kwargs
-        pass
-
-    def render(self, **kwargs):
-        """
-        Render objects in row/column
-
-        :return: HTML
-        :rtype: unicode
-        """
-        out = ''
-        for con in self.content:
-            out += Column(con, width=self.width).render()
-        out = Row(out).render()
-        return out
-
-
-def row1column(*content, **kwargs):
+def rowXcolumn(*content, **kwargs):
     """
     Wrap content in a row and column of width width.
 
@@ -491,21 +502,70 @@ def row1column(*content, **kwargs):
     :param kwargs: keyword args (width: bootstrap width int or unicode, ...)
     :type kwargs: dict
     """
-    return Row1Column(*content, **kwargs)
-R1C = functools.partial(row1column, width=12)
-R1C1 = functools.partial(row1column, width=1)
-R1C2 = functools.partial(row1column, width=2)
-R1C3 = functools.partial(row1column, width=3)
-R1C4 = functools.partial(row1column, width=4)
-R1C5 = functools.partial(row1column, width=5)
-R1C6 = functools.partial(row1column, width=6)
-R1C7 = functools.partial(row1column, width=7)
-R1C8 = functools.partial(row1column, width=8)
-R1C9 = functools.partial(row1column, width=9)
-R1C10 = functools.partial(row1column, width=10)
-R1C11 = functools.partial(row1column, width=11)
-R1C12 = functools.partial(row1column, width=12)
+    return RowXColumn(*content, **kwargs)
+RXC = functools.partial(rowXcolumn, width=12)
+RXC1 = functools.partial(rowXcolumn, width=1)
+RXC2 = functools.partial(rowXcolumn, width=2)
+RXC3 = functools.partial(rowXcolumn, width=3)
+RXC4 = functools.partial(rowXcolumn, width=4)
+RXC5 = functools.partial(rowXcolumn, width=5)
+RXC6 = functools.partial(rowXcolumn, width=6)
+RXC7 = functools.partial(rowXcolumn, width=7)
+RXC8 = functools.partial(rowXcolumn, width=8)
+RXC9 = functools.partial(rowXcolumn, width=9)
+RXC10 = functools.partial(rowXcolumn, width=10)
+RXC11 = functools.partial(rowXcolumn, width=11)
+RXC12 = functools.partial(rowXcolumn, width=12)
 
+
+def rowcolumnX(*content, **kwargs):
+    """
+    Wrap content in a row and column of width width.
+
+    :param content: content
+    :type content: unicode or collections.iterable
+    :param kwargs: keyword args (width: bootstrap width int or unicode, ...)
+    :type kwargs: dict
+    """
+    return RowColumnX(*content, **kwargs)
+RCX = functools.partial(rowcolumnX, width=12)
+RC1X = functools.partial(rowcolumnX, width=1)
+RC2X = functools.partial(rowcolumnX, width=2)
+RC3X = functools.partial(rowcolumnX, width=3)
+RC4X = functools.partial(rowcolumnX, width=4)
+RC5X = functools.partial(rowcolumnX, width=5)
+RC6X = functools.partial(rowcolumnX, width=6)
+RC7X = functools.partial(rowcolumnX, width=7)
+RC8X = functools.partial(rowcolumnX, width=8)
+RC9X = functools.partial(rowcolumnX, width=9)
+RC10X = functools.partial(rowcolumnX, width=10)
+RC11X = functools.partial(rowcolumnX, width=11)
+RC12X = functools.partial(rowcolumnX, width=12)
+
+
+def rowXcolumnX(*content, **kwargs):
+    """
+    Wrap content in a row and column of width width.
+
+    :param content: content
+    :type content: unicode or collections.iterable
+    :param kwargs: keyword args (width: bootstrap width int or unicode, ...)
+    :type kwargs: dict
+    """
+    return RowXColumnX(*content, **kwargs)
+RXCX = functools.partial(rowXcolumnX, width=12)
+RXC1X = functools.partial(rowXcolumnX, width=1)
+RXC2X = functools.partial(rowXcolumnX, width=2)
+RXC3X = functools.partial(rowXcolumnX, width=3)
+RXC4X = functools.partial(rowXcolumnX, width=4)
+RXC5X = functools.partial(rowXcolumnX, width=5)
+RXC6X = functools.partial(rowXcolumnX, width=6)
+RXC7X = functools.partial(rowXcolumnX, width=7)
+RXC8X = functools.partial(rowXcolumnX, width=8)
+RXC9X = functools.partial(rowXcolumnX, width=9)
+RXC10X = functools.partial(rowXcolumnX, width=10)
+RXC11X = functools.partial(rowXcolumnX, width=11)
+RXC12X = functools.partial(rowXcolumnX, width=12)
 
 ########################################################################################################################
 #
