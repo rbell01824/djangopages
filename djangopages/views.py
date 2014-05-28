@@ -493,7 +493,7 @@ class Test07(DPage):
                                       )
 
         xrform = Form(self, TestFormButton, 'Update the display',
-                      action_url='/dpages/test7')
+                      action_url='/dpages/Test07')
         ###################
         # Create some other content that uses form data
         ###################
@@ -556,9 +556,13 @@ class Test08(DPage):
         # Put content on page
         ###################
         # Define the content layout
+        # self.content = (RC(xr1),
+        #                 R(C3(X(company_tit, company_tbl)),
+        #                   C6(X(node_tit, node_tbl))),
+        #                 RC(xr3))
         self.content = (RC(xr1),
-                        R(C3(company_tit, company_tbl),
-                          C6(node_tit, node_tbl)),
+                        R(C3X(company_tit, company_tbl),
+                          C6(X(node_tit, node_tbl))),
                         RC(xr3))
         # self.content = t_node
         return self
@@ -642,9 +646,9 @@ class Test10(DPage):
         b10 = Button('Link', 'btn-primary', 'btn-sm')
         b11 = Button('Link', 'btn-primary', 'btn-xs')
         self.content = (RC12(Markdown('Buttons come in different colors/styles')),
-                        R(C12(b1, b2, b3, b4, b5, b6, b7)),
+                        R(C12X(b1, b2, b3, b4, b5, b6, b7)),
                         RC12(Markdown('Buttons come in sizes')),
-                        R(C12(b8, b9, b10, b11)),)
+                        R(C12X(b8, b9, b10, b11)),)
         return self
 
 

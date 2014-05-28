@@ -43,49 +43,50 @@ from djangopages.libs import dict_nested_set
 ########################################################################################################################
 
 
-def static_name_generator(base_name='x'):
+def unique_name(base_name='x'):
     """
-    Returns a unique name of the form base_name_counter.  Used internally to create id and other names.
+    Returns a unique name of the form 'base_name'_counter.  Used internally to create id and other names.
+
+    ex. unique_name('xxx')
 
     :param base_name:
     :return: Unique name
     :rtype: unicode
     """
-    if not hasattr(static_name_generator, "counter"):
-        static_name_generator.counter = 0  # it doesn't exist yet, so initialize it
-    static_name_generator.counter += 1
-    return '{}_{}'.format(base_name, static_name_generator.counter)
+    if not hasattr(unique_name, "counter"):
+        unique_name.counter = 0  # it doesn't exist yet, so initialize it
+    unique_name.counter += 1
+    return '{}_{}'.format(base_name, unique_name.counter)
 
 
-def render_objects(objects, **kwargs):
+def render_objects(*content, **kwargs):
     """
-    Render the object or objects.
+    Render the content.
 
-    :param objects: list of objects or object to render
+    ex. render_objects('something', 'another thing', ('a list thing', 'second'))
+
+    render_objects is also available as X(...) as a convenience method.
+
+    :param content: content to render
     :type: list or object
-    :param kwargs: extra arguments for render
+    :param kwargs: RFU
     :type kwargs: dict
     :return: Rendered output of objects
     :rtype: unicode
     """
-    # if whatever is in objs is iterable, iterate over the objects and render each according to whatever it is
-    # otherwise, just render whatever it is
     out = ''
-    if isinstance(objects, collections.Iterable):           # if iterable, iterate over objects
-        for obj in objects:
-            if hasattr(obj, 'render'):                      # use render method if available
-                out += obj.render(**kwargs)
-            elif isinstance(obj, basestring):               # basestring just renders itself
-                out += obj
-            elif isinstance(obj, collections.Iterable):     # this object is iterable so recurse
-                out += render_objects(obj, **kwargs)
-            else:                                           # everything else just render itself
-                out += obj
-        return out
-    elif hasattr(objects, 'render'):                        # non iterable with render, so render it
-        return objects.render(**kwargs)
-    else:                                                   # everything else just render itself
-        return objects
+    for con in content:
+        if isinstance(con, basestring):                     # strings are just themselves
+            out += con
+        elif hasattr(con, 'render'):                        # objects with render methods know how to render themselves
+            out += con.render(**kwargs)
+        elif isinstance(con, collections.Iterable):         # collections are walked
+            for con1 in con:
+                out += render_objects(con1, **kwargs)       # recurse to render this collection item
+        else:
+            raise ValueError                                # this should never happen
+    return out
+X = functools.partial(render_objects)                       # convenience method for render objects
 
 ########################################################################################################################
 #
@@ -139,7 +140,7 @@ class DPage(object):
     def __init__(self, request=None, context=None, template=None, **kwargs):
         """
         Initialize the DPage.  As a general rule, you need not perform initialization in the DPage child class.
-        However, several advanced techniques are possible.   should you wish
+        However, if you do it is possible to provide additional context content and customize the template.
 
         :param request: The request object
         :type request: WSGIRequest
@@ -171,11 +172,11 @@ class DPage(object):
                     self.content(RC12(xr1, xr2, xr3))
                     return self
         """
-        raise NotImplementedError("Subclasses should implement this!")
+        raise NotImplementedError("Subclasses should implement DPage.page!")
 
     def render(self, **kwargs):
         """
-        Render this DPage.
+        Render this DPage and return a Django response object.
 
         :return: response object
         :rtype: HttpResponse
@@ -195,126 +196,101 @@ class DPage(object):
 
         return render(self.request, self.template, self.context)
 
-        # note: could code the template here and simplifing the base
-        # # build out template & pour in the content
-        # template = '{% extends "base.html" %}\n' \
-        #            '{% load django_tables2 %}\n' \
-        #            '{% block content %}\n' \
-        #            '<!-- Start of dpage page -->\n' \
-        #            '    <div class="container-fluid">\n' \
-        #            '        insert_the_content_here\n' \
-        #            '    </div>\n' \
-        #            '<!-- End of dpage page -->\n' \
-        #            '{% endblock content %}\n'
-        # output = template.replace('insert_the_content_here', content)
-        #
-        # # create template and context objects
-        # t = Template(output)
-        # c = Context(self.context)
-        #
-        # return HttpResponse(t.render(c))
+########################################################################################################################
+#
+# Content classes.
+#
+########################################################################################################################
+
+
+class Content(object):
+    """
+    Base class for content classes.
+
+    Content classes provide content for DPage.  See the examples in the code.
+    """
+    def __init__(self):
+        pass
+
+    def render(self):
+        """
+        Render this content object.
+        """
+        raise NotImplementedError("Subclasses should implement Content.render!")
 
 ########################################################################################################################
 #
 # Layout support classes and methods.  Really just syntactic sugar to make layout easier.
 #
 ########################################################################################################################
-#
-#  A DPage contains a list of rows.  Each row may have multiple columns.  Columns have a default or
-# specified width.  Columns can contain anything that has a render method.  Rows may be nested in columns may be
-# nested in rows ... to whatever deapth amuses.  Past 2 or 3 it's probably not a good idea.
-#
-#     row_________________________________________________________________________________________________
-#     col________________________ col__________________________ col_______________________________________
-#     form_______________________ graph________________________ table_____________________________________
-#     text_______________________ markdown_____________________ html______________________________________
-#
-# Example:
-#         x1 = Text('Row 1: This text comes from dpage.Text')
-#         x21 = Markdown('Row 2 col 1: **Bold Markdown Text**')
-#         x22 = HTML('<p>Row 2 col 2: </p><h3>H3 text from DPageHTML</h3>')
-#         x3 = HTML('<p>Row 3: Text from loremipsum. {}</p>'.format(get_paragraph()))
-#         x41 = HTML('<p>Row 4 col 1:{}</p>'.format(get_paragraph()))
-#         x42 = HTML('<p>Row 4 col 2:{}</p>'.format(get_paragraph()))
-#         x51 = HTML('<p>Row 5 col 1:{}</p>'.format(get_paragraph()))
-#         x521 = HTML('<p>Row 5 col 2 row 1:{}</p>'.format(get_paragraph()))
-#         x522 = HTML('<p>Row 5 col 2 row 2:{}</p>'.format(get_paragraph()))
-#         x5231 = HTML('<p>Row 5 col 2 row 3 col 1: {}</p>'.format(get_paragraph()))
-#         x5232 = HTML('<p>Row 5 col 2 row 3 col 2: {}</p>'.format(get_paragraph()))
-#         x5233 = HTML('<p>Row 5 col 2 row 3 col 3: {}</p>'.format(get_paragraph()))
-#         # page.layout(R(C3(x41), C9(x42)))
-#         self.layout(RC12(x1),
-#                     RC6(x21, x22),
-#                     RC(x3),
-#                     R(C3(x41), C9(R(x42))),
-#                     R(C3(x51), C9(R(x521),
-#                                   R(x522),
-#                                   RC4(x5231, x5232, x5233)
-#                                   )
-#                       )
-#                     )
-#
-########################################################################################################################
 
 
-class Column(object):
+class Column(Content):
     """
     Wrap *content objects in column of width width=nn.  Content is rendered and wrapped in a single
     bootstrap 3 column of width width.
-
-    kwargs:
-        width: column bootstrap width, defaults to 12
-
-    ex: Column('some content', 'more content', 'still more content', width=6)
-
-    Generally it is much more convenient to use the Cn functions to create columns.
-
-    ex. C6( 'column 1 content', 'column 2 content' )            # defines two 6 wide columns
-
-    The following Cn functiona are available: C, C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12.
-
     """
     def __init__(self, *content, **kwargs):
         """
-        Initialize Column object.
+        Initialize Column object.  Wraps content objects in a column of width width.  Width defaults to 12.
+
+        ex. Column('aaa', 'bbb', width=6)
+
+            Creates two columns of width 6.  The first contains 'aaa'.  The second contains 'bbb'.
+
+        Generally it is much more convenient to use the Cn functions to create columns.
+
+        ex. C6( 'aaa', 'bbb' )
+
+        The following Cn functions are available: C, C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12.
+
+        kwargs:
+            width=12                set the column width
+            template='some str'     override the default template
+
         :param content: Content to wrap in a column of width width
         :type content: object or collections.iterable
-        :param kwargs: RFU and width
+        :param kwargs: Use to override default width of 12.  Other uses RFU.
         :type kwargs: dict
         :return: Column object
         :rtype: Column object
         """
         self.content = content
         self.width = kwargs.pop('width', 12)
+        self.template = kwargs.pop('template', '<!-- Start of dpage col -->\n'
+                                               '<div class="col-md-{width}">\n'
+                                               '    {content} '
+                                               '</div>\n'
+                                               '<!-- End of dpage col -->\n')
         self.kwargs = kwargs
         return
 
     def render(self, **kwargs):
         """
-        Render objects in column
+        Render objects in column of width width
 
         :param kwargs: RFU
         :type kwargs: dict
         """
-        dpage_col_before = '<!-- Start of dpage col -->\n' \
-                           '<div class="col-md-{width}">\n'
-        dpage_col_after = '</div>\n' \
-                          '<!-- End of dpage col -->\n'
+        out = ''
+        for con in self.content:
+            out += self.template.format(width=self.width, content=render_objects(con))
+        return out
 
-        out = render_objects(self.content)
-        out = dpage_col_before.format(width=self.width) + out + dpage_col_after
+
+class ColumnX(Column):
+    def render(self, **kwargs):
+        """
+        Render objects in a single column of width width
+
+        :param kwargs: RFU
+        :type kwargs: dict
+        """
+        out = self.template.format(width=self.width, content=render_objects(self.content))
         return out
 
 
 def column(*content, **kwargs):
-    """
-    Convenience method to allow functools.partial synonyms for Column.
-
-    :param content: Content to wrap in a column of width width
-    :type content: object or collections.iterable
-    :param kwargs: keyword args (width: bootstrap width int or unicode, ...)
-    :type kwargs: dict
-    """
     return Column(*content, **kwargs)
 C = functools.partial(column)
 C1 = functools.partial(column, width=1)
@@ -331,9 +307,26 @@ c11 = functools.partial(column, width=11)
 C12 = functools.partial(column, width=12)
 
 
-class Row(object):
+def columnX(*content, **kwargs):
+    return ColumnX(*content, **kwargs)
+CX = functools.partial(columnX)
+C1X = functools.partial(columnX, width=1)
+C2X = functools.partial(columnX, width=2)
+C3X = functools.partial(columnX, width=3)
+C4X = functools.partial(columnX, width=4)
+C5X = functools.partial(columnX, width=5)
+C6X = functools.partial(columnX, width=6)
+C7X = functools.partial(columnX, width=7)
+C8X = functools.partial(columnX, width=8)
+C9X = functools.partial(columnX, width=9)
+c10X = functools.partial(columnX, width=10)
+c11X = functools.partial(columnX, width=11)
+C12X = functools.partial(columnX, width=12)
+
+
+class Row(Content):
     """
-    Wrap content in a row.
+    Wrap each content in a row.
     """
     def __init__(self, *content, **kwargs):
         """
@@ -347,39 +340,54 @@ class Row(object):
         :rtype: Row object
         """
         self.content = content
+        self.template = kwargs.pop('template', '<!-- Start of dpage row -->\n'
+                                               '<div class="row">\n'
+                                               '    {content}\n'
+                                               '</div>\n'
+                                               '<!-- End of dpage row -->\n')
         self.kwargs = kwargs
         return
 
     def render(self, **kwargs):
         """
-        Render objects in row
+        Render each object in row
 
         :param kwargs: RFU
         :type kwargs: dict
         """
-        # HTML to create a bootstrap3 row
-        dpage_row_before = '<!-- Start of dpage row -->\n' \
-                           '<div class="row">\n'
-        dpage_row_after = '</div>\n' \
-                          '<!-- End of dpage row -->\n'
+        out = ''
+        for con in self.content:
+            out += self.template.format(content=render_objects(con))
+        return out
 
-        out = dpage_row_before + render_objects(self.content) + dpage_row_after
+
+class RowX(Row):
+    """
+    Wrap all content in a row.
+    """
+    def render(self, **kwargs):
+        """
+        Render all objects in a row
+
+        :param kwargs: RFU
+        :type kwargs: dict
+        """
+        out = self.template.format(content=render_objects(self.content))
         return out
 
 
 def row(*content, **kwargs):
-    """
-    Wrap content in a bootstrap 3 row
-    :param content: The html content to wrap
-    :type content: unicode
-    :param kwargs: RFU
-    :type kwargs: dict
-    """
     return Row(*content, **kwargs)
 R = functools.partial(row)
 
 
-class RowColumn(object):
+def rowX(*content, **kwargs):
+    return RowX(*content, **kwargs)
+RX = functools.partial(rowX)
+
+
+
+class ZRowColumn(object):
     """
     Wrap content in a row with columns of width width.
     """
@@ -726,8 +734,8 @@ class Modal(object):
         self.button = kwargs.pop('button', None)
         self.header = kwargs.pop('header', None)
         self.footer = kwargs.pop('footer', None)
-        self.id = kwargs.pop('id', static_name_generator('modal'))
-        self.modal_label = kwargs.pop('modal_label', static_name_generator('modal_label'))
+        self.id = kwargs.pop('id', unique_name('modal'))
+        self.modal_label = kwargs.pop('modal_label', unique_name('modal_label'))
         self.kwargs = kwargs
         return
 
@@ -816,7 +824,7 @@ class Panel(object):
         """
         self.content = content
         self.button = kwargs.pop('button', None)
-        self.id = kwargs.pop('id', static_name_generator('panel'))
+        self.id = kwargs.pop('id', unique_name('panel'))
         self.kwargs = kwargs
         # todo 2: add header, footer, and panel class attributes here
         pass
@@ -861,7 +869,7 @@ class Accordion(object):
         # todo 2: check that content is AccordionPanel or list of AccordionPanel
         # todo 2: add other accordion options in kwargs
         self.content = content
-        self.id = kwargs.pop('id', static_name_generator('accordion_id'))
+        self.id = kwargs.pop('id', unique_name('accordion_id'))
         self.kwargs = kwargs
         return
 
@@ -892,7 +900,7 @@ class AccordionPanel(object):
         self.accordion_id = kwargs.pop('accordion_id', None)
         self.title = kwargs.pop('title', '')
         self.panel_collapsed = kwargs.pop('collapsed', True)
-        self.id = kwargs.pop('id', static_name_generator('panel_id'))
+        self.id = kwargs.pop('id', unique_name('panel_id'))
         # todo 2: add other accordion panel options here
         return
 
@@ -950,7 +958,7 @@ class AccordionMultiPanel(object):
         self.accordion_id = kwargs.pop('accordion_id', None)
         self.title = kwargs.pop('title', '')
         self.panel_collapsed = kwargs.pop('collapsed', True)
-        self.id = kwargs.pop('id', static_name_generator('panel_id'))
+        self.id = kwargs.pop('id', unique_name('panel_id'))
         # todo 2: add other options here
         return
 
@@ -994,7 +1002,7 @@ class AccordionMultiPanel(object):
         return out
 
 
-# fixme: finish table
+# fixme: finish table  do this: http://www.pontikis.net/labs/bs_grid/demo/
 class Table(object):
     """
     Table support
@@ -1165,7 +1173,7 @@ class Table2(object):
         output = t.render(Context(c))
         return output
         # output = ''
-        # name = static_name_generator('table')
+        # name = unique_name('table')
         # self.dpage.context[name] = self.qs
         # template = '<!-- start of table -->\n' \
         #            '    {% render_table x_the_table_object %}\n' \
@@ -1296,7 +1304,7 @@ class Carousel(object):
     """
     def __init__(self, *content, **kwargs):
         self.content = content
-        self.id = kwargs.pop('id', static_name_generator('carousel_id'))
+        self.id = kwargs.pop('id', unique_name('carousel_id'))
         self.data_interval = kwargs.pop('data-interval', 'false')
         self.indicators = kwargs.pop('indicators', None)
         self.background_color = kwargs.pop('background-color', '#D8D8D8')
@@ -1417,7 +1425,8 @@ class Carousel(object):
 
 LEGAL_GRAPH_TYPES = ['line', 'pie', 'column', 'bar', 'area']
 
-
+# todo 1: add data links, see http://stackoverflow.com/questions/19399346/need-to-link-url-in-highchart
+# todo 1: http://birdchan.com/home/2012/09/07/highcharts-pie-charts-can-have-url-links/comment-page-1/
 class Graph(object):
     """
     DPage graph object class that uses Chartkick.
