@@ -700,11 +700,14 @@ class HTML(object):
 #
 ########################################################################################################################
 
+# fixme: add option for template
 
-class Link(object):
+class Link(Content):
     """
-    Link text support
+    Link text support.  Link renders its content and wraps in a link.
     """
+    template = '<a href="{href}" {target} {link_class}>{body}</a>'
+
     def __init__(self, href, *content, **kwargs):
         """
         Create a DPage Link object and initialize it.
@@ -714,11 +717,14 @@ class Link(object):
         :param content: Content the link wraps
         :type content:
         :param kwargs:
+            target          <a> tag target
+
         """
         self.href = href
         self.content = content
         self.target = kwargs.pop('target', None)
         self.link_class = kwargs.pop('link_class', None)
+        self.template = kwargs.pop('template', Link.template)
         self.kwargs = kwargs
         pass
 
@@ -734,12 +740,14 @@ class Link(object):
         link_class = ''
         if self.link_class:
             link_class = 'class="{link_class}" '.format(link_class=self.link_class)
-        template = '<a href="{href}" {target} {link_class}>{body}</a>'
         out = template.format(href=self.href, target=target, link_class=link_class, body=body)
         return out
 
 
 class LinkButton(Link):
+    """
+    Link styled as a button
+    """
     def __init__(self, href, *content, **kwargs):
         link_class = kwargs.pop('link_class', 'btn btn-primary btn-sm')
         super(LinkButton, self).__init__(href, *content, link_class=link_class, **kwargs)
