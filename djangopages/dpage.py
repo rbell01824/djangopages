@@ -700,17 +700,22 @@ class HTML(object):
 #
 ########################################################################################################################
 
-# fixme: add option for template
 
 class Link(Content):
     """
     Link text support.  Link renders its content and wraps in a link.
     """
     template = '<a href="{href}" {target} {link_class}>{body}</a>'
+    button_link_class = 'btn btn-primary btn-sm'
 
     def __init__(self, href, *content, **kwargs):
         """
         Create a DPage Link object and initialize it.
+
+        ex. Link('/dpages/Test07', 'Link to the form test page', button=True)
+
+        Note: Link('href', content1, content2) is equivalent to
+              Link('href', x(content1, content2))
 
         :param href: Link href
         :type href: unicode
@@ -718,12 +723,14 @@ class Link(Content):
         :type content:
         :param kwargs:
             target          <a> tag target
-
+            button          If True, display link as a button
+            link_class      Bootstrap 3 button link class string. Defaults to 'btn btn-primary btn-sm'
         """
         self.href = href
         self.content = content
         self.target = kwargs.pop('target', None)
-        self.link_class = kwargs.pop('link_class', None)
+        self.button = kwargs.pop('button', None)
+        self.link_class = kwargs.pop('link_class', Link.button_link_class)
         self.template = kwargs.pop('template', Link.template)
         self.kwargs = kwargs
         pass
@@ -738,25 +745,12 @@ class Link(Content):
         if self.target:
             target = 'target="{target}" '.format(self.target)
         link_class = ''
-        if self.link_class:
+        if self.button:
             link_class = 'class="{link_class}" '.format(link_class=self.link_class)
-        out = template.format(href=self.href, target=target, link_class=link_class, body=body)
+        out = self.template.format(href=self.href, target=target, link_class=link_class, body=body)
         return out
 
-
-class LinkButton(Link):
-    """
-    Link styled as a button
-    """
-    def __init__(self, href, *content, **kwargs):
-        link_class = kwargs.pop('link_class', 'btn btn-primary btn-sm')
-        super(LinkButton, self).__init__(href, *content, link_class=link_class, **kwargs)
-        return
-
-    def render(self):
-        out = super(LinkButton, self).render()
-        return out
-
+# fixme: resume work here btn-block, active state support
 
 class Button(object):
     """

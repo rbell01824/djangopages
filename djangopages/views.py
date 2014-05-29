@@ -608,16 +608,16 @@ class Test09(DPage):
         # Put content on page
         ###################
         # Define the content layout
-        self.content = (RC(get_paragraph()),
-                        Panel(RX(C3(company_tit, company_tbl)), button='Show Companies'),
-                        Panel(RX(C6(node_tit, node_tbl)), button='Show Nodes'),
+        self.content = (Markdown('**Side by side panels**'),
+                        RX(C2(Panel(company_tit, company_tbl, button='Show Companies')),
+                           C6(Panel(node_tit, node_tbl, button='Show Nodes'))),
                         RC(get_paragraph()),
                         RC(Markdown('#Button Panel')),
                         RXC6(('The button is in the left column.', bpn, bpc,
                               'The panel is in the right column', get_paragraph()),
                              (get_paragraph(), Markdown('#### Node panel will appear here'), pn,
                               get_paragraph(), Markdown('#### Company panel will appear here'), pc)
-                             )
+                             ),
                         )
         # self.content = t_node
         return self
@@ -721,8 +721,8 @@ class Test13(DPage):
         self.content = (RC(Link('/dpages/DPagesList', 'Link to list page')),
                         RC(Link('/dpages/Test07', 'Link to the form test page')),
                         RC(Markdown('#### Link buttons')),
-                        RXC((LinkButton('/dpages/DPagesList', 'Link to list page'), ' ',
-                             LinkButton('/dpages/Test07', 'Link to the form test page'),)
+                        RXC((Link('/dpages/DPagesList', 'Link to list page', button=True), ' ',
+                             Link('/dpages/Test07', 'Link to the form test page', button=True),)
                         ))
         return self
 
@@ -753,7 +753,7 @@ class DPagesList(DPage):
         template = '<a href="/dpages/{name}" class="btn btn-primary btn-xs">Show</a>'
         for page in pages:
             cls = page['cls']
-            lnk = LinkButton('/dpages/{name}'.format(name=cls.__name__), 'Show me')
+            lnk = Link('/dpages/{name}'.format(name=cls.__name__), 'Show me', button=True)
             line = RX(C3((lnk, ' ', cls.title,)), C6(cls.description))
             out.append(line)
         self.content = out
