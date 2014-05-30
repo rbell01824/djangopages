@@ -636,20 +636,24 @@ class Test10(DPage):
         Build button test page
         """
         b1 = Button('Default')
-        b2 = Button('Primary', 'btn-primary')
-        b3 = Button('Success', 'btn-success')
-        b4 = Button('Info', 'btn-info')
-        b5 = Button('Warning', 'btn-warning')
-        b6 = Button('Danger', 'btn-danger')
-        b7 = Button('Link', 'btn-link')
-        b8 = Button('Link', 'btn-primary', 'btn-lg')
-        b9 = Button('Link', 'btn-primary', '')
-        b10 = Button('Link', 'btn-primary', 'btn-sm')
-        b11 = Button('Link', 'btn-primary', 'btn-xs')
+        b2 = Button('Primary', btn_type='btn-primary')
+        b3 = Button('Success', btn_type='btn-success')
+        b4 = Button('Info', btn_type='btn-info')
+        b5 = Button('Warning', btn_type='btn-warning')
+        b6 = Button('Danger', btn_type='btn-danger')
+        b7 = Button('Link', btn_type='btn-link')
+        b8 = Button('Link', btn_type='btn-primary', btn_size='btn-lg')
+        b9 = Button('Link', btn_type='btn-primary', btn_size='')
+        b10 = Button('Link', btn_type='btn-primary', btn_size='btn-sm')
+        b11 = Button('Link', btn_type='btn-primary', btn_size='btn-xs')
+        b12 = Button(X(Markdown('### Markdown title\nSome additional text')))
+        b13 = Button('btn-block button', btn_extra='btn-block')
         self.content = (RC12(Markdown('Buttons come in different colors/styles')),
                         R(C12X(b1, b2, b3, b4, b5, b6, b7)),
                         RC12(Markdown('Buttons come in sizes')),
-                        R(C12X(b8, b9, b10, b11)),)
+                        R(C12X(b8, b9, b10, b11)),
+                        R(C12X('<br/>', b12)),
+                        RC4(b13))
         return self
 
 

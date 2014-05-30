@@ -629,7 +629,9 @@ class Markdown(object):
 
         :param content: Text to process as markdown.
         :type content: unicode
-        :param kwargs: extensions, RFU
+        :param kwargs:
+            extensions          Markdown extensions
+            RFU
         :type kwargs: dict
         """
         self.content = content
@@ -715,7 +717,7 @@ class Link(Content):
         ex. Link('/dpages/Test07', 'Link to the form test page', button=True)
 
         Note: Link('href', content1, content2) is equivalent to
-              Link('href', x(content1, content2))
+              Link('href', X(content1, content2))
 
         :param href: Link href
         :type href: unicode
@@ -725,6 +727,7 @@ class Link(Content):
             target          <a> tag target
             button          If True, display link as a button
             link_class      Bootstrap 3 button link class string. Defaults to 'btn btn-primary btn-sm'
+            RFU
         """
         self.href = href
         self.content = content
@@ -750,51 +753,64 @@ class Link(Content):
         out = self.template.format(href=self.href, target=target, link_class=link_class, body=body)
         return out
 
-# fixme: resume work here btn-block, active state support
+# fixme: resume work here btn-block, diabled, active, active state support
 
-class Button(object):
+
+class Button(Content):
     """
     DPage button class
     """
-    def __init__(self, btn_text, btn_type='btn-default', btn_size=None, btn_extra=None, **kwargs):
+    template = '<!-- start of button -->\n' \
+               '    <button type="button" class="btn {btn_type} {btn_size} {btn_active} {btn_block}" {btn_extra}>\n' \
+               '        {btn_text}\n' \
+               '    </button>\n' \
+               '<!-- end of button -->\n'
+
+    def __init__(self, *content, **kwargs):
         """
         Create a button object.
 
-        :param btn_text: The text to display in the button.
-        :type btn_text: unicode
-        :param btn_type: The type of button to display per Bootstrap 3
-        :type btn_type: unicode
-        :param btn_size: The size of the button to display per Bootstrap 3
-        :type btn_size: unicode
-        :param btn_extra: Extra text for <button ...>.  Used to create buttons for Modal and Panel
-        :type btn_extra: unicode
+        ex. Button('my first button', '<br/>', 'some more text')   is equivalent to
+            Button(X('my first button', '<br/>', 'some more text'))
+
+        :param content: The content to wrap in a button.
+        :param kwargs:
+            btn_type            The button type.  Defaults to btn-default.
+            btn_size            The button size.  Defaults to bootstrap 3 default size.
+            btn_block           If True, render a block style button.  Default False.
+            btn_extra           RFU
+            template
+            RFU
+        :type kwargs: dict
         """
-        self.btn_text = btn_text
-        self.btn_type = btn_type
-        self.btn_size = btn_size if btn_size else ''
-        self.btn_extra = btn_extra if btn_extra else ''
+        self.content = content
+        self.btn_type = kwargs.pop('btn_type', 'btn-default')
+        self.btn_size = kwargs.pop('btn_size', '')
+        self.btn_block = '' if not kwargs.pop('btn_block', None) else 'btn_block'
+        self.btn_extra = kwargs.pop('btn_extra', '')
+        self.template = kwargs.pop('template', Button.template)
         self.kwargs = kwargs
         return
 
     def render(self):
-        template = '<!-- start of button -->\n' \
-                   '    <button type="button" class="btn {btn_type} {btn_size}" {btn_extra}>\n' \
-                   '        {btn_text}\n' \
-                   '    </button>\n' \
-                   '<!-- end of button -->\n'
-        out = template.format(btn_text=self.btn_text,
-                              btn_type=self.btn_type,
-                              btn_size=self.btn_size,
-                              btn_extra=self.btn_extra)
+        content = render_objects(self.content)
+        out = self.template.format(btn_text=content,
+                                   btn_type=self.btn_type,
+                                   btn_size=self.btn_size,
+                                   btn_extra=self.btn_extra)
         return out
 
 
 class ButtonModal(Button):
     """
-    Button to control modal object
+    Button to control modal object.  Modal must exist so that its id is available.
     """
-    def __init__(self, btn_text, modal, btn_type='btn-default', btn_size=None, **kwargs):
+    def __init__(self, button, modal, btn_type='btn-default', btn_size=None, **kwargs):
+        """
+
+        """
         self.modal = modal
+        self.button = button
         btn_extra = 'data-toggle="modal" data-target="#{modal_id}" '.format(modal_id=modal.id)
         super(ButtonModal, self).__init__(btn_text, btn_type, btn_size, btn_extra=btn_extra, **kwargs)
         return
@@ -810,12 +826,17 @@ class Modal(object):
     Modal object
     """
     def __init__(self, *content, **kwargs):
+        """
+        Initialize a Modal.
+
+        :param
+        """
         self.content = content
         self.button = kwargs.pop('button', None)
         self.header = kwargs.pop('header', None)
         self.footer = kwargs.pop('footer', None)
-        self.id = kwargs.pop('id', unique_name('modal'))
-        self.modal_label = kwargs.pop('modal_label', unique_name('modal_label'))
+        self.id = kwargs.pop('id', unique_name('modal'))                                # id's the modal proper
+        self.modal_label = kwargs.pop('modal_label', unique_name('modal_label'))        # labels the modal header
         self.kwargs = kwargs
         return
 
