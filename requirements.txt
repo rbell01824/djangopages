@@ -1,4 +1,3 @@
-loremipsum
 Django==1.6.4
 Markdown==2.4
 argparse==1.2.1
@@ -8,9 +7,9 @@ django-bootstrap3==4.4.0
 django-extensions==1.3.6
 django-qsstats-magic==0.7.2
 django-suit==0.2.8
-django-taggit==0.12
 django-tables2==0.15.0
+django-taggit==0.12
+loremipsum==1.0.2
 python-dateutil==2.2
 six==1.6.1
 wsgiref==0.1.2
-
