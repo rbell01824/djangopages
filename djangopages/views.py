@@ -8,6 +8,7 @@
 """
 
 from __future__ import unicode_literals
+# noinspection PyUnresolvedReferences
 import logging
 
 log = logging.getLogger(__name__)
@@ -21,7 +22,6 @@ __version__ = "0.1"
 __maintainer__ = "rbell01824"
 __email__ = "rbell01824@gmail.com"
 
-from loremipsum import get_paragraph
 import datetime
 import qsstats
 
@@ -30,16 +30,15 @@ from django.db.models import Count
 from django import forms
 
 from djangopages.dpage import *
+from djangopages.dpage_layout import *
+from djangopages.dpage_bootstrap3 import *
+from djangopages.dpage_graphs import *
+from djangopages.dpage_texthtml import *
 
+#todo 3: unused imports, shouldn't I have examples for these
 from test_data.models import syslog_query, syslog_companies, syslog_hosts,\
     syslog_event_graph, \
     VNode, VCompany
-
-
-########################################################################################################################
-
-def GP():
-    return get_paragraph()
 
 ########################################################################################################################
 #
@@ -63,10 +62,29 @@ class Test01(DPage):
         ###################
         # Put some content on the page
         ###################
-        self.content.append(Text('This text comes from dpage.Text.', ' So does this'))
-        self.content.append(Markdown('#Header markdown text', '**Bold Markdown Text**'))
-        self.content.append(HTML('<h3>H3 text from DPageHTML</h3>',
-                                 '<strong>Strong text from HTML content</strong>'))
+        intro = Markdown("""
+**DjangoPages** provides a number of ways to put content on a web page including **Text**, **Markdown**, and **HTML**.
+
+The code for a basic django page looks something like this:
+
+    def page(self):
+        self.content.append(Text('The <strong>Text</strong> method supports text content and HTML.',
+                                 '<br/>Newlines are supported using html.'))
+        self.content.append(Markdown('**Markdown** outputs markdown text'))
+        self.content.append(HTML('<p><strong>HTML</strong> supports direct html output</p>'))
+        self.content.append(Markdown('#Many other widgets can be used to output content.'))
+        return self
+
+**Many** other widgets can be used to output content.
+
+Below is the output for this page.
+<hr style="box-shadow: 0 0 10px 1px black;">
+        """)
+        self.content.append(intro)
+        self.content.append(Text('The <strong>Text</strong> method supports text content and HTML.',
+                                 '<br/>Newlines are supported using html.'))
+        self.content.append(Markdown('**Markdown** outputs markdown text'))
+        self.content.append(HTML('<p><strong>HTML</strong> supports direct html output</p>'))
         return self
 
 
@@ -82,16 +100,34 @@ class Test02(DPage):
         """
         Override
         """
-        ###################
+        intro = Markdown("""
+**DjangoPages** provides a number of ways to layout content using bootstrap3.
+
+This code layout creates 3 rows spanning the full page.  If you resize the browser you will see that the page
+ is responsive.
+
+    def page(self):
         # Create some page content
-        ###################
         xr1 = HTML('<h3> H3 Text on row 1</h3>')
         xr2 = Markdown('**Markdown bold text on row 2.**  Followed by regular text. ')
-        xr3 = Text('Text on row 3 with', Button('embeded non functional button'), 'Some more text in row 3')
-        ###################
+        xr3 = Text('Text on row 3')
+
         # Layout the content on the page
-        ###################
-        self.content = (RC12(xr1, xr2), RC(xr3),)
+        self.content = (RC(xr1), RC(xr2), RC(xr3), RC('Raw strings are OK'))
+        return self
+
+**Many** other methods can be used to layout content.
+
+Below is the output for this page.
+<hr style="box-shadow: 0 0 10px 1px black;">
+        """)
+        # Create some page content
+        xr1 = HTML('<h3> H3 Text on row 1</h3>')
+        xr2 = Markdown('**Markdown bold text on row 2.**  Followed by regular text. ')
+        xr3 = Text('Text on row 3')
+
+        # Layout the content on the page
+        self.content = (RC(intro), RC(xr1), RC(xr2), RC(xr3), RC('Raw strings are OK'))
         return self
 
 
@@ -107,37 +143,77 @@ class Test03(DPage):
         """
         Override
         """
-        ###################
+        intro = Markdown("""
+**DjangoPages** easily creates complex bootstrap layouts with multiple rows and multiple of columns per row.
+
+This code layout creates 3 rows spanning the full page.  If you resize the browser you will see that the page
+ is responsive.
+
+Note: GP generates loremipsum text.
+
+    def page(self):
         # Create some page content
-        ###################
         x1 = Text('Row 1: This text comes from dpage.Text')
         x21 = Markdown('Row 2 col 1: **Bold Markdown Text**')
-        x22 = HTML('<p>Row 2 col 2: </p><h3>H3 text from DPageHTML</h3>')
-        x3 = HTML('<p>Row 3: Text from loremipsum. {}</p>'.format(get_paragraph()))
-        x41 = HTML('<p>Row 4 col 1:{}</p>'.format(get_paragraph()))
-        x42 = HTML('<p>Row 4 col 2:{}</p>'.format(get_paragraph()))
-        x51 = HTML('<p>Row 5 col 1:{}</p>'.format(get_paragraph()))
-        x521 = HTML('<p>Row 5 col 2 row 1:{}</p>'.format(get_paragraph()))
-        x522 = HTML('<p>Row 5 col 2 row 2:{}</p>'.format(get_paragraph()))
-        x5231 = HTML('<p>Row 5 col 2 row 3 col 1: {}</p>'.format(get_paragraph()))
-        x5232 = HTML('<p>Row 5 col 2 row 3 col 2: {}</p>'.format(get_paragraph()))
-        x5233 = HTML('<p>Row 5 col 2 row 3 col 3: {}</p>'.format(get_paragraph()))
-        ###################
-        # Layout the content on the page
-        #
-        # This layout generates roughly 200 lines of Bootstrap 3 html!
-        ###################
-        self.content = (RC(x1),
-                        RC6(x21, x22),
-                        RC(x3),
-                        RX(C3(x41), C9(x42)),
-                        RX(C3(x51), C9(RC(x521),
+        x22 = HTML('<p>Row 2 col 2: </p>')
+        x3 = HTML('<p>Row 3: Text from loremipsum. {}</p>'.format(GP()))    # GP generates loremipsum text
+        x41 = HTML('<p>Row 4 col 1:{}</p>'.format(GP()))
+        x42 = HTML('<p>Row 4 col 2:{}</p>'.format(GP()))
+        x51 = HTML('<p>Row 5 col 1:{}</p>'.format(GP()))
+        x521 = HTML('<p>Row 5 col 2 row 1:{}</p>'.format(GP()))
+        x522 = HTML('<p>Row 5 col 2 row 2:{}</p>'.format(GP()))
+        x5231 = HTML('<p>Row 5 col 2 row 3 col 1: {}</p>'.format(GP()))
+        x5232 = HTML('<p>Row 5 col 2 row 3 col 2: {}</p>'.format(GP()))
+        x5233 = HTML('<p>Row 5 col 2 row 3 col 3: {}</p>'.format(GP()))
+
+        # Layout the content on the page. This layout generates roughly 200 lines of Bootstrap 3 html!
+        self.content = (RC(x1),                         # row with 1 full width column
+                        RC6(x21, x22),                  # row with 2 column each is 6 wide
+                        RC(x3),                         # row with 1 full width column
+                        RX(C3(x41), C9(x42)),           # row with 1 column 3 wide and 1 column 9 wide
+                        RX(C3(x51), C9(RC(x521),        # row with 1 column 3 wide and 1 column 9 wide
+                                                        # 9 wide column has 3 rows, the last of chich has 3 columns
                                        RC(x522),
                                        RX(C4(x5231), C4(x5232), C4(x5233))
                                        )
-                          )
+                           )
                         )
         return self
+
+Below is the output for this page.
+<hr style="box-shadow: 0 0 10px 1px black;">
+        """)
+
+        # Create some page content
+        x1 = Text('Row 1: This text comes from dpage.Text')
+        x21 = Markdown('Row 2 col 1: **Bold Markdown Text**')
+        x22 = HTML('<p>Row 2 col 2: </p>')
+        x3 = HTML('<p>Row 3: Text from loremipsum. {}</p>'.format(GP()))    # GP generates loremipsum text
+        x41 = HTML('<p>Row 4 col 1:{}</p>'.format(GP()))
+        x42 = HTML('<p>Row 4 col 2:{}</p>'.format(GP()))
+        x51 = HTML('<p>Row 5 col 1:{}</p>'.format(GP()))
+        x521 = HTML('<p>Row 5 col 2 row 1:{}</p>'.format(GP()))
+        x522 = HTML('<p>Row 5 col 2 row 2:{}</p>'.format(GP()))
+        x5231 = HTML('<p>Row 5 col 2 row 3 col 1: {}</p>'.format(GP()))
+        x5232 = HTML('<p>Row 5 col 2 row 3 col 2: {}</p>'.format(GP()))
+        x5233 = HTML('<p>Row 5 col 2 row 3 col 3: {}</p>'.format(GP()))
+
+        # Layout the content on the page. This layout generates roughly 200 lines of Bootstrap 3 html!
+        self.content = (RC(intro),                      # output the intro
+                        RC(x1),                         # row with 1 full width column
+                        RC6(x21, x22),                  # row with 2 column each is 6 wide
+                        RC(x3),                         # row with 1 full width column
+                        RX(C3(x41), C9(x42)),           # row with 1 column 3 wide and 1 column 9 wide
+                        RX(C3(x51), C9(RC(x521),        # row with 1 column 3 wide and 1 column 9 wide
+                                                        # 9 wide column has 3 rows, the last of chich has 3 columns
+                                       RC(x522),
+                                       RX(C4(x5231), C4(x5232), C4(x5233))
+                                       )
+                           )
+                        )
+        return self
+
+# todo 1: start here to upgrade examples
 
 
 class Test04(DPage):
@@ -195,9 +271,9 @@ class Test04(DPage):
                             'Total errors {}'.format(all_count_host))
         text_bottom = Markdown('### Analysis\n'
                                'Here is where the analysis can go.\n\n' +
-                               '{}\n\n'.format(get_paragraph()) +
-                               '{}\n\n'.format(get_paragraph()) +
-                               '{}\n\n'.format(get_paragraph()))
+                               '{}\n\n'.format(GP()) +
+                               '{}\n\n'.format(GP()) +
+                               '{}\n\n'.format(GP()))
         ###################
         # Layout the content on the page
         ###################
@@ -268,6 +344,7 @@ class Test05(DPage):
         ###################
         # Layout the content on the page
         ###################
+        # noinspection PyRedundantParentheses
         return (RC4(cbt, cecbn, eecbn), RC(errbt),)
 
     def host_summary(self, company, node):
@@ -567,6 +644,7 @@ class Test08(DPage):
         # self.content = t_node
         return self
 
+# fixme: test09 failing
 
 class Test09(DPage):
     """
@@ -611,12 +689,12 @@ class Test09(DPage):
         self.content = (Markdown('**Side by side panels**'),
                         RX(C2(Panel(company_tit, company_tbl, button='Show Companies')),
                            C6(Panel(node_tit, node_tbl, button='Show Nodes'))),
-                        RC(get_paragraph()),
+                        RC(GP()),
                         RC(Markdown('#Button Panel')),
                         RXC6(('The button is in the left column.', bpn, bpc,
-                              'The panel is in the right column', get_paragraph()),
-                             (get_paragraph(), Markdown('#### Node panel will appear here'), pn,
-                              get_paragraph(), Markdown('#### Company panel will appear here'), pc)
+                              'The panel is in the right column', GP()),
+                             (GP(), Markdown('#### Node panel will appear here'), pn,
+                              GP(), Markdown('#### Company panel will appear here'), pc)
                              ),
                         )
         # self.content = t_node
@@ -669,19 +747,19 @@ class Test11(DPage):
         """
         Build modal test page
         """
-        mdl1 = Modal(RC(Markdown('#This is modal 1'), get_paragraph(), get_paragraph()))
+        mdl1 = Modal(RC(Markdown('#This is modal 1'), GP(), GP()))
         b1 = ButtonModal('Click to display modal 1', mdl1)
-        mdl2 = Modal(RC(Markdown('#This is modal 2'), get_paragraph(), get_paragraph()))
+        mdl2 = Modal(RC(Markdown('#This is modal 2'), GP(), GP()))
         b2 = ButtonModal('Click to display modal 2', mdl2)
-        mdl3 = Modal(get_paragraph(), get_paragraph(),
+        mdl3 = Modal(GP(), GP(),
                      button='Modal 3 button',
                      header=Markdown('####Markdown header for modal 3'),
                      footer=(Button('A button'), 'This is the footer for modal 3',))
-        self.content = (RC(get_paragraph()),
+        self.content = (RC(GP()),
                         RCX('Text before buttons ', b1, b2, ' Text after buttons'),
-                        RC(get_paragraph()),
+                        RC(GP()),
                         RC(X('Text before button ', mdl3, ' Text after button')),
-                        RC(get_paragraph()))
+                        RC(GP()))
         return self
 
 
@@ -710,7 +788,7 @@ class Test12(DPage):
         self.content = (RC(GP()),
                         RX(C3(Markdown('**Panel on left**')), C9(crsl1)),
                         RC(GP()),
-                        RX(C9(crsl2), C3(Markdown('**Panel on right**')) ),
+                        RX(C9(crsl2), C3(Markdown('**Panel on right**'))),
                         RC(GP())
                         )
         return self
@@ -727,7 +805,8 @@ class Test13(DPage):
                         RC(Markdown('#### Link buttons')),
                         RXC((Link('/dpages/DPagesList', 'Link to list page', button=True), ' ',
                              Link('/dpages/Test07', 'Link to the form test page', button=True),)
-                        ))
+                            )
+                        )
         return self
 
 
@@ -754,6 +833,7 @@ class DPagesList(DPage):
         pages = DPage.pages_list
         pages = sorted(pages, key=lambda x: x['name'])
         out = []
+        # fixme: should template be used
         template = '<a href="/dpages/{name}" class="btn btn-primary btn-xs">Show</a>'
         for page in pages:
             cls = page['cls']
@@ -774,20 +854,24 @@ class DPagesView(View):
     """
     View class for dev testing.
     """
-    def get(self, request, name):
+    @staticmethod
+    def get(request, name):
         """
         Execute the graph method and display the results.
         :param request:
         """
+        # noinspection PyUnresolvedReferences
         dt = DPage.pages_dict[name]
         dpage = dt(request).page()
         return dpage.render()
 
-    def post(self, request, name):
+    @staticmethod
+    def post(request, name):
         """
         Send the post data to the page and rerender.
         :param request:
         """
+        # noinspection PyUnresolvedReferences
         dt = DPage.pages_dict[name]
         dpage = dt(request).page()
         return dpage.render()

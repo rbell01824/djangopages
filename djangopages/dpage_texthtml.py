@@ -23,6 +23,7 @@ __maintainer__ = 'rbell01824'
 __email__ = 'rbell01824@gmail.com'
 
 import markdown
+from loremipsum import get_paragraph
 
 from djangopages.dpage import Content, render_objects
 from django.utils.encoding import force_unicode
@@ -138,3 +139,18 @@ class HTML(object):
             else:
                 out += render_objects(obj)
         return out
+
+########################################################################################################################
+#
+# Convenience method for loremipsum text generation.
+#
+########################################################################################################################
+
+
+# noinspection PyPep8Naming
+def GP():
+    """
+    Provide a bit of syntactic sugar for the more verbose get_paragraph in loremipsum.
+    :return:
+    """
+    return get_paragraph()

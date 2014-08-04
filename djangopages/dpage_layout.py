@@ -78,7 +78,7 @@ class Column(Content):
 
     def render(self, **kwargs):
         """
-        Render objects in column of width width
+        Render objects in column of width width.  Render each content object in a column of width width.
         """
         out = ''
         for con in self.content:
@@ -88,7 +88,7 @@ class Column(Content):
 
 class ColumnX(Column):
     """
-    Render objects in a single column of width width.
+    Render objects in a single column of width width.  Render all the objects then wrap in a column of width width.
     """
     def render(self, **kwargs):
         """
@@ -142,7 +142,7 @@ C12X = functools.partial(columnX, width=12)
 
 class Row(Content):
     """
-    Wrap each content in a row.
+    Wrap each content object in a row in a row.
     """
     template = '<!-- Start of dpage row -->\n' \
                '<div class="row">\n' \
@@ -179,7 +179,7 @@ class Row(Content):
 
 class RowX(Row):
     """
-    Wrap all content in a row.
+    Wrap all concatenation of all content in a row.
     """
     def render(self, **kwargs):
         """
@@ -208,8 +208,9 @@ RX = functools.partial(rowX)
 
 class RowColumn(Row, Column):
     """
-    Create a rowcolumn class.  Wrap content in a row wrapping a column.  Equivalent to
-    Row(Column(content).render()).render()
+    Create a rowcolumn class.  Wrap content in a row wrapping a column.
+
+    Equivalent to: Row(Column(content).render()).render()
     """
     def __init__(self, *content, **kwargs):
         """
@@ -234,9 +235,9 @@ class RowColumn(Row, Column):
 class RowColumnX(Row, ColumnX):
     def __init__(self, *content, **kwargs):
         """
-            Initialize RowColumnX object.  Wrap content in a row wrapping a column.  Equivalent to
-            Row(ColumnX(content).render()).render()
+        Initialize RowColumnX object.  Wrap content in a row wrapping a column.
 
+        Equivalent to: Row(ColumnX(content).render()).render()
         """
         super(RowColumnX, self).__init__(*content, **kwargs)
         self.row_template = kwargs.pop('row_template', Row.template)
@@ -257,7 +258,9 @@ class RowColumnX(Row, ColumnX):
 class RowXColumn(RowX, Column):
     def __init__(self, *content, **kwargs):
         """
-            Initialize RowColumnX object.
+        Initialize RowColumnX object.
+
+        Equivalent to: RowX(Column(content).render()).render()
         """
         super(RowXColumn, self).__init__(*content, **kwargs)
         self.row_template = kwargs.pop('row_template', Row.template)
@@ -278,7 +281,9 @@ class RowXColumn(RowX, Column):
 class RowXColumnX(RowX, ColumnX):
     def __init__(self, *content, **kwargs):
         """
-            Initialize RowColumnX object.
+        Initialize RowColumnX object.
+
+        Equivalent to: RowX(ColumnX(content).render()).render()
         """
         super(RowXColumnX, self).__init__(*content, **kwargs)
         self.row_template = kwargs.pop('row_template', Row.template)

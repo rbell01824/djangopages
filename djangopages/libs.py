@@ -172,3 +172,4 @@ def static_name_generator(base_name='x'):
         static_name_generator.counter = 0  # it doesn't exist yet, so initialize it
     static_name_generator.counter += 1
     return '{}_{}'.format(base_name, static_name_generator.counter)
+

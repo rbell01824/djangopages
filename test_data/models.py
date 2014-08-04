@@ -23,7 +23,7 @@ __status__ = "dev"
 from django.db import models
 from django.db.models import Count
 
-from djangopages.dpage import Graph
+from djangopages.dpage_graphs import Graph
 
 
 class CIA(models.Model):
