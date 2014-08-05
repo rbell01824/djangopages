@@ -20,6 +20,9 @@ __status__ = "dev"
 
 # work list
 """
+get all existing test apps working
+add Nose to system for testing
+make test routines for all existing functions
 add link button
 add bootstrap 3 tables
 add syntactic suggar for Forms

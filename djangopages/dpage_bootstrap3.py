@@ -83,8 +83,9 @@ class Panel(Content):
         template = self.template
         if self.heading:
             template = self.heading_template
+            heading = render_objects(self.heading)
         for con in self.content:
-            out += template.format(heading=self.heading, content=render_objects(con))
+            out += template.format(heading=heading, content=render_objects(con))
         return out
 
 

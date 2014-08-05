@@ -114,6 +114,89 @@ class DPagesView(View):
 ########################################################################################################################
 
 
+class Test000a(DPage):
+    title = 'DjangoPages_Test000a'
+    description = 'DjangoPages concepts'
+    tags = []
+
+    def page(self):
+        doc_heading = Markdown('### DjangoPages Concepts').render()
+        doc = Markdown("""
+DjangoPages is built on a few simple concepts uniformly applied.
+
+Each Django page must
+
+ * **inherit from the DPage class** and
+ * **override the base class page method**, ie. it must set self.content to the page's html content.
+
+To make it easy to create the page, ie. set self.content, DjangoPages provides a rich collection
+of methods to:
+
+ * Create text and graph content on the page, including DB driven content
+ * Layout the page using bootstrap 3's grid technology
+ * Use a large range of bootstrap 3 and jQuery widgets to create highly functional pages
+
+The tests in this list were originally developed during development to validate DjangoPage
+functionality.  They provide an introduction to DjangoPages and its features.
+
+Of necessity, it was necessary to use some features before they are introduced.  However, if you
+study the test in order you will encounter all DjangoPage's features.
+        """)
+
+        self.content = R(C(Panel(doc, heading=doc_heading)))
+        return self
+
+
+class Test000b(DPage):                              # The class name also defines the page's URL
+    title = 'DjangoPages_Test000b'                  # Define the page title
+    description = 'DjangoPage overview'             # Set the page's description
+    tags = []                                       # Pages may have tags to facilitate searching
+
+    def page(self):                                 # Override the page method to generate the page's HTML
+
+        # Create some page content
+        doc_heading = Markdown('### DjangoPage Overview')
+        doc = Markdown("""
+The source for a DjangoPage generally looks something like this:
+
+    class Test000b(DPage):                              # The class name also defines the page's URL
+        title = 'DjangoPages_Test000b'                  # Define the page title
+        description = 'DjangoPage overview'             # Set the page's description
+        tags = []                                       # Pages may have tags to facilitate searching
+
+        def page(self):                                 # Override the page method to generate the page's HTML
+
+            # Create some page content
+            doc_heading = Markdown('### DjangoPage Overview')
+            doc = Markdown('The source for a DjangoPage generally looks something like this:')
+            panel = Panel(doc, heading=doc_heading)
+
+            # Put it in a bootstrap 3 grid
+            column = Column(panel)
+            row = Row(column)
+            self.content = row
+            return self
+
+The code is generally self descriptive.
+
+ * Markdown creates a markdown object.
+ * Panel(doc, heading=doc_heading)) creates a bootstrap 3 panel with a heading
+ * Column() creates a full width bootstrap 3 column to contain the panel
+ * Row() creates a bootstrap 3 row that contains the column
+
+
+Most DjangoPages follow this general pattern.
+
+While the page could be written in this fashion, most pages take advantage of various convenience
+methods and techniques to reduce the code count.  Many of these techniques are introduced in the
+tests that follow.
+        """)
+
+        # Put the content in a bootstrap 3 responsive grid
+        self.content = Row(Column(Panel(doc, heading=doc_heading)))
+        return self
+
+
 class Test001(DPage):
     title = 'DjangoPages_Test001'
     description = 'Demonstrate Text widget'
@@ -294,45 +377,138 @@ Text, HTML, Markdown, and LI content can be combined on a page.
         return self
 
 
-class Test01(DPage):
-    """
-    Class based dpage with render method overridden.  Objs style interface.
-    """
-    title = 'DjangoPages_Test01'
-    description = 'Demonstrate basic text widgets'
+class Test008(DPage):
+    title = 'DjangoPages_Test008'
+    description = 'Demonstrate Row and Column layout basics'
     tags = []
 
     def page(self):
-        """
-        Actually create the page
-        """
-        ###################
-        # Put some content on the page
-        ###################
-        intro = Markdown("""
-**DjangoPages** provides a number of ways to put content on a web page including **Text**, **Markdown**, and **HTML**.
+        doc_heading = Markdown('### Row and Column layout basics').render()
+        doc = Panel(Markdown("""
+Row and Column can be used to create responsive page grid layouts.
 
-The code for a basic django page looks something like this:
+The basic methods are
+
+ * Row to create a bootstrap 3 row
+ * Column to create a bootstrap 3 column
+
+####Code
+    r1 = Markdown('####Text in row 1')
+    r2 = Markdown('####Text in row 2')
+
+    content = []
+    content.append(Row(Column(r1)))
+    content.append(Row(Column(r2)))
+    content = Panel(content, heading=Markdown('###Code output').render())
+    self.content = RX(C6(doc), C6(content))
+        """), heading=doc_heading)
+        r1 = Markdown('####Text in row 1')
+        r2 = Markdown('####Text in row 2')
+
+        # noinspection PyListCreation
+        content = []
+        content.append(Row(Column(r1)))
+        content.append(Row(Column(r2)))
+        content = Panel(content, heading=Markdown('###Code output').render())
+        self.content = RX(C6(doc), C6(content))
+        return self
+
+
+class Test009(DPage):
+    title = 'DjangoPages_Test009'
+    description = 'Demonstrate R and C convenience methods'
+    tags = []
 
     def page(self):
-        self.content.append(Text('The <strong>Text</strong> method supports text content and HTML.',
-                                 '<br/>Newlines are supported using html.'))
-        self.content.append(Markdown('**Markdown** outputs markdown text'))
-        self.content.append(HTML('<p><strong>HTML</strong> supports direct html output</p>'))
-        self.content.append(Markdown('#Many other widgets can be used to output content.'))
+        doc_heading = Markdown('### Convenience methods & techniques for grid layouts').render()
+        doc = Panel(Markdown("""
+DjangoPages provides a number of convenience methods and techniques to simplify creating
+responsive bootstrap 3 grid layouts.
+
+The R and C convenience methods can be used to reduce typing.
+
+The content can be built without creating an explicit content list.
+
+####Code
+    r1 = Markdown('####Text in row 1')
+    r2 = Markdown('####Text in row 2')
+
+    content = Panel([R(C(r1)),
+                     R(C(r2))],
+                    heading=Markdown('###Code output').render())
+    self.content = RX(C6(doc), C6(content))
+
+This technique makes the grid layout clearer and avoids several lines of code.
+
+You can even do this:
+
+####Code
+    content = Panel([R(C(Markdown('####Text in row 1'))),
+                     R(C(Markdown('####Text in row 2')))],
+                    heading=Markdown('###Code output').render())
+    self.content = RX(C6(doc), C6(content))
+
+You may use whatever style you find comfortable.
+        """), heading=doc_heading)
+        r1 = Markdown('####Text in row 1')
+        r2 = Markdown('####Text in row 2')
+
+        content = Panel([R(C(r1)),
+                         R(C(r2))],
+                        heading=Markdown('###Code output').render())
+        self.content = RX(C6(doc), C6(content))
         return self
 
-**Many** other widgets can be used to output content.
 
-Below is the output for this page.
-<hr style="box-shadow: 0 0 10px 1px black;">
-        """)
-        self.content.append(intro)
-        self.content.append(Text('The <strong>Text</strong> method supports text content and HTML.',
-                                 '<br/>Newlines are supported using html.'))
-        self.content.append(Markdown('**Markdown** outputs markdown text'))
-        self.content.append(HTML('<p><strong>HTML</strong> supports direct html output</p>'))
+class Test020(DPage):
+    title = 'DjangoPages_Test020'
+    description = 'Demonstrate Row and Column layout basics'
+    tags = []
+
+    def page(self):
+        doc_heading = Markdown('### Row and Column layout basics').render()
+        doc = Panel(Markdown("""
+Row and Column can be used to create responsive page grid layouts.
+
+The basic methods are
+
+ * Row to create a bootstrap 3 row
+ * Column to create a bootstrap 3 column
+
+The convenience methods R for Row and C for Column save typing and make layout creation easier.
+
+In bootstrap 3, columns have a width of 1 - 12 within their container.  The convenience method
+Cn specified a bootstrap 3 column of width n, ex C3 specified a bootstrap 3 column of width 3.
+
+Generally, when DjangoPage widgets receive a list argument the widget applies itself to each
+element in the list, ie. **widget(a, b) === widget(a)+widget(b)**.  This is almost always the
+desired behavior.  When it is not use the X widget, ie.
+**widget(X(a,b)) === widget(a.render()+b.render()).
+
+####Code
+    r1 = LI([5])                    # text for row 1
+    r2c1 = LI([3, 2])               # text for row 2 column 1
+    r2c2 = LI(1)                    # text for row 2 column 2
+
+    # create layout
+    content = []
+    content.append(R(C(r1)))
+    content.append(R(X(C6(r2c1), C6(r2c2))))
+    content = Panel(content, heading=Markdown('###Code output').render())
+    self.content = RX(C6(doc), C6(content))
+        """), heading=doc_heading)
+        r1 = LI([5])                    # text for row 1
+        r2c1 = LI([3, 2])               # text for row 2 column 1
+        r2c2 = LI(1)                    # text for row 2 column 2
+
+        # create layout
+        content = []
+        content.append(R(C(r1)))
+        content.append(R(X(C6(r2c1), C6(r2c2))))
+        content = Panel(content, heading=Markdown('###Code output').render())
+        self.content = RX(C6(doc), C6(content))
         return self
+
 
 
 class Test02(DPage):
@@ -369,7 +545,7 @@ Below is the output for this page.
 <hr style="box-shadow: 0 0 10px 1px black;">
         """)
         # Create some page content
-        xr1 = HTML('<h3> H3 Text on row 1</h3>')
+        xr1 = Markdown('This is row 1')
         xr2 = Markdown('**Markdown bold text on row 2.**  Followed by regular text. ')
         xr3 = Text('Text on row 3')
 
