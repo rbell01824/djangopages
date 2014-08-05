@@ -1,7 +1,15 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-""" Some description here
+""" Various bootstrap 3 widgets
+
+Many of these widgets accept a list of arguments.  The default behavior is to apply the widget
+to each member of the list.
+
+Where desired it is possible to evaluate and concatenate the list using the X widget.
+
+Final widget template handling is done in the widget's render method.  This is a concious design
+choice that allows post instance definition of the template.
 
 8/4/14 - Initial creation
 
@@ -32,6 +40,8 @@ from djangopages.dpage import Content, render_objects, unique_name
 #
 # Various Bootstrap 3 widgets.
 #
+#
+#
 # todo: add heading small support
 # todo: add lead body copy support
 # todo: add small, bold, italics
@@ -41,6 +51,50 @@ from djangopages.dpage import Content, render_objects, unique_name
 #
 ########################################################################################################################
 
+
+class Panel(Content):
+    """
+    Basic panel class
+    """
+    template = """
+    <div class="panel panel-default">
+        <div class="panel-body">
+            {content}
+        </div>
+    </div>"""
+    heading_template = """
+    <div class="panel panel-default">
+        <div class="panel-heading">{heading}</div>
+        <div class="panel-body">
+            {content}
+        </div>
+    </div>"""
+
+    def __init__(self, *content, **kwargs):
+        super(Panel, self).__init__()
+        self.template = kwargs.pop('template', Panel.template)
+        self.heading = kwargs.pop('heading', None)
+        self.content = content
+        self.kwargs = kwargs
+        return
+
+    def render(self):
+        out = ''
+        template = self.template
+        if self.heading:
+            template = self.heading_template
+        for con in self.content:
+            out += template.format(heading=self.heading, content=render_objects(con))
+        return out
+
+
+################################################################################
+################################################################################
+#
+# fixme: Put these in alpha order
+#
+################################################################################
+################################################################################
 
 class Link(Content):
     """
@@ -247,7 +301,7 @@ class ButtonPanel(Button):
         return out
 
 
-class Panel(object):
+class Panel_fixme(object):
     """
     Collapsible button panel
     """

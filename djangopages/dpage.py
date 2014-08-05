@@ -99,7 +99,7 @@ X = functools.partial(render_objects)                       # convenience method
 
 ########################################################################################################################
 #
-# Register class support
+# DPage class
 #
 ########################################################################################################################
 
@@ -107,26 +107,20 @@ X = functools.partial(render_objects)                       # convenience method
 class _DPageRegister(type):
     """
     Internal metaclass to register DPage child objects.  Do not mess with this!
-
-
     """
     # noinspection PyMissingConstructor,PyUnusedLocal
     def __init__(cls, name, base, attrs):
         if not hasattr(cls, 'pages_list'):
             # Executed when processing DPageRegister class itself.
             # Use class variables so there is only one copy of pages_list and pages_dict
+            # Insert pages_list and pages_dict into the class definition of the class using this metaclass
             cls.pages_list = []          # List of subclasses to allow listing
             cls.pages_dict = {}          # Dictionary of subclasses to allow quick name lookup
         else:
-            # This is a plugin implementation that needs to be registered.
+            # This is a plugin implementation of this class that needs to be registered.
+            # Save the class name and cls object.
             cls.pages_list.append({'cls': cls, 'name': name})       # Put in list
             cls.pages_dict[name] = cls                              # Put in dict
-
-########################################################################################################################
-#
-# DPage class
-#
-########################################################################################################################
 
 
 class DPage(object):

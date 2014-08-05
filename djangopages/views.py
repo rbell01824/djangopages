@@ -42,9 +42,256 @@ from test_data.models import syslog_query, syslog_companies, syslog_hosts,\
 
 ########################################################################################################################
 #
+# Dpage that list the available DPage tests.
+#
+########################################################################################################################
+
+
+class DPagesList(DPage):
+    """
+    Page to list DPages
+    """
+    title = 'DjangoPages_List'
+    description = 'This page: list the available DPages'
+    tags = []
+
+    def page(self):
+        """
+        List available pages
+        """
+        # noinspection PyUnresolvedReferences
+        pages = DPage.pages_list
+        pages = sorted(pages, key=lambda x: x['name'])
+        out = []
+        for page in pages:
+            # get the class definition for this page
+            cls = page['cls']
+            # make a link button object to execute an instance of the class
+            lnk = Link('/dpages/{name}'.format(name=cls.__name__), 'Run test', button=True)
+            # Output a line with the link button, test title, and test description
+            line = RX(C3((lnk, ' ', cls.title,)), C6(cls.description))
+            out.append(line)
+        self.content = out
+        return self
+
+########################################################################################################################
+#
+# Display and process a DPage
+#
+########################################################################################################################
+
+
+class DPagesView(View):
+    """
+    View class for dev testing.
+    """
+    @staticmethod
+    def get(request, name):
+        """
+        Execute the graph method and display the results.
+        :param request:
+        """
+        # noinspection PyUnresolvedReferences
+        dt = DPage.pages_dict[name]
+        dpage = dt(request).page()
+        return dpage.render()
+
+    @staticmethod
+    def post(request, name):
+        """
+        Send the post data to the page and rerender.
+        :param request:
+        """
+        # noinspection PyUnresolvedReferences
+        dt = DPage.pages_dict[name]
+        dpage = dt(request).page()
+        return dpage.render()
+
+########################################################################################################################
+#
 # Development test class based view
 #
 ########################################################################################################################
+
+
+class Test001(DPage):
+    title = 'DjangoPages_Test001'
+    description = 'Demonstrate Text widget'
+    tags = []
+
+    def page(self):
+        doc_heading = Markdown('### Text(&lt;content&gt;[,...])').render()
+        doc = Panel(Markdown("""
+The Text widget simply outputs it's content.  It does not add an HTML wrapper.
+
+ * Multiple content is concatenated.
+ * Text can also output raw HTML
+ * If content is an object, it's render method is called and the output concatenated.
+
+####Code
+    content = Text('This is some Text content. ',
+                   'This is some more Text content.',
+                   '</br>Text can also output HTML',
+                   Markdown('**Embedded markdown bold text.**'))
+        """), heading=doc_heading)
+        content = Text('This is some Text content. ',
+                       'This is some more Text content.',
+                       '</br>Text can also output HTML.',
+                       Markdown('**Embedded markdown bold text.**'))
+        content = Panel(content, heading=Markdown('###Code output').render())
+        self.content = RX(C6(doc), C6(content))
+        return self
+
+
+class Test002(DPage):
+    title = 'DjangoPages_Test002'
+    description = 'Demonstrate HTML widget'
+    tags = []
+
+    def page(self):
+        doc_heading = Markdown('### HTML(&lt;content&gt;[,...])').render()
+        doc = Panel(Markdown("""
+The HTML widget is identical to the Text widget and simply outputs it's content.
+It does not add an HTML wrapper.
+
+ * Multiple content is concatenated.
+ * If content is an object, it's render method is called and the output concatenated.
+
+####Code
+    content = HTML('<strong>This is some strong HTML content.</strong> ',
+                   '<i>This is some italic HTML content.</i>',
+                   '</br><u>Text can also output underlined HTML.</u>',
+                   Markdown('**Embedded markdown bold text.**'))
+        """), heading=doc_heading)
+        content = HTML('<strong>This is some strong HTML content.</strong> ',
+                       '<i>This is some italic HTML content.</i>',
+                       '</br><u>Text can also output underlined HTML.</u>',
+                       Markdown('**Embedded markdown bold text.**'))
+        content = Panel(content, heading=Markdown('###Code output').render())
+        self.content = RX(C6(doc), C6(content))
+        return self
+
+
+class Test003(DPage):
+    title = 'DjangoPages_Test003'
+    description = 'Demonstrate Markdown widget'
+    tags = []
+
+    def page(self):
+        doc_heading = Markdown('### Markdown(&lt;content&gt;[,...])').render()
+        doc = Panel(Markdown("""
+The Markdown widget accepts Markdown text and renders the HTML equivalent.
+
+ * Multiple content is concatenated.
+ * If content is an object, it's render method is called and the output concatenated.
+
+####Code
+    content = Markdown('###Markdown h3',
+                       '**Markdown bold text**',
+                       Markdown('*Embedded markdown object italic text.*'))
+        """), heading=doc_heading)
+        content = Markdown('###Markdown h3',
+                           '**Markdown bold text**',
+                           Markdown('*Embedded markdown object italic text.*'))
+        content = Panel(content, heading=Markdown('###Code output').render())
+        self.content = RX(C6(doc), C6(content))
+        return self
+
+
+class Test004(DPage):
+    title = 'DjangoPages_Test004'
+    description = 'Demonstrate LI_paragraph widget'
+    tags = []
+
+    def page(self):
+        doc_heading = Markdown('### LI_paragraph() generates loremipsum paragraphs').render()
+        doc = Panel(Markdown("""
+LI_para(amount=1, para=True) generates amount loremipsum paragraphs.  This is often useful during page development.
+
+ * **amount** is the number of paragraphs to generate
+ * **para** if true wraps each paragraph in an HTML paragraph
+
+####Code
+    content = Text(LI_paragraph(2))
+        """), heading=doc_heading)
+        content = Text(LI_paragraph(2))
+        content = Panel(content, heading=Markdown('###Code output').render())
+        self.content = RX(C6(doc), C6(content))
+        return self
+
+
+class Test005(DPage):
+    title = 'DjangoPages_Test005'
+    description = 'Demonstrate LI_sentence widget'
+    tags = []
+
+    def page(self):
+        doc_heading = Markdown('### LI_sentence() generates loremipsum sentences').render()
+        doc = Panel(Markdown("""
+LI_sentence(amount=1, para=True) generates amount loremipsum sentences.  This is often useful during page development.
+
+ * **amount** is the number of sentences to generate
+ * **para** if true wraps the sentences in an HTML paragraph
+
+####Code
+    content = Text(LI_para(5))
+        """), heading=doc_heading)
+        content = Text(LI_sentence(5))
+        content = Panel(content, heading=Markdown('###Code output').render())
+        self.content = RX(C6(doc), C6(content))
+        return self
+
+
+class Test006(DPage):
+    title = 'DjangoPages_Test006'
+    description = 'Demonstrate LI widget'
+    tags = []
+
+    def page(self):
+        doc_heading = Markdown('### LI() generates loremipsum paragraphs').render()
+        doc = Panel(Markdown("""
+LI(amount=1, para=True) generates amount loremipsum paragraphs if amount is an int/long.
+If amount is a list, it specifies the length in sentences of each generated paragraph.
+  This is often useful during page development.
+
+ * **amount** is the number of pragraphs to generate or a list of paragraph lengths in sentences
+ * **para** if true wraps the paragraphs in an HTML paragraph
+
+####Code
+    content = Text(LI([1, 2, 5]))
+        """), heading=doc_heading)
+        content = Text(LI([1, 2, 5]))
+        content = Panel(content, heading=Markdown('###Code output').render())
+        self.content = RX(C6(doc), C6(content))
+        return self
+
+
+class Test007(DPage):
+    title = 'DjangoPages_Test007'
+    description = 'Demonstrate Text, HTML, Markdown, and LI widgets on same page'
+    tags = []
+
+    def page(self):
+        doc_heading = Markdown('### Text, HTML, Markdown, and LI output can be combined').render()
+        doc = Panel(Markdown("""
+Text, HTML, Markdown, and LI content can be combined on a page.
+
+####Code
+    content = []
+    content.append(Markdown('**Some bold Markdown text**'))
+    content.append(HTML('<i><b>Some italic bold HTML text</b></i>'))
+    content.append(Text('</br>Some Text text'))
+    content.append(LI([3, 5]))
+        """), heading=doc_heading)
+        # noinspection PyListCreation
+        content = []
+        content.append(Markdown('**Some bold Markdown text**'))
+        content.append(HTML('<i><b>Some italic bold HTML text</b></i>'))
+        content.append(Text('</br>Some Text text'))
+        content.append(LI([3, 5]))
+        content = Panel(content, heading=Markdown('###Code output').render())
+        self.content = RX(C6(doc), C6(content))
+        return self
 
 
 class Test01(DPage):
@@ -808,70 +1055,3 @@ class Test13(DPage):
                             )
                         )
         return self
-
-
-########################################################################################################################
-#
-# List the available DPages.
-#
-########################################################################################################################
-
-
-class DPagesList(DPage):
-    """
-    Page to list DPages
-    """
-    title = 'DjangoPages_List'
-    description = 'This page: list the available DPages'
-    tags = []
-
-    def page(self):
-        """
-        List available pages
-        """
-        # noinspection PyUnresolvedReferences
-        pages = DPage.pages_list
-        pages = sorted(pages, key=lambda x: x['name'])
-        out = []
-        # fixme: should template be used
-        template = '<a href="/dpages/{name}" class="btn btn-primary btn-xs">Show</a>'
-        for page in pages:
-            cls = page['cls']
-            lnk = Link('/dpages/{name}'.format(name=cls.__name__), 'Show me', button=True)
-            line = RX(C3((lnk, ' ', cls.title,)), C6(cls.description))
-            out.append(line)
-        self.content = out
-        return self
-
-########################################################################################################################
-#
-# Display and process a DPage
-#
-########################################################################################################################
-
-
-class DPagesView(View):
-    """
-    View class for dev testing.
-    """
-    @staticmethod
-    def get(request, name):
-        """
-        Execute the graph method and display the results.
-        :param request:
-        """
-        # noinspection PyUnresolvedReferences
-        dt = DPage.pages_dict[name]
-        dpage = dt(request).page()
-        return dpage.render()
-
-    @staticmethod
-    def post(request, name):
-        """
-        Send the post data to the page and rerender.
-        :param request:
-        """
-        # noinspection PyUnresolvedReferences
-        dt = DPage.pages_dict[name]
-        dpage = dt(request).page()
-        return dpage.render()

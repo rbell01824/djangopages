@@ -23,7 +23,7 @@ __maintainer__ = 'rbell01824'
 __email__ = 'rbell01824@gmail.com'
 
 import markdown
-from loremipsum import get_paragraph
+import loremipsum
 
 from djangopages.dpage import Content, render_objects
 from django.utils.encoding import force_unicode
@@ -37,15 +37,17 @@ from django.utils.encoding import force_unicode
 
 class Text(Content):
     """
-    Renders content to the page.  Text can also be included by passing a str in the
-    content.
+    Renders content to the page.
+
+    If <content> is a basestring, outputs <content>.  Otherwise outputs <content>.render().
+    Accepts (<content>, <content>, ... ).
     """
 
     def __init__(self, *content, **kwargs):
         """
             Create text object and initialize it.
-            :param content: The text.
-            :type content: unicode
+            :param content: The content text or object list.
+            :type content: unicode or obj or list
             :param kwargs: RFU
             :type kwargs: dict
         """
@@ -57,7 +59,8 @@ class Text(Content):
     def render(self, **kwargs):
         """
         Render the Text object
-        :param kwargs:
+        :param kwargs: RFU
+        :type kwargs: dict
         """
         out = ''
         for obj in self.content:
@@ -66,6 +69,16 @@ class Text(Content):
             else:
                 out += render_objects(obj, **kwargs)
         return out
+
+
+class HTML(Text):
+    """
+    Syntactic sugar for Text.  HTML can make the text a bit clearer.
+    """
+
+    def __init__(self, *content, **kwargs):
+        super(HTML, self).__init__(*content, **kwargs)
+        return
 
 
 class Markdown(object):
@@ -107,50 +120,60 @@ class Markdown(object):
         return out
 
 
-class HTML(object):
-    """
-    Holds HTML text for inclusion in a DPage.  This is a convenience method since DPageMarkdown can be
-    used interchangeably.
-    """
-
-    def __init__(self, *content, **kwargs):
-        """
-        Create a DPageHTML object and initialize it.
-
-        :param content: Text to process as html.
-        :type content: unicode
-        :param kwargs: RFU
-        :type kwargs: dict
-        """
-        self.content = content
-        self.kwargs = kwargs
-        pass
-
-    # noinspection PyUnusedLocal
-    def render(self, **kwargs):
-        """
-        Render HTML text.
-        :param kwargs:
-        """
-        out = ''
-        for obj in self.content:
-            if isinstance(obj, basestring):
-                out += obj
-            else:
-                out += render_objects(obj)
-        return out
-
 ########################################################################################################################
 #
-# Convenience method for loremipsum text generation.
+# Convenience methods for loremipsum text generation.
 #
 ########################################################################################################################
 
 
 # noinspection PyPep8Naming
-def GP():
+def LI(amount=1, para=True):
     """
-    Provide a bit of syntactic sugar for the more verbose get_paragraph in loremipsum.
-    :return:
+    Generate loremipsum paragraphs of sentence length sentences.
+    :param amount: Number of paragraphs to generate, or a list of sentence lengths for each paragraph.
+    :type amount: int or list
+    :param para: If true wrap each paragraph in html p tags
+    :type para: bool
     """
-    return get_paragraph()
+    if isinstance(amount, (int, long, float)):
+        return LI_paragraph(amount, para)
+    out = ''
+    for pl in amount:
+        out += LI_sentence(pl, para)
+    return out
+
+
+# noinspection PyPep8Naming
+def LI_paragraph(amount=1, para=True):
+    """
+    Provide a bit of syntactic sugar for the more verbose get_paragraphs in loremipsum.
+    :param amount: Number of paragraphs to generate
+    :type amount: int
+    :param para: If true wrap each paragraph in html p tags
+    :type para: bool
+    """
+    li = loremipsum.get_paragraphs(amount)
+    if not para:
+        return li
+    out = []
+    for p in li:
+        out.append('<p>{}</p>'.format(p))
+    return out
+
+
+# noinspection PyPep8Naming
+def LI_sentence(amount=1, para=True):
+    """
+    Provide a bit of syntactic sugar for the more verbose get_sentences in loremipsum.
+    :param amount: Number of sentences to generate
+    :type amount: int
+    """
+    li = loremipsum.get_sentences(amount)
+    if not para:
+        return li
+    out = ''
+    for p in li:
+        out += ' ' + p
+    out = '<p>{}</p>'.format(out)
+    return out
