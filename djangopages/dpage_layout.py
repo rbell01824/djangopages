@@ -88,7 +88,7 @@ class Column(Content):
 
 class ColumnX(Column):
     """
-    Render objects in a single column of width width.  Render all the objects then wrap in a column of width width.
+    Render objects in a single column of width width. Equivalent to Column(X(content)).
     """
     def render(self, **kwargs):
         """

@@ -137,15 +137,15 @@ def LI(amount=1, para=True):
     :type para: bool
     """
     if isinstance(amount, (int, long, float)):
-        return LI_paragraph(amount, para)
+        return LI_Paragraph(amount, para)
     out = ''
     for pl in amount:
-        out += LI_sentence(pl, para)
+        out += LI_Sentence(pl, para)
     return out
 
 
 # noinspection PyPep8Naming
-def LI_paragraph(amount=1, para=True):
+def LI_Paragraph(amount=1, para=True):
     """
     Provide a bit of syntactic sugar for the more verbose get_paragraphs in loremipsum.
     :param amount: Number of paragraphs to generate
@@ -163,7 +163,7 @@ def LI_paragraph(amount=1, para=True):
 
 
 # noinspection PyPep8Naming
-def LI_sentence(amount=1, para=True):
+def LI_Sentence(amount=1, para=True):
     """
     Provide a bit of syntactic sugar for the more verbose get_sentences in loremipsum.
     :param amount: Number of sentences to generate

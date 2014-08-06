@@ -96,6 +96,7 @@ def render_objects(*content, **kwargs):
             raise ValueError('Unknown content type in render_objects {}'.format(con))
     return out
 X = functools.partial(render_objects)                       # convenience method for render objects
+RO = X
 
 ########################################################################################################################
 #
