@@ -36,9 +36,7 @@ from djangopages.dpage_graphs import *
 from djangopages.dpage_texthtml import *
 
 #todo 3: unused imports, shouldn't I have examples for these
-from test_data.models import syslog_query, syslog_companies, syslog_hosts,\
-    syslog_event_graph, \
-    VNode, VCompany
+from test_data.models import syslog_query, syslog_event_graph, VNode, VCompany
 
 ########################################################################################################################
 #
@@ -69,7 +67,7 @@ class DPagesList(DPage):
             # make a link button object to execute an instance of the class
             lnk = Link('/dpages/{name}'.format(name=cls.__name__), 'Run test', button=True)
             # Output a line with the link button, test title, and test description
-            line = RX(C3((lnk, ' ', cls.title,)), C6(cls.description))
+            line = R(C3((lnk, ' ', cls.title,)), C6(cls.description))
             out.append(line)
         self.content = out
         return self
@@ -109,6 +107,37 @@ class DPagesView(View):
 
 ########################################################################################################################
 #
+# Development test class based view support functions
+#
+########################################################################################################################
+
+
+def doc_panel(dpage, text):
+    """
+    Support method to create the documentation panel for the examples/tests.
+    """
+    doc = Markdown(text)
+    doc_heading = Markdown('###{title}\n'
+                           '[Prev](/dpages/{prev}) [Next](/dpages/{next})'
+                           .format(title=dpage.title, next=next_dpage(dpage), prev=prev_dpage(dpage)))
+    panel = Panel(doc, heading=doc_heading)
+    return panel
+
+
+def content_panel(content):
+    """
+    Support function for content.
+    """
+    return Panel(content, heading=Markdown('###Output'))
+
+
+def page_content(dpage, text, content):
+    """
+    """
+    return R(C6(doc_panel(dpage, text)), C6(content_panel(content)))
+
+########################################################################################################################
+#
 # Development test class based view
 #
 ########################################################################################################################
@@ -120,8 +149,7 @@ class Test000a(DPage):
     tags = []
 
     def page(self):
-        doc_heading = Markdown('###{}'.format(self.title))
-        doc = Markdown("""
+        doc = """
 DjangoPages is built on a few simple concepts uniformly applied.
 
 Each Django page must
@@ -139,12 +167,15 @@ of methods to:
 The tests in this list were originally developed during development to validate DjangoPage
 functionality.  They provide an introduction to DjangoPages and its features.
 
-Of necessity, it was necessary to use some features before they are introduced.  However, if you
-study the test in order you will encounter all DjangoPage's features in a reasonably understandable
+It was necessary to use some features before they are introduced.  However, if you
+study the test in order you will encounter all DjangoPage's features in a reasonably tutorial
 fashion.
-        """)
 
-        self.content = R(C(Panel(doc, heading=doc_heading)))
+Note, the initial examples are intentionally verbose so they may be more easily understood.
+As the examples proceed, they become less verbose and more production oriented.
+        """
+
+        self.content = R(C(doc_panel(self, doc)))
         return self
 
 
@@ -156,8 +187,7 @@ class Test000b(DPage):                              # The class name also define
     def page(self):                                 # Override the page method to generate the page's HTML
 
         # Create some page content
-        doc_heading = Markdown('###{}'.format(self.title))
-        doc = Markdown("""
+        doc = """
 The source for a DjangoPage generally looks something like this:
 
     class Test000b(DPage):                              # The class name also defines the page's URL
@@ -170,10 +200,10 @@ The source for a DjangoPage generally looks something like this:
             # Create some page content
             doc_heading = Markdown('### DjangoPage Overview')
             doc = Markdown('The source for a DjangoPage generally looks something like this:')
-            panel = Panel(doc, heading=doc_heading)
+            doc_panel = Panel(doc, heading=doc_heading)
 
             # Put it in a bootstrap 3 grid
-            column = Column(panel)
+            column = Column(doc_panel)
             row = Row(column)
             self.content = row
             return self
@@ -185,31 +215,29 @@ The code is generally self descriptive.
  * Column() creates a full width bootstrap 3 column to contain the panel
  * Row() creates a bootstrap 3 row that contains the column
 
-
 Most DjangoPages follow this general pattern.
 
 While the page could be written in this fashion, most pages take advantage of various convenience
 methods and techniques to reduce the code count.  Many of these techniques are introduced in the
 tests that follow.
-        """)
+        """
 
         # Put the content in a bootstrap 3 responsive grid
-        self.content = Row(Column(Panel(doc, heading=doc_heading)))
+        self.content = Row(Column(doc_panel(self, doc)))
         return self
 
 
 class Test001a(DPage):
-    title = 'Text'
-    description = 'Demonstrate Text widget'
+    title = 'Text/HTML'
+    description = 'Demonstrate Text/HTML widget'
     tags = []
 
     def page(self):
-        doc_heading = Markdown('###{}'.format(self.title))
-        doc = Panel(Markdown("""
-The Text widget simply outputs it's content.  It does not add an HTML wrapper.
+        doc = """
+The Text and HTML widgets simply output their content.  They do not add an HTML wrapper.
 
  * Multiple content is concatenated.
- * Text can also output raw HTML
+ * Text, T, and HTML can be used interchangeably.
  * If content is an object, the output of it's render method is used.  This allows
    inclusion of the output of other DjangoPage widgets.
 
@@ -221,43 +249,30 @@ The Text widget simply outputs it's content.  It does not add an HTML wrapper.
                    Markdown(' *Embedded markdown italic text.*'
                             ' Note, Markdown wraps its output in an HTML paragraph.'))
 
+    or HTML
+
+    content = HTML('<strong>This is some strong HTML content.</strong> ',
+                   '<i>This is some italic HTML content.</i>',
+                   '</br><u>Text can also output underlined HTML.</u>',
+                   Markdown('**Embedded markdown bold text.**'))
+
+    or T convenience method
+
+    content = T('<strong>This is some strong HTML content.</strong> ',
+                '<i>This is some italic HTML content.</i>',
+                '</br><u>Text can also output underlined HTML.</u>',
+                Markdown('**Embedded markdown bold text.**'))
 **Note: These examples use a responsive bootstrap 3 grid layout. This will be explained in subsequent
 examples/test.  You can see the responsive behavior by adjusting the browser width.**
-        """), heading=doc_heading)
+        """
+
         content = Text('This is some Text content. ',
                        'This is some more Text content.',
                        '</br>Text can also output HTML.',
                        Markdown('**Embedded markdown bold text.**'),
                        Markdown(' *Embedded markdown italic text.*'
                                 ' Note, Markdown wraps its output in an HTML paragraph.'))
-        content = Panel(content, heading=Markdown('###Output'))
-        self.content = RX(C6(doc), C6(content))
-        return self
-
-
-class Test001b(DPage):
-    title = 'HTML'
-    description = 'Demonstrate HTML widget'
-    tags = []
-
-    def page(self):
-        doc_heading = Markdown('###{}'.format(self.title))
-        doc = Panel(Markdown("""
-The HTML widget is **identical to the Text widget** and simply outputs it's content.  Text and
-HTML may be used interchangeably.
-
-####Code
-    content = HTML('<strong>This is some strong HTML content.</strong> ',
-                   '<i>This is some italic HTML content.</i>',
-                   '</br><u>Text can also output underlined HTML.</u>',
-                   Markdown('**Embedded markdown bold text.**'))
-        """), heading=doc_heading)
-        content = HTML('<strong>This is some strong HTML content.</strong> ',
-                       '<i>This is some italic HTML content.</i>',
-                       '</br><u>Text can also output underlined HTML.</u>',
-                       Markdown('**Embedded markdown bold text.**'))
-        content = Panel(content, heading=Markdown('###Output'))
-        self.content = RX(C6(doc), C6(content))
+        self.content = page_content(self, doc, content)
         return self
 
 
@@ -267,8 +282,7 @@ class Test001c(DPage):
     tags = []
 
     def page(self):
-        doc_heading = Markdown('###{}'.format(self.title))
-        doc = Panel(Markdown("""
+        doc = """
 The Markdown widget accepts Markdown text and renders the HTML equivalent.
 
  * Multiple content is concatenated.
@@ -278,12 +292,18 @@ The Markdown widget accepts Markdown text and renders the HTML equivalent.
     content = Markdown('###Markdown h3',
                        '**Markdown bold text**',
                        Markdown('*Embedded markdown object italic text.*'))
-        """), heading=doc_heading)
+
+    or M convenience method
+
+    content = M('###Markdown h3',
+                '**Markdown bold text**',
+                M('*Embedded markdown object italic text.*'))
+        """
+
         content = Markdown('###Markdown h3',
                            '**Markdown bold text**',
                            Markdown('*Embedded markdown object italic text.*'))
-        content = Panel(content, heading=Markdown('###Output'))
-        self.content = RX(C6(doc), C6(content))
+        self.content = page_content(self, doc, content)
         return self
 
 
@@ -293,19 +313,20 @@ class Test001d(DPage):
     tags = []
 
     def page(self):
-        doc_heading = Markdown('###{}'.format(self.title))
-        doc = Panel(Markdown("""
-LI_para(amount=1, para=True) generates amount loremipsum paragraphs.  This is often useful during page development.
+        doc = """
+LI_para(amount=1, para=True)
 
- * **amount** is the number of paragraphs to generate
+ * **amount** is the number of loremipsum paragraphs to generate
  * **para** if true wraps each paragraph in an HTML paragraph
 
 ####Code
     content = LI_Paragraph(2)       # Make two loremipsum paragraphs
-        """), heading=doc_heading)
+
+As a practical matter LI is far more frequently used than LI_Paragraph.
+        """
+
         content = LI_Paragraph(2)       # Make two loremipsum paragraphs
-        content = Panel(content, heading=Markdown('###Output'))
-        self.content = RX(C6(doc), C6(content))
+        self.content = page_content(self, doc, content)
         return self
 
 
@@ -315,19 +336,20 @@ class Test001e(DPage):
     tags = []
 
     def page(self):
-        doc_heading = Markdown('###{}'.format(self.title))
-        doc = Panel(Markdown("""
-LI_Sentence(amount=1, para=True) generates amount loremipsum sentences.  This is often useful during page development.
+        doc = """
+LI_Sentence(amount=1, para=True)
 
- * **amount** is the number of sentences to generate
+ * **amount** is the number of loremipsum sentences to generate
  * **para** if true wraps the sentences in an HTML paragraph
 
 ####Code
-    content = LI_para(5)
-        """), heading=doc_heading)
-        content = LI_Sentence(5)
-        content = Panel(content, heading=Markdown('###Output'))
-        self.content = RX(C6(doc), C6(content))
+    content = LI_Sentence(5)        # make one loremipsum paragraph of 5 sentences
+
+As a practical mater LI is far more frequently used than LI_Sentence.
+        """
+
+        content = LI_Sentence(5)        # make one loremipsum pragraph of 5 sentences
+        self.content = page_content(self, doc, content)
         return self
 
 
@@ -337,8 +359,7 @@ class Test001f(DPage):
     tags = []
 
     def page(self):
-        doc_heading = Markdown('###{}'.format(self.title))
-        doc = Panel(Markdown("""
+        doc = """
 LI(amount=1, para=True)
 
 * **amount** is
@@ -349,22 +370,21 @@ LI(amount=1, para=True)
 By using amount=[n, n,...] you can control the paragraph length.
 
 ####Code
-    content = LI([1, 2, 5])
-        """), heading=doc_heading)
-        content = LI([1, 2, 5])
-        content = Panel(content, heading=Markdown('###Output'))
-        self.content = RX(C6(doc), C6(content))
+    content = LI([1, 2, 5])     # make 3 paragraphs with different number of sentences
+        """
+
+        content = LI([1, 2, 5])         # make 3 paragraphs with different number of sentences
+        self.content = page_content(self, doc, content)
         return self
 
 
 class Test002a(DPage):
     title = 'Multiple widgets on page'
-    description = 'Multiple widgets on a page'
+    description = 'Demonstrate multiple widgets on a page'
     tags = []
 
     def page(self):
-        doc_heading = Markdown('###{}'.format(self.title))
-        doc = Panel(Markdown("""
+        doc = """
 Multiple widgets can be combined on a page.
 
 ####Code
@@ -373,26 +393,25 @@ Multiple widgets can be combined on a page.
     content.append(HTML('<i><b>Some italic bold HTML text</b></i>'))
     content.append(Text('</br>Some Text text'))
     content.append(LI([3, 5]))
-        """), heading=doc_heading)
+        """
+
         # noinspection PyListCreation
         content = []
         content.append(Markdown('**Some bold Markdown text**'))
         content.append(HTML('<i><b>Some italic bold HTML text</b></i>'))
         content.append(Text('</br>Some Text text'))
         content.append(LI([3, 5]))
-        content = Panel(content, heading=Markdown('###Output'))
-        self.content = RX(C6(doc), C6(content))
+        self.content = page_content(self, doc, content)
         return self
 
 
 class Test002b(DPage):
     title = 'Simplify content creation'
-    description = 'Simplify content creation'
+    description = 'Demonstrate simplified content creation'
     tags = []
 
     def page(self):
-        doc_heading = Markdown('###{}'.format(self.title))
-        doc = Panel(Markdown("""
+        doc = """
 Using
 
     content = []
@@ -402,26 +421,25 @@ Using
 is needlessly verbose and can lead to difficult to understand code.  Alternately you can
 
 #### Code
-    # create the content for column 2 panel
-    panel_heading = Markdown('###Output')
-    panel_content = (Markdown('**Some bold Markdown text**'),
-                     LI([3, 5]))
-    # create c2 panel
-    c2 = Panel(panel_content, heading=panel_heading)
-    # put documentation and column 2 panel in a single row
-    # with two columns of width 6
-    self.content = RX(C6(doc), C6(c2))
-    return self
-        """), heading=doc_heading)
-        # create the content for column 2 panel
-        panel_heading = Markdown('###Output')
-        panel_content = (Markdown('**Some bold Markdown text**'),
-                         LI([3, 5]))
-        # create c2 panel
-        c2 = Panel(panel_content, heading=panel_heading)
-        # put documentation and column 2 panel in a single row
-        # with two columns of width 6
-        self.content = RX(C6(doc), C6(c2))
+    # create the content for column 2 and put in panel
+    content = (MD('**Some bold Markdown text**'),
+               LI([3, 5]),
+               MD('**Some bold text after the LI**'))
+
+Here **content = ...** creates a list of content to include in the page avoiding
+
+    content = []
+    content.append( ...
+    content.append( ...
+    content.append( ...
+        """
+
+        # create the content for column 2 and put in panel
+        content = (MD('**Some bold Markdown text**'),
+                   LI([3, 5]),
+                   MD('**Some bold text after the LI**'))
+
+        self.content = page_content(self, doc, content)
         return self
 
 
@@ -431,133 +449,180 @@ class Test003a(DPage):
     tags = []
 
     def page(self):
-        doc_heading = Markdown('###{}'.format(self.title))
-        doc = Panel(Markdown("""
+        doc = """
 Row and Column can be used to create responsive bootstrap 3 page grid layouts.
 
 The basic methods are
 
  * Row(content, ...) to create a bootstrap 3 row
+     * content is the content to place in the row
+ * R(content, ...) convenience synonym for Row
  * Column(content, ..., [width=n]) to create a bootstrap 3 column of width n.
+     * content is the content to place in the column
+     * width is the bootstrap 3 width, default 12
+ * C(content, ..., [width=n]) convenience synonym for Column
+ * Rows may contain multiple columns
+ * Columns may contain multiple rows
 
 #### Code
-    r1 = Markdown('####Text in row 1')
-    r2 = Markdown('####Text in row 2')
+    # Create some text for two rows
+    row1 = MD('####Text in row 1')
+    row2col1 = MD('####Text in row 2 column 1')
+    row2col2 = MD('####Text in row 2 column 2')
 
-    panel_heading = Markdown('###Output')
-    panel_content = X(Row(Column(r1, width=12)),
-                      Row(Column(r2, width=12)))
+    content = (Row(Column(row1)),                                   # with Row & Column
+               R(C(row2col1, width=6), C(row2col2, width=6)))       # with R & C
+        """
 
-    panel = Panel(panel_content, heading=panel_heading)
-    c1 = Column(doc, width=6)
-    c2 = Column(panel, width=6)
-    self.content = Row(X(c1, c2))
-    return self
+        # Create some text for two rows
+        row1 = MD('####Text in row 1')
+        row2col1 = MD('####Text in row 2 column 1')
+        row2col2 = MD('####Text in row 2 column 2')
 
-**Note: Row(X(c1, c2))** The inner X() renders its content.
-
-DjangoPage widgets generally accept either a single argument or a list.  When given a list, widgets
-are applied to each member of the list individually so that
-
-    Row(c1, c2) is equivalent to Row(c1)+Row(c2)
-
-On the example/test pages we want a single row containing two columns.  By using **X(c1, c2)**
-we create a single object for the row, ie. we get a single row with two columns not two rows with
-a single column each..
-
-Alternately we could have written **Row((c1, c2))**.  The inner () create a list object which
-is evaluated before Row is applied.
-
-In the following examples several other convenience methods are introduced.
-    """), heading=doc_heading)
-        r1 = Markdown('####Text in row 1')
-        r2 = Markdown('####Text in row 2')
-
-        panel_heading = Markdown('###Output')
-        panel_content = X(Row(Column(r1, width=12)),
-                          Row(Column(r2, width=12)))
-
-        panel = Panel(panel_content, heading=panel_heading)
-        c1 = Column(doc, width=6)
-        c2 = Column(panel, width=6)
-        self.content = Row(X(c1, c2))
+        content = (Row(Column(row1)),                                   # with Row & Column
+                   R(C(row2col1, width=6), C(row2col2, width=6)))       # with R & C
+        self.content = page_content(self, doc, content)
         return self
 
 
 class Test003b(DPage):
-    title = 'R and C'
-    description = 'Demonstrate R and C convenience methods'
+    title = 'Cn convenienc method'
+    description = 'Demonstrate Cn convenience method'
     tags = []
 
     def page(self):
-        doc_heading = Markdown('###{}'.format(self.title))
-        doc = Panel(Markdown("""
-DjangoPages provides a number of convenience methods and techniques to simplify creating
-responsive bootstrap 3 grid layouts.  These reduce typing and properly used can make the
-page layout clear.
+        doc = """
+The Cn family of methods may be used to define columns if bootstrap width n.
 
-The R and C convenience methods can be used to reduce typing.  They are equivalent to Row
-and Column respectively.
+The basic methods Cn are
 
-####Code
-    # create panel's content
-    r1 = Markdown('####Text in row 1')
-    r2 = Markdown('####Text in row 2')
-    # create panel
-    panel = Panel(X(R(C(r1, width=12)),         # layout clearly defined
-                    R(C(r2, width=12))),
-                  heading=Markdown('###Output'))
-    # define page content (documentation and output panel)
-    self.content = R(X(C6(doc), C6(panel)))
-    return self
+ * C = functools.partial(column)
+ * C1 = functools.partial(column, width=1)
+ * C2 = functools.partial(column, width=2)
+ * C3 = functools.partial(column, width=3)
+ * C4 = functools.partial(column, width=4)
+ * C5 = functools.partial(column, width=5)
+ * C6 = functools.partial(column, width=6)
+ * C7 = functools.partial(column, width=7)
+ * C8 = functools.partial(column, width=8)
+ * C9 = functools.partial(column, width=9)
+ * c10 = functools.partial(column, width=10)
+ * c11 = functools.partial(column, width=11)
+ * C12 = functools.partial(column, width=12)
 
-This technique makes the grid layout clearer and avoids several lines of code and intermediate
-values.  In DjangoPages it is generally convenient to define the page content then 'pour' the
-content into the grid layout.
-        """), heading=doc_heading)
-        # create panel's content
-        r1 = Markdown('####Text in row 1')
-        r2 = Markdown('####Text in row 2')
-        # create panel
-        panel = Panel(X(R(C(r1, width=12)),         # layout clearly defined
-                        R(C(r2, width=12))),
-                      heading=Markdown('###Output'))
-        # define page content (documentation and output panel)
-        self.content = R(X(C6(doc), C6(panel)))
+#### Code
+    # Create some text for two rows
+    row1 = MD('####Text in row 1')
+    row2col1 = MD('####Text in row 2: Column 1')
+    row2col2 = MD('####Column 2')
+    row2col3 = MD('####Column 3')
+
+    content = (Row(Column(row1)),                                   # with Row & Column
+               R(C4(row2col1), C4(row2col2), C4(row2col3)))         # with R & C4
+        """
+
+        # Create some text for two rows
+        row1 = MD('####Text in row 1')
+        row2col1 = MD('####Text in row 2: Column 1')
+        row2col2 = MD('####Column 2')
+        row2col3 = MD('####Column 3')
+
+        content = (Row(Column(row1)),                                   # with Row & Column
+                   R(C4(row2col1), C4(row2col2), C4(row2col3)))         # with R & C4
+        self.content = page_content(self, doc, content)
         return self
 
 
-class Test003c(DPage):
-    title = 'R and C: all the details'
-    description = 'Row and Column details'
+class Test003ca(DPage):
+    title = 'RowColumn/RC convenience methods'
+    description = 'Demonstrate RowColumn/RC convenience methods'
     tags = []
 
     def page(self):
-        doc_heading = Markdown('###{}'.format(self.title))
-        doc = Panel(Markdown("""
-DjangoPages contains a number of convenience methods to make bootstrap grid layout easy.
+        doc = """
+RowColumn addresses the common case Row(Column(content, ...)).
 
-    C===Column width defaults to 12
-    Cn===Column(..., width=n), 1 <= n <= 12
-    CX===Column(X(...))
-    CnX===Column(X(...), width=n), 1 <= n <= 12
-    R===Row
-    RX===Row(X(...))
-    RC===Row(Column(...))
-    RCn===Row(Column(..., width=n)
-    RXC===Row(X(Column(...)))
-    RXCn===Row(X(Column(..., width=n)))
-    RCX===Row(Column(X(...)))
-    RCnX===Row(Column(X(...), width=n)
-    RXCX===Row(X(Column(X(...))))
-    RXCnX===Row(X(Column(X(...), width=n)))
+ * RowColumn(content, ... , [width=n]), or
+ * RC(content, ..., [width=n])
+ * RCn(content, ...)  where n specified the column width
+
+where
+
+ * content is the content to place in the column
+ * width is the bootstrap 3 width, default 12
+
+#### Code
+    # Create content
+    content = RC(T('Row 1 text. '), T('More row 1 text.'))
+
+This example illustrates a RC subtlety.
+
+    RC(T(...), T(...))
+
+    is equivalent to
+
+    R(C(T(...), T(...))
+
+Only a single row and column are created.  This can be seen with your browser's inspect element feature.
+
+Note: A RowColumn may contain many rows of text, ie. RowColumn is a layout widget independent
+of the number of lines of text contained therein.
+        """
+
+        # Create content
+        content = RC(T('Row 1 text. '), T('More row 1 text.'))
+        self.content = page_content(self, doc, content)
+        return self
+
+
+class Test003cza(DPage):
+    title = 'Multiple rows with XR'
+    description = title
+    tags = []
+
+    def page(self):
+        doc = """
+Sometimes it is useful to create multiple rows with a single statement.
+
 
 Some of these convenience methods are rather advanced and as a practical matter probably shouldn't
 generally be used as there exact meaning is not clear at a glance.  However, if you need them they
 are available.
 
-        """), heading=doc_heading)
-        self.content = RC(doc)
+####Code
+    # define the content
+    content = XR(C('Row 1'), C('Row 2'), C(MD('####Markdown Row 3')))
+        """
+
+        # define the content
+        content = XR(C('Row 1'), C('Row 2'), C(MD('####Markdown Row 3')))
+        # content = (R(C('Row 1')), R(C('Row 2')), R(C(MD('####Markdown Row 3'))))
+        self.content = page_content(self, doc, content)
+        return self
+
+
+class Test003cb(DPage):
+    title = 'Multiple rows/columns with XRC'
+    description = title
+    tags = []
+
+    def page(self):
+        doc = """
+XR is useful, but most of the time you will really want XRC so you needn't define all the columns.
+
+Some of these convenience methods are rather advanced and as a practical matter probably shouldn't
+generally be used as there exact meaning is not clear at a glance.  However, if you need them they
+are available.
+
+####Code
+    # define the content
+    content = XR(C('Row 1'), C('Row 2'), C(MD('####Markdown Row 3')))
+        """
+
+        # define the content
+        content = XR(C('Row 1'), C('Row 2'), C(MD('####Markdown Row 3')))
+        # content = (R(C('Row 1')), R(C('Row 2')), R(C(MD('####Markdown Row 3'))))
+        self.content = page_content(self, doc, content)
         return self
 
 
@@ -567,8 +632,7 @@ class Test003d(DPage):
     tags = []
 
     def page(self):
-        doc_heading = Markdown('###{}'.format(self.title))
-        doc = Panel(Markdown("""
+        doc = """
 Row and Column can be used to create arbitrarily complex responsive bootstrap 3 layouts.
 
 Here is the code to create a row with two columns of width 6.
@@ -587,20 +651,21 @@ Here is the code to create a row with two columns of width 6.
     r2c2 = LI(1)                    # text for row 2 column 2
 
     # create layout for panel content
-    panel_content = (R(C(r1)), R(X(C6(r2c1), C6(r2c2))))
-    panel = Panel(panel_content, heading=Markdown('###Output'))
-    self.content = RX(C6(doc), C6(panel))
+    content_panel = (R(C(r1)), R(X(C6(r2c1), C6(r2c2))))
+    panel = Panel(content_panel, heading=Markdown('###Output'))
+    self.content = R(C6(doc), C6(panel))
     return self
-        """), heading=doc_heading)
+        """
+
         # define the content
         r1 = LI([5])                    # text for row 1
         r2c1 = LI([3, 2])               # text for row 2 column 1
         r2c2 = LI(1)                    # text for row 2 column 2
 
         # create layout for panel content
-        panel_content = (R(C(r1)), R(X(C6(r2c1), C6(r2c2))))
-        panel = Panel(panel_content, heading=Markdown('###Output'))
-        self.content = RX(C6(doc), C6(panel))
+        content_panel = (R(C(r1)), R(X(C6(r2c1), C6(r2c2))))
+        panel = Panel(content_panel, heading=Markdown('###Output'))
+        self.content = R(C6(doc), C6(panel))
         return self
 
 
@@ -638,11 +703,11 @@ class Test003e(DPage):
         self.content = (RC(x1),                         # row with 1 full width column
                         RC6(x21, x22),                  # row with 2 column each is 6 wide
                         RC(x3),                         # row with 1 full width column
-                        RX(C3(x41), C9(x42)),           # row with 1 column 3 wide and 1 column 9 wide
-                        RX(C3(x51), C9(RC(x521),        # row with 1 column 3 wide and 1 column 9 wide
+                        R(C3(x41), C9(x42)),           # row with 1 column 3 wide and 1 column 9 wide
+                        R(C3(x51), C9(RC(x521),        # row with 1 column 3 wide and 1 column 9 wide
                                                         # 9 wide column has 3 rows, the last of chich has 3 columns
                                        RC(x522),
-                                       RX(C4(x5231), C4(x5232), C4(x5233))
+                                       R(C4(x5231), C4(x5232), C4(x5233))
                                        )
                            )
                         )
@@ -653,7 +718,7 @@ Below is the output for this page.
         """)
 
         # Create some page content
-        x1 = Text('Row 1: This text comes from dpage.Text')
+        x1 = Markdown('Row 1: Some text on row 1')
         x21 = Markdown('Row 2 col 1: **Bold Markdown Text**')
         x22 = HTML('<p>Row 2 col 2: </p>')
         x3 = HTML('<p>Row 3: Text from loremipsum. {}</p>'.format(LI()))
@@ -671,11 +736,11 @@ Below is the output for this page.
                         RC(x1),                         # row with 1 full width column
                         RC6(x21, x22),                  # row with 2 column each is 6 wide
                         RC(x3),                         # row with 1 full width column
-                        RX(C3(x41), C9(x42)),           # row with 1 column 3 wide and 1 column 9 wide
-                        RX(C3(x51), C9(RC(x521),        # row with 1 column 3 wide and 1 column 9 wide
+                        R(C3(x41), C9(x42)),           # row with 1 column 3 wide and 1 column 9 wide
+                        R(C3(x51), C9(RC(x521),        # row with 1 column 3 wide and 1 column 9 wide
                                                         # 9 wide column has 3 rows, the last of chich has 3 columns
                                        RC(x522),
-                                       RX(C4(x5231), C4(x5232), C4(x5233))
+                                       R(C4(x5231), C4(x5232), C4(x5233))
                                        )
                            )
                         )
@@ -745,9 +810,9 @@ class Test04(DPage):
         ###################
         # Layout the content on the page
         ###################
-        self.content = (RXC(text_top),
-                        RXC6(col_graph, pie_graph),
-                        RXC(text_bottom))
+        self.content = (RC(text_top),
+                        RC6(col_graph, pie_graph),
+                        RC(text_bottom))
         return self
 
 
@@ -835,7 +900,7 @@ class Test05(DPage):
         ###################
         # Layout the content on the page
         ###################
-        xxx = RX(C4(cbt), C8(errbt))
+        xxx = R(C4(cbt), C8(errbt))
         ###################
         # Put the layout in an accordion multi panel
         ###################
@@ -1051,9 +1116,9 @@ class Test07(DPage):
         ###################
         # Put into a layout
         ###################
-        self.content = (RXC12(xr1),
+        self.content = (RC12(xr1),
                         R(C4(xrform), C6(xr2)),
-                        RXC3(xr4))
+                        RC3(xr4))
         return self
 
 
@@ -1106,7 +1171,7 @@ class Test08(DPage):
         #                   C6(X(node_tit, node_tbl))),
         #                 RC(xr3))
         self.content = (RC(xr1),
-                        RX(C3X(company_tit, company_tbl),
+                        R(C3X(company_tit, company_tbl),
                            C6(X(node_tit, node_tbl))),
                         RC(xr3))
         # self.content = t_node
@@ -1155,11 +1220,11 @@ class Test09(DPage):
         ###################
         # Define the content layout
         self.content = (Markdown('**Side by side panels**'),
-                        RX(C2(Panel(company_tit, company_tbl, button='Show Companies')),
+                        R(C2(Panel(company_tit, company_tbl, button='Show Companies')),
                            C6(Panel(node_tit, node_tbl, button='Show Nodes'))),
                         RC(LI()),
                         RC(Markdown('#Button Panel')),
-                        RXC6(('The button is in the left column.', bpn, bpc,
+                        RC6(('The button is in the left column.', bpn, bpc,
                               'The panel is in the right column', LI()),
                              (LI(), Markdown('#### Node panel will appear here'), pn,
                               LI(), Markdown('#### Company panel will appear here'), pc)
@@ -1254,9 +1319,9 @@ class Test12(DPage):
         crsl1 = Carousel(c1r, c2r, c3r, c4r)
         crsl2 = Carousel(c1l, c2l, c3l, c4l)
         self.content = (RC(LI()),
-                        RX(C3(Markdown('**Panel on left**')), C9(crsl1)),
+                        R(C3(Markdown('**Panel on left**')), C9(crsl1)),
                         RC(LI()),
-                        RX(C9(crsl2), C3(Markdown('**Panel on right**'))),
+                        R(C9(crsl2), C3(Markdown('**Panel on right**'))),
                         RC(LI())
                         )
         return self
@@ -1271,7 +1336,7 @@ class Test13(DPage):
         self.content = (RC(Link('/dpages/DPagesList', 'Link to list page')),
                         RC(Link('/dpages/Test07', 'Link to the form test page')),
                         RC(Markdown('#### Link buttons')),
-                        RXC((Link('/dpages/DPagesList', 'Link to list page', button=True), ' ',
+                        RC((Link('/dpages/DPagesList', 'Link to list page', button=True), ' ',
                              Link('/dpages/Test07', 'Link to the form test page', button=True),)
                             )
                         )
