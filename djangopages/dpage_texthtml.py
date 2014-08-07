@@ -24,6 +24,7 @@ __email__ = 'rbell01824@gmail.com'
 
 import markdown
 import loremipsum
+import functools
 
 from djangopages.dpage import Content, render_objects
 from django.utils.encoding import force_unicode
@@ -69,6 +70,7 @@ class Text(Content):
             else:
                 out += render_objects(obj, **kwargs)
         return out
+T = functools.partial(Text)
 
 
 class HTML(Text):
@@ -118,6 +120,7 @@ class Markdown(object):
             else:
                 out += render_objects(obj, **kwargs)
         return out
+MD = functools.partial(Markdown)
 
 
 ########################################################################################################################
