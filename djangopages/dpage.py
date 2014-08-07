@@ -23,15 +23,10 @@ __email__ = "rbell01824@gmail.com"
 
 import collections
 import functools
-from copy import copy
 
 from django.conf import settings
-from django.template import Template
-from django.template import Context
 from django.http import HttpResponse
 from django.shortcuts import render
-
-from djangopages.libs import dict_nested_set
 
 # todo 3: add class to deal with file like objects and queryset objects
 # todo 3: add support for select2 https://github.com/applegrew/django-select2
@@ -44,59 +39,6 @@ from djangopages.libs import dict_nested_set
         # todo 3: here check text type and deal with file like objects and queryset objects
         # for now just deal with actual text
         # todo 2: add markdown kwargs options here
-
-########################################################################################################################
-#
-# Support Routines
-#
-########################################################################################################################
-
-
-def unique_name(base_name='x'):
-    """
-    Returns a unique name of the form 'base_name'_counter.  Used internally to create id and other names.
-
-    ex. unique_name('xxx')
-
-    :param base_name:
-    :return: Unique name
-    :rtype: unicode
-    """
-    if not hasattr(unique_name, "counter"):
-        unique_name.counter = 0  # it doesn't exist yet, so initialize it
-    unique_name.counter += 1
-    return '{}_{}'.format(base_name, unique_name.counter)
-
-
-def render_objects(*content, **kwargs):
-    """
-    Render the content.
-
-    ex. render_objects('something', 'another thing', ('a list thing', 'second'))
-
-    render_objects is also available as X(...) as a convenience method.
-
-    :param content: content to render
-    :type: list or object
-    :param kwargs: RFU
-    :type kwargs: dict
-    :return: Rendered output of objects
-    :rtype: unicode
-    """
-    out = ''
-    for con in content:
-        if isinstance(con, basestring):                     # strings are just themselves
-            out += con
-        elif hasattr(con, 'render'):                        # objects with render methods know how to render themselves
-            out += con.render(**kwargs)
-        elif isinstance(con, collections.Iterable):         # collections are walked
-            for con1 in con:
-                out += render_objects(con1, **kwargs)       # recurse to render this collection item
-        else:                                               # this should never happen
-            raise ValueError('Unknown content type in render_objects {}'.format(con))
-    return out
-X = functools.partial(render_objects)                       # convenience method for render objects
-RO = X
 
 ########################################################################################################################
 #
@@ -206,6 +148,12 @@ class DPage(object):
 
         return render(self.request, self.template, self.context)
 
+    def __unicode__(self):
+        return self.__class__.__name__
+
+    def __str__(self):
+        return unicode(self).encode('utf8')
+
 ########################################################################################################################
 #
 # Content classes and methods
@@ -227,3 +175,104 @@ class Content(object):
         Render this content object.
         """
         raise NotImplementedError("Subclasses should implement Content.render!")
+
+########################################################################################################################
+#
+# Support Routines
+#
+########################################################################################################################
+
+
+def unique_name(base_name='x'):
+    """
+    Returns a unique name of the form 'base_name'_counter.  Used internally to create id and other names.
+
+    ex. unique_name('xxx')
+
+    :param base_name:
+    :return: Unique name
+    :rtype: unicode
+    """
+    if not hasattr(unique_name, "counter"):
+        unique_name.counter = 0  # it doesn't exist yet, so initialize it
+    unique_name.counter += 1
+    return '{}_{}'.format(base_name, unique_name.counter)
+
+
+def render_objects(*content, **kwargs):
+    """
+    Render the content.
+
+    ex. render_objects('something', 'another thing', ('a list thing', 'second'))
+
+    render_objects is also available as X(...) as a convenience method.
+
+    :param content: content to render
+    :type: list or object
+    :param kwargs: RFU
+    :type kwargs: dict
+    :return: Rendered output of objects
+    :rtype: unicode
+    """
+    out = ''
+    for con in content:
+        if isinstance(con, basestring):                     # strings are just themselves
+            out += con
+        elif hasattr(con, 'render'):                        # objects with render methods know how to render themselves
+            out += con.render(**kwargs)
+        elif isinstance(con, collections.Iterable):         # collections are walked
+            for con1 in con:
+                out += render_objects(con1, **kwargs)       # recurse to render this collection item
+        else:                                               # this should never happen
+            raise ValueError('Unknown content type in render_objects {}'.format(con))
+    return out
+X = functools.partial(render_objects)                       # convenience method for render objects
+RO = X
+
+
+def next_dpage(dpage, obj=False):
+    """
+    Return next dpage in the dpage list.
+    :param dpage:
+    :param obj:
+    :return:
+    """
+    pl = dpage.pages_list
+    # noinspection PyBroadException
+    try:
+        pi = pl.index({'name': dpage.__class__.__name__, 'cls': dpage.__class__})
+        if obj:
+            return pl[pi+1]
+        else:
+            return pl[pi+1]['name']
+    except:
+        return None
+
+
+def prev_dpage(dpage, obj=False):
+    """
+    Return previous dpage in the dpage list.
+    :param dpage:
+    :param obj:
+    :return:
+    """
+    pl = dpage.pages_list
+    # noinspection PyBroadException
+    try:
+        pi = pl.index({'name': dpage.__class__.__name__, 'cls': dpage.__class__})
+        if obj:
+            return pl[pi-1]
+        else:
+            return pl[pi-1]['name']
+    except:
+        return None
+
+
+def sibling_dpage(dpage, obj=False):
+    """
+    Return the prev and next dpage objects from the list
+    :param dpage:
+    :param obj:
+    :return:
+    """
+    return prev_dpage(dpage, obj), next_dpage(dpage, obj)
