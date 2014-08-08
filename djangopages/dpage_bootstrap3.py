@@ -52,6 +52,52 @@ from djangopages.dpage import Content, render_objects, unique_name
 ########################################################################################################################
 
 
+class Button(Content):
+    """
+    DPage button class
+    """
+    template = '<!-- start of button -->\n' \
+               '    <button type="button" class="btn {btn_type} {btn_size} {btn_active} {btn_block}" {btn_extra}>\n' \
+               '        {btn_text}\n' \
+               '    </button>\n' \
+               '<!-- end of button -->\n'
+
+    def __init__(self, *content, **kwargs):
+        """
+        Create a button object.
+
+        ex. Button('my first button', '<br/>', 'some more text')   is equivalent to
+            Button(X('my first button', '<br/>', 'some more text'))
+
+        :param content: The content to wrap in a button.
+        :param kwargs:
+            btn_type            The button type.  Defaults to btn-default.
+            btn_size            The button size.  Defaults to bootstrap 3 default size.
+            btn_block           If True, render a block style button.  Default False.
+            btn_extra           RFU
+            template
+            RFU
+        :type kwargs: dict
+        """
+        super(Button, self).__init__()
+        self.content = content
+        self.btn_type = kwargs.pop('btn_type', 'btn-default')
+        self.btn_size = kwargs.pop('btn_size', '')
+        self.btn_block = '' if not kwargs.pop('btn_block', None) else 'btn_block'
+        self.btn_extra = kwargs.pop('btn_extra', '')
+        self.template = kwargs.pop('template', Button.template)
+        self.kwargs = kwargs
+        return
+
+    def render(self):
+        content = render_objects(self.content)
+        out = self.template.format(btn_text=content,
+                                   btn_type=self.btn_type,
+                                   btn_size=self.btn_size,
+                                   btn_extra=self.btn_extra)
+        return out
+
+
 class Panel(Content):
     """
     Basic panel class
@@ -147,52 +193,6 @@ class Link(Content):
         return out
 
 # fixme: resume work here btn-block, diabled, active, active state support
-
-
-class Button(Content):
-    """
-    DPage button class
-    """
-    template = '<!-- start of button -->\n' \
-               '    <button type="button" class="btn {btn_type} {btn_size} {btn_active} {btn_block}" {btn_extra}>\n' \
-               '        {btn_text}\n' \
-               '    </button>\n' \
-               '<!-- end of button -->\n'
-
-    def __init__(self, *content, **kwargs):
-        """
-        Create a button object.
-
-        ex. Button('my first button', '<br/>', 'some more text')   is equivalent to
-            Button(X('my first button', '<br/>', 'some more text'))
-
-        :param content: The content to wrap in a button.
-        :param kwargs:
-            btn_type            The button type.  Defaults to btn-default.
-            btn_size            The button size.  Defaults to bootstrap 3 default size.
-            btn_block           If True, render a block style button.  Default False.
-            btn_extra           RFU
-            template
-            RFU
-        :type kwargs: dict
-        """
-        super(Button, self).__init__()
-        self.content = content
-        self.btn_type = kwargs.pop('btn_type', 'btn-default')
-        self.btn_size = kwargs.pop('btn_size', '')
-        self.btn_block = '' if not kwargs.pop('btn_block', None) else 'btn_block'
-        self.btn_extra = kwargs.pop('btn_extra', '')
-        self.template = kwargs.pop('template', Button.template)
-        self.kwargs = kwargs
-        return
-
-    def render(self):
-        content = render_objects(self.content)
-        out = self.template.format(btn_text=content,
-                                   btn_type=self.btn_type,
-                                   btn_size=self.btn_size,
-                                   btn_extra=self.btn_extra)
-        return out
 
 
 class ButtonModal(Button):

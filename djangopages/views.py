@@ -51,7 +51,7 @@ class DPagesList(DPage):
     """
     title = 'DjangoPages_List'
     description = 'This page: list the available DPages'
-    tags = []
+    tags = ['overview']
 
     def page(self):
         """
@@ -65,9 +65,10 @@ class DPagesList(DPage):
             # get the class definition for this page
             cls = page['cls']
             # make a link button object to execute an instance of the class
-            lnk = Link('/dpages/{name}'.format(name=cls.__name__), 'Run test', button=True)
+            lnk = Link('/dpages/{name}'.format(name=cls.__name__), cls.title)
+            # lnkbtn = Button(lnk, btn_size='btn-xs')
             # Output a line with the link button, test title, and test description
-            line = R(C3((lnk, ' ', cls.title,)), C6(cls.description))
+            line = R(C3(lnk), C6(cls.description))
             out.append(line)
         self.content = out
         return self
@@ -136,6 +137,15 @@ def page_content(dpage, text, content):
     """
     return R(C6(doc_panel(dpage, text)), C6(content_panel(content)))
 
+
+def page_content_v(dpage, text, content):
+    """
+    """
+    return RC(doc_panel(dpage, text),
+              MD('Below is the output for this page.'
+                 '<hr style="box-shadow: 0 0 10px 1px black;">'),
+              content_panel(content))
+
 ########################################################################################################################
 #
 # Development test class based view
@@ -146,7 +156,7 @@ def page_content(dpage, text, content):
 class Test000a(DPage):
     title = 'DjangoPages Concepts'
     description = 'DjangoPages concepts'
-    tags = []
+    tags = ['overview']
 
     def page(self):
         doc = """
@@ -182,7 +192,7 @@ As the examples proceed, they become less verbose and more production oriented.
 class Test000b(DPage):                              # The class name also defines the page's URL
     title = 'DjangoPages Overview'                  # Define the page title
     description = 'DjangoPage overview'             # Set the page's description
-    tags = []                                       # Pages may have tags to facilitate searching
+    tags = ['overview']                             # Pages may have tags to facilitate searching
 
     def page(self):                                 # Override the page method to generate the page's HTML
 
@@ -193,7 +203,7 @@ The source for a DjangoPage generally looks something like this:
     class Test000b(DPage):                              # The class name also defines the page's URL
         title = 'DjangoPages Overview'                  # Define the page title
         description = 'DjangoPage overview'             # Set the page's description
-        tags = []                                       # Pages may have tags to facilitate searching
+        tags = ['overview']                             # Pages may have tags to facilitate searching
 
         def page(self):                                 # Override the page method to generate the page's HTML
 
@@ -230,7 +240,7 @@ tests that follow.
 class Test001a(DPage):
     title = 'Text/HTML'
     description = 'Demonstrate Text/HTML widget'
-    tags = []
+    tags = ['text']
 
     def page(self):
         doc = """
@@ -279,7 +289,7 @@ examples/test.  You can see the responsive behavior by adjusting the browser wid
 class Test001c(DPage):
     title = 'Markdown'
     description = 'Demonstrate Markdown widget'
-    tags = []
+    tags = ['text']
 
     def page(self):
         doc = """
@@ -310,7 +320,7 @@ The Markdown widget accepts Markdown text and renders the HTML equivalent.
 class Test001d(DPage):
     title = 'LI_Paragraph'
     description = 'Demonstrate LI_Paragraph widget'
-    tags = []
+    tags = ['text']
 
     def page(self):
         doc = """
@@ -333,7 +343,7 @@ As a practical matter LI is far more frequently used than LI_Paragraph.
 class Test001e(DPage):
     title = 'LI_Sentence'
     description = 'Demonstrate LI_Sentence widget'
-    tags = []
+    tags = ['text']
 
     def page(self):
         doc = """
@@ -356,7 +366,7 @@ As a practical mater LI is far more frequently used than LI_Sentence.
 class Test001f(DPage):
     title = 'LI'
     description = 'Demonstrate LI widget'
-    tags = []
+    tags = ['text']
 
     def page(self):
         doc = """
@@ -381,7 +391,7 @@ By using amount=[n, n,...] you can control the paragraph length.
 class Test002a(DPage):
     title = 'Multiple widgets on page'
     description = 'Demonstrate multiple widgets on a page'
-    tags = []
+    tags = ['content']
 
     def page(self):
         doc = """
@@ -408,7 +418,7 @@ Multiple widgets can be combined on a page.
 class Test002b(DPage):
     title = 'Simplify content creation'
     description = 'Demonstrate simplified content creation'
-    tags = []
+    tags = ['content']
 
     def page(self):
         doc = """
@@ -446,7 +456,7 @@ Here **content = ...** creates a list of content to include in the page avoiding
 class Test003a(DPage):
     title = 'Bootstrap 3 grids'
     description = 'Demonstrate bootstrap 3 Row and Column layout basics'
-    tags = []
+    tags = ['layout']
 
     def page(self):
         doc = """
@@ -488,7 +498,7 @@ The basic methods are
 class Test003b(DPage):
     title = 'Cn convenienc method'
     description = 'Demonstrate Cn convenience method'
-    tags = []
+    tags = ['layout']
 
     def page(self):
         doc = """
@@ -536,7 +546,7 @@ The basic methods Cn are
 class Test003ca(DPage):
     title = 'RowColumn/RC convenience methods'
     description = 'Demonstrate RowColumn/RC convenience methods'
-    tags = []
+    tags = ['layout']
 
     def page(self):
         doc = """
@@ -577,7 +587,7 @@ of the number of lines of text contained therein.
 class Test003cb(DPage):
     title = 'Multiple columns with XC'
     description = title
-    tags = []
+    tags = ['layout']
 
     def page(self):
         doc = """
@@ -597,7 +607,7 @@ Sometimes it is useful to create multiple columns with a single statement.
 class Test003cc(DPage):
     title = 'Multiple rows with XR'
     description = title
-    tags = []
+    tags = ['layout']
 
     def page(self):
         doc = """
@@ -614,11 +624,12 @@ Sometimes it is useful to create multiple rows with a single statement.
         self.content = page_content(self, doc, content)
         return self
 
+# fixme: resume work here on widgets
 
 class Test003cd(DPage):
-    title = 'Multiple rows/columns with XR and XC'
+    title = 'Buttons'
     description = title
-    tags = []
+    tags = ['buttons']
 
     def page(self):
         doc = """
@@ -645,6 +656,36 @@ XR and XC when used in combination provide an easy self documenting way to creat
         self.content = page_content(self, doc, content)
         return self
 
+
+class Test004a(DPage):
+    title = 'DB driven graphs'
+    description = title
+    tags = []
+
+    def page(self):
+        doc = """
+XR and XC can be used together to easily create complex layouts.
+
+####Code
+    # define the text content
+    text = LI([5], para=False)
+    # row 1 has 2 6 wide columns
+    # row 2 has 3 4 wide columns
+    content = XR(XC6('Row 1 Col 1 '+text, 'Row 1 Col 2 '+text),
+                 XC4('Row 2 Col 1 '+text, 'Row 2 Col 2 '+text, 'Row 2 Col 3 '+text))
+
+XR and XC when used in combination provide an easy self documenting way to create complex layouts.
+        """
+
+        # define the text content
+        text = LI([5], para=False)
+        # row 1 has 2 6 wide columns
+        # row 2 has 3 4 wide columns
+        content = XR(XC6('Row 1 Col 1 '+text, 'Row 1 Col 2 '+text),
+                     XC4('Row 2 Col 1 '+text, 'Row 2 Col 2 '+text, 'Row 2 Col 3 '+text),
+                     XC6('Row 3 Col 1 '+text, XR(XC('Row 3 Col 2 Row 1 '+text, 'Row 3 Col 2 Row 2 '+text))))
+        self.content = page_content_v(self, doc, content)
+        return self
 # todo 1: start here to upgrade examples
 
 
