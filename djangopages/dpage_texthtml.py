@@ -173,10 +173,10 @@ def LI_Sentence(amount=1, para=True):
     :type amount: int
     """
     li = loremipsum.get_sentences(amount)
-    if not para:
-        return li
     out = ''
     for p in li:
         out += ' ' + p
+    if not para:
+        return out
     out = '<p>{}</p>'.format(out)
     return out

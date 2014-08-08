@@ -557,7 +557,6 @@ where
 
 This example illustrates a RC subtlety.
 
-    RC(T(...), T(...))
 
     is equivalent to
 
@@ -575,7 +574,27 @@ of the number of lines of text contained therein.
         return self
 
 
-class Test003cza(DPage):
+class Test003cb(DPage):
+    title = 'Multiple columns with XC'
+    description = title
+    tags = []
+
+    def page(self):
+        doc = """
+Sometimes it is useful to create multiple columns with a single statement.
+
+####Code
+    # define the content
+    content = R(XC4('Column 1', 'Column 2', 'Column3'))
+        """
+
+        # define the content
+        content = R(XC4('Column 1', 'Column 2', 'Column3'))
+        self.content = page_content(self, doc, content)
+        return self
+
+
+class Test003cc(DPage):
     title = 'Multiple rows with XR'
     description = title
     tags = []
@@ -584,11 +603,6 @@ class Test003cza(DPage):
         doc = """
 Sometimes it is useful to create multiple rows with a single statement.
 
-
-Some of these convenience methods are rather advanced and as a practical matter probably shouldn't
-generally be used as there exact meaning is not clear at a glance.  However, if you need them they
-are available.
-
 ####Code
     # define the content
     content = XR(C('Row 1'), C('Row 2'), C(MD('####Markdown Row 3')))
@@ -601,149 +615,34 @@ are available.
         return self
 
 
-class Test003cb(DPage):
-    title = 'Multiple rows/columns with XRC'
+class Test003cd(DPage):
+    title = 'Multiple rows/columns with XR and XC'
     description = title
     tags = []
 
     def page(self):
         doc = """
-XR is useful, but most of the time you will really want XRC so you needn't define all the columns.
-
-Some of these convenience methods are rather advanced and as a practical matter probably shouldn't
-generally be used as there exact meaning is not clear at a glance.  However, if you need them they
-are available.
+XR and XC can be used together to easily create complex layouts.
 
 ####Code
-    # define the content
-    content = XR(C('Row 1'), C('Row 2'), C(MD('####Markdown Row 3')))
+    # define the text content
+    text = LI([5], para=False)
+    # row 1 has 2 6 wide columns
+    # row 2 has 3 4 wide columns
+    content = XR(XC6('Row 1 Col 1 '+text, 'Row 1 Col 2 '+text),
+                 XC4('Row 2 Col 1 '+text, 'Row 2 Col 2 '+text, 'Row 2 Col 3 '+text))
+
+XR and XC when used in combination provide an easy self documenting way to create complex layouts.
         """
 
-        # define the content
-        content = XR(C('Row 1'), C('Row 2'), C(MD('####Markdown Row 3')))
-        # content = (R(C('Row 1')), R(C('Row 2')), R(C(MD('####Markdown Row 3'))))
+        # define the text content
+        text = LI([5], para=False)
+        # row 1 has 2 6 wide columns
+        # row 2 has 3 4 wide columns
+        content = XR(XC6('Row 1 Col 1 '+text, 'Row 1 Col 2 '+text),
+                     XC4('Row 2 Col 1 '+text, 'Row 2 Col 2 '+text, 'Row 2 Col 3 '+text),
+                     XC6('Row 3 Col 1 '+text, XR(XC('Row 3 Col 2 Row 1 '+text, 'Row 3 Col 2 Row 2 '+text))))
         self.content = page_content(self, doc, content)
-        return self
-
-
-class Test003d(DPage):
-    title = 'R and C complex layouts'
-    description = 'Row and Column details'
-    tags = []
-
-    def page(self):
-        doc = """
-Row and Column can be used to create arbitrarily complex responsive bootstrap 3 layouts.
-
-Here is the code to create a row with two columns of width 6.
-
-* The left column contains this description in a panel (code not shown).
-* The right column contains a panel with two rows
-    * Row 1 contains a 5 sentence LI paragraph
-    * Row 2 contains 2 columns of width 6 (Note: bootstrap 3 creates a 12 wide grid in each grid cell)
-        * The left column contains two LI paragraphs
-        * The right column contains a single LI paragraph
-
-####Code
-    # define the content
-    r1 = LI([5])                    # text for row 1
-    r2c1 = LI([3, 2])               # text for row 2 column 1
-    r2c2 = LI(1)                    # text for row 2 column 2
-
-    # create layout for panel content
-    content_panel = (R(C(r1)), R(X(C6(r2c1), C6(r2c2))))
-    panel = Panel(content_panel, heading=Markdown('###Output'))
-    self.content = R(C6(doc), C6(panel))
-    return self
-        """
-
-        # define the content
-        r1 = LI([5])                    # text for row 1
-        r2c1 = LI([3, 2])               # text for row 2 column 1
-        r2c2 = LI(1)                    # text for row 2 column 2
-
-        # create layout for panel content
-        content_panel = (R(C(r1)), R(X(C6(r2c1), C6(r2c2))))
-        panel = Panel(content_panel, heading=Markdown('###Output'))
-        self.content = R(C6(doc), C6(panel))
-        return self
-
-
-class Test003e(DPage):
-    """
-    Complex render test
-    """
-    title = 'Complex layout'
-    description = 'Demonstrate complex row/column layout'
-    tags = []
-
-    def page(self):
-        """
-        Override
-        """
-        intro = Markdown("""
-**DjangoPages** easily creates complex bootstrap layouts with multiple rows and multiple columns per row.
-
-    def page(self):
-        # Create some page content
-        x1 = Text('Row 1: This text comes from dpage.Text')
-        x21 = Markdown('Row 2 col 1: **Bold Markdown Text**')
-        x22 = HTML('<p>Row 2 col 2: </p>')
-        x3 = HTML('<p>Row 3: Text from loremipsum. {}</p>'.format(LI()))    # LI generates loremipsum text
-        x41 = HTML('<p>Row 4 col 1:{}</p>'.format(LI()))
-        x42 = HTML('<p>Row 4 col 2:{}</p>'.format(LI()))
-        x51 = HTML('<p>Row 5 col 1:{}</p>'.format(LI()))
-        x521 = HTML('<p>Row 5 col 2 row 1:{}</p>'.format(LI()))
-        x522 = HTML('<p>Row 5 col 2 row 2:{}</p>'.format(LI()))
-        x5231 = HTML('<p>Row 5 col 2 row 3 col 1: {}</p>'.format(LI()))
-        x5232 = HTML('<p>Row 5 col 2 row 3 col 2: {}</p>'.format(LI()))
-        x5233 = HTML('<p>Row 5 col 2 row 3 col 3: {}</p>'.format(LI()))
-
-        # Layout the content on the page. This layout generates roughly 200 lines of Bootstrap 3 html!
-        self.content = (RC(x1),                         # row with 1 full width column
-                        RC6(x21, x22),                  # row with 2 column each is 6 wide
-                        RC(x3),                         # row with 1 full width column
-                        R(C3(x41), C9(x42)),           # row with 1 column 3 wide and 1 column 9 wide
-                        R(C3(x51), C9(RC(x521),        # row with 1 column 3 wide and 1 column 9 wide
-                                                        # 9 wide column has 3 rows, the last of chich has 3 columns
-                                       RC(x522),
-                                       R(C4(x5231), C4(x5232), C4(x5233))
-                                       )
-                           )
-                        )
-        return self
-
-Below is the output for this page.
-<hr style="box-shadow: 0 0 10px 1px black;">
-        """)
-
-        # Create some page content
-        x1 = Markdown('Row 1: Some text on row 1')
-        x21 = Markdown('Row 2 col 1: **Bold Markdown Text**')
-        x22 = HTML('<p>Row 2 col 2: </p>')
-        x3 = HTML('<p>Row 3: Text from loremipsum. {}</p>'.format(LI()))
-        x41 = HTML('<p>Row 4 col 1:{}</p>'.format(LI()))
-        x42 = HTML('<p>Row 4 col 2:{}</p>'.format(LI()))
-        x51 = HTML('<p>Row 5 col 1:{}</p>'.format(LI()))
-        x521 = HTML('<p>Row 5 col 2 row 1:{}</p>'.format(LI()))
-        x522 = HTML('<p>Row 5 col 2 row 2:{}</p>'.format(LI()))
-        x5231 = HTML('<p>Row 5 col 2 row 3 col 1: {}</p>'.format(LI()))
-        x5232 = HTML('<p>Row 5 col 2 row 3 col 2: {}</p>'.format(LI()))
-        x5233 = HTML('<p>Row 5 col 2 row 3 col 3: {}</p>'.format(LI()))
-
-        # Layout the content on the page. This layout generates roughly 200 lines of Bootstrap 3 html!
-        self.content = (RC(intro),                      # output the intro
-                        RC(x1),                         # row with 1 full width column
-                        RC6(x21, x22),                  # row with 2 column each is 6 wide
-                        RC(x3),                         # row with 1 full width column
-                        R(C3(x41), C9(x42)),           # row with 1 column 3 wide and 1 column 9 wide
-                        R(C3(x51), C9(RC(x521),        # row with 1 column 3 wide and 1 column 9 wide
-                                                        # 9 wide column has 3 rows, the last of chich has 3 columns
-                                       RC(x522),
-                                       R(C4(x5231), C4(x5232), C4(x5233))
-                                       )
-                           )
-                        )
         return self
 
 # todo 1: start here to upgrade examples
