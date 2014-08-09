@@ -49,8 +49,8 @@ class DPagesList(DPage):
     """
     Page to list DPages
     """
-    title = 'DjangoPages_List'
-    description = 'This page: list the available DPages'
+    title = 'DjangoPages List'
+    description = 'List the test/demo DPages'
     tags = ['overview']
 
     def page(self):
@@ -59,7 +59,6 @@ class DPagesList(DPage):
         """
         # noinspection PyUnresolvedReferences
         pages = DPage.pages_list
-        pages = sorted(pages, key=lambda x: x['name'])
         out = []
         for page in pages:
             # get the class definition for this page
@@ -153,7 +152,7 @@ def page_content_v(dpage, text, content):
 ########################################################################################################################
 
 
-class Test000a(DPage):
+class DpageConcepts1(DPage):
     title = 'DjangoPages Concepts'
     description = 'DjangoPages concepts'
     tags = ['overview']
@@ -189,7 +188,7 @@ As the examples proceed, they become less verbose and more production oriented.
         return self
 
 
-class Test000b(DPage):                              # The class name also defines the page's URL
+class DpageConcepts2(DPage):                        # The class name also defines the page's URL
     title = 'DjangoPages Overview'                  # Define the page title
     description = 'DjangoPage overview'             # Set the page's description
     tags = ['overview']                             # Pages may have tags to facilitate searching
@@ -237,7 +236,7 @@ tests that follow.
         return self
 
 
-class Test001a(DPage):
+class TestTextHTML(DPage):
     title = 'Text/HTML'
     description = 'Demonstrate Text/HTML widget'
     tags = ['text']
@@ -286,7 +285,7 @@ examples/test.  You can see the responsive behavior by adjusting the browser wid
         return self
 
 
-class Test001c(DPage):
+class TestMarkdown(DPage):
     title = 'Markdown'
     description = 'Demonstrate Markdown widget'
     tags = ['text']
@@ -317,7 +316,8 @@ The Markdown widget accepts Markdown text and renders the HTML equivalent.
         return self
 
 
-class Test001d(DPage):
+# noinspection PyPep8Naming
+class TestLI_Paragraph(DPage):
     title = 'LI_Paragraph'
     description = 'Demonstrate LI_Paragraph widget'
     tags = ['text']
@@ -340,7 +340,8 @@ As a practical matter LI is far more frequently used than LI_Paragraph.
         return self
 
 
-class Test001e(DPage):
+# noinspection PyPep8Naming
+class TestLI_Sentence(DPage):
     title = 'LI_Sentence'
     description = 'Demonstrate LI_Sentence widget'
     tags = ['text']
@@ -363,7 +364,7 @@ As a practical mater LI is far more frequently used than LI_Sentence.
         return self
 
 
-class Test001f(DPage):
+class TestLI(DPage):
     title = 'LI'
     description = 'Demonstrate LI widget'
     tags = ['text']
@@ -388,7 +389,7 @@ By using amount=[n, n,...] you can control the paragraph length.
         return self
 
 
-class Test002a(DPage):
+class TestMultipleWidgets(DPage):
     title = 'Multiple widgets on page'
     description = 'Demonstrate multiple widgets on a page'
     tags = ['content']
@@ -415,7 +416,7 @@ Multiple widgets can be combined on a page.
         return self
 
 
-class Test002b(DPage):
+class TestContent(DPage):
     title = 'Simplify content creation'
     description = 'Demonstrate simplified content creation'
     tags = ['content']
@@ -453,8 +454,8 @@ Here **content = ...** creates a list of content to include in the page avoiding
         return self
 
 
-class Test003a(DPage):
-    title = 'Bootstrap 3 grids'
+class TestRowColumn(DPage):
+    title = 'Bootstrap 3 Row/Column'
     description = 'Demonstrate bootstrap 3 Row and Column layout basics'
     tags = ['layout']
 
@@ -495,7 +496,7 @@ The basic methods are
         return self
 
 
-class Test003b(DPage):
+class TestCn(DPage):
     title = 'Cn convenienc method'
     description = 'Demonstrate Cn convenience method'
     tags = ['layout']
@@ -543,7 +544,7 @@ The basic methods Cn are
         return self
 
 
-class Test003ca(DPage):
+class TestRC(DPage):
     title = 'RowColumn/RC convenience methods'
     description = 'Demonstrate RowColumn/RC convenience methods'
     tags = ['layout']
@@ -584,7 +585,7 @@ of the number of lines of text contained therein.
         return self
 
 
-class Test003cb(DPage):
+class TextXC(DPage):
     title = 'Multiple columns with XC'
     description = title
     tags = ['layout']
@@ -604,7 +605,7 @@ Sometimes it is useful to create multiple columns with a single statement.
         return self
 
 
-class Test003cc(DPage):
+class TestXR(DPage):
     title = 'Multiple rows with XR'
     description = title
     tags = ['layout']
