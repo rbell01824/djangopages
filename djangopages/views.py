@@ -64,10 +64,12 @@ class DPagesList(DPage):
             # get the class definition for this page
             cls = page['cls']
             # make a link button object to execute an instance of the class
-            lnk = Link('/dpages/{name}'.format(name=cls.__name__), cls.title)
+            lnk = Link('/dpages/{name}'.format(name=cls.__name__), cls.title,
+                       button='btn-primary btn-xs btn-block',
+                       style='margin-top:5px; text-align:left;')
             # lnkbtn = Button(lnk, btn_size='btn-xs')
             # Output a line with the link button, test title, and test description
-            line = R(C3(lnk), C6(cls.description))
+            line = R(X(C3(lnk), C6(cls.description)))
             out.append(line)
         self.content = out
         return self
@@ -134,16 +136,18 @@ def content_panel(content):
 def page_content(dpage, text, content):
     """
     """
-    return R(C6(doc_panel(dpage, text)), C6(content_panel(content)))
+    doc = doc_panel(dpage, text)
+    content = content_panel(content)
+    return R(X(C6(doc), C6(content)))
 
 
 def page_content_v(dpage, text, content):
     """
     """
-    return RC(doc_panel(dpage, text),
-              MD('Below is the output for this page.'
-                 '<hr style="box-shadow: 0 0 10px 1px black;">'),
-              content_panel(content))
+    return R(C(X(doc_panel(dpage, text),
+                 MD('Below is the output for this page.'
+                    '<hr style="box-shadow: 0 0 10px 1px black;">'),
+                 content_panel(content))))
 
 ########################################################################################################################
 #
@@ -153,8 +157,8 @@ def page_content_v(dpage, text, content):
 
 
 class DpageConcepts1(DPage):
-    title = 'DjangoPages Concepts'
-    description = 'DjangoPages concepts'
+    title = 'Overview: DjangoPages Concepts'
+    description = title
     tags = ['overview']
 
     def page(self):
@@ -189,8 +193,8 @@ As the examples proceed, they become less verbose and more production oriented.
 
 
 class DpageConcepts2(DPage):                        # The class name also defines the page's URL
-    title = 'DjangoPages Overview'                  # Define the page title
-    description = 'DjangoPage overview'             # Set the page's description
+    title = 'Overview: DjangoPages Definition'      # Define the page title
+    description = title                             # Set the page's description
     tags = ['overview']                             # Pages may have tags to facilitate searching
 
     def page(self):                                 # Override the page method to generate the page's HTML
@@ -200,8 +204,8 @@ class DpageConcepts2(DPage):                        # The class name also define
 The source for a DjangoPage generally looks something like this:
 
     class Test000b(DPage):                              # The class name also defines the page's URL
-        title = 'DjangoPages Overview'                  # Define the page title
-        description = 'DjangoPage overview'             # Set the page's description
+        title = 'Overview: DjangoPages Definition'      # Define the page title
+        description = title                             # Set the page's description
         tags = ['overview']                             # Pages may have tags to facilitate searching
 
         def page(self):                                 # Override the page method to generate the page's HTML
@@ -237,18 +241,24 @@ tests that follow.
 
 
 class TestTextHTML(DPage):
-    title = 'Text/HTML'
-    description = 'Demonstrate Text/HTML widget'
+    title = 'Text: Text/HTML'
+    description = 'Demonstrate ' + title
     tags = ['text']
 
     def page(self):
         doc = """
+Text(content_1, ...)
+T(content_1, ...)
+HTML(content_1, ...)
+
+ * contents: text to output
+
 The Text and HTML widgets simply output their content.  They do not add an HTML wrapper.
 
  * Multiple content is concatenated.
  * Text, T, and HTML can be used interchangeably.
  * If content is an object, the output of it's render method is used.  This allows
-   inclusion of the output of other DjangoPage widgets.
+   inclusion of the output of other DjangoPage widgets, ex. Markdown.
 
 ####Code
     content = Text('This is some Text content. ',
@@ -286,16 +296,20 @@ examples/test.  You can see the responsive behavior by adjusting the browser wid
 
 
 class TestMarkdown(DPage):
-    title = 'Markdown'
-    description = 'Demonstrate Markdown widget'
+    title = 'Text: Markdown'
+    description = 'Demonstrate ' + title
     tags = ['text']
 
     def page(self):
         doc = """
-The Markdown widget accepts Markdown text and renders the HTML equivalent.
 
- * Multiple content is concatenated.
- * If content is an object, it's render method is called and the output concatenated.
+Markdown(*content, **kwargs)
+
+ * content: markdown text
+ * kwargs: keyword args
+    * extensions: markdown extensions
+
+Markdown renders markdown text.  Note it may also contain HTML.
 
 ####Code
     content = Markdown('###Markdown h3',
@@ -318,8 +332,8 @@ The Markdown widget accepts Markdown text and renders the HTML equivalent.
 
 # noinspection PyPep8Naming
 class TestLI_Paragraph(DPage):
-    title = 'LI_Paragraph'
-    description = 'Demonstrate LI_Paragraph widget'
+    title = 'Text: LI_Paragraph'
+    description = 'Demonstrate ' + title
     tags = ['text']
 
     def page(self):
@@ -342,8 +356,8 @@ As a practical matter LI is far more frequently used than LI_Paragraph.
 
 # noinspection PyPep8Naming
 class TestLI_Sentence(DPage):
-    title = 'LI_Sentence'
-    description = 'Demonstrate LI_Sentence widget'
+    title = 'Text: LI_Sentence'
+    description = 'Demonstrate ' + title
     tags = ['text']
 
     def page(self):
@@ -365,8 +379,8 @@ As a practical mater LI is far more frequently used than LI_Sentence.
 
 
 class TestLI(DPage):
-    title = 'LI'
-    description = 'Demonstrate LI widget'
+    title = 'Text: LI'
+    description = 'Demonstrate ' + title
     tags = ['text']
 
     def page(self):
@@ -389,9 +403,38 @@ By using amount=[n, n,...] you can control the paragraph length.
         return self
 
 
+class TestBRSP(DPage):
+    title = 'Text: BR & SP'
+    description = 'Demonstrate ' + title
+    tags = ['text']
+
+    def page(self):
+        doc = """
+Sometimes it is useful to output multiple spaces or new lines.
+
+ * BR(amount=1)
+    * amount: number of &lt;br/&gt; to output
+ * SP(amount=1)
+    * amount: number of &amp;nbsp; to output
+
+####Code
+    content = (R(C(MD('####SP'))),
+               R(C(('two', SP(), 'words'))),
+               R(C(MD('####BR'))),
+               R(C(('two', BR(), 'lines'))))
+        """
+
+        content = (R(C(MD('####SP'))),
+                   R(C(('two', SP(), 'words'))),
+                   R(C(MD('####BR'))),
+                   R(C(('two', BR(), 'lines'))))
+        self.content = page_content(self, doc, content)
+        return self
+
+
 class TestMultipleWidgets(DPage):
-    title = 'Multiple widgets on page'
-    description = 'Demonstrate multiple widgets on a page'
+    title = 'Content: Multiple widgets on page'
+    description = 'Demonstrate ' + title
     tags = ['content']
 
     def page(self):
@@ -417,8 +460,8 @@ Multiple widgets can be combined on a page.
 
 
 class TestContent(DPage):
-    title = 'Simplify content creation'
-    description = 'Demonstrate simplified content creation'
+    title = 'Content: Simplify content creation'
+    description = 'Demonstrate ' + title
     tags = ['content']
 
     def page(self):
@@ -455,98 +498,107 @@ Here **content = ...** creates a list of content to include in the page avoiding
 
 
 class TestRowColumn(DPage):
-    title = 'Bootstrap 3 Row/Column'
-    description = 'Demonstrate bootstrap 3 Row and Column layout basics'
+    title = 'Layout: Bootstrap 3 Row/Column'
+    description = 'Demonstrate ' + title
     tags = ['layout']
 
     def page(self):
         doc = """
-Row and Column can be used to create responsive bootstrap 3 page grid layouts.
+ * Row(content, classes='', style='', template=None)
+ * R(...)
+     * content: the row content
+     * classes: other class for the widget
+     * style: styles for the widget
+     * template: override default template
+ * Column(content, width=12, classes='', style='', template=None)
+ * C(...)
+     * content: the column content
+     * classes: other class for the widget
+     * style: styles for the widget
+     * template: override default template
 
-The basic methods are
+Row and Column can be used to create responsive bootstrap 3 page grid layouts. They are mutually nestable, ie.
 
- * Row(content, ...) to create a bootstrap 3 row
-     * content is the content to place in the row
- * R(content, ...) convenience synonym for Row
- * Column(content, ..., [width=n]) to create a bootstrap 3 column of width n.
-     * content is the content to place in the column
-     * width is the bootstrap 3 width, default 12
- * C(content, ..., [width=n]) convenience synonym for Column
  * Rows may contain multiple columns
  * Columns may contain multiple rows
 
 #### Code
     # Create some text for two rows
-    row1 = MD('####Text in row 1')
-    row2col1 = MD('####Text in row 2 column 1')
-    row2col2 = MD('####Text in row 2 column 2')
+    text = LI([5], para=False)
+    row1 = ('**Text in row 1** ' + text)
+    row2col1 = '**Text in row 2 col 1**' + text
+    row2col2 = '**Text in row 2 col 2**' + text
 
     content = (Row(Column(row1)),                                   # with Row & Column
-               R(C(row2col1, width=6), C(row2col2, width=6)))       # with R & C
+               R((C(row2col1, width=6), C(row2col2, width=6))))     # with R & C
         """
 
         # Create some text for two rows
-        row1 = MD('####Text in row 1')
-        row2col1 = MD('####Text in row 2 column 1')
-        row2col2 = MD('####Text in row 2 column 2')
+        text = LI([5], para=False)
+        row1 = ('**Text in row 1** ' + text)
+        row2col1 = '**Text in row 2 col 1**' + text
+        row2col2 = '**Text in row 2 col 2**' + text
 
         content = (Row(Column(row1)),                                   # with Row & Column
-                   R(C(row2col1, width=6), C(row2col2, width=6)))       # with R & C
+                   R((C(row2col1, width=6), C(row2col2, width=6))))     # with R & C
         self.content = page_content(self, doc, content)
         return self
 
 
 class TestCn(DPage):
-    title = 'Cn convenienc method'
-    description = 'Demonstrate Cn convenience method'
+    title = 'Layout: Cn convenienc method'
+    description = 'Demonstrate ' + title
     tags = ['layout']
 
     def page(self):
         doc = """
-The Cn family of methods may be used to define columns if bootstrap width n.
+The Cn family of methods may be used to define columns with a width of n.
 
 The basic methods Cn are
 
- * C = functools.partial(column)
- * C1 = functools.partial(column, width=1)
- * C2 = functools.partial(column, width=2)
- * C3 = functools.partial(column, width=3)
- * C4 = functools.partial(column, width=4)
- * C5 = functools.partial(column, width=5)
- * C6 = functools.partial(column, width=6)
- * C7 = functools.partial(column, width=7)
- * C8 = functools.partial(column, width=8)
- * C9 = functools.partial(column, width=9)
- * c10 = functools.partial(column, width=10)
- * c11 = functools.partial(column, width=11)
- * C12 = functools.partial(column, width=12)
+ * C = functools.partial(Column)
+ * C1 = functools.partial(Column, width=1)
+ * C2 = functools.partial(Column, width=2)
+ * C3 = functools.partial(Column, width=3)
+ * C4 = functools.partial(Column, width=4)
+ * C5 = functools.partial(Column, width=5)
+ * C6 = functools.partial(Column, width=6)
+ * C7 = functools.partial(Column, width=7)
+ * C8 = functools.partial(Column, width=8)
+ * C9 = functools.partial(Column, width=9)
+ * c10 = functools.partial(Column, width=10)
+ * c11 = functools.partial(Column, width=11)
+ * C12 = functools.partial(Column, width=12)
 
 #### Code
     # Create some text for two rows
-    row1 = MD('####Text in row 1')
-    row2col1 = MD('####Text in row 2: Column 1')
-    row2col2 = MD('####Column 2')
-    row2col3 = MD('####Column 3')
+    text = LI([5], para=False)
+    row1 = ('**Text in row 1** ' + text)
+    row2col1 = '**Text in row 2 col 1**' + text
+    row2col2 = '**Text in row 2 col 2**' + text
+    row2col3 = '**Text in row 2 col 3**' + text
 
-    content = (Row(Column(row1)),                                   # with Row & Column
-               R(C4(row2col1), C4(row2col2), C4(row2col3)))         # with R & C4
+    content = (R(C(row1)),                                          # with R & C
+               R(X(C4(row2col1), C4(row2col2), C4(row2col3))))      # with R & C4
         """
 
         # Create some text for two rows
-        row1 = MD('####Text in row 1')
-        row2col1 = MD('####Text in row 2: Column 1')
-        row2col2 = MD('####Column 2')
-        row2col3 = MD('####Column 3')
+        text = LI([5], para=False)
+        row1 = ('**Text in row 1** ' + text)
+        row2col1 = '**Text in row 2 col 1**' + text
+        row2col2 = '**Text in row 2 col 2**' + text
+        row2col3 = '**Text in row 2 col 3**' + text
 
-        content = (Row(Column(row1)),                                   # with Row & Column
-                   R(C4(row2col1), C4(row2col2), C4(row2col3)))         # with R & C4
+        content = (R(C(row1)),                                          # with R & C
+                   R(X(C4(row2col1), C4(row2col2), C4(row2col3))))      # with R & C4
         self.content = page_content(self, doc, content)
         return self
 
+# fixme: resume work here
 
 class TestRC(DPage):
-    title = 'RowColumn/RC convenience methods'
-    description = 'Demonstrate RowColumn/RC convenience methods'
+    title = 'Layout: RowColumn/RC convenience methods'
+    description = 'Demonstrate ' + title
     tags = ['layout']
 
     def page(self):
@@ -586,8 +638,8 @@ of the number of lines of text contained therein.
 
 
 class TextXC(DPage):
-    title = 'Multiple columns with XC'
-    description = title
+    title = 'Layout: Multiple columns with XC'
+    description = 'Demonstrate ' + title
     tags = ['layout']
 
     def page(self):
@@ -606,8 +658,8 @@ Sometimes it is useful to create multiple columns with a single statement.
 
 
 class TestXR(DPage):
-    title = 'Multiple rows with XR'
-    description = title
+    title = 'Layout: Multiple rows with XR'
+    description = 'Demonstrate ' + title
     tags = ['layout']
 
     def page(self):
@@ -625,42 +677,135 @@ Sometimes it is useful to create multiple rows with a single statement.
         self.content = page_content(self, doc, content)
         return self
 
-# fixme: resume work here on widgets
+# todo 1: go back and update the test doc to be like TestGlyphicons
 
-class Test003cd(DPage):
-    title = 'Buttons'
-    description = title
-    tags = ['buttons']
+
+class TestGlyphicons(DPage):
+    title = 'Glyphicons'
+    description = 'Demonstrate ' + title
+    tags = ['glyphicons', 'text']
 
     def page(self):
         doc = """
-XR and XC can be used together to easily create complex layouts.
+Gliphicon(content, classes='', style='', template=None)
+GL(content, classes='', style='', template=None)
+
+ * content: the glypy name, ex. star is glyphicon-star.
+ * classes: other class for the widget
+ * style: styles for the widget
+ * template: override default template
 
 ####Code
-    # define the text content
-    text = LI([5], para=False)
-    # row 1 has 2 6 wide columns
-    # row 2 has 3 4 wide columns
-    content = XR(XC6('Row 1 Col 1 '+text, 'Row 1 Col 2 '+text),
-                 XC4('Row 2 Col 1 '+text, 'Row 2 Col 2 '+text, 'Row 2 Col 3 '+text))
-
-XR and XC when used in combination provide an easy self documenting way to create complex layouts.
+    # define the content
+    content = XR(XC(Glyphicon('star'),
+                    GL('heart')))
         """
 
-        # define the text content
-        text = LI([5], para=False)
-        # row 1 has 2 6 wide columns
-        # row 2 has 3 4 wide columns
-        content = XR(XC6('Row 1 Col 1 '+text, 'Row 1 Col 2 '+text),
-                     XC4('Row 2 Col 1 '+text, 'Row 2 Col 2 '+text, 'Row 2 Col 3 '+text),
-                     XC6('Row 3 Col 1 '+text, XR(XC('Row 3 Col 2 Row 1 '+text, 'Row 3 Col 2 Row 2 '+text))))
+        # define the content
+        content = XR(XC(Glyphicon('star'),
+                        GL('heart')))
         self.content = page_content(self, doc, content)
         return self
 
 
+class TestButton(DPage):
+    title = 'Buttons'
+    description = 'Demonstrate ' + title
+    tags = ['buttons']
+
+    def page(self):
+        doc = """
+Button(content, btn_extras='', disabled=False, classes='', style='', template=None)
+
+ * content: text of the widget
+ * btn_extras: bootstrap 3 btn- classes
+ * disabled: disabled
+ * classes: other class for the widget
+ * style: styles for the widget
+ * template: override default template
+
+####Code
+    # define content objects
+    r1 = Button('Button')                                               # basic
+    r2 = (BR(),
+          Button('Large', btn_extras='btn-lg'),                         # large
+          Button('XS Success', btn_extras='btn-xs btn-success'))        # XS success
+    r3 = (BR(), Button('Block with red text',
+                       btn_extras='btn-block', style='color:red;'))     # block red
+    r4 = (BR(), Button((GL('star'), 'Star Button'),
+                       btn_extras='btn-primary'))                       # primary glyph
+    r5 = (BR(), Button('Disabled', disabled=True))                      # disabled
+    r6 = Button('Warning with style',
+                btn_extras='btn-warning',
+                style='color:white; width:200px;margin-top:5px;')       # styles
+
+    # put into layout
+    content = XR(XC(r1, r2, r3, r4, r5, r6))
+        """
+
+        # define content objects
+        r1 = Button('Button')                                               # basic
+        r2 = (BR(),
+              Button('Large', btn_extras='btn-lg'),                         # large
+              Button('XS Success', btn_extras='btn-xs btn-success'))        # XS success
+        r3 = (BR(), Button('Block with red text',
+                           btn_extras='btn-block', style='color:red;'))     # block red
+        r4 = (BR(), Button((GL('star'), 'Star Button'),
+                           btn_extras='btn-primary'))                       # primary glyph
+        r5 = (BR(), Button('Disabled', disabled=True))                      # disabled
+        r6 = Button('Warning with style',
+                    btn_extras='btn-warning',
+                    style='color:white; width:200px;margin-top:5px;')       # styles
+
+        # put into layout
+        content = XR(XC(r1, r2, r3, r4, r5, r6))
+        self.content = page_content(self, doc, content)
+        return self
+
+
+class TestLink(DPage):
+    title = 'Link'
+    description = 'Demonstrate ' + title
+    tags = ['link']
+
+    def page(self):
+        doc = """
+Link(href, content, button='', classes='', style='', template=None)
+
+ * href: link href
+ * content: link content
+ * button: button classes, ex. 'btn-success btn-sm'
+ * classes: other class for the widget
+ * style: styles for the widget
+ * template: override default template
+
+####Code
+    # define content objects
+    r1 = Link('/dpages/DPagesList', 'Link to DPagesList')
+    r2 = Link('/dpages/DPagesList', 'Button link to DPagesList', button=True)
+    r3 = Link('#', 'Button style', button='btn-success btn-sm',
+              style='color:white;width:200px;margin-top:5px;')
+
+    # put into layout
+    content = XR(XC(r1, r2, r3))
+        """
+
+        # define content objects
+        r1 = Link('/dpages/DPagesList', 'Link to DPagesList')
+        r2 = Link('/dpages/DPagesList', 'Button link to DPagesList', button='btn-info btn-xs')
+        r3 = Link('#', 'Button style', button='btn-success btn-sm',
+                  style='color:white;width:200px;margin-top:5px;')
+
+        # put into layout
+        content = XR(XC(r1, r2, r3))
+        self.content = page_content(self, doc, content)
+        return self
+
+# fixme: resume work here on widgets
+
 class Test004a(DPage):
     title = 'DB driven graphs'
-    description = title
+    description = 'Demonstrate ' + title
     tags = []
 
     def page(self):
@@ -1151,9 +1296,9 @@ class Test09(DPage):
         ###################
         # Create a button panel
         ###################
-        pn = Panel(node_tit, node_tbl)
+        pn = Panel(X(node_tit, node_tbl))
         bpn = ButtonPanel('Open the node panel', pn)
-        pc = Panel(company_tit, company_tbl)
+        pc = Panel(X(company_tit, company_tbl))
         bpc = ButtonPanel('Open the company panel', pc)
 
         ###################

@@ -167,7 +167,11 @@ class Content(object):
 
     Content classes provide content for DPage.  See the examples in the code.
     """
-    def __init__(self):
+    def __init__(self, content='', classes='', style='', template=None):
+        self.content = content
+        self.classes = classes
+        self.style = style
+        self.template = template if template else self.template
         pass
 
     def render(self):
@@ -175,6 +179,18 @@ class Content(object):
         Render this content object.
         """
         raise NotImplementedError("Subclasses should implement Content.render!")
+
+    def render_setup(self, extra_classes='', extra_style=''):
+        content = render_objects(self.content)
+        classes = ''
+        if self.classes or extra_classes:
+            classes = 'class="{} {}"'.format(self.classes, extra_classes)
+        style = ''
+        if self.style or extra_style:
+            style = 'style="{}"'.format(self.style)
+        template = self.template
+        return content, classes, style, template
+
 
 ########################################################################################################################
 #

@@ -36,7 +36,7 @@ from django.utils.encoding import force_unicode
 ########################################################################################################################
 
 
-class Text(Content):
+class Text(object):
     """
     Renders content to the page.
 
@@ -44,20 +44,16 @@ class Text(Content):
     Accepts (<content>, <content>, ... ).
     """
 
-    def __init__(self, *content, **kwargs):
+    def __init__(self, *content):
         """
-            Create text object and initialize it.
-            :param content: The content text or object list.
-            :type content: unicode or obj or list
-            :param kwargs: RFU
-            :type kwargs: dict
+        Create text object and initialize it.
+        :param content: The content text or object list.
         """
         super(Text, self).__init__()
         self.content = content
-        self.kwargs = kwargs
         return
 
-    def render(self, **kwargs):
+    def render(self):
         """
         Render the Text object
         :param kwargs: RFU
@@ -68,19 +64,10 @@ class Text(Content):
             if isinstance(obj, basestring):
                 out += obj
             else:
-                out += render_objects(obj, **kwargs)
+                out += render_objects(obj)
         return out
 T = functools.partial(Text)
-
-
-class HTML(Text):
-    """
-    Syntactic sugar for Text.  HTML can make the text a bit clearer.
-    """
-
-    def __init__(self, *content, **kwargs):
-        super(HTML, self).__init__(*content, **kwargs)
-        return
+HTML = functools.partial(Text)
 
 
 class Markdown(object):
@@ -180,3 +167,27 @@ def LI_Sentence(amount=1, para=True):
         return out
     out = '<p>{}</p>'.format(out)
     return out
+
+
+# noinspection PyPep8Naming
+def BR(amount=1):
+    """
+    amount <br />
+    :param amount:
+    :return:
+    """
+    return '<br />'*amount
+
+
+# noinspection PyPep8Naming
+def SP(amount=1):
+    """
+    Amount spaces.
+    :param amount:
+    :return:
+    """
+    return '&nbsp;'*amount
+
+
+# todo 2: add html sysbols see http://www.w3schools.com/html/html_entities.asp and subsequent pages
+

@@ -30,6 +30,8 @@ __version__ = '0.1'
 __maintainer__ = 'rbell01824'
 __email__ = 'rbell01824@gmail.com'
 
+import functools
+
 from django.template import Template
 from django.template import Context
 from django.core.context_processors import csrf
@@ -57,44 +59,80 @@ class Button(Content):
     DPage button class
     """
     template = '<!-- start of button -->\n' \
-               '    <button type="button" class="btn {btn_type} {btn_size} {btn_active} {btn_block}" {btn_extra}>\n' \
-               '        {btn_text}\n' \
+               '    <button type="button" {classes} {disabled} {style}>\n' \
+               '        {content}\n' \
                '    </button>\n' \
                '<!-- end of button -->\n'
 
-    def __init__(self, *content, **kwargs):
+    def __init__(self, content, btn_extras='', disabled=False, classes='', style='', template=None):
         """
         Create a button object.
-
-        ex. Button('my first button', '<br/>', 'some more text')   is equivalent to
-            Button(X('my first button', '<br/>', 'some more text'))
-
-        :param content: The content to wrap in a button.
-        :param kwargs:
-            btn_type            The button type.  Defaults to btn-default.
-            btn_size            The button size.  Defaults to bootstrap 3 default size.
-            btn_block           If True, render a block style button.  Default False.
-            btn_extra           RFU
-            template
-            RFU
-        :type kwargs: dict
         """
-        super(Button, self).__init__()
-        self.content = content
-        self.btn_type = kwargs.pop('btn_type', 'btn-default')
-        self.btn_size = kwargs.pop('btn_size', '')
-        self.btn_block = '' if not kwargs.pop('btn_block', None) else 'btn_block'
-        self.btn_extra = kwargs.pop('btn_extra', '')
-        self.template = kwargs.pop('template', Button.template)
-        self.kwargs = kwargs
+        super(Button, self).__init__(content, classes, style, template)
+        self.btn_extras = btn_extras
+        self.disabled = disabled
         return
 
     def render(self):
-        content = render_objects(self.content)
-        out = self.template.format(btn_text=content,
-                                   btn_type=self.btn_type,
-                                   btn_size=self.btn_size,
-                                   btn_extra=self.btn_extra)
+        disabled = 'disabled="disabled"' if self.disabled else ''
+        extra = ' '.join(['btn', self.btn_extras])
+        content, classes, style, template = self.render_setup(extra_classes=extra)
+        out = template.format(content=content,
+                              disabled=disabled,
+                              style=style,
+                              classes=classes)
+        return out
+BTN = functools.partial(Button)
+
+
+class Glyphicon(Content):
+    """
+    Convenience method to output bootstrap 3 glyphicons
+    """
+    template = """
+    <span {classes} {style}></span>
+    """
+
+    def __init__(self, content, classes='', style='', template=None):
+        super(Glyphicon, self).__init__(content, classes, style, template)
+        return
+
+    def render(self):
+        extra = 'glyphicon glyphicon-{}'.format(self.content)
+        content, classes, style, template = self.render_setup(extra_classes=extra)
+        out = template.format(style=style,
+                              classes=classes)
+        return out
+
+GL = functools.partial(Glyphicon)
+
+
+class Link(Content):
+    """
+    Link text support.  Link renders its content and wraps in a link.
+    """
+    template = '<a href="{href}" {classes} {style}>{content}</a>'
+
+    def __init__(self, href, content, button='', classes='', style='', template=None):
+        """
+        Create a DPage Link object and initialize it.
+        """
+        super(Link, self).__init__(content, classes, style, template)
+        self.href = href
+        self.button = button
+
+    def render(self):
+        """
+        Render link.
+        """
+        extra = ''
+        if self.button:
+            extra = 'btn {}'.format(self.button)
+        content, classes, style, template = self.render_setup(extra_classes=extra)
+        out = template.format(href=self.href,
+                              classes=classes,
+                              style=style,
+                              content=content)
         return out
 
 
@@ -108,6 +146,7 @@ class Panel(Content):
             {content}
         </div>
     </div>"""
+
     heading_template = """
     <div class="panel panel-default">
         <div class="panel-heading">{heading}</div>
@@ -116,22 +155,22 @@ class Panel(Content):
         </div>
     </div>"""
 
-    def __init__(self, *content, **kwargs):
+    def __init__(self, content, heading=None, template=None):
         super(Panel, self).__init__()
-        self.template = kwargs.pop('template', Panel.template)
-        self.heading = kwargs.pop('heading', None)
+        self.template = template
+        self.heading = heading
         self.content = content
-        self.kwargs = kwargs
         return
 
     def render(self):
-        out = ''
-        template = self.template
         heading = None
+        template = Panel.template
         if self.heading:
-            template = self.heading_template
+            template = Panel.heading_template
             heading = render_objects(self.heading)
-        out += template.format(heading=heading, content=render_objects(self.content))
+        if self.template:
+            template = self.template
+        out = template.format(heading=heading, content=render_objects(self.content))
         return out
 
 
@@ -142,55 +181,6 @@ class Panel(Content):
 #
 ################################################################################
 ################################################################################
-
-class Link(Content):
-    """
-    Link text support.  Link renders its content and wraps in a link.
-    """
-    template = '<a href="{href}" {target} {link_class}>{body}</a>'
-    button_link_class = 'btn btn-primary btn-sm'
-
-    def __init__(self, href, *content, **kwargs):
-        """
-            Create a DPage Link object and initialize it.
-
-            ex. Link('/dpages/Test07', 'Link to the form test page', button=True)
-
-            Note: Link('href', content1, content2) is equivalent to
-                  Link('href', X(content1, content2))
-
-            :param href: Link href
-            :type href: unicode
-            :param content: Content the link wraps
-            :type content:
-            :param kwargs:
-                target          <a> tag target
-                button          If True, display link as a button
-                link_class      Bootstrap 3 button link class string. Defaults to 'btn btn-primary btn-sm'
-                RFU
-        """
-        super(Link, self).__init__()
-        self.href = href
-        self.content = content
-        self.target = kwargs.pop('target', None)
-        self.button = kwargs.pop('button', None)
-        self.link_class = kwargs.pop('link_class', Link.button_link_class)
-        self.template = kwargs.pop('template', Link.template)
-        self.kwargs = kwargs
-
-    def render(self):
-        """
-        Render link.
-        """
-        body = render_objects(self.content)
-        target = ''
-        if self.target:
-            target = 'target="{target}" '.format(self.target)
-        link_class = ''
-        if self.button:
-            link_class = 'class="{link_class}" '.format(link_class=self.link_class)
-        out = self.template.format(href=self.href, target=target, link_class=link_class, body=body)
-        return out
 
 # fixme: resume work here btn-block, diabled, active, active state support
 
