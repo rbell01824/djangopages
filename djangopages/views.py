@@ -144,10 +144,13 @@ def page_content(dpage, text, content):
 def page_content_v(dpage, text, content):
     """
     """
-    return R(C(X(doc_panel(dpage, text),
-                 MD('Below is the output for this page.'
-                    '<hr style="box-shadow: 0 0 10px 1px black;">'),
-                 content_panel(content))))
+    if len(content) > 0:
+        return R(C(X(doc_panel(dpage, text),
+                     MD('Below is the output for this page.'
+                        '<hr style="box-shadow: 0 0 10px 1px black;">'),
+                     content_panel(content))))
+    else:
+        return R(C(doc_panel(dpage, text)))
 
 ########################################################################################################################
 #
@@ -156,7 +159,7 @@ def page_content_v(dpage, text, content):
 ########################################################################################################################
 
 
-class DpageConcepts1(DPage):
+class DPageConcepts1(DPage):
     title = 'Overview: DjangoPages Concepts'
     description = title
     tags = ['overview']
@@ -192,7 +195,7 @@ As the examples proceed, they become less verbose and more production oriented.
         return self
 
 
-class DpageConcepts2(DPage):                        # The class name also defines the page's URL
+class DPageConcepts2(DPage):                        # The class name also defines the page's URL
     title = 'Overview: DjangoPages Definition'      # Define the page title
     description = title                             # Set the page's description
     tags = ['overview']                             # Pages may have tags to facilitate searching
@@ -225,8 +228,8 @@ The code is generally self descriptive.
 
  * Markdown creates a markdown object.
  * Panel(doc, heading=doc_heading)) creates a bootstrap 3 panel with a heading
- * Column() creates a full width bootstrap 3 column to contain the panel
- * Row() creates a bootstrap 3 row that contains the column
+ * Column() creates a full width bootstrap 3 column to contain the panel. C() is a shortcut for Column().
+ * Row() creates a bootstrap 3 row that contains the column. R() is a shortcut for Row().
 
 Most DjangoPages follow this general pattern.
 
@@ -422,13 +425,45 @@ Sometimes it is useful to output multiple spaces or new lines.
                R(C(('two', SP(), 'words'))),
                R(C(MD('####BR'))),
                R(C(('two', BR(), 'lines'))))
+
+R(C((..., ...))) will be explained shortly.
         """
 
-        content = (R(C(MD('####SP'))),
+        content = (Row(C(MD('####SP'))),
                    R(C(('two', SP(), 'words'))),
                    R(C(MD('####BR'))),
                    R(C(('two', BR(), 'lines'))))
         self.content = page_content(self, doc, content)
+        return self
+
+
+class TestSequence(DPage):
+    title = 'Content: Widget sequence arguments'
+    description = 'Demonstrate ' + title
+    tags = ['content']
+
+    def page(self):
+        doc = """
+Most DjangoPage widgets take a single content argument. However, it is often convenient to combine
+the output of multiple widgets as the content of another widget.
+
+Wrapping the inner widgets in a sequence allows the combined arguments to be passed as a single content
+argument.
+
+    R(C(('two ', 'words')))
+
+is more convenient and generally clearer than
+
+    r = 'two ' + 'words'
+    R(C(r))
+
+If you wish you can make this more explicit with the X widget that renders its arguments and
+concatenates the result.
+
+    R(C(X('two ', 'words')))
+        """
+
+        self.content = page_content_v(self, doc, '')
         return self
 
 
@@ -439,7 +474,7 @@ class TestMultipleWidgets(DPage):
 
     def page(self):
         doc = """
-Multiple widgets can be combined on a page.
+Multiple widgets can be combined on a page as previously illustrated.
 
 ####Code
     content = []
@@ -497,6 +532,35 @@ Here **content = ...** creates a list of content to include in the page avoiding
         return self
 
 
+class TestClassesStyles(DPage):
+    title = 'Content: Widget classes and styles'
+    description = 'Demonstrate ' + title
+    tags = ['content']
+
+    def page(self):
+        doc = """
+It is generally convenient to pass extra classes and styles to widgets.
+
+Most DjangoPage widgets take
+
+ * classes='list of additional classes'
+ * styles='additional styles'
+
+arguments.
+
+####Code
+    content = (Row(C(LI([5])), style='border-style:solid;border-color:red;'),
+               Row((C6(LI([2]), style='border-style:solid;border-width:1px'),
+                    C6(LI([2]), style='border-style:solid;border-width:1px'))))
+        """
+
+        content = (Row(C(LI([5])), style='border-style:solid;border-color:red;'),
+                   Row((C6(LI([2]), style='border-style:solid;border-width:1px'),
+                        C6(LI([2]), style='border-style:solid;border-width:1px'))))
+        self.content = page_content(self, doc, content)
+        return self
+
+
 class TestRowColumn(DPage):
     title = 'Layout: Bootstrap 3 Row/Column'
     description = 'Demonstrate ' + title
@@ -543,6 +607,8 @@ Row and Column can be used to create responsive bootstrap 3 page grid layouts. T
                    R((C(row2col1, width=6), C(row2col2, width=6))))     # with R & C
         self.content = page_content(self, doc, content)
         return self
+
+# fixme: resume work here
 
 
 class TestCn(DPage):

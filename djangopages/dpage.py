@@ -160,6 +160,8 @@ class DPage(object):
 #
 ########################################################################################################################
 
+# fixme: add +, * operators to content, http://rgruet.free.fr/PQR26/PQR2.6.html#SpecialMethods
+
 
 class Content(object):
     """

@@ -56,8 +56,6 @@ class Text(object):
     def render(self):
         """
         Render the Text object
-        :param kwargs: RFU
-        :type kwargs: dict
         """
         out = ''
         for obj in self.content:
@@ -115,6 +113,7 @@ MD = functools.partial(Markdown)
 # Convenience methods for loremipsum text generation.
 #
 ########################################################################################################################
+# todo 1: turn LI methods into classes
 
 
 # noinspection PyPep8Naming
@@ -167,6 +166,8 @@ def LI_Sentence(amount=1, para=True):
         return out
     out = '<p>{}</p>'.format(out)
     return out
+
+# todo 1: turn SP & BR & NBSP methods into classes
 
 
 # noinspection PyPep8Naming
