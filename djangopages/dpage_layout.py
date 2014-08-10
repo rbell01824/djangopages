@@ -143,7 +143,7 @@ class RowColumn(Row, Column):
         Render RowColumn
         """
         # fixme: add list support
-        # fixme: add styles for row
+        # todo 2: add styles for row
         content, classes, style, template = self.render_setup()
         out = Column(content, width=self.width,
                      classes=self.classes, style=self.style, template=self.template).render()

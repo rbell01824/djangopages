@@ -662,6 +662,7 @@ The basic methods Cn are
 
 # fixme: resume work here
 
+
 class TestRC(DPage):
     title = 'Layout: RowColumn/RC convenience methods'
     description = 'Demonstrate ' + title

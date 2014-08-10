@@ -193,6 +193,14 @@ class Content(object):
         template = self.template
         return content, classes, style, template
 
+    def __add__(self, other):
+        return self.render() + other
+
+    def __radd__(self, other):
+        return other + self.render()
+
+    def __mul__(self, other):
+        return self.render() * other
 
 ########################################################################################################################
 #
