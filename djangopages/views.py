@@ -686,8 +686,6 @@ class TestRC(DPage):
 
     def page(self):
         doc = """
-RowColumn addresses the common case Row(Column(content, ...)).
-
  * RowColumn(content, [width=n]), or
  * RC(content, [width=n])
  * RCn(content, [width=n])  where n specified the column width
@@ -696,6 +694,8 @@ where
 
  * content is the content to place in the column
  * width is the bootstrap 3 width, default 12
+
+RowColumn addresses the common case Row(Column(content, ...)).
 
 #### Code
     # Create content
@@ -709,50 +709,61 @@ where
         self.content = page_content(self, doc, content)
         return self
 
-class TestRCWidth(DPage):
 
-
-class TextXC(DPage):
-    title = 'Layout: Multiple columns with XC'
+class TestRCList(DPage):
+    title = 'Layout: RC list'
     description = 'Demonstrate ' + title
     tags = ['layout']
 
     def page(self):
         doc = """
-Sometimes it is useful to create multiple columns with a single statement.
 
-####Code
-    # define the content
-    content = R(XC4('Column 1', 'Column 2', 'Column3'))
+ * RCn([[row 1 col 1, row 1 col 2], ...])
+
+RCn creates multiple rows each containing multiple columns in a single statement.
+
+#### Code
+    # Create content
+    text = MD('**Text in a row column.** '+LI([5], para=False))
+    content = RC6([[text, text], [text, text]])C6([[text, text], [text, text]])
         """
 
-        # define the content
-        content = R(XC4('Column 1', 'Column 2', 'Column3'))
+        # Create content
+        text = MD('**Text in a row column.** '+LI([5], para=False))
+        content = RC6([[text, text], [text, text]])
         self.content = page_content(self, doc, content)
         return self
 
 
-class TestXR(DPage):
-    title = 'Layout: Multiple rows with XR'
+class TestRList1(DPage):
+    """
+    """
+    title = 'Layout: R list with individual column widths'
     description = 'Demonstrate ' + title
     tags = ['layout']
 
     def page(self):
         doc = """
-Sometimes it is useful to create multiple rows with a single statement.
 
-####Code
-    # define the content
-    content = XR(C('Row 1'), C('Row 2'), C(MD('####Markdown Row 3')))
+ * R([Cn([row 1 col 1, row 1 col 2]), ...])
+
+R([Cn(),...]) creates multiple rows each containing multiple columns of different specified widths.
+
+#### Code
+    # Create content
+    text = MD('**Text in a row column.** '+LI([5], para=False))
+    content = R([C(text),
+                 C6([text, text]),
+                 C4([text, text, text])])
         """
 
-        # define the content
-        content = XR(C('Row 1'), C('Row 2'), C(MD('####Markdown Row 3')))
-        # content = (R(C('Row 1')), R(C('Row 2')), R(C(MD('####Markdown Row 3'))))
+        # Create content
+        text = MD('**Text in a row column.** '+LI([5], para=False))
+        content = R([C(text),
+                     C6([text, text]),
+                     C4([text, text, text])])
         self.content = page_content(self, doc, content)
         return self
-
-# todo 1: go back and update the test doc to be like TestGlyphicons
 
 
 class TestGlyphicons(DPage):
@@ -762,8 +773,10 @@ class TestGlyphicons(DPage):
 
     def page(self):
         doc = """
-Gliphicon(content, classes='', style='', template=None)
-GL(content, classes='', style='', template=None)
+ * Gliphicon(content, classes='', style='', template=None)
+ * GL(content, classes='', style='', template=None)
+
+where
 
  * content: the glypy name, ex. star is glyphicon-star.
  * classes: other class for the widget
@@ -772,13 +785,15 @@ GL(content, classes='', style='', template=None)
 
 ####Code
     # define the content
-    content = XR(XC(Glyphicon('star'),
-                    GL('heart')))
+    glyphs = [(Glyphicon('star'), GL('heart'), GL('music')),
+              (GL('zoom-in'), GL('refresh'), GL('qrcode'))]
+    content = RC(glyphs))
         """
 
         # define the content
-        content = XR(XC(Glyphicon('star'),
-                        GL('heart')))
+        glyphs = [(Glyphicon('star'), GL('heart'), GL('music')),
+                  (GL('zoom-in'), GL('refresh'), GL('qrcode'))]
+        content = RC(glyphs)
         self.content = page_content(self, doc, content)
         return self
 
@@ -815,7 +830,7 @@ Button(content, btn_extras='', disabled=False, classes='', style='', template=No
                 style='color:white; width:200px;margin-top:5px;')       # styles
 
     # put into layout
-    content = XR(XC(r1, r2, r3, r4, r5, r6))
+    content = RC([r1, r2, r3, r4, r5, r6])
         """
 
         # define content objects
@@ -833,7 +848,7 @@ Button(content, btn_extras='', disabled=False, classes='', style='', template=No
                     style='color:white; width:200px;margin-top:5px;')       # styles
 
         # put into layout
-        content = XR(XC(r1, r2, r3, r4, r5, r6))
+        content = RC([r1, r2, r3, r4, r5, r6])
         self.content = page_content(self, doc, content)
         return self
 
@@ -857,66 +872,37 @@ Link(href, content, button='', classes='', style='', template=None)
 ####Code
     # define content objects
     r1 = Link('/dpages/DPagesList', 'Link to DPagesList')
-    r2 = Link('/dpages/DPagesList', 'Button link to DPagesList', button=True)
-    r3 = Link('#', 'Button style', button='btn-success btn-sm',
-              style='color:white;width:200px;margin-top:5px;')
+    r2 = Link('/dpages/DPagesList', 'Button link to DPagesList',
+              button='btn-info btn-xs')
+    r3 = Link('/dpages/DPagesList', 'Button with style and classes to DpagesList',
+              button='btn-success btn-sm',
+              style='color:white;width:r00px;margin-top:5px;')
 
     # put into layout
-    content = XR(XC(r1, r2, r3))
+    content = RC([r1, r2, r3])
         """
 
         # define content objects
         r1 = Link('/dpages/DPagesList', 'Link to DPagesList')
-        r2 = Link('/dpages/DPagesList', 'Button link to DPagesList', button='btn-info btn-xs')
-        r3 = Link('#', 'Button style', button='btn-success btn-sm',
-                  style='color:white;width:200px;margin-top:5px;')
+        r2 = Link('/dpages/DPagesList', 'Button link to DPagesList',
+                  button='btn-info btn-xs')
+        r3 = Link('/dpages/DPagesList', 'Button with style and classes to DpagesList',
+                  button='btn-success btn-sm',
+                  style='color:white;width:r00px;margin-top:5px;')
 
         # put into layout
-        content = XR(XC(r1, r2, r3))
+        content = RC([r1, r2, r3])
         self.content = page_content(self, doc, content)
         return self
 
-# fixme: resume work here on widgets
 
-class Test004a(DPage):
-    title = 'DB driven graphs'
-    description = 'Demonstrate ' + title
-    tags = []
-
-    def page(self):
-        doc = """
-XR and XC can be used together to easily create complex layouts.
-
-####Code
-    # define the text content
-    text = LI([5], para=False)
-    # row 1 has 2 6 wide columns
-    # row 2 has 3 4 wide columns
-    content = XR(XC6('Row 1 Col 1 '+text, 'Row 1 Col 2 '+text),
-                 XC4('Row 2 Col 1 '+text, 'Row 2 Col 2 '+text, 'Row 2 Col 3 '+text))
-
-XR and XC when used in combination provide an easy self documenting way to create complex layouts.
-        """
-
-        # define the text content
-        text = LI([5], para=False)
-        # row 1 has 2 6 wide columns
-        # row 2 has 3 4 wide columns
-        content = XR(XC6('Row 1 Col 1 '+text, 'Row 1 Col 2 '+text),
-                     XC4('Row 2 Col 1 '+text, 'Row 2 Col 2 '+text, 'Row 2 Col 3 '+text),
-                     XC6('Row 3 Col 1 '+text, XR(XC('Row 3 Col 2 Row 1 '+text, 'Row 3 Col 2 Row 2 '+text))))
-        self.content = page_content_v(self, doc, content)
-        return self
-# todo 1: start here to upgrade examples
-
-
-class Test04(DPage):
+class TestBasicGraphs(DPage):
     """
     Basic test of Graph facility with two graphs in a row.
     """
-    title = 'DjangoPages_Test04'
-    description = 'Demonstrate DB driven graphs with highcharts customization'
-    tags = []
+    title = 'Graphs'
+    description = 'Demonstrate ' + title
+    tags = ['graphs']
 
     def page(self):
         """
@@ -972,7 +958,7 @@ class Test04(DPage):
         # Layout the content on the page
         ###################
         self.content = (RC(text_top),
-                        RC6(col_graph, pie_graph),
+                        RC6((col_graph, pie_graph)),
                         RC(text_bottom))
         return self
 
