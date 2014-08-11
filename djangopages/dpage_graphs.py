@@ -54,7 +54,7 @@ class Graph(object):
         :param graph_type: The type of this graph.  Must be line, pie, column, bar, or area.
         :type graph_type: unicode
         :param data: The name of the context variable holding the graph's data
-        :type data: unicode or list[dict] or dict
+        :type data: unicode or list[dict] or list[list] or dict
         :param options: 'with' options for the chartkick graph.
         :type options: unicode
         :param kwargs: RFU

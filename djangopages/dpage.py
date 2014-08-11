@@ -68,28 +68,12 @@ class _DPageRegister(type):
 
 class DPage(object):
     """
-    DPage classes define Django Page objects, pages to be displayed.
-
-    Basic example:
-
-        class Example(DPage):
-            title = 'DjangoPages_Example'               # You must define a class title.  It must be unique.
-            description = 'Demonstrate links'           # You should provide a class description.  It may be any
-                                                        # length.
-            tags = []                                   # RFU
-
-            def page(self):                             # You must override the page class.
-                self.content = ...                      # page must define the content
-                return self                             # You must return self
-
-    See the source for additional child class examples.
-
-    A DPage object can be displayed by invoking its render method, ex. <object>.render.
-
+    DPage classes define Django Page objects, ie. pages that can be displayed.
     """
     __metaclass__ = _DPageRegister              # use DPageRegister to register child classes
 
-    def __init__(self, request=None, context=None, template=None, **kwargs):
+    def __init__(self, request=None, context=None, template=None,
+                 title='', description='', tags=None):
         """
         Initialize the DPage.  As a general rule, you need not perform initialization in the DPage child class.
         However, if you do it is possible to provide additional context content and customize the template.
@@ -107,22 +91,30 @@ class DPage(object):
         self.request = request
         self.context = context
         self.template = template if template else settings.DPAGE_DEFAULT_TEMPLATE
+        if not self.title:
+            self.title = title
+        if not self.description:
+            self.description = description
+        if not self.tags:
+            if tags:
+                self.tags = tags
+            else:
+                self.tags = list()
         self.content = []
-        self.kwargs = kwargs
         pass
 
     def page(self):
         """
-        Define the page.  The subclass must define this method.
+        Define the page.  The subclass must define this method to create the page content.
 
         The page method defines the page.  Example:
 
-                def page(self):
-                    xr1 = Text('This text comes from dpage.Text')
-                    xr2 = Markdown('**Bold Markdown Text**')
-                    xr3 = HTML('<h3>H3 text from DPageHTML</h3>')
-                    self.content(RC12(xr1, xr2, xr3))
-                    return self
+            def page(self):
+                xr1 = Text('This text comes from dpage.Text')
+                xr2 = Markdown('**Bold Markdown Text**')
+                xr3 = HTML('<h3>H3 text from DPageHTML</h3>')
+                self.content(RC([xr1, xr2, xr3])
+                return self
         """
         raise NotImplementedError("Subclasses should implement DPage.page!")
 
@@ -153,6 +145,17 @@ class DPage(object):
 
     def __str__(self):
         return unicode(self).encode('utf8')
+
+    @staticmethod
+    def find(tag):
+        # noinspection PyUnresolvedReferences
+        pages = DPage.pages_list
+        lst = []
+        for p in pages:
+            cls = p['cls']
+            if tag in cls.tags:
+                lst.append(p)
+        return lst
 
 ########################################################################################################################
 #
