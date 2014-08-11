@@ -334,8 +334,8 @@ Markdown renders markdown text.  Note it may also contain HTML.
 
 
 # noinspection PyPep8Naming
-class TestLI_Paragraph(DPage):
-    title = 'Text: LI_Paragraph'
+class TestLIParagraph(DPage):
+    title = 'Text: LIParagraph'
     description = 'Demonstrate ' + title
     tags = ['text']
 
@@ -347,36 +347,36 @@ LI_para(amount=1, para=True)
  * **para** if true wraps each paragraph in an HTML paragraph
 
 ####Code
-    content = LI_Paragraph(2)       # Make two loremipsum paragraphs
+    content = LIParagraph(2)       # Make two loremipsum paragraphs
 
-As a practical matter LI is far more frequently used than LI_Paragraph.
+As a practical matter LI is far more frequently used than LIParagraph.
         """
 
-        content = LI_Paragraph(2)       # Make two loremipsum paragraphs
+        content = LIParagraph(2)       # Make two loremipsum paragraphs
         self.content = page_content(self, doc, content)
         return self
 
 
 # noinspection PyPep8Naming
-class TestLI_Sentence(DPage):
-    title = 'Text: LI_Sentence'
+class TestLISentence(DPage):
+    title = 'Text: LISentence'
     description = 'Demonstrate ' + title
     tags = ['text']
 
     def page(self):
         doc = """
-LI_Sentence(amount=1, para=True)
+LISentence(amount=1, para=True)
 
  * **amount** is the number of loremipsum sentences to generate
  * **para** if true wraps the sentences in an HTML paragraph
 
 ####Code
-    content = LI_Sentence(5)        # make one loremipsum paragraph of 5 sentences
+    content = LISentence(5)        # make one loremipsum paragraph of 5 sentences
 
-As a practical mater LI is far more frequently used than LI_Sentence.
+As a practical mater LI is far more frequently used than LISentence.
         """
 
-        content = LI_Sentence(5)        # make one loremipsum pragraph of 5 sentences
+        content = LISentence(5)        # make one loremipsum pragraph of 5 sentences
         self.content = page_content(self, doc, content)
         return self
 
@@ -402,6 +402,26 @@ By using amount=[n, n,...] you can control the paragraph length.
         """
 
         content = LI([1, 2, 5])         # make 3 paragraphs with different number of sentences
+        self.content = page_content(self, doc, content)
+        return self
+
+
+class TestPlusMul(DPage):
+    title = 'Text: + and *'
+    description = 'Demonstrate ' + title
+    tags = ['text', 'content']
+
+    def page(self):
+        doc = """
+DjangoPage widgets support the string methods + and *.
+
+####Code
+    content = LISentence(2) + LISentence(2) + \\
+        '<p>' + Text('This phrase will output 3 times.  ') * 3 + '</p>'
+        """
+        content = LISentence(2) + LISentence(2) + \
+            '<p>' + Text('This phrase will output 3 times.  ') * 3 + '</p>'
+
         self.content = page_content(self, doc, content)
         return self
 
@@ -588,27 +608,25 @@ Row and Column can be used to create responsive bootstrap 3 page grid layouts. T
 
 #### Code
     # Create some text for two rows
-    text = LI([5], para=False)
-    row1 = ('**Text in row 1** ' + text)
-    row2col1 = '**Text in row 2 col 1**' + text
-    row2col2 = '**Text in row 2 col 2**' + text
+    text = MD(LI([5], para=False))
+    row1 = MD('**Text in row 1** '+text)
+    row2col1 = MD('**Text in row 2 col 1**' + text)
+    row2col2 = MD('**Text in row 2 col 2**' + text)
 
     content = (Row(Column(row1)),                                   # with Row & Column
                R((C(row2col1, width=6), C(row2col2, width=6))))     # with R & C
         """
 
         # Create some text for two rows
-        text = LI([5], para=False)
-        row1 = ('**Text in row 1** ' + text)
-        row2col1 = '**Text in row 2 col 1**' + text
-        row2col2 = '**Text in row 2 col 2**' + text
+        text = MD(LI([5], para=False))
+        row1 = MD('**Text in row 1** '+text)
+        row2col1 = MD('**Text in row 2 col 1**' + text)
+        row2col2 = MD('**Text in row 2 col 2**' + text)
 
         content = (Row(Column(row1)),                                   # with Row & Column
                    R((C(row2col1, width=6), C(row2col2, width=6))))     # with R & C
         self.content = page_content(self, doc, content)
         return self
-
-# fixme: resume work here
 
 
 class TestCn(DPage):
@@ -618,7 +636,7 @@ class TestCn(DPage):
 
     def page(self):
         doc = """
-The Cn family of methods may be used to define columns with a width of n.
+The Cn family of methods may be used to more conveniently define columns with a width of n.
 
 The basic methods Cn are
 
@@ -639,10 +657,10 @@ The basic methods Cn are
 #### Code
     # Create some text for two rows
     text = LI([5], para=False)
-    row1 = ('**Text in row 1** ' + text)
-    row2col1 = '**Text in row 2 col 1**' + text
-    row2col2 = '**Text in row 2 col 2**' + text
-    row2col3 = '**Text in row 2 col 3**' + text
+    row1 = MD('**Text in row 1** ' + text)
+    row2col1 = MD('**Text in row 2 col 1**' + text)
+    row2col2 = MD('**Text in row 2 col 2**' + text)
+    row2col3 = MD('**Text in row 2 col 3**' + text)
 
     content = (R(C(row1)),                                          # with R & C
                R(X(C4(row2col1), C4(row2col2), C4(row2col3))))      # with R & C4
@@ -650,17 +668,15 @@ The basic methods Cn are
 
         # Create some text for two rows
         text = LI([5], para=False)
-        row1 = ('**Text in row 1** ' + text)
-        row2col1 = '**Text in row 2 col 1**' + text
-        row2col2 = '**Text in row 2 col 2**' + text
-        row2col3 = '**Text in row 2 col 3**' + text
+        row1 = MD('**Text in row 1** ' + text)
+        row2col1 = MD('**Text in row 2 col 1**' + text)
+        row2col2 = MD('**Text in row 2 col 2**' + text)
+        row2col3 = MD('**Text in row 2 col 3**' + text)
 
         content = (R(C(row1)),                                          # with R & C
                    R(X(C4(row2col1), C4(row2col2), C4(row2col3))))      # with R & C4
         self.content = page_content(self, doc, content)
         return self
-
-# fixme: resume work here
 
 
 class TestRC(DPage):
@@ -672,9 +688,9 @@ class TestRC(DPage):
         doc = """
 RowColumn addresses the common case Row(Column(content, ...)).
 
- * RowColumn(content, ... , [width=n]), or
- * RC(content, ..., [width=n])
- * RCn(content, ...)  where n specified the column width
+ * RowColumn(content, [width=n]), or
+ * RC(content, [width=n])
+ * RCn(content, [width=n])  where n specified the column width
 
 where
 
@@ -683,25 +699,17 @@ where
 
 #### Code
     # Create content
-    content = RC(T('Row 1 text. '), T('More row 1 text.'))
-
-This example illustrates a RC subtlety.
-
-
-    is equivalent to
-
-    R(C(T(...), T(...))
-
-Only a single row and column are created.  This can be seen with your browser's inspect element feature.
-
-Note: A RowColumn may contain many rows of text, ie. RowColumn is a layout widget independent
-of the number of lines of text contained therein.
+    text = MD('**Text in a row column.** '+LI([5], para=False))
+    content = RC(text)
         """
 
         # Create content
-        content = RC(T('Row 1 text. '), T('More row 1 text.'))
+        text = MD('**Text in a row column.** '+LI([5], para=False))
+        content = RC(text)
         self.content = page_content(self, doc, content)
         return self
+
+class TestRCWidth(DPage):
 
 
 class TextXC(DPage):

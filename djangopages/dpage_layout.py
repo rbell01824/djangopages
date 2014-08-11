@@ -129,7 +129,7 @@ class RowColumn(Row, Column):
     """
     Equivalent to Row(Column(content, width, classes, style, template))
     """
-    template = ''
+    # todo 2: add styles for row
 
     def __init__(self, content, width=12, classes='', style='', template=None):
         """
@@ -142,7 +142,6 @@ class RowColumn(Row, Column):
         """
         Render RowColumn
         """
-        # todo 2: add styles for row
         if isinstance(self.content, list):              # if list, iterate over elements
             out = ''
             for con in self.content:

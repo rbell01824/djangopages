@@ -160,8 +160,6 @@ class DPage(object):
 #
 ########################################################################################################################
 
-# fixme: add +, * operators to content, http://rgruet.free.fr/PQR26/PQR2.6.html#SpecialMethods
-
 
 class Content(object):
     """
@@ -169,11 +167,14 @@ class Content(object):
 
     Content classes provide content for DPage.  See the examples in the code.
     """
-    def __init__(self, content='', classes='', style='', template=None):
+    template = ''
+
+    def __init__(self, content='', classes='', style='', template=None, kwargs=None):
         self.content = content
         self.classes = classes
         self.style = style
         self.template = template if template else self.template
+        self.kwargs = kwargs
         pass
 
     def render(self):

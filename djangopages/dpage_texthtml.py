@@ -36,21 +36,19 @@ from django.utils.encoding import force_unicode
 ########################################################################################################################
 
 
-class Text(object):
+class Text(Content):
     """
     Renders content to the page.
 
     If <content> is a basestring, outputs <content>.  Otherwise outputs <content>.render().
     Accepts (<content>, <content>, ... ).
     """
-
     def __init__(self, *content):
         """
         Create text object and initialize it.
         :param content: The content text or object list.
         """
-        super(Text, self).__init__()
-        self.content = content
+        super(Text, self).__init__(content)
         return
 
     def render(self):
@@ -68,127 +66,117 @@ T = functools.partial(Text)
 HTML = functools.partial(Text)
 
 
-class Markdown(object):
+class Markdown(Content):
     """
     Holds markdown text for inclusion in a DPage.  Markdown can also hold Text and HTML.
     """
-
     def __init__(self, *content, **kwargs):
-        """
-        Create a markdown object and initialize it.
-
-        :param content: Text to process as markdown.
-        :type content: unicode
-        :param kwargs:
-            extensions          Markdown extensions
-            RFU
-        :type kwargs: dict
-        """
-        self.content = content
-        self.extensions = kwargs.pop('extensions', None)
-        self.kwargs = kwargs
+        super(Markdown, self).__init__(content, kwargs=kwargs)
         pass
 
-    def render(self, **kwargs):
-        """
-        Render markdown text.
-        :param kwargs:
-        """
+    def render(self):
+        extensions = self.kwargs.pop('extensions', '')
         out = ''
         for obj in self.content:
             if isinstance(obj, basestring):
                 out += markdown.markdown(force_unicode(obj),
-                                         self.extensions if self.extensions else '',
+                                         extensions,
                                          output_format='html5',
                                          safe_mode=False,
                                          enable_attributes=False)
             else:
-                out += render_objects(obj, **kwargs)
+                out += render_objects(obj)
         return out
 MD = functools.partial(Markdown)
 
-
 ########################################################################################################################
 #
-# Convenience methods for loremipsum text generation.
+# loremipsum text generation.
 #
 ########################################################################################################################
-# todo 1: turn LI methods into classes
 
 
-# noinspection PyPep8Naming
-def LI(amount=1, para=True):
+class LI(Content):
     """
     Generate loremipsum paragraphs of sentence length sentences.
-    :param amount: Number of paragraphs to generate, or a list of sentence lengths for each paragraph.
-    :type amount: int or list
-    :param para: If true wrap each paragraph in html p tags
-    :type para: bool
     """
-    if isinstance(amount, (int, long, float)):
-        return LI_Paragraph(amount, para)
-    out = ''
-    for pl in amount:
-        out += LI_Sentence(pl, para)
-    return out
+    def __init__(self, amount=1, para=True):
+        super(LI, self).__init__()
+        self.amount = amount
+        self.para = para
+        pass
+
+    def render(self):
+        amount = self.amount
+        para = self.para
+        if isinstance(amount, list):
+            out = ''
+            for pl in amount:
+                out += LISentence(pl, para).render()
+            return out
+        return LIParagraph(amount, para).render()
 
 
-# noinspection PyPep8Naming
-def LI_Paragraph(amount=1, para=True):
+class LIParagraph(Content):
     """
-    Provide a bit of syntactic sugar for the more verbose get_paragraphs in loremipsum.
-    :param amount: Number of paragraphs to generate
-    :type amount: int
-    :param para: If true wrap each paragraph in html p tags
-    :type para: bool
+    Generate a loremipsum paragraph
     """
-    li = loremipsum.get_paragraphs(amount)
-    if not para:
-        return li
-    out = []
-    for p in li:
-        out.append('<p>{}</p>'.format(p))
-    return out
+    def __init__(self, amount=1, para=True):
+        super(LIParagraph, self).__init__()
+        self.amount = amount
+        self.para = para
+        pass
 
-
-# noinspection PyPep8Naming
-def LI_Sentence(amount=1, para=True):
-    """
-    Provide a bit of syntactic sugar for the more verbose get_sentences in loremipsum.
-    :param amount: Number of sentences to generate
-    :type amount: int
-    """
-    li = loremipsum.get_sentences(amount)
-    out = ''
-    for p in li:
-        out += ' ' + p
-    if not para:
+    def render(self):
+        amount = self.amount
+        para = self.para
+        li = loremipsum.get_paragraphs(amount)
+        if not para:
+            return li
+        out = ''
+        for p in li:
+            out += '<p>{}</p>'.format(p)
         return out
-    out = '<p>{}</p>'.format(out)
-    return out
+
+
+class LISentence(Content):
+    """
+    Generate a loremipsum sentences
+    """
+    def __init__(self, amount=1, para=True):
+        super(LISentence, self).__init__()
+        self.amount = amount
+        self.para = para
+        pass
+
+    def render(self):
+        amount = self.amount
+        para = self.para
+        li = loremipsum.get_sentences(amount)
+        out = ''
+        for p in li:
+            out += ' ' + p
+        if para:
+            out = '<p>{}</p>'.format(out)
+        return out
+
 
 # todo 1: turn SP & BR & NBSP methods into classes
 
 
-# noinspection PyPep8Naming
-def BR(amount=1):
+class AmountStr(Content):
     """
-    amount <br />
-    :param amount:
-    :return:
+    amount occurences of a string
     """
-    return '<br />'*amount
+    def __init__(self, content, amount=1):
+        super(AmountStr, self).__init__(content)
+        self.amount = amount
+        pass
 
-
-# noinspection PyPep8Naming
-def SP(amount=1):
-    """
-    Amount spaces.
-    :param amount:
-    :return:
-    """
-    return '&nbsp;'*amount
-
+    def render(self):
+        return self.content*self.amount
+AS = functools.partial(AmountStr)
+BR = functools.partial(AmountStr, '<br/>')
+SP = functools.partial(AmountStr, '&nbsp;')
 
 # todo 2: add html sysbols see http://www.w3schools.com/html/html_entities.asp and subsequent pages
-
