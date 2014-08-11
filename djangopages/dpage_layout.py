@@ -142,13 +142,20 @@ class RowColumn(Row, Column):
         """
         Render RowColumn
         """
-        # fixme: add list support
         # todo 2: add styles for row
-        content, classes, style, template = self.render_setup()
-        out = Column(content, width=self.width,
-                     classes=self.classes, style=self.style, template=self.template).render()
-        out = Row(out).render()
-        return out
+        if isinstance(self.content, list):              # if list, iterate over elements
+            out = ''
+            for con in self.content:
+                c = Column(con, width=self.width,
+                           classes=self.classes, style=self.style, template=self.template)
+                out += Row(c).render()
+            return out
+        else:
+            content, classes, style, template = self.render_setup()
+            c = Column(content, width=self.width,
+                       classes=self.classes, style=self.style, template=self.template)
+            out = Row(c).render()
+            return out
 
 RC = functools.partial(RowColumn, width=12)
 RC1 = functools.partial(RowColumn, width=1)
