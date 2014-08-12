@@ -130,7 +130,7 @@ class DPage(object):
             self.context = {}
 
         # render all our objects
-        content = render_objects(self.content, **kwargs)
+        content = render_objects(self.content)
 
         # if there was nothing, use the default content
         if len(content) == 0:
@@ -165,10 +165,29 @@ class DPage(object):
 
 
 class DWidget(object):
-    """
-    Base class for content classes.
+    """ DWidget(s) provide content for DPage(s)
 
-    Content classes provide content for DPage.  See the examples in the code.
+    DWidget(content='', classes='', style='', template=None, kwargs=None)
+
+    * content: the widget's content
+    * style: extra styles for the widget
+    * template: template override for the widget
+    * kwargs: additional widget arguments
+
+    The base class initialization saves the arguments.
+
+    DWidget provides a default render method that MUST be overridden in the child class.
+    The default render method raises NotImplementedError.
+
+    DWidget implements
+
+    * __add__
+    * __radd__
+    * __mul__
+    * __str__
+    * __repr__
+
+    as a convenience.
     """
     template = ''
 
@@ -186,15 +205,33 @@ class DWidget(object):
         """
         raise NotImplementedError("Subclasses should implement Content.render!")
 
-    def render_setup(self, extra_classes='', extra_style=''):
-        content = render_objects(self.content)
+    def render_setup(self, extra_classes=None, extra_style=None):
+        """ Provides default setup for render.
+
+        content, classes, style, template = self.render_setup(extra_classes=None, extra_style=None)
+
+        * extra_classes: if sepcified extra classes to apply to the widget
+        * extra_style: if specified extra styles to apply to the widget
+
+        Applies render_objects to content, classes, extra_classes, style, extra_style,
+        and template.
+
+        * content: content string for the widget
+        * classes: class string for the widget adding extra_classes or ''
+        * style: style string for the widget adding extra_styles
+        * template: template to use with the widget
+
+        See tbd for how this method should be used.
+        """
+        content = RO(self.content)
         classes = ''
         if self.classes or extra_classes:
-            classes = 'class="{} {}"'.format(self.classes, extra_classes)
+            classes = 'class="{} {}"'.format(RO(self.classes),
+                                             RO(extra_classes))
         style = ''
         if self.style or extra_style:
-            style = 'style="{}"'.format(self.style)
-        template = self.template
+            style = 'style="{}"'.format(RO(self.style))
+        template = RO(self.template)
         return content, classes, style, template
 
     def __add__(self, other):
@@ -212,7 +249,6 @@ class DWidget(object):
     def __repr__(self):
         return self.render()
 
-
 ########################################################################################################################
 #
 # Support Routines
@@ -220,51 +256,53 @@ class DWidget(object):
 ########################################################################################################################
 
 
-def unique_name(base_name='x'):
-    """
-    Returns a unique name of the form 'base_name'_counter.  Used internally to create id and other names.
+def render_objects(*content):
+    """ Render the content.
 
-    ex. unique_name('xxx')
+    DWidget.render_objects(<content>, [<content>, ...])
 
-    :param base_name:
-    :return: Unique name
-    :rtype: unicode
-    """
-    if not hasattr(unique_name, "counter"):
-        unique_name.counter = 0  # it doesn't exist yet, so initialize it
-    unique_name.counter += 1
-    return '{}_{}'.format(base_name, unique_name.counter)
+    * content: the content to render
 
+    Returns
 
-def render_objects(*content, **kwargs):
-    """
-    Render the content.
+    * content.render()+...
 
-    ex. render_objects('something', 'another thing', ('a list thing', 'second'))
+    Example:
 
-    render_objects is also available as X(...) as a convenience method.
+    DWidget.render_objects('thing 1', ('thing 2', MD('thing'))
 
-    :param content: content to render
-    :type: list or object
-    :param kwargs: RFU
-    :type kwargs: dict
-    :return: Rendered output of objects
-    :rtype: unicode
+    Synonyms: X, RO.
     """
     out = ''
     for con in content:
         if isinstance(con, basestring):                     # strings are just themselves
             out += con
         elif hasattr(con, 'render'):                        # objects with render methods know how to render themselves
-            out += con.render(**kwargs)
+            out += con.render()
         elif isinstance(con, collections.Iterable):         # collections are walked
             for con1 in con:
-                out += render_objects(con1, **kwargs)       # recurse to render this collection item
+                out += render_objects(con1)                 # recurse to render this collection item
         else:                                               # this should never happen
             raise ValueError('Unknown content type in render_objects {}'.format(con))
     return out
 X = functools.partial(render_objects)                       # convenience method for render objects
 RO = X
+
+
+def unique_name(base_name='x'):
+    """ Returns a unique name of the form 'base_name'_counter.
+
+    This function is used by widgets and for other internal purporse to
+    create unique names for id(s) and other purposes.
+
+    * basename: the base name to use for the name
+
+    Returns a name of the form <basename>n where n is 0, 1, 2, ... on subsequent uses.
+    """
+    if not hasattr(unique_name, "counter"):
+        unique_name.counter = 0  # it doesn't exist yet, so initialize it
+    unique_name.counter += 1
+    return '{}_{}'.format(base_name, unique_name.counter)
 
 
 def next_dpage(dpage, obj=False):

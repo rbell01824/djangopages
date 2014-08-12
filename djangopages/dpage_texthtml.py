@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-""" Some description here
+""" Text widgets
 
 8/4/14 - Initial creation
 
@@ -37,38 +37,46 @@ from django.utils.encoding import force_unicode
 
 
 class Text(DWidget):
-    """
-    Renders content to the page.
+    """ Renders content to the page.
 
-    If <content> is a basestring, outputs <content>.  Otherwise outputs <content>.render().
-    Accepts (<content>, <content>, ... ).
+    | Text(content, para=False, classes='', style='', template=None)
+    | T(...)
+    | HTML(...)
+
+    * para: If True wrap the output in <p>...</p>
     """
-    def __init__(self, *content):
-        """
-        Create text object and initialize it.
-        :param content: The content text or object list.
-        """
-        super(Text, self).__init__(content)
+    template = '{content}'
+    template_para = '<p {classes} {style}>{content}</p>'
+
+    def __init__(self, content, para=False, classes='', style='', template=None):
+        super(Text, self).__init__(content, classes, style, template)
+        self.para = para
         return
 
     def render(self):
         """
         Render the Text object
         """
-        out = ''
-        for obj in self.content:
-            if isinstance(obj, basestring):
-                out += obj
-            else:
-                out += render_objects(obj)
-        return out
+        content, classes, style, template = self.render_setup()
+        if self.para:
+            return Text.template_para.format(content=content, classes=classes, style=style)
+        return template.format(content=content, classes=classes, style=style)
 T = functools.partial(Text)
 HTML = functools.partial(Text)
 
 
 class Markdown(DWidget):
-    """
-    Holds markdown text for inclusion in a DPage.  Markdown can also hold Text and HTML.
+    """ Renders markdown to the page.
+
+    | Markdown(<content>, [<content>, ...], [extensions=...])
+    | MD()
+
+    <content> is the content to render.
+    extensions are markdown extensions.  See markdown.markdown in library.
+
+    If <content> is a basestring output markdown(<content>) to the page.
+    Otherwise outputs markdown(<content>.render).
+    Multiple content is concatenated.
     """
     def __init__(self, *content, **kwargs):
         super(Markdown, self).__init__(content, kwargs=kwargs)
@@ -78,14 +86,13 @@ class Markdown(DWidget):
         extensions = self.kwargs.pop('extensions', '')
         out = ''
         for obj in self.content:
-            if isinstance(obj, basestring):
-                out += markdown.markdown(force_unicode(obj),
-                                         extensions,
-                                         output_format='html5',
-                                         safe_mode=False,
-                                         enable_attributes=False)
-            else:
-                out += render_objects(obj)
+            if not isinstance(obj, basestring):
+                obj = render_objects(obj)
+            out += markdown.markdown(force_unicode(obj),
+                                     extensions,
+                                     output_format='html5',
+                                     safe_mode=False,
+                                     enable_attributes=False)
         return out
 MD = functools.partial(Markdown)
 
@@ -97,8 +104,17 @@ MD = functools.partial(Markdown)
 
 
 class LI(DWidget):
-    """
-    Generate loremipsum paragraphs of sentence length sentences.
+    """ Generate loremipsum paragraphs of sentence length amount.
+
+    LI(amount=1, para=True)
+
+    * amount: If amount is list, generated multiple paragraphs of lengths defined by
+      list. Otherwise, invoke LIParagraph(amount, para).render() to output amount paragraphs.
+    * para: if True wrap the paragraphs in <p>...</p>
+
+    ex.
+        LI([3,5]) creates two paragraphs.  The first has 3 sentences.  The second 5
+        sentences.
     """
     def __init__(self, amount=1, para=True):
         super(LI, self).__init__()
@@ -121,8 +137,8 @@ class LIParagraph(DWidget):
     """Generate amount loremipsum paragraphs
 
     LIParagraph(amount=1, para=True)
-        amount: number of paragraphs to return
-        para: if true, wrap each returned paragraph in <p>...</p>
+        | amount: number of paragraphs to return
+        | para: if true, wrap each returned paragraph in <p>...</p>
     """
     def __init__(self, amount=1, para=True):
         super(LIParagraph, self).__init__()

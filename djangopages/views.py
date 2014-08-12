@@ -28,6 +28,7 @@ import qsstats
 from django.views.generic import View
 from django.db.models import Count
 from django import forms
+from django.http import HttpResponseNotFound
 
 from djangopages.dpage import *
 from djangopages.dpage_layout import *
@@ -55,10 +56,14 @@ class DPagesView(View):
         Execute the graph method and display the results.
         :param request:
         """
-        # noinspection PyUnresolvedReferences
-        dt = DPage.pages_dict[name]
-        dpage = dt(request).page()
-        return dpage.render()
+        try:
+            # noinspection PyUnresolvedReferences
+            dt = DPage.pages_dict[name]
+            dpage = dt(request).page()
+            return dpage.render()
+        except KeyError:
+            return HttpResponseNotFound('<h1>Page &lt;{}&gt; not found</h1>'.format(name))
+
 
     @staticmethod
     def post(request, name):
@@ -117,23 +122,6 @@ class DPagesAll(DPage):
     def page(self):
         # noinspection PyUnresolvedReferences
         self.content = page_content_v(self, page_list_for_pages(DPage.pages_list), None)
-        return self
-
-
-class DPagesText(DPage):
-    """
-    List text related pages
-    """
-    title = 'DjangoPages Text Widgets'
-    description = 'List Text Widget DjangoPages'
-    tags = ['toc']
-
-    def page(self):
-        doc = """
-DjangoPages provides a variety of **_text_** widgets.
-        """
-        content = (MD(doc), page_list_for_pages(DPage.find('text')))
-        self.content = page_content_v(self, content, None)
         return self
 
 ########################################################################################################################
@@ -212,280 +200,23 @@ def page_content_v(dpage, text, content):
 ########################################################################################################################
 
 
-class DPageConcepts000(DPage):
-    title = 'Overview: DjangoPages Concepts'
-    description = title
-    tags = ['overview']
-
-    def page(self):
-        doc = """
-DjangoPages is built on a few simple concepts uniformly applied.
-
-Each Django page must
-
- * **inherit from the DPage class** and
- * **override the base class page method** by defining the page content, ie.
- it must set self.content to the page's html content.
-
-To make it easy to create the page, DjangoPages provides a rich collection
-of widgets to:
-
- * Create content for the page.  Widgets provide for text, html, markdown, graph, tables, etc.
- * Create a responsive page layout using Bootstrap 3's grid technology
-
-DjangoPage widgets can be easily extended and modified.
-        """
-
-        self.content = page_content_v(self, doc, None)
-        return self
-
-
-class DPageConcepts002(DPage):                      # The class name also defines the page's URL
-    title = 'Overview: DjangoPages Definition'      # Define the page title
-    description = title                             # Set the page's description
-    tags = ['overview']                             # Pages may have tags to facilitate searching
-
-    def page(self):                                 # Override the page method to generate the page's HTML
-
-        # Create some page content
-        doc = """
-The source for a DjangoPage generally looks something like this:
-
-    class Test000b(DPage):                              # The class name also defines the page's URL
-        title = 'Overview: DjangoPages Definition'      # Define the page title
-        description = title                             # Set the page's description
-        tags = ['overview']                             # Pages may have tags to facilitate searching
-
-        def page(self):                                 # Override the page method to generate the page's HTML
-
-            # Create content panel
-            doc_heading = Markdown('### DjangoPage Overview')       # Create heading using markdown
-            doc = 'This is the panel body'                          # Create body using markdown
-            doc = Markdown(doc)
-            doc_panel = Panel(doc, heading=doc_heading)             # Create the panel
-
-            # Create layout and save panel
-            column = Column(doc_panel)                              # Put it in a bootstrap 3 column
-            row = Row(column)                                       # Put the column in a bootstrap 3 row
-            self.content = row                                      # set our content
-            return self
-
-The code is generally self descriptive.
-
- * Markdown creates a markdown object.
- * Panel(doc, heading=doc_heading)) creates a bootstrap 3 panel with a heading
- * Column() creates a full width bootstrap 3 column to contain the panel. C() is a shortcut for Column().
- * Row() creates a bootstrap 3 row that contains the column. R() is a shortcut for Row().
-
-Most DjangoPages follow this general pattern.
-
- * Page content is created
- * The content is put in a layout
-
-While the page could be written in this fashion, most pages take advantage of various convenience
-methods and techniques to reduce the code count.  Many of these techniques are introduced in the
-tests that follow.
-        """
-
-        # Put the content in a bootstrap 3 responsive grid
-        self.content = Row(Column(doc_panel(self, doc)))
-        return self
-
-
-class DPageConcepts003(DPage):
-    title = 'Overview: DjangoPages Definition 2'
-    description = title
-    tags = ['overview']
-
-    def page(self):
-        doc = """
-In practice DjangoPages are much less verbose than the first example.  Generally the page
-would look something like this:
-
-    class Test000b(DPage):
-        title = 'Overview: DjangoPages Definition'
-        description = title
-        tags = ['overview']
-
-        def page(self):
-            doc_panel = Panel(MD('This is the panel body',
-                              MD('### DjangoPage Overview'))
-            self.content = RC(doc_panel)
-            return self
-
-DjangoPages provides a number of convenience methods and abbreviations to simplify page creation
-and reduce code.
-        """
-
-        # Put the content in a bootstrap 3 responsive grid
-        self.content = Row(Column(doc_panel(self, doc)))
-        return self
-
-
-class DPageConcepts004(DPage):
-    title = 'Overview: DjangoPage Widgets'
-    description = title
-    tags = ['overview']
-
-    def page(self):
-        doc = '''
-Much of DjangoPage's utility comes from DjangoPage widgets. You have already seen several and will encounter
-others in these tests/examples.
-
-Widgets must
-
- * Inherit from Content
- * Initialize any custom arguments they use
- * Override the default render method and return the widgets result HTML
-
-DjangoPage widgets are generally simple and easy to create.  They look something like this:
-
-    class Glyphicon(Content):
-        """
-        Convenience method to output bootstrap 3 glyphicons
-        """
-
-        template = """
-        <span {classes} {style}></span>
-        """
-
-        def __init__(self, content, classes='', style='', template=None):
-            super(Glyphicon, self).__init__(content, classes, style, template)
-            return
-
-        def render(self):
-            extra = 'glyphicon glyphicon-{}'.format(self.content)
-            content, classes, style, template = self.render_setup(extra_classes=extra)
-            out = template.format(style=style,
-                                  classes=classes)
-            return out
-
-    GL = functools.partial(Glyphicon)
-
-Many widgets, not all, contain a template.  The template simply defines some html that the widget
-customizes based on its arguments.
-
-The __init__ method is responsible for initializing the base class and saving any custom arguments the
-widget uses.
-
-All widgets take
- * content: The widget's content. Typically, data central to the widget's output.
- * classes: Any additional classes to be applied to the widget.
- * style: Any additional styles to be applied to the widget.
- * template: Value that will override the widget's default template.
-
-The render method is responsible for generating the widget's html output.  Generally, it creates any extra
-classes and/or styles and uses self.render_setup() to create final values for the widget's content, classes,
-style, and template.
-
-render_setup will evaluates methods used to define the widget's content, classes, style, and template. This is
-an extremely important service as it allows the use of other widgets to create these elements.
-        '''
-
-        # Put the content in a bootstrap 3 responsive grid
-        self.content = Row(Column(doc_panel(self, doc)))
-        return self
-
-
-class DPageConcepts005(DPage):
-    title = 'Overview: DjangoPages page processing'
-    description = title
-    tags = ['overview']
-
-    def page(self):
-        doc = """
-When a DjangoPage is created its URL is defined based on the page's class name.  It is not necessary to
-create a urls.py entry.  Convenience methods are planned to facilitate control of the site url namespace.
-
-When the url is used the page is rendered as follows:
-
- * The page's render method is executed.  As a general proposition DjangoPages need not and should not
-   override the DPage render method.
- * The Dpage render method renders each element of self.content
- * The results are concatenated
- * The results are passed to the page's template and a response object returned
-
-The end result is that DjangoPages render using the underlying Django render/response methods.
-        """
-
-        self.content = R(C(doc_panel(self, doc)))
-        return self
-
-
-class DPageConcepts006(DPage):
-    title = 'Overview: DjangoPages test/examples'
-    description = title
-    tags = ['overview']
-
-    def page(self):
-        doc = """
-The tests in this list were originally created during development to validate DjangoPage
-functionality.  They provide an introduction to DjangoPages and its features.
-
-It was necessary to use some features before they are introduced.  However, if you
-study the test in order you will encounter all DjangoPage's features in a reasonably tutorial
-fashion.
-
-Note, the initial examples are intentionally verbose so they may be more easily understood.
-As the examples proceed, they become less verbose and more production oriented.
-        """
-
-        self.content = R(C(doc_panel(self, doc)))
-        return self
-
-
 class TestTextHTML(DPage):
     title = 'Text: Text/HTML'
     description = 'Demonstrate ' + title
     tags = ['text']
 
     def page(self):
-        doc = """
-Text(content_1, ...)
-T(content_1, ...)
-HTML(content_1, ...)
-
- * contents: text to output
-
-The Text and HTML widgets simply output their content.  They do not add an HTML wrapper.
-
- * Multiple content is concatenated.
- * Text, T, and HTML can be used interchangeably.
- * If content is an object, the output of it's render method is used.  This allows
-   inclusion of the output of other DjangoPage widgets, ex. Markdown.
-
-####Code
-    content = Text('This is some Text content. ',
-                   'This is some more Text content.',
-                   '</br>Text can also output HTML.',
-                   Markdown('**Embedded markdown bold text.**'),
-                   Markdown(' *Embedded markdown italic text.*'
-                            ' Note, Markdown wraps its output in an HTML paragraph.'))
-
-    or HTML
-
-    content = HTML('<strong>This is some strong HTML content.</strong> ',
-                   '<i>This is some italic HTML content.</i>',
-                   '</br><u>Text can also output underlined HTML.</u>',
-                   Markdown('**Embedded markdown bold text.**'))
-
-    or T convenience method
-
-    content = T('<strong>This is some strong HTML content.</strong> ',
-                '<i>This is some italic HTML content.</i>',
-                '</br><u>Text can also output underlined HTML.</u>',
-                Markdown('**Embedded markdown bold text.**'))
-**Note: These examples use a responsive bootstrap 3 grid layout. This will be explained in subsequent
-examples/test.  You can see the responsive behavior by adjusting the browser width.**
-        """
-
-        content = Text('This is some Text content. ',
-                       'This is some more Text content.',
-                       '</br>Text can also output HTML.',
-                       Markdown('**Embedded markdown bold text.**'),
-                       Markdown(' *Embedded markdown italic text.*'
-                                ' Note, Markdown wraps its output in an HTML paragraph.'))
-        self.content = page_content(self, doc, content)
+        doc1 = Text(('This is some Text content. ',
+                     'This is some more Text content.',
+                     '</br>Text can also output HTML.',
+                     Markdown('**Embedded markdown bold text.**'),
+                     Markdown(' *Embedded markdown italic text.*'
+                              ' Note, Markdown wraps its output in an HTML paragraph.')))
+        doc2 = Text('Bisque packground style para', para=True, style='background-color:bisque;')
+        doc3 = Text('Red templated text', template='<font color="red">{content}</font>')
+        # content = RC([doc1, doc2, doc3])
+        content = doc1+doc2+doc3
+        self.content = page_content_v(self, content, None)
         return self
 
 

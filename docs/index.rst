@@ -22,6 +22,7 @@ content creation and layout.
    :maxdepth: 2
 
    overview
+   text
 
 Indices and tables
 ==================
