@@ -39,11 +39,19 @@ from django.utils.encoding import force_unicode
 class Text(DWidget):
     """ Renders content to the page.
 
-    | Text(content, para=False, classes='', style='', template=None)
+    | Text(\*content, \*\*kwargs)
     | T(...)
     | HTML(...)
 
-    * para: If True wrap the output in <p>...</p>
+        :param content: content
+        :type content: basestring or tuple or DWidget
+        :param kwargs: standard kwargs plus
+        :type kwargs: dict
+
+    additional kwargs
+
+        :param para: if True wrap output in a paragraph
+        :type para: bool
     """
     template = '{content}'
     template_para = '<p {classes} {style}>{content}</p>'
@@ -67,26 +75,28 @@ HTML = functools.partial(Text)
 class Markdown(DWidget):
     """ Renders markdown to the page.
 
-    | Markdown(<content>, [<content>, ...], [extensions=...])
+    | Markdown(\*content, \*\*kwargs)
     | MD()
 
-    <content> is the content to render.
-    extensions are markdown extensions.  See markdown.markdown in library.
+        :param content: content
+        :type content: basestring or tuple or DWidget
+        :param kwargs: standard kwargs plus
+        :type kwargs: dict
 
-    If <content> is a basestring output markdown(<content>) to the page.
-    Otherwise outputs markdown(<content>.render).
-    Multiple content is concatenated.
+    additional kwargs
+
+        :param extensions: see Markdown extensions in python documentation
+        :type extensions: varies
     """
     def __init__(self, *content, **kwargs):
         super(Markdown, self).__init__(content, kwargs=kwargs)
         pass
 
     def render(self):
-        extensions = self.kwargs.pop('extensions', '')
+        extensions = self.kwargs.pop('extensions', [])
+        content, classes, style, template = self.render_setup()
         out = ''
         for obj in self.content:
-            if not isinstance(obj, basestring):
-                obj = render_objects(obj)
             out += markdown.markdown(force_unicode(obj),
                                      extensions,
                                      output_format='html5',
@@ -100,6 +110,8 @@ MD = functools.partial(Markdown)
 # loremipsum text generation.
 #
 ########################################################################################################################
+
+# fixme: resume work here
 
 
 class LI(DWidget):
