@@ -164,7 +164,7 @@ class DPage(object):
 ########################################################################################################################
 
 
-class Content(object):
+class DWidget(object):
     """
     Base class for content classes.
 

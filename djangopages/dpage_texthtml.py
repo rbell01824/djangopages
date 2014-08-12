@@ -26,7 +26,7 @@ import markdown
 import loremipsum
 import functools
 
-from djangopages.dpage import Content, render_objects
+from djangopages.dpage import DWidget, render_objects
 from django.utils.encoding import force_unicode
 
 ########################################################################################################################
@@ -36,7 +36,7 @@ from django.utils.encoding import force_unicode
 ########################################################################################################################
 
 
-class Text(Content):
+class Text(DWidget):
     """
     Renders content to the page.
 
@@ -66,7 +66,7 @@ T = functools.partial(Text)
 HTML = functools.partial(Text)
 
 
-class Markdown(Content):
+class Markdown(DWidget):
     """
     Holds markdown text for inclusion in a DPage.  Markdown can also hold Text and HTML.
     """
@@ -96,7 +96,7 @@ MD = functools.partial(Markdown)
 ########################################################################################################################
 
 
-class LI(Content):
+class LI(DWidget):
     """
     Generate loremipsum paragraphs of sentence length sentences.
     """
@@ -117,9 +117,12 @@ class LI(Content):
         return LIParagraph(amount, para).render()
 
 
-class LIParagraph(Content):
-    """
-    Generate a loremipsum paragraph
+class LIParagraph(DWidget):
+    """Generate amount loremipsum paragraphs
+
+    LIParagraph(amount=1, para=True)
+        amount: number of paragraphs to return
+        para: if true, wrap each returned paragraph in <p>...</p>
     """
     def __init__(self, amount=1, para=True):
         super(LIParagraph, self).__init__()
@@ -139,7 +142,7 @@ class LIParagraph(Content):
         return out
 
 
-class LISentence(Content):
+class LISentence(DWidget):
     """
     Generate a loremipsum sentences
     """
@@ -164,7 +167,7 @@ class LISentence(Content):
 # todo 1: turn SP & BR & NBSP methods into classes
 
 
-class AmountStr(Content):
+class AmountStr(DWidget):
     """
     amount occurences of a string
     """

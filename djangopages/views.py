@@ -120,27 +120,6 @@ class DPagesAll(DPage):
         return self
 
 
-class DPagesOverview(DPage):
-    """
-    List overview pages
-    """
-    title = 'DjangoPages Overview'
-    description = 'List Overview DjangoPages'
-    tags = ['toc']
-
-    def page(self):
-        doc = """
-DjangoPages provides a set of technologies to quickly and easily:
-
- * Create responsive Django web pages using Bootstrap 3 and jQuery
- * Draw web page content from Django and related databases
-        """
-        content = (MD(doc), page_list_for_pages(DPage.find('overview')))
-        self.content = page_content_v(self, content, None)
-
-        return self
-
-
 class DPagesText(DPage):
     """
     List text related pages

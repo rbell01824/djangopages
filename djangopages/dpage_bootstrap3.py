@@ -36,7 +36,7 @@ from django.template import Template
 from django.template import Context
 from django.core.context_processors import csrf
 
-from djangopages.dpage import Content, render_objects, unique_name
+from djangopages.dpage import DWidget, render_objects, unique_name
 
 ########################################################################################################################
 #
@@ -54,7 +54,7 @@ from djangopages.dpage import Content, render_objects, unique_name
 ########################################################################################################################
 
 
-class Button(Content):
+class Button(DWidget):
     """
     DPage button class
     """
@@ -85,7 +85,7 @@ class Button(Content):
 BTN = functools.partial(Button)
 
 
-class Glyphicon(Content):
+class Glyphicon(DWidget):
     """
     Convenience method to output bootstrap 3 glyphicons
     """
@@ -107,7 +107,7 @@ class Glyphicon(Content):
 GL = functools.partial(Glyphicon)
 
 
-class Link(Content):
+class Link(DWidget):
     """
     Link text support.  Link renders its content and wraps in a link.
     """
@@ -136,7 +136,7 @@ class Link(Content):
         return out
 
 
-class Panel(Content):
+class Panel(DWidget):
     """
     Basic panel class
     """

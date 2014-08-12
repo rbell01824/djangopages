@@ -23,7 +23,7 @@ __email__ = 'rbell01824@gmail.com'
 
 import functools
 
-from djangopages.dpage import Content, render_objects
+from djangopages.dpage import DWidget, render_objects
 
 ########################################################################################################################
 #
@@ -32,7 +32,7 @@ from djangopages.dpage import Content, render_objects
 ########################################################################################################################
 
 
-class Column(Content):
+class Column(DWidget):
     """
     Wrap *content objects in column of width width=nn.  Content is rendered and wrapped in a single
     bootstrap 3 column of width width.
@@ -86,7 +86,7 @@ C11 = functools.partial(Column, width=11)
 C12 = functools.partial(Column, width=12)
 
 
-class Row(Content):
+class Row(DWidget):
     """
     Wrap content in a row.
     """
