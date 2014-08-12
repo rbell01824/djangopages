@@ -95,34 +95,27 @@ class DPagesList(DPage):
         """
         List available pages
         """
-
-        doc = """
-DjangoPages provides a set of technologies to quickly and easily:
-
- * Create responsive Django web pages using Bootstrap 3 and jQuery
- * Draw web page content from Django and related databases
-
-The links below provide an introduction to DJangoPages.
-        """
-        content = (MD(doc),
-                   page_list_for_pages(DPage.find('toc')))
-        self.content = page_content_v(self, content, None)
-
-        return self
-
-
-class DPagesAll(DPage):
-    """
-    List all dpage pages
-    """
-    title = 'All'
-    description = 'List all DjangoPages'
-    tags = ['toc']
-
-    def page(self):
+        t = '<a href="/dpages/{name}" ' \
+            'class="btn btn-default btn-xs" ' \
+            'role="button" ' \
+            'style="width:400px;text-align:left;margin-bottom:2px;">' \
+            '{text}' \
+            '</a><br/>'
         # noinspection PyUnresolvedReferences
-        self.content = page_content_v(self, page_list_for_pages(DPage.pages_list), None)
+        pages = DPage.pages_list
+        out = ''
+        for page in pages:
+            # get the class definition for this page
+            cls = page['cls']
+            # make a link button object to execute an instance of the class
+            # lnk = Link('/dpages/{name}'.format(name=cls.__name__), cls.title)
+            # lnkbtn = Button(lnk, btn_size='btn-xs')
+            # Output a line with the link button, test title, and test description
+            line = t.format(name=cls.__name__, text=cls.title)
+            out += line
+        self.content = out
         return self
+
 
 ########################################################################################################################
 #
@@ -206,17 +199,15 @@ class TestTextHTML(DPage):
     tags = ['text']
 
     def page(self):
-        doc1 = Text(('This is some Text content. ',
+        doc1 = Text('This is some Text content. ',
                      'This is some more Text content.',
-                     '</br>Text can also output HTML.',
-                     Markdown('**Embedded markdown bold text.**'),
-                     Markdown(' *Embedded markdown italic text.*'
-                              ' Note, Markdown wraps its output in an HTML paragraph.')))
+                     '</br>Text can also output HTML.')
         doc2 = Text('Bisque packground style para', para=True, style='background-color:bisque;')
         doc3 = Text('Red templated text', template='<font color="red">{content}</font>')
         # content = RC([doc1, doc2, doc3])
         content = doc1+doc2+doc3
-        self.content = page_content_v(self, content, None)
+        # self.content = page_content_v(self, content, None)
+        self.content = content
         return self
 
 

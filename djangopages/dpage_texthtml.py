@@ -48,9 +48,8 @@ class Text(DWidget):
     template = '{content}'
     template_para = '<p {classes} {style}>{content}</p>'
 
-    def __init__(self, content, para=False, classes='', style='', template=None):
-        super(Text, self).__init__(content, classes, style, template)
-        self.para = para
+    def __init__(self, *content, **kwargs):
+        super(Text, self).__init__(content, kwargs)
         return
 
     def render(self):
@@ -58,7 +57,7 @@ class Text(DWidget):
         Render the Text object
         """
         content, classes, style, template = self.render_setup()
-        if self.para:
+        if self.kwargs.pop('para', None):
             return Text.template_para.format(content=content, classes=classes, style=style)
         return template.format(content=content, classes=classes, style=style)
 T = functools.partial(Text)

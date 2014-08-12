@@ -69,14 +69,9 @@ class _DPageRegister(type):
 class DPage(object):
     """
     DPage classes define Django Page objects, ie. pages that can be displayed.
-    """
-    __metaclass__ = _DPageRegister              # use DPageRegister to register child classes
 
-    def __init__(self, request=None, context=None, template=None,
-                 title='', description='', tags=None):
-        """
-        Initialize the DPage.  As a general rule, you need not perform initialization in the DPage child class.
-        However, if you do it is possible to provide additional context content and customize the template.
+    As a general rule, you need not perform initialization in the DPage child class.  However, if you do these
+    parameters are available.
 
         :param request: The request object
         :type request: WSGIRequest
@@ -85,8 +80,19 @@ class DPage(object):
         :param template: template name to use for this DPage object.  If None, DPageDefaultTemplate specified in
                          settings is used.
         :type template: unicode
-        :param kwargs: RFU
-        :type kwargs: dict
+        :param title: brief title for this DPage object
+        :type title: unicode
+        :param description: longer description for this DPage object
+        :type description: unicode
+        :param tags: list of tags for this DPage
+        :type tags: list
+    """
+    __metaclass__ = _DPageRegister              # use DPageRegister to register child classes
+
+    def __init__(self, request=None, context=None, template=None,
+                 title='', description='', tags=None):
+        """
+        Initialize the DPage.
         """
         self.request = request
         self.context = context
@@ -118,7 +124,7 @@ class DPage(object):
         """
         raise NotImplementedError("Subclasses should implement DPage.page!")
 
-    def render(self, **kwargs):
+    def render(self):
         """
         Render this DPage and return a Django response object.
 
@@ -146,8 +152,17 @@ class DPage(object):
     def __str__(self):
         return unicode(self).encode('utf8')
 
+    # fixme: rename these method, document, change globally
+
     @staticmethod
     def find(tag):
+        """
+        Find all the DPage(s) with this tag.
+            :param tag: Tag
+            :type tag: unicode
+            :return: List of DPage(s) with this tag.
+            :rtype: list
+        """
         # noinspection PyUnresolvedReferences
         pages = DPage.pages_list
         lst = []
@@ -156,6 +171,50 @@ class DPage(object):
             if tag in cls.tags:
                 lst.append(p)
         return lst
+
+    def next(self, obj=False):
+        """
+        Return next dpage in the dpage list.
+            :param obj: If true, return the object.  Otherwise return the name.
+            :type obj: bool
+        """
+        # noinspection PyUnresolvedReferences
+        pl = DPage.pages_list
+        # noinspection PyBroadException
+        try:
+            pi = pl.index({'name': self.__class__.__name__, 'cls': self.__class__})
+            if obj:
+                return pl[pi+1]
+            else:
+                return pl[pi+1]['name']
+        except:
+            return None
+
+    def prev(self, obj=False):
+        """
+        Return previous dpage in the dpage list.
+            :param obj: If true, return the object.  Otherwise return the name.
+            :type obj: bool
+        """
+        # noinspection PyUnresolvedReferences
+        pl = DPage.pages_list
+        # noinspection PyBroadException
+        try:
+            pi = pl.index({'name': self.__class__.__name__, 'cls': self.__class__})
+            if obj:
+                return pl[pi-1]
+            else:
+                return pl[pi-1]['name']
+        except:
+            return None
+
+    def siblings(self, obj=False):
+        """
+        Return the prev and next dpage objects from the list
+            :param obj: If true, return the object.  Otherwise return the name.
+            :type obj: bool
+        """
+        return self.prev(obj), self.next(obj)
 
 ########################################################################################################################
 #
@@ -168,6 +227,7 @@ class DWidget(object):
     """ DWidget(s) provide content for DPage(s)
 
     DWidget(content='', classes='', style='', template=None, kwargs=None)
+    # def __init__(self, content='', classes='', style='', template=None, kwargs=None):
 
     * content: the widget's content
     * style: extra styles for the widget
@@ -191,13 +251,13 @@ class DWidget(object):
     """
     template = ''
 
-    def __init__(self, content='', classes='', style='', template=None, kwargs=None):
+    def __init__(self, content, kwargs):
         self.content = content
-        self.classes = classes
-        self.style = style
-        self.template = template if template else self.template
+        self.classes = kwargs.pop('classes', None)
+        self.style = kwargs.pop('style', None)
+        self.template = kwargs.pop('template', self.template)
         self.kwargs = kwargs
-        pass
+        return
 
     def render(self):
         """
@@ -215,6 +275,8 @@ class DWidget(object):
 
         Applies render_objects to content, classes, extra_classes, style, extra_style,
         and template.
+
+        Returns (content, classes, style, template, kwargs)
 
         * content: content string for the widget
         * classes: class string for the widget adding extra_classes or ''
@@ -303,51 +365,3 @@ def unique_name(base_name='x'):
         unique_name.counter = 0  # it doesn't exist yet, so initialize it
     unique_name.counter += 1
     return '{}_{}'.format(base_name, unique_name.counter)
-
-
-def next_dpage(dpage, obj=False):
-    """
-    Return next dpage in the dpage list.
-    :param dpage:
-    :param obj:
-    :return:
-    """
-    pl = dpage.pages_list
-    # noinspection PyBroadException
-    try:
-        pi = pl.index({'name': dpage.__class__.__name__, 'cls': dpage.__class__})
-        if obj:
-            return pl[pi+1]
-        else:
-            return pl[pi+1]['name']
-    except:
-        return None
-
-
-def prev_dpage(dpage, obj=False):
-    """
-    Return previous dpage in the dpage list.
-    :param dpage:
-    :param obj:
-    :return:
-    """
-    pl = dpage.pages_list
-    # noinspection PyBroadException
-    try:
-        pi = pl.index({'name': dpage.__class__.__name__, 'cls': dpage.__class__})
-        if obj:
-            return pl[pi-1]
-        else:
-            return pl[pi-1]['name']
-    except:
-        return None
-
-
-def sibling_dpage(dpage, obj=False):
-    """
-    Return the prev and next dpage objects from the list
-    :param dpage:
-    :param obj:
-    :return:
-    """
-    return prev_dpage(dpage, obj), next_dpage(dpage, obj)
