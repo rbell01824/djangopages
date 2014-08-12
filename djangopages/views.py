@@ -668,6 +668,8 @@ R(C((..., ...))) will be explained shortly.
         self.content = page_content(self, doc, content)
         return self
 
+# fixme: move this to overview
+
 
 class TestSequence(DPage):
     title = 'Content: Widget sequence arguments'
