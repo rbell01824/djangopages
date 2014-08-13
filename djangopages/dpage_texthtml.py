@@ -69,10 +69,12 @@ class Text(DWidget):
         super(Text, self).__init__(content, kwargs)
         return
 
-    def generate(self, template, con_s, con_l, classes, style, kwargs):
+    def generate(self, template, content, classes, style, kwargs):
+        # todo 2: support [] and render multiple T
+        c = ' '.join(content)
         if kwargs.get('para', None):
-            return Text.template_para.format(content=con_s, classes=classes, style=style)
-        return template.format(content=con_s, classes=classes, style=style)
+            return Text.template_para.format(content=c, classes=classes, style=style)
+        return template.format(content=c, classes=classes, style=style)
 T = functools.partial(Text)
 HTML = functools.partial(Text)
 
@@ -95,9 +97,11 @@ class Markdown(DWidget):
         super(Markdown, self).__init__(content, kwargs)
         return
 
-    def generate(self, template, con_s, con_l, classes, style, kwargs):
+    def generate(self, template, content, classes, style, kwargs):
+        # todo 2: support [] and render multiple MD
         extensions = kwargs.get('extensions', [])
-        out = markdown.markdown(force_unicode(con_s),
+        c = ' '.join(content)
+        out = markdown.markdown(force_unicode(c),
                                 extensions,
                                 output_format='html5',
                                 safe_mode=False,
@@ -127,9 +131,9 @@ class LI(DWidget):
         super(LI, self).__init__(content, kwargs)
         return
 
-    def generate(self, template, con_s, con_l, classes, style, kwargs):
+    def generate(self, template, content, classes, style, kwargs):
         out = ''
-        for pl in con_l:
+        for pl in content:
             if pl > 0:
                 content = ' '.join(loremipsum.get_sentences(pl))
             else:
@@ -160,11 +164,11 @@ class AmountStr(DWidget):
         super(AmountStr, self).__init__(content, kwargs)
         return
 
-    def generate(self, template, con_s, con_l, classes, style, kwargs):
+    def generate(self, template, content, classes, style, kwargs):
         amt = 1
-        if len(con_l) > 0:
-            amt = con_l[0]
-        return template.format(content=con_s, classes=classes, style=style) * amt
+        if len(content) > 1:
+            amt = content[1]
+        return template.format(content=content[0], classes=classes, style=style) * amt
 AS = functools.partial(AmountStr)
 BR = functools.partial(AmountStr, '<br/>')
 SP = functools.partial(AmountStr, '&nbsp;')

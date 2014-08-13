@@ -23,6 +23,7 @@ content creation and layout.
 
    overview
    text
+   layout
 
 Indices and tables
 ==================

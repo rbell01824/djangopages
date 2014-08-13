@@ -191,9 +191,7 @@ def page_content_3(dpage, code, output):
                '<a href="/dpages/DPagesList">Home </a>' \
                '<a href="/dpages/{prev}">Prev </a>' \
                '<a href="/dpages/{next}">Next</a>' \
-               '<pre>' \
-               '{code}' \
-               '</pre>' \
+               '<pre>{code}</pre>' \
                '<h4>Output for this code</h4>' \
                '<hr style="box-shadow: 0 0 10px 1px black;">' \
                '{output}'
@@ -208,8 +206,8 @@ def page_content_3(dpage, code, output):
 ########################################################################################################################
 
 
-class TestTextHTML(DPage):
-    title = 'Text: Text/HTML'
+class TestText(DPage):
+    title = 'Text: Text'
     description = 'Demonstrate ' + title
     tags = ['text']
 
@@ -265,6 +263,7 @@ content = T(LI(1, 2, 5),                                # make 3 paragraphs with
             LI(15, style='background-color:bisque;'))   # paragraph with background
         """
 
+        # content = LI(1,2,3)
         content = T(LI(1, 2, 5),                                # make 3 paragraphs with different number of sentences
                     LI(15, style='background-color:bisque;'))   # paragraph with background
         self.content = page_content_3(self, code, content)
@@ -304,38 +303,6 @@ content = T('line brake here', BR(), 'second line', BR(2), 'third', SP(5), 'line
         self.content = page_content_3(self, doc, content)
         return self
 
-# fixme: move this to overview
-
-
-class TestSequence(DPage):
-    title = 'Content: Widget sequence arguments'
-    description = 'Demonstrate ' + title
-    tags = ['content']
-
-    def page(self):
-        doc = """
-Most DjangoPage widgets take a single content argument. However, it is often convenient to combine
-the output of multiple widgets as the content of another widget.
-
-Wrapping the inner widgets in a sequence allows the combined arguments to be passed as a single content
-argument.
-
-    R(C(('two ', 'words')))
-
-is more convenient and generally clearer than
-
-    r = 'two ' + 'words'
-    R(C(r))
-
-If you wish you can make this more explicit with the X widget that renders its arguments and
-concatenates the result.
-
-    R(C(X('two ', 'words')))
-        """
-
-        self.content = page_content_v(self, doc, '')
-        return self
-
 
 class TestMultipleWidgets(DPage):
     title = 'Content: Multiple widgets on page'
@@ -344,100 +311,84 @@ class TestMultipleWidgets(DPage):
 
     def page(self):
         doc = """
-Multiple widgets can be combined on a page as previously illustrated.
-
-####Code
-    content = []
-    content.append(Markdown('**Some bold Markdown text**'))
-    content.append(HTML('<i><b>Some italic bold HTML text</b></i>'))
-    content.append(Text('</br>Some Text text'))
-    content.append(LI([3, 5]))
+content = T(Markdown('**Some bold Markdown text**'),
+            HTML('<i><b>Some italic bold HTML text</b></i>'),
+            Text('</br>Some Text text'),
+            LI(3, 5))
         """
 
         # noinspection PyListCreation
-        content = []
-        content.append(Markdown('**Some bold Markdown text**'))
-        content.append(HTML('<i><b>Some italic bold HTML text</b></i>'))
-        content.append(Text('</br>Some Text text'))
-        content.append(LI([3, 5]))
-        self.content = page_content(self, doc, content)
+        content = T(Markdown('**Some bold Markdown text**'),
+                    HTML('<i><b>Some italic bold HTML text</b></i>'),
+                    Text('</br>Some Text text'),
+                    LI(3, 5))
+        self.content = page_content_3(self, doc, content)
         return self
 
 
-class TestClassesStyles(DPage):
-    title = 'Content: Widget classes and styles'
+class TestColumn(DPage):
+    title = 'Layout: Bootstrap 3 Column'
     description = 'Demonstrate ' + title
-    tags = ['content']
+    tags = ['layout']
 
     def page(self):
         doc = """
-It is generally convenient to pass extra classes and styles to widgets.
-
-Most DjangoPage widgets take
-
- * classes='list of additional classes'
- * styles='additional styles'
-
-arguments.
-
-####Code
-    content = (Row(C(LI([5])), style='border-style:solid;border-color:red;'),
-               Row((C6(LI([2]), style='border-style:solid;border-width:1px'),
-                    C6(LI([2]), style='border-style:solid;border-width:1px'))))
+t = '<b>Some text</b> ' + 'Be kind to your web footed friends. ' * 15
+content = T('&lt;div class="row"&gt;',
+            C3(t, style='background-color:powderblue'),
+            C(t+'mighty ducks '*30, width=6, style='background-color:bisque;'),
+            C3(t, style='background-color:violet'),
+            '&lt;/div&gt;')
         """
 
-        content = (Row(C(LI([5])), style='border-style:solid;border-color:red;'),
-                   Row((C6(LI([2]), style='border-style:solid;border-width:1px'),
-                        C6(LI([2]), style='border-style:solid;border-width:1px'))))
-        self.content = page_content(self, doc, content)
+        # Create some text for two rows
+        t = '<b>Some text</b> ' + 'Be kind to your web footed friends. ' * 15
+        content = T('<div class="row">',
+                    C3(t, style='background-color:powderblue'),
+                    C(t+'mighty ducks '*30, width=6, style='background-color:bisque;'),
+                    C3(t, style='background-color:violet'),
+                    '</div>')
+        self.content = page_content_3(self, doc, content)
         return self
 
 
-class TestRowColumn(DPage):
-    title = 'Layout: Bootstrap 3 Row/Column'
+class TestColumnList(DPage):
+    title = 'Layout: Column List'
     description = 'Demonstrate ' + title
     tags = ['layout']
 
     def page(self):
         doc = """
  * Row(content, classes='', style='', template=None)
- * R(...)
-     * content: the row content
-     * classes: other class for the widget
-     * style: styles for the widget
-     * template: override default template
- * Column(content, width=12, classes='', style='', template=None)
- * C(...)
-     * content: the column content
-     * classes: other class for the widget
-     * style: styles for the widget
-     * template: override default template
-
-Row and Column can be used to create responsive bootstrap 3 page grid layouts. They are mutually nestable, ie.
-
- * Rows may contain multiple columns
- * Columns may contain multiple rows
-
-#### Code
-    # Create some text for two rows
-    text = MD(LI([5], para=False))
-    row1 = MD('**Text in row 1** '+text)
-    row2col1 = MD('**Text in row 2 col 1**' + text)
-    row2col2 = MD('**Text in row 2 col 2**' + text)
-
-    content = (Row(Column(row1)),                                   # with Row & Column
-               R((C(row2col1, width=6), C(row2col2, width=6))))     # with R & C
         """
 
         # Create some text for two rows
-        text = MD(LI([5], para=False))
-        row1 = MD('**Text in row 1** '+text)
-        row2col1 = MD('**Text in row 2 col 1**' + text)
-        row2col2 = MD('**Text in row 2 col 2**' + text)
+        t1 = '<b>Some text</b> ' + 'Be kind to your web footed friends. ' * 15
+        t2 = '<b>Ducks</b>' + 'Ducks ' * 30
+        content = T('<div class="row">',
+                    C3([t1, t2], style='background-color:powderblue'),
+                    '</div>')
+        self.content = page_content_3(self, doc, content)
+        return self
 
-        content = (Row(Column(row1)),                                   # with Row & Column
-                   R((C(row2col1, width=6), C(row2col2, width=6))))     # with R & C
-        self.content = page_content(self, doc, content)
+class TestRow(DPage):
+    title = 'Layout: Bootstrap 3 Row'
+    description = 'Demonstrate ' + title
+    tags = ['layout']
+
+    def page(self):
+        doc = """
+ * Row(content, classes='', style='', template=None)
+        """
+
+        # Create some text for two rows
+        t = '<b>Some text</b> ' + 'Be kind to your web footed friends. ' * 15
+        content = T('<div class="row">',
+                    C3(t, style='background-color:powderblue'),
+                    C(t+'mighty ducks '*30, width=6, style='background-color:bisque;'),
+                    C3(t, style='background-color:violet'),
+                    '</div>')
+        self.content = page_content_3(self, doc, content)
         return self
 
 

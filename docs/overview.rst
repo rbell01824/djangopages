@@ -1,15 +1,10 @@
 .. DjangoPages overview.
 
-Overview
-========
+.. automodule:: djangopages.dpage
 
-DjangoPages has two main conceptual components:
-
-* Pages created by subclassing DPage
-* Widgets created by subclassing DWidget that provide content to pages
 
 DPage Introduction
-------------------
+==================
 
 DPage(s) define DjangoPage(s). Typically a DjangoPage looks something like this::
 
@@ -66,7 +61,7 @@ DPage Details
    :members: render, find, next, prev, siblings
 
 Widget Introduction
--------------------
+===================
 
 DWidget(s) create content for DjangoPages. For example::
 
@@ -157,13 +152,14 @@ DWidgets must:
 
 You can see many examples DWidget examples in djangopages.dpage_texthtml.py and related modules.
 
-DWidget Details
----------------
+Widget Base Class Details
+-------------------------
 
 .. autoclass:: djangopages.dpage.DWidget
+   :members: add_classes, add_style
 
 Other base DjangoPage methods
------------------------------
+=============================
 
 The following other methods play a useful role in DjangoPages.
 

@@ -1,10 +1,21 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-""" Some description here
+"""
+Overview
+========
+
+.. module:: dpage
+   :synopsis: Provides base DjangoPage DPage and DWidget
+
+.. moduleauthor:: Richard Bell <rbell01824@gmail.com>
 
 5/9/14 - Initial creation
 
+DjangoPages has two main conceptual components:
+
+* Pages created by subclassing DPage
+* Widgets created by subclassing DWidget that provide content to pages
 """
 
 from __future__ import unicode_literals
@@ -36,9 +47,9 @@ from django.shortcuts import render
 # todo 2: support rest of bootstrap 3 form attributes
 # todo 2: syntactic suggar for Form
 
-        # todo 3: here check text type and deal with file like objects and queryset objects
-        # for now just deal with actual text
-        # todo 2: add markdown kwargs options here
+# todo 3: here check text type and deal with file like objects and queryset objects
+# for now just deal with actual text
+# todo 2: add markdown kwargs options here
 
 ########################################################################################################################
 #
@@ -136,7 +147,8 @@ class DPage(object):
             self.context = {}
 
         # render all our objects
-        content, ignore_lst = render_objects(self.content)
+        c = render_objects(self.content)
+        content = ' '.join(c)
 
         # if there was nothing, use the default content
         if len(content) == 0:
@@ -267,21 +279,25 @@ class DWidget(object):
         Invoke the generate method, likely the child class generate, to actually
         create the output HTML.
         """
-        con_s, con_l = render_objects(self.content)
+        content = render_objects(self.content)
         classes = ''
         if self.classes:
-            classes = 'class="{}"'.format(RO(self.classes)[0])
+            classes = 'class="{}"'.format(render_objects(self.classes)[0])
         style = ''
         if self.style:
-            style = 'style="{}"'.format(RO(self.style)[0])
-        template = RO(self.template)[0]
-        # todo 2: apply RO to kwargs
+            style = 'style="{}"'.format(render_objects(self.style)[0])
+        template = render_objects(self.template)[0]
+        # todo 2: apply render_objects to kwargs
         kwargs = self.kwargs
-        out = self.generate(template, con_s, con_l, classes, style, kwargs)
+        out = self.generate(template, content, classes, style, kwargs)
         return out
 
-    def generate(self, template, con_s, con_l, classes, style, kwargs):
-        return template.format(content=con_s, classes=classes, style=style)
+    def generate(self, template, content, classes, style, kwargs):
+        try:
+            c = ' '.join(content)
+            return template.format(content=c, classes=classes, style=style)
+        except TypeError:
+            raise TypeError('Non string content for default DWidget generate')
 
     def __add__(self, other):
         return self.render() + other
@@ -298,6 +314,36 @@ class DWidget(object):
     def __repr__(self):
         return self.render()
 
+    @staticmethod
+    def add_classes(existing, new):
+        """ Add classes to existing classes.
+
+        :param existing: Existing class string, ex. class="someclass another_class"
+        :type existing: str
+        :param new: Classes to add, ex. "a_class_to_add"
+        :type new: str
+        :return: new class string, ex. class="someclass another_class a_class_to_add"
+        :rtype: str
+        """
+        if existing == '':
+            return 'class="{}"'.format(new)
+        return existing[:-1] + ' ' + new + '"'
+
+    @staticmethod
+    def add_style(existing, new):
+        """ Add classes to existing classes.
+
+        :param existing: Existing style string, ex. style="style1;style2;"
+        :type existing: str
+        :param new: Styles to add, ex. "style3;style4;"
+        :type new: str
+        :return: new style string, ex. style="style1;style2;style3;style4;"
+        :rtype: str
+        """
+        if existing == '':
+            return 'style="{}"'.format(new)
+        return existing[:-1] + ' ' + new + '"'
+
 ########################################################################################################################
 #
 # Support Routines
@@ -313,29 +359,35 @@ def render_objects(*content):
 
     :param content: content to render
     :type content: varies
-    :return: content_string, content_list
-    :rtype: ( str, list )
+    :return: content list
+    :rtype: list
 
     Renders each element of *content*.  If it returns a string, appends to
     content_string.  Otherwise, extends content_list
     """
-    str_out = ''
-    lst_out = list()
+    rtn = []
     for con in content:
         if isinstance(con, basestring):                     # strings are just themselves
-            str_out += con
+            rtn.append(con)
         elif hasattr(con, 'render'):                        # objects with render methods know how to render themselves
-            str_out += con.render()
-        elif isinstance(con, collections.Iterable):         # collections are walked
+            rtn.append(con.render())
+        elif isinstance(con, tuple):                        # tuples are walked
             for con1 in con:
-                s, l = render_objects(con1)                 # recurse to render this collection item
-                str_out += s
-                lst_out.extend(l)
-        else:
-            lst_out.append(con)
-    return str_out, lst_out
+                c = render_objects(con1)                    # recurse to render this collection item
+                rtn.extend(c)
+            pass
+        # fixme: resume work here to get list working properly should result in a list appended
+        elif isinstance(con, list):
+            for con1 in con:
+                c = render_objects(con1)
+                rtn.append(c)
+            pass
+        elif isinstance(con, int):
+            rtn.append(con)
+        else:                                               # everything else is put in the list
+            raise ValueError('Unknown content type in render_objects {}'.format(con))
+    return rtn
 X = functools.partial(render_objects)                       # convenience method for render objects
-RO = X
 
 
 def unique_name(base_name='x'):

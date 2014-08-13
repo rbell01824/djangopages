@@ -1,10 +1,22 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-""" django pages layout support routines
+"""
+Layout Widgets
+==============
+
+.. module:: dpage_layout
+   :synopsis: Provides DjangoPage widgets to create bootstrap 3 layouts
+
+.. moduleauthor:: Richard Bell <rbell01824@gmail.com>
+
+DjangoPages provides a number of widgets to create bootstrap 3 responsive
+grid layouts.
 
 8/4/14 - Initial creation
 
+
+**Widgets**
 """
 
 from __future__ import unicode_literals
@@ -33,9 +45,34 @@ from djangopages.dpage import DWidget, render_objects
 
 
 class Column(DWidget):
-    """
-    Wrap *content objects in column of width width=nn.  Content is rendered and wrapped in a single
-    bootstrap 3 column of width width.
+    """ Outputs a bootstrap 3 column
+
+    | Synonym: C(...), useful abbreviation
+
+    :param content: content
+    :type content: basestring or tuple or DWidget
+    :param kwargs: standard kwargs
+    :type kwargs: dict
+
+    additional kwargs
+
+    :param width: column width, default 12
+    :type width: int
+
+    | Additional synonyms:
+    | C1(...), default width 1
+    | C2(...), default width 2
+    | C3(...), default width 3
+    | C4(...), default width 4
+    | C5(...), default width 5
+    | C6(...), default width 6
+    | C7(...), default width 7
+    | C8(...), default width 8
+    | C9(...), default width 9
+    | C10(...), default width 10
+    | C11(...), default width 12
+    | C121(...), default width 11
+
     """
     template = '<!-- Start of dpage col -->\n' \
                '<div {classes} {style}>\n' \
@@ -43,34 +80,27 @@ class Column(DWidget):
                '</div>\n' \
                '<!-- End of dpage col -->\n'
 
-    def __init__(self, content, width=12, classes='', style='', template=None):
+    def __init__(self, *content, **kwargs):
         """
         Initialize Column object.  Wraps content objects in a column of width width.  Width defaults to 12.
         """
-        super(Column, self).__init__(content, classes, style, template)
-        self.width = width
+        super(Column, self).__init__(content, kwargs)
         return
 
-    def render(self):
-        """
-        Wrap content in a column.
-        """
-        # extra = 'col-md-{}'.format(self.width)
-        # content, classes, style, template = self.render_setup(extra_classes=extra)
-        # out = template.format(classes=classes, style=style, content=content)
-        # return out
-        if isinstance(self.content, list):              # if list, iterate over elements
-            out = ''
-            for con in self.content:
-                c = Column(con, self.width, self.classes, self.style, self.template)
-                out += c.render()
+    def generate(self, template, content, classes, style, kwargs):
+        width = kwargs.get('width', 12)
+        classes = self.add_classes(classes, 'col-md-{}'.format(width))
+        try:
+            c = ' '.join(content)
+            out = template.format(content=c, classes=classes, style=style)
             return out
-        else:
-            extra = 'col-md-{}'.format(self.width)
-            content, classes, style, template = self.render_setup(extra_classes=extra)
-            out = template.format(classes=classes, style=style, content=content)
-            return out
-
+        except TypeError:
+            pass
+        out = ''
+        for con in content:
+            c = Column(con, width=width, template=template, classes=classes, style=style).render()
+            out += c
+        return out
 C = functools.partial(Column)
 C1 = functools.partial(Column, width=1)
 C2 = functools.partial(Column, width=2)
