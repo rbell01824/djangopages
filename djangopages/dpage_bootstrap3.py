@@ -137,15 +137,27 @@ class Link(DWidget):
 
 
 class Panel(DWidget):
-    """
-    Basic panel class
+    """ Bootstrap 3 panel
+    | Panel(\*content, \*\*kwargs)
+
+        :param content: content
+        :type content: basestring or tuple or DWidget
+        :param kwargs: standard kwargs
+        :type kwargs: dict
+
+    additional kwargs
+
+        :param heading: Panel heading
+        :type para: basestring or tuple or DWidget
+
     """
     template = """
     <div class="panel panel-default">
         <div class="panel-body">
             {content}
         </div>
-    </div>"""
+    </div>
+    """
 
     heading_template = """
     <div class="panel panel-default">
@@ -153,24 +165,20 @@ class Panel(DWidget):
         <div class="panel-body">
             {content}
         </div>
-    </div>"""
+    </div>
+    """
 
-    def __init__(self, content, heading=None, template=None):
-        super(Panel, self).__init__()
-        self.template = template
-        self.heading = heading
-        self.content = content
+    def __init__(self, *content, **kwargs):
+        super(Panel, self).__init__(content, kwargs)
         return
 
-    def render(self):
-        heading = None
-        template = Panel.template
-        if self.heading:
+    def generate(self, template, content, classes, style, kwargs):
+        heading = kwargs.get('heading', None)
+        if heading:
+            heading = render_objects(heading)
+        if heading and template == Panel.template:
             template = Panel.heading_template
-            heading = render_objects(self.heading)
-        if self.template:
-            template = self.template
-        out = template.format(heading=heading, content=render_objects(self.content))
+        out = template.format(content=content, classes=classes, style=style, heading=heading)
         return out
 
 

@@ -64,7 +64,6 @@ class DPagesView(View):
         except KeyError:
             return HttpResponseNotFound('<h1>Page &lt;{}&gt; not found</h1>'.format(name))
 
-
     @staticmethod
     def post(request, name):
         """
@@ -155,7 +154,7 @@ def doc_panel(dpage, text):
     doc = Markdown(text)
     doc_heading = Markdown('###{title}\n'
                            '[Home](/dpages/DPagesList) [Prev](/dpages/{prev}) [Next](/dpages/{next})'
-                           .format(title=dpage.title, next=next_dpage(dpage), prev=prev_dpage(dpage)))
+                           .format(title=dpage.title, next=dpage.next(), prev=dpage.prev()))
     panel = Panel(doc, heading=doc_heading)
     return panel
 
@@ -186,6 +185,22 @@ def page_content_v(dpage, text, content):
     else:
         return R(C(doc_panel(dpage, text)))
 
+
+def page_content_3(dpage, code, output):
+    template = '<h4>{title}</h4>' \
+               '<a href="/dpages/DPagesList">Home </a>' \
+               '<a href="/dpages/{prev}">Prev </a>' \
+               '<a href="/dpages/{next}">Next</a>' \
+               '<pre>' \
+               '{code}' \
+               '</pre>' \
+               '<h4>Output for this code</h4>' \
+               '<hr style="box-shadow: 0 0 10px 1px black;">' \
+               '{output}'
+    next = dpage.next()
+    prev = dpage.prev()
+    return template.format(title=dpage.title, code=code, output=output, next=next, prev=prev)
+
 ########################################################################################################################
 #
 # Development test/demonstrations
@@ -199,15 +214,25 @@ class TestTextHTML(DPage):
     tags = ['text']
 
     def page(self):
+        code = """
+doc1 = Text('This is some Text content. ',
+             'This is some more Text content.',
+             '&lt;/br&gt;Text can also output HTML.')
+doc2 = Text('Bisque packground style para', para=True, style='background-color:bisque;')
+doc3 = Text('Red templated text', template='&lt;font color="red"&gt;{content}&lt;/font&gt;')
+content = doc1 + doc2 + doc3
+self.content = content
+return self
+        """
         doc1 = Text('This is some Text content. ',
-                     'This is some more Text content.',
-                     '</br>Text can also output HTML.')
+                    'This is some more Text content.',
+                    '</br>Text can also output HTML.')
         doc2 = Text('Bisque packground style para', para=True, style='background-color:bisque;')
         doc3 = Text('Red templated text', template='<font color="red">{content}</font>')
         # content = RC([doc1, doc2, doc3])
-        content = doc1+doc2+doc3
+        content = doc1 + doc2 + doc3
         # self.content = page_content_v(self, content, None)
-        self.content = content
+        self.content = page_content_3(self, code, content)
         return self
 
 
@@ -217,80 +242,15 @@ class TestMarkdown(DPage):
     tags = ['text']
 
     def page(self):
-        doc = """
-
-Markdown(*content, **kwargs)
-
- * content: markdown text
- * kwargs: keyword args
-    * extensions: markdown extensions
-
-Markdown renders markdown text.  Note it may also contain HTML.
-
-####Code
-    content = Markdown('###Markdown h3',
-                       '**Markdown bold text**',
-                       Markdown('*Embedded markdown object italic text.*'))
-
-    or M convenience method
-
-    content = M('###Markdown h3',
-                '**Markdown bold text**',
-                M('*Embedded markdown object italic text.*'))
+        code = """
+content = Markdown('###Markdown h3\\n',
+                   '**Markdown bold text**',
+                   Markdown('*Embedded markdown object italic text.*'))
         """
-
-        content = Markdown('###Markdown h3',
+        content = Markdown('###Markdown h3\n',
                            '**Markdown bold text**',
                            Markdown('*Embedded markdown object italic text.*'))
-        self.content = page_content(self, doc, content)
-        return self
-
-
-# noinspection PyPep8Naming
-class TestLIParagraph(DPage):
-    title = 'Text: LIParagraph'
-    description = 'Demonstrate ' + title
-    tags = ['text']
-
-    def page(self):
-        doc = """
-LI_para(amount=1, para=True)
-
- * **amount** is the number of loremipsum paragraphs to generate
- * **para** if true wraps each paragraph in an HTML paragraph
-
-####Code
-    content = LIParagraph(2)       # Make two loremipsum paragraphs
-
-As a practical matter LI is far more frequently used than LIParagraph.
-        """
-
-        content = LIParagraph(2)       # Make two loremipsum paragraphs
-        self.content = page_content(self, doc, content)
-        return self
-
-
-# noinspection PyPep8Naming
-class TestLISentence(DPage):
-    title = 'Text: LISentence'
-    description = 'Demonstrate ' + title
-    tags = ['text']
-
-    def page(self):
-        doc = """
-LISentence(amount=1, para=True)
-
- * **amount** is the number of loremipsum sentences to generate
- * **para** if true wraps the sentences in an HTML paragraph
-
-####Code
-    content = LISentence(5)        # make one loremipsum paragraph of 5 sentences
-
-As a practical mater LI is far more frequently used than LISentence.
-        """
-
-        content = LISentence(5)        # make one loremipsum pragraph of 5 sentences
-        self.content = page_content(self, doc, content)
+        self.content = page_content_3(self, code, content)
         return self
 
 
@@ -300,22 +260,14 @@ class TestLI(DPage):
     tags = ['text']
 
     def page(self):
-        doc = """
-LI(amount=1, para=True)
-
-* **amount** is
-    * the number of pragraphs to generate or
-    * a list of paragraph lengths in sentences
-* **para** if true wraps the paragraphs in an HTML paragraph
-
-By using amount=[n, n,...] you can control the paragraph length.
-
-####Code
-    content = LI([1, 2, 5])     # make 3 paragraphs with different number of sentences
+        code = """
+content = T(LI(1, 2, 5),                                # make 3 paragraphs with different number of sentences
+            LI(15, style='background-color:bisque;'))   # paragraph with background
         """
 
-        content = LI([1, 2, 5])         # make 3 paragraphs with different number of sentences
-        self.content = page_content(self, doc, content)
+        content = T(LI(1, 2, 5),                                # make 3 paragraphs with different number of sentences
+                    LI(15, style='background-color:bisque;'))   # paragraph with background
+        self.content = page_content_3(self, code, content)
         return self
 
 
@@ -325,17 +277,16 @@ class TestPlusMul(DPage):
     tags = ['text', 'content']
 
     def page(self):
-        doc = """
-DjangoPage widgets support the string methods + and *.
+        code = """
+li = LI(12, style='background-color:bisque;')
+content = li + li * 2
 
-####Code
-    content = LISentence(2) + LISentence(2) + \\
-        '<p>' + Text('This phrase will output 3 times.  ') * 3 + '</p>'
++ and * force immediate rendering of the widget.
         """
-        content = LISentence(2) + LISentence(2) + \
-            '<p>' + Text('This phrase will output 3 times.  ') * 3 + '</p>'
+        li = LI(12, style='background-color:bisque;')
+        content = li + li * 2
 
-        self.content = page_content(self, doc, content)
+        self.content = page_content_3(self, code, content)
         return self
 
 
@@ -346,27 +297,11 @@ class TestBRSP(DPage):
 
     def page(self):
         doc = """
-Sometimes it is useful to output multiple spaces or new lines.
-
- * BR(amount=1)
-    * amount: number of &lt;br/&gt; to output
- * SP(amount=1)
-    * amount: number of &amp;nbsp; to output
-
-####Code
-    content = (R(C(MD('####SP'))),
-               R(C(('two', SP(), 'words'))),
-               R(C(MD('####BR'))),
-               R(C(('two', BR(), 'lines'))))
-
-R(C((..., ...))) will be explained shortly.
+content = T('line brake here', BR(), 'second line', BR(2), 'third', SP(5), 'line', BR(), AS('*** ', 2))
         """
 
-        content = (Row(C(MD('####SP'))),
-                   R(C(('two', SP(), 'words'))),
-                   R(C(MD('####BR'))),
-                   R(C(('two', BR(), 'lines'))))
-        self.content = page_content(self, doc, content)
+        content = T('line brake here', BR(), 'second line', BR(2), 'third', SP(5), 'line', BR(), AS('*** ', 2))
+        self.content = page_content_3(self, doc, content)
         return self
 
 # fixme: move this to overview

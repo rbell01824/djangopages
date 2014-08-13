@@ -1,10 +1,20 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-""" Text widgets
+"""
+Text Widgets
+============
+
+.. module:: dpage_texthtml
+   :synopsis: Provides DjangoPage widgets to create text
+
+.. moduleauthor:: Richard Bell <rbell01824@gmail.com>
+
+DjangoPages provides a number of widgets to create text on pages.
 
 8/4/14 - Initial creation
 
+**Widgets**
 """
 
 from __future__ import unicode_literals
@@ -26,7 +36,7 @@ import markdown
 import loremipsum
 import functools
 
-from djangopages.dpage import DWidget, render_objects
+from djangopages.dpage import DWidget
 from django.utils.encoding import force_unicode
 
 ########################################################################################################################
@@ -37,21 +47,20 @@ from django.utils.encoding import force_unicode
 
 
 class Text(DWidget):
-    """ Renders content to the page.
+    """ Renders text content to the page.
 
-    | Text(\*content, \*\*kwargs)
-    | T(...)
-    | HTML(...)
+    | Synonym: T(...), useful abbreviation
+    | Synonym: HTML(...), useful to indicate intent
 
-        :param content: content
-        :type content: basestring or tuple or DWidget
-        :param kwargs: standard kwargs plus
-        :type kwargs: dict
+    :param content: content
+    :type content: basestring or tuple or DWidget
+    :param kwargs: standard kwargs
+    :type kwargs: dict
 
     additional kwargs
 
-        :param para: if True wrap output in a paragraph
-        :type para: bool
+    :param para: if True wrap output in a paragraph
+    :type para: bool
     """
     template = '{content}'
     template_para = '<p {classes} {style}>{content}</p>'
@@ -60,48 +69,39 @@ class Text(DWidget):
         super(Text, self).__init__(content, kwargs)
         return
 
-    def render(self):
-        """
-        Render the Text object
-        """
-        content, classes, style, template = self.render_setup()
-        if self.kwargs.pop('para', None):
-            return Text.template_para.format(content=content, classes=classes, style=style)
-        return template.format(content=content, classes=classes, style=style)
+    def generate(self, template, con_s, con_l, classes, style, kwargs):
+        if kwargs.get('para', None):
+            return Text.template_para.format(content=con_s, classes=classes, style=style)
+        return template.format(content=con_s, classes=classes, style=style)
 T = functools.partial(Text)
 HTML = functools.partial(Text)
 
 
 class Markdown(DWidget):
-    """ Renders markdown to the page.
+    """ Renders markdown content to the page.
 
-    | Markdown(\*content, \*\*kwargs)
-    | MD()
+    Synonyms: MD()
 
-        :param content: content
-        :type content: basestring or tuple or DWidget
-        :param kwargs: standard kwargs plus
-        :type kwargs: dict
+    :param content: content
+    :type content: basestring or tuple or DWidget
+    :param kwargs: standard kwargs plus
+    :type kwargs: dict
 
     additional kwargs
 
-        :param extensions: see Markdown extensions in python documentation
-        :type extensions: varies
+    :param extensions: see Markdown extensions in python documentation
     """
     def __init__(self, *content, **kwargs):
-        super(Markdown, self).__init__(content, kwargs=kwargs)
-        pass
+        super(Markdown, self).__init__(content, kwargs)
+        return
 
-    def render(self):
-        extensions = self.kwargs.pop('extensions', [])
-        content, classes, style, template = self.render_setup()
-        out = ''
-        for obj in self.content:
-            out += markdown.markdown(force_unicode(obj),
-                                     extensions,
-                                     output_format='html5',
-                                     safe_mode=False,
-                                     enable_attributes=False)
+    def generate(self, template, con_s, con_l, classes, style, kwargs):
+        extensions = kwargs.get('extensions', [])
+        out = markdown.markdown(force_unicode(con_s),
+                                extensions,
+                                output_format='html5',
+                                safe_mode=False,
+                                enable_attributes=False)
         return out
 MD = functools.partial(Markdown)
 
@@ -111,100 +111,60 @@ MD = functools.partial(Markdown)
 #
 ########################################################################################################################
 
-# fixme: resume work here
-
 
 class LI(DWidget):
-    """ Generate loremipsum paragraphs of sentence length amount.
-
-    LI(amount=1, para=True)
-
-    * amount: If amount is list, generated multiple paragraphs of lengths defined by
-      list. Otherwise, invoke LIParagraph(amount, para).render() to output amount paragraphs.
-    * para: if True wrap the paragraphs in <p>...</p>
+    """ Generate loremipsum paragraphs of sentence specified lengths.
 
     ex.
-        LI([3,5]) creates two paragraphs.  The first has 3 sentences.  The second 5
-        sentences.
+        LI(3, 5) creates two paragraphs wrapping each in an HTML paragraph.
+        The first has 3 sentences.  The second 5 sentences.
     """
-    def __init__(self, amount=1, para=True):
-        super(LI, self).__init__()
-        self.amount = amount
-        self.para = para
-        pass
+    template = '<p {classes} {style}>' \
+               '{content}' \
+               '</p>'
 
-    def render(self):
-        amount = self.amount
-        para = self.para
-        if isinstance(amount, list):
-            out = ''
-            for pl in amount:
-                out += LISentence(pl, para).render()
-            return out
-        return LIParagraph(amount, para).render()
+    def __init__(self, *content, **kwargs):
+        super(LI, self).__init__(content, kwargs)
+        return
 
-
-class LIParagraph(DWidget):
-    """Generate amount loremipsum paragraphs
-
-    LIParagraph(amount=1, para=True)
-        | amount: number of paragraphs to return
-        | para: if true, wrap each returned paragraph in <p>...</p>
-    """
-    def __init__(self, amount=1, para=True):
-        super(LIParagraph, self).__init__()
-        self.amount = amount
-        self.para = para
-        pass
-
-    def render(self):
-        amount = self.amount
-        para = self.para
-        li = loremipsum.get_paragraphs(amount)
-        if not para:
-            return li
+    def generate(self, template, con_s, con_l, classes, style, kwargs):
         out = ''
-        for p in li:
-            out += '<p>{}</p>'.format(p)
+        for pl in con_l:
+            if pl > 0:
+                content = ' '.join(loremipsum.get_sentences(pl))
+            else:
+                content = loremipsum.get_paragraph()
+            out += template.format(content=content, classes=classes, style=style)
         return out
-
-
-class LISentence(DWidget):
-    """
-    Generate a loremipsum sentences
-    """
-    def __init__(self, amount=1, para=True):
-        super(LISentence, self).__init__()
-        self.amount = amount
-        self.para = para
-        pass
-
-    def render(self):
-        amount = self.amount
-        para = self.para
-        li = loremipsum.get_sentences(amount)
-        out = ''
-        for p in li:
-            out += ' ' + p
-        if para:
-            out = '<p>{}</p>'.format(out)
-        return out
-
 
 # todo 1: turn SP & BR & NBSP methods into classes
 
 
 class AmountStr(DWidget):
-    """
-    amount occurences of a string
-    """
-    def __init__(self, content, amount=1):
-        super(AmountStr, self).__init__(content)
-        self.amount = amount
-        pass
+    """ Generate amount occuranced of a string.
 
-    def render(self):
-        return self.content*self.amount
+    :param content[0]: the string to use
+    :type content[0]:
+    :param content[1]: the number of times to repeat the string
+    :type content[2]: int
+
+    ex. AmountStr('xxx ', 2) generates 'xxx xxx '
+
+    | Variations:
+    | BR, generates one or more HTML line breaks
+    | SP, generates one or more non-breaking HTML spaces
+    """
+    template = '<span {classes} {style}>{content}</span>'
+
+    def __init__(self, *content, **kwargs):
+        super(AmountStr, self).__init__(content, kwargs)
+        return
+
+    def generate(self, template, con_s, con_l, classes, style, kwargs):
+        amt = 1
+        if len(con_l) > 0:
+            amt = con_l[0]
+        return template.format(content=con_s, classes=classes, style=style) * amt
 AS = functools.partial(AmountStr)
 BR = functools.partial(AmountStr, '<br/>')
 SP = functools.partial(AmountStr, '&nbsp;')

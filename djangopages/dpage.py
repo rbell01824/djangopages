@@ -107,7 +107,7 @@ class DPage(object):
             else:
                 self.tags = list()
         self.content = []
-        pass
+        return
 
     def page(self):
         """
@@ -136,7 +136,7 @@ class DPage(object):
             self.context = {}
 
         # render all our objects
-        content = render_objects(self.content)
+        content, ignore_lst = render_objects(self.content)
 
         # if there was nothing, use the default content
         if len(content) == 0:
@@ -151,8 +151,6 @@ class DPage(object):
 
     def __str__(self):
         return unicode(self).encode('utf8')
-
-    # fixme: rename these method, document, change globally
 
     @staticmethod
     def find(tag):
@@ -226,18 +224,19 @@ class DPage(object):
 class DWidget(object):
     """ DWidget(s) provide content for DPage(s)
 
-    DWidget(content='', classes='', style='', template=None, kwargs=None)
-    # def __init__(self, content='', classes='', style='', template=None, kwargs=None):
+    DWidget(content='', template=None, classes='', style='', kwargs=None)
+    # def __init__(self, content='', template=None, classes='', style='', kwargs=None):
 
     * content: the widget's content
-    * style: extra styles for the widget
     * template: template override for the widget
+    * classes: extra classes for the widget
+    * style: extra styles for the widget
     * kwargs: additional widget arguments
 
     The base class initialization saves the arguments.
 
-    DWidget provides a default render method that MUST be overridden in the child class.
-    The default render method raises NotImplementedError.
+    DWidget provides a default render and generate methods.
+    Derived classes **must** override (preferably) generate or (if needed) render.
 
     DWidget implements
 
@@ -248,53 +247,41 @@ class DWidget(object):
     * __repr__
 
     as a convenience.
+
+    .. note:: Add (+) and mul (*) force immediate rendering of the widget.
     """
     template = ''
 
     def __init__(self, content, kwargs):
         self.content = content
+        self.template = kwargs.pop('template', self.template)
         self.classes = kwargs.pop('classes', None)
         self.style = kwargs.pop('style', None)
-        self.template = kwargs.pop('template', self.template)
         self.kwargs = kwargs
         return
 
     def render(self):
+        """ Render this widget.
+
+        Apply render_object to the widget's content, classes, style, and template.
+        Invoke the generate method, likely the child class generate, to actually
+        create the output HTML.
         """
-        Render this content object.
-        """
-        raise NotImplementedError("Subclasses should implement Content.render!")
-
-    def render_setup(self, extra_classes=None, extra_style=None):
-        """ Provides default setup for render.
-
-        content, classes, style, template = self.render_setup(extra_classes=None, extra_style=None)
-
-        * extra_classes: if sepcified extra classes to apply to the widget
-        * extra_style: if specified extra styles to apply to the widget
-
-        Applies render_objects to content, classes, extra_classes, style, extra_style,
-        and template.
-
-        Returns (content, classes, style, template, kwargs)
-
-        * content: content string for the widget
-        * classes: class string for the widget adding extra_classes or ''
-        * style: style string for the widget adding extra_styles
-        * template: template to use with the widget
-
-        See tbd for how this method should be used.
-        """
-        content = RO(self.content)
+        con_s, con_l = render_objects(self.content)
         classes = ''
-        if self.classes or extra_classes:
-            classes = 'class="{} {}"'.format(RO(self.classes),
-                                             RO(extra_classes))
+        if self.classes:
+            classes = 'class="{}"'.format(RO(self.classes)[0])
         style = ''
-        if self.style or extra_style:
-            style = 'style="{}"'.format(RO(self.style))
-        template = RO(self.template)
-        return content, classes, style, template
+        if self.style:
+            style = 'style="{}"'.format(RO(self.style)[0])
+        template = RO(self.template)[0]
+        # todo 2: apply RO to kwargs
+        kwargs = self.kwargs
+        out = self.generate(template, con_s, con_l, classes, style, kwargs)
+        return out
+
+    def generate(self, template, con_s, con_l, classes, style, kwargs):
+        return template.format(content=con_s, classes=classes, style=style)
 
     def __add__(self, other):
         return self.render() + other
@@ -321,32 +308,32 @@ class DWidget(object):
 def render_objects(*content):
     """ Render the content.
 
-    DWidget.render_objects(<content>, [<content>, ...])
+    | Synonym: X
+    | Synonym: RO
 
-    * content: the content to render
+    :param content: content to render
+    :type content: varies
+    :return: content_string, content_list
+    :rtype: ( str, list )
 
-    Returns
-
-    * content.render()+...
-
-    Example:
-
-    DWidget.render_objects('thing 1', ('thing 2', MD('thing'))
-
-    Synonyms: X, RO.
+    Renders each element of *content*.  If it returns a string, appends to
+    content_string.  Otherwise, extends content_list
     """
-    out = ''
+    str_out = ''
+    lst_out = list()
     for con in content:
         if isinstance(con, basestring):                     # strings are just themselves
-            out += con
+            str_out += con
         elif hasattr(con, 'render'):                        # objects with render methods know how to render themselves
-            out += con.render()
+            str_out += con.render()
         elif isinstance(con, collections.Iterable):         # collections are walked
             for con1 in con:
-                out += render_objects(con1)                 # recurse to render this collection item
-        else:                                               # this should never happen
-            raise ValueError('Unknown content type in render_objects {}'.format(con))
-    return out
+                s, l = render_objects(con1)                 # recurse to render this collection item
+                str_out += s
+                lst_out.extend(l)
+        else:
+            lst_out.append(con)
+    return str_out, lst_out
 X = functools.partial(render_objects)                       # convenience method for render objects
 RO = X
 
@@ -354,12 +341,13 @@ RO = X
 def unique_name(base_name='x'):
     """ Returns a unique name of the form 'base_name'_counter.
 
+    :param base_name: the base name
+    :type base_name: str
+    :return: basenamen, ex. x0, x1, ...
+    :rtype: str
+
     This function is used by widgets and for other internal purporse to
     create unique names for id(s) and other purposes.
-
-    * basename: the base name to use for the name
-
-    Returns a name of the form <basename>n where n is 0, 1, 2, ... on subsequent uses.
     """
     if not hasattr(unique_name, "counter"):
         unique_name.counter = 0  # it doesn't exist yet, so initialize it

@@ -161,12 +161,12 @@ DWidget Details
 ---------------
 
 .. autoclass:: djangopages.dpage.DWidget
-   :members: render_setup
 
 Other base DjangoPage methods
 -----------------------------
 
 The following other methods play a useful role in DjangoPages.
 
+.. autofunction:: djangopages.dpage.render_objects
 .. autofunction:: djangopages.dpage.unique_name
 
