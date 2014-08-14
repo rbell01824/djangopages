@@ -431,6 +431,32 @@ class TestMapRC(DPage):
         return self
 
 
+class TestButton(DPage):
+    title = 'Buttons'
+    description = 'Demonstrate ' + title
+    tags = ['buttons']
+
+    def page(self):
+        code = """
+btn = Button('Button 1', 'Button 2')
+content = RC2M((btn,),
+               (BTN('Button 3', type='btn-success btn-xs'),),
+               (BTN('Button 4'), BTN('Button 5')),
+               (BTN('Button 6')+BTN('Button 7'),),
+               style='margin-top:2px;')
+        """
+
+        # define content objects
+        btn = Button('Button 1', 'Button 2')
+        content = RC2M((btn,),
+                       (BTN('Button 3', type='btn-success btn-xs'),),
+                       (BTN('Button 4'), BTN('Button 5')),
+                       (BTN('Button 6')+BTN('Button 7'),),
+                       style='margin-top:2px;')
+        self.content = page_content_3(self, code, content)
+        return self
+
+
 class TestGlyphicons(DPage):
     title = 'Glyphicons'
     description = 'Demonstrate ' + title
@@ -459,61 +485,6 @@ where
         glyphs = [(Glyphicon('star'), GL('heart'), GL('music')),
                   (GL('zoom-in'), GL('refresh'), GL('qrcode'))]
         content = RC(glyphs)
-        self.content = page_content(self, doc, content)
-        return self
-
-
-class TestButton(DPage):
-    title = 'Buttons'
-    description = 'Demonstrate ' + title
-    tags = ['buttons']
-
-    def page(self):
-        doc = """
-Button(content, btn_extras='', disabled=False, classes='', style='', template=None)
-
- * content: text of the widget
- * btn_extras: bootstrap 3 btn- classes
- * disabled: disabled
- * classes: other class for the widget
- * style: styles for the widget
- * template: override default template
-
-####Code
-    # define content objects
-    r1 = Button('Button')                                               # basic
-    r2 = (BR(),
-          Button('Large', btn_extras='btn-lg'),                         # large
-          Button('XS Success', btn_extras='btn-xs btn-success'))        # XS success
-    r3 = (BR(), Button('Block with red text',
-                       btn_extras='btn-block', style='color:red;'))     # block red
-    r4 = (BR(), Button((GL('star'), 'Star Button'),
-                       btn_extras='btn-primary'))                       # primary glyph
-    r5 = (BR(), Button('Disabled', disabled=True))                      # disabled
-    r6 = Button('Warning with style',
-                btn_extras='btn-warning',
-                style='color:white; width:200px;margin-top:5px;')       # styles
-
-    # put into layout
-    content = RC([r1, r2, r3, r4, r5, r6])
-        """
-
-        # define content objects
-        r1 = Button('Button')                                               # basic
-        r2 = (BR(),
-              Button('Large', btn_extras='btn-lg'),                         # large
-              Button('XS Success', btn_extras='btn-xs btn-success'))        # XS success
-        r3 = (BR(), Button('Block with red text',
-                           btn_extras='btn-block', style='color:red;'))     # block red
-        r4 = (BR(), Button((GL('star'), 'Star Button'),
-                           btn_extras='btn-primary'))                       # primary glyph
-        r5 = (BR(), Button('Disabled', disabled=True))                      # disabled
-        r6 = Button('Warning with style',
-                    btn_extras='btn-warning',
-                    style='color:white; width:200px;margin-top:5px;')       # styles
-
-        # put into layout
-        content = RC([r1, r2, r3, r4, r5, r6])
         self.content = page_content(self, doc, content)
         return self
 

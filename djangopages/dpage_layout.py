@@ -2,8 +2,8 @@
 # coding=utf-8
 
 """
-Layout Widgets
-==============
+Layout Bootstrap 3 Widgets
+==========================
 
 .. module:: dpage_layout
    :synopsis: Provides DjangoPage widgets to create bootstrap 3 layouts
@@ -14,7 +14,6 @@ DjangoPages provides a number of widgets to create bootstrap 3 responsive
 grid layouts.
 
 8/4/14 - Initial creation
-
 
 **Widgets**
 """

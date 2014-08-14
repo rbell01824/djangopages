@@ -1,18 +1,20 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-""" Various bootstrap 3 widgets
+"""
+Bootstrap 3 Widgets
+===================
 
-Many of these widgets accept a list of arguments.  The default behavior is to apply the widget
-to each member of the list.
+.. module:: dpage_bootstrap3
+   :synopsis: Provides DjangoPage widgets to create various bootstrap 3 elements
 
-Where desired it is possible to evaluate and concatenate the list using the X widget.
+.. moduleauthor:: Richard Bell <rbell01824@gmail.com>
 
-Final widget template handling is done in the widget's render method.  This is a concious design
-choice that allows post instance definition of the template.
+DjangoPages provides a number of widgets to create various bootstrap 3 elements.
 
 8/4/14 - Initial creation
 
+**Widgets**
 """
 
 from __future__ import unicode_literals
@@ -55,8 +57,21 @@ from djangopages.dpage import DWidget, _render, unique_name
 
 
 class Button(DWidget):
-    """
-    DPage button class
+    """ Outputs a bootstrap 3 button
+
+    | Synonym: BTN(...), useful abbreviation
+
+    :param content: content
+    :type content: basestring or tuple or DWidget
+    :param kwargs: standard kwargs
+    :type kwargs: dict
+
+    additional kwargs
+
+    :param disabled: default False, if true button is disabled
+    :type width: bool
+    :param type: default 'btn-default', button type
+    :type type: str
     """
     template = '<!-- start of button -->\n' \
                '    <button type="button" {classes} {disabled} {style}>\n' \
@@ -64,23 +79,18 @@ class Button(DWidget):
                '    </button>\n' \
                '<!-- end of button -->\n'
 
-    def __init__(self, content, btn_extras='', disabled=False, classes='', style='', template=None):
-        """
-        Create a button object.
-        """
-        super(Button, self).__init__(content, classes, style, template)
-        self.btn_extras = btn_extras
-        self.disabled = disabled
+    def __init__(self, *content, **kwargs):
+        super(Button, self).__init__(content, kwargs)
         return
 
-    def render(self):
-        disabled = 'disabled="disabled"' if self.disabled else ''
-        extra = ' '.join(['btn', self.btn_extras])
-        content, classes, style, template = self.render_setup(extra_classes=extra)
-        out = template.format(content=content,
-                              disabled=disabled,
-                              style=style,
-                              classes=classes)
+    def generate(self, template, content, classes, style, kwargs):
+        assert isinstance(content, tuple)
+        disabled = kwargs.get('disabled', '')
+        type = kwargs.get('type', 'btn-default')
+        classes = self.add_classes(classes, 'btn {}'.format(type))
+        out = ''
+        for c in content:
+            out += template.format(content=c, classes=classes, style=style, disabled=disabled)
         return out
 BTN = functools.partial(Button)
 

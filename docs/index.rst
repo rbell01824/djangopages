@@ -24,6 +24,7 @@ content creation and layout.
    overview
    text
    layout
+   bootstrap3
 
 Indices and tables
 ==================
