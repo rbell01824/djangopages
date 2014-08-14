@@ -72,18 +72,14 @@ class Column(DWidget):
     | C10(...), default width 10
     | C11(...), default width 12
     | C121(...), default width 11
-
     """
     template = '<!-- Start of dpage col -->\n' \
                '<div {classes} {style}>\n' \
-               '    {content} '  \
+               '    {content}\n'  \
                '</div>\n' \
                '<!-- End of dpage col -->\n'
 
     def __init__(self, *content, **kwargs):
-        """
-        Initialize Column object.  Wraps content objects in a column of width width.  Width defaults to 12.
-        """
         super(Column, self).__init__(content, kwargs)
         return
 
@@ -111,8 +107,14 @@ C12 = functools.partial(Column, width=12)
 
 
 class Row(DWidget):
-    """
-    Wrap content in a row.
+    """ Outputs a bootstrap 3 row
+
+    | Synonym: R(...), useful abbreviation
+
+    :param content: content
+    :type content: basestring or tuple or DWidget
+    :param kwargs: standard kwargs
+    :type kwargs: dict
     """
     template = '<!-- Start of dpage row -->\n' \
                '<div {classes} {style}>\n' \
@@ -120,66 +122,62 @@ class Row(DWidget):
                '</div>\n' \
                '<!-- End of dpage row -->\n'
 
-    def __init__(self, content, classes='', style='', template=None):
-        """
-        Wrap content objects in row.
-        """
-        super(Row, self).__init__(content, classes, style, template)
+    def __init__(self, *content, **kwargs):
+        super(Row, self).__init__(content, kwargs)
         return
 
-    def render(self, **kwargs):
-        """
-        Wrap content in a row
-        """
-        # extra = 'row'.format()
-        # content, classes, style, template = self.render_setup(extra_classes=extra)
-        # out = template.format(classes=classes, style=style, content=content)
-        # return out
-        if isinstance(self.content, list):              # if list, iterate over elements
-            out = ''
-            for con in self.content:
-                r = Row(con, self.classes, self.style, self.template)
-                out += r.render()
-            return out
-        else:
-            extra = 'row'.format()
-            content, classes, style, template = self.render_setup(extra_classes=extra)
-            out = template.format(classes=classes, style=style, content=content)
-            return out
+    def generate(self, template, content, classes, style, kwargs):
+        assert isinstance(content, tuple)
+        classes = self.add_classes(classes, 'row')
+        out = ''
+        for c in content:
+            out += template.format(content=c, classes=classes, style=style)
+        return out
 R = functools.partial(Row)
 
 
-class RowColumn(Row, Column):
+class RowColumn(DWidget):
+    """ Equivalent to Row(Column(...))
+
+    | Synonym: RC(...), useful abbreviation
+
+    :param content: content
+    :type content: basestring or tuple or DWidget
+    :param kwargs: standard kwargs
+    :type kwargs: dict
+
+    additional kwargs
+
+    :param width: column width, default 12
+    :type width: int
+
+    | Additional synonyms:
+    | RC(...), default width 12
+    | RC1(...), default width 1
+    | RC2(...), default width 2
+    | RC3(...), default width 3
+    | RC4(...), default width 4
+    | RC5(...), default width 5
+    | RC6(...), default width 6
+    | RC7(...), default width 7
+    | RC8(...), default width 8
+    | RC9(...), default width 9
+    | RC10(...), default width 10
+    | RC11(...), default width 12
+    | RC12(...), default width 11
     """
-    Equivalent to Row(Column(content, width, classes, style, template))
-    """
-    # todo 2: add styles for row
+    def __init__(self, *content, **kwargs):
+        super(RowColumn, self).__init__(content, kwargs)
+        return
 
-    def __init__(self, content, width=12, classes='', style='', template=None):
-        """
-        Initialize RowColumn object.
-        """
-        super(RowColumn, self).__init__(content, classes, style, template)
-        self.width = width
-
-    def render(self):
-        """
-        Render RowColumn
-        """
-        if isinstance(self.content, list):              # if list, iterate over elements
-            out = ''
-            for con in self.content:
-                c = Column(con, width=self.width,
-                           classes=self.classes, style=self.style, template=self.template)
-                out += Row(c).render()
-            return out
-        else:
-            content, classes, style, template = self.render_setup()
-            c = Column(content, width=self.width,
-                       classes=self.classes, style=self.style, template=self.template)
-            out = Row(c).render()
-            return out
-
+    def generate(self, template, content, classes, style, kwargs):
+        assert isinstance(content, tuple)
+        width = kwargs.get('width', 12)
+        out = ''
+        for con in self.content:
+            out += Column(con, classes=classes, style=style, width=width).render()
+        out = Row(out).render()
+        return out
 RC = functools.partial(RowColumn, width=12)
 RC1 = functools.partial(RowColumn, width=1)
 RC2 = functools.partial(RowColumn, width=2)
@@ -195,26 +193,67 @@ RC11 = functools.partial(RowColumn, width=11)
 RC12 = functools.partial(RowColumn, width=12)
 
 
-# class XRowColumn(XRow, Column):
-#     """
-#     Equivalent to Row(Column(content))
-#     """
-#     def __init__(self, *content, **kwargs):
-#         """
-#         Initialize RowColumn object.
-#         """
-#         super(RowColumn, self).__init__(*content, **kwargs)
-#         self.row_template = kwargs.pop('row_template', Row.template)
-#         self.col_template = kwargs.pop('col_template', Column.template)
-#         self.kwargs = kwargs
-#         self.content = content
-#
-#     def render(self, **kwargs):
-#         """
-#         Render RowColumnX
-#         :param kwargs:
-#         """
-#         out = Column(*self.content, template=self.col_template, **self.kwargs).render()
-#         out = Row(out, template=self.row_template, **self.kwargs).render()
-#         return out
-#
+class RowColumnMap(DWidget):
+    """ Equivalent to map(Row(Column(...)), ... )
+    
+    ex. content = RC6M((t, t), 
+                       (t, t), style='border:1px solid;')
+    
+    Generates two rows with C6 content.  
+    
+    | Synonym: RCM(...), useful abbreviation
+
+    :param content: content
+    :type content: basestring or tuple or DWidget
+    :param kwargs: standard kwargs
+    :type kwargs: dict
+
+    additional kwargs
+
+    :param width: column width, default 12
+    :type width: int
+
+    | Additional synonyms:
+    | RCM(...), default width 12
+    | RC1M(...), default width 1
+    | RC2M(...), default width 2
+    | RC3M(...), default width 3
+    | RC4M(...), default width 4
+    | RC5M(...), default width 5
+    | RC6M(...), default width 6
+    | RC7M(...), default width 7
+    | RC8M(...), default width 8
+    | RC9M(...), default width 9
+    | RC10M(...), default width 10
+    | RC11M(...), default width 12
+    | RC12M(...), default width 11
+    """
+    def __init__(self, *content, **kwargs):
+        super(RowColumnMap, self).__init__(content, kwargs)
+        return
+
+    def generate(self, template, content, classes, style, kwargs):
+        assert isinstance(content, tuple)
+        width = kwargs.get('width', 12)
+        out = ''
+        for r in self.content:
+            assert isinstance(r, tuple)
+            rout = ''
+            for c in r:
+                rout += Column(c, classes=self.classes, style=self.style, width=width).render()
+            rout = Row(rout).render()
+            out += rout
+        return out
+RCM = functools.partial(RowColumnMap, width=12)
+RC1M = functools.partial(RowColumnMap, width=1)
+RC2M = functools.partial(RowColumnMap, width=2)
+RC3M = functools.partial(RowColumnMap, width=3)
+RC4M = functools.partial(RowColumnMap, width=4)
+RC5M = functools.partial(RowColumnMap, width=5)
+RC6M = functools.partial(RowColumnMap, width=6)
+RC7M = functools.partial(RowColumnMap, width=7)
+RC8M = functools.partial(RowColumnMap, width=8)
+RC9M = functools.partial(RowColumnMap, width=9)
+RC10M = functools.partial(RowColumnMap, width=10)
+RC11M = functools.partial(RowColumnMap, width=11)
+RC12M = functools.partial(RowColumnMap, width=12)

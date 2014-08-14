@@ -171,17 +171,17 @@ def page_content(dpage, text, content):
     """
     doc = doc_panel(dpage, text)
     content = content_panel(content)
-    return R(X(C6(doc), C6(content)))
+    return R(C6(doc), C6(content))
 
 
 def page_content_v(dpage, text, content):
     """
     """
     if content and len(content) > 0:
-        return R(C(X(doc_panel(dpage, text),
+        return R(C(doc_panel(dpage, text),
                      MD('Below is the output for this page.'
                         '<hr style="box-shadow: 0 0 10px 1px black;">'),
-                     content_panel(content))))
+                     content_panel(content)))
     else:
         return R(C(doc_panel(dpage, text)))
 
@@ -295,12 +295,12 @@ class TestBRSP(DPage):
     tags = ['text']
 
     def page(self):
-        doc = """
+        code = """
 content = T('line brake here', BR(), 'second line', BR(2), 'third', SP(5), 'line', BR(), AS('*** ', 2))
         """
 
         content = T('line brake here', BR(), 'second line', BR(2), 'third', SP(5), 'line', BR(), AS('*** ', 2))
-        self.content = page_content_3(self, doc, content)
+        self.content = page_content_3(self, code, content)
         return self
 
 
@@ -310,7 +310,7 @@ class TestMultipleWidgets(DPage):
     tags = ['content']
 
     def page(self):
-        doc = """
+        code = """
 content = T(Markdown('**Some bold Markdown text**'),
             HTML('&lt;i&gt;&lt;b&gt;Some italic bold HTML text&lt;/b&gt;&lt;/i&gt;'),
             Text('&lt;/br&gt;Some Text text'),
@@ -322,7 +322,7 @@ content = T(Markdown('**Some bold Markdown text**'),
                     HTML('<i><b>Some italic bold HTML text</b></i>'),
                     Text('</br>Some Text text'),
                     LI(3, 5))
-        self.content = page_content_3(self, doc, content)
+        self.content = page_content_3(self, code, content)
         return self
 
 
@@ -332,7 +332,7 @@ class TestColumn(DPage):
     tags = ['layout']
 
     def page(self):
-        doc = """
+        code = """
 t = '<b>Some text</b> ' + 'Be kind to your web footed friends. ' * 15
 content = T('&lt;div class="row"&gt;',
             C(t, width=3, style='background-color:powderblue'),
@@ -344,11 +344,11 @@ content = T('&lt;div class="row"&gt;',
         # Create some text for two rows
         t = '<b>Some text</b> ' + 'Be kind to your web footed friends. ' * 15
         content = T('<div class="row">',
-                    C(t, width=3, style='background-color:powderblue'),
+                    C(t, width=3, style='background-color:powderblue;'),
                     C6(t+'mighty ducks '*30, width=6, style='background-color:bisque;'),
                     C3(t, style='background-color:violet'),
                     '</div>')
-        self.content = page_content_3(self, doc, content)
+        self.content = page_content_3(self, code, content)
         return self
 
 
@@ -358,7 +358,7 @@ class TestColumnList(DPage):
     tags = ['layout']
 
     def page(self):
-        doc = """
+        code = """
 t1 = '&lt;b&gt;Some text&lt;/b&gt; ' + 'Be kind to your web footed friends. ' * 15
 t2 = '&lt;b&gt;Ducks&lt;/b&gt;' + 'Ducks ' * 70
 content = T('&lt;div class="row"&gt;',
@@ -372,7 +372,7 @@ content = T('&lt;div class="row"&gt;',
         content = T('<div class="row">',
                     C6(t1, t2, style='border:1px solid;'),
                     '</div>')
-        self.content = page_content_3(self, doc, content)
+        self.content = page_content_3(self, code, content)
         return self
 
 
@@ -382,155 +382,52 @@ class TestRow(DPage):
     tags = ['layout']
 
     def page(self):
-        doc = """
- * Row(content, classes='', style='', template=None)
+        code = """
+content = T(R(C6(LI(5), LI(2, 3), style='border:1px solid;')),
+            R(C(LI(20, style='background-color:powderblue;'))))
         """
 
         # Create some text for two rows
-        t = '<b>Some text</b> ' + 'Be kind to your web footed friends. ' * 15
-        content = T('<div class="row">',
-                    C3(t, style='background-color:powderblue'),
-                    C(t+'mighty ducks '*30, width=6, style='background-color:bisque;'),
-                    C3(t, style='background-color:violet'),
-                    '</div>')
-        self.content = page_content_3(self, doc, content)
-        return self
-
-
-class TestCn(DPage):
-    title = 'Layout: Cn convenienc method'
-    description = 'Demonstrate ' + title
-    tags = ['layout']
-
-    def page(self):
-        doc = """
-The Cn family of methods may be used to more conveniently define columns with a width of n.
-
-The basic methods Cn are
-
- * C = functools.partial(Column)
- * C1 = functools.partial(Column, width=1)
- * C2 = functools.partial(Column, width=2)
- * C3 = functools.partial(Column, width=3)
- * C4 = functools.partial(Column, width=4)
- * C5 = functools.partial(Column, width=5)
- * C6 = functools.partial(Column, width=6)
- * C7 = functools.partial(Column, width=7)
- * C8 = functools.partial(Column, width=8)
- * C9 = functools.partial(Column, width=9)
- * c10 = functools.partial(Column, width=10)
- * c11 = functools.partial(Column, width=11)
- * C12 = functools.partial(Column, width=12)
-
-#### Code
-    # Create some text for two rows
-    text = LI([5], para=False)
-    row1 = MD('**Text in row 1** ' + text)
-    row2col1 = MD('**Text in row 2 col 1**' + text)
-    row2col2 = MD('**Text in row 2 col 2**' + text)
-    row2col3 = MD('**Text in row 2 col 3**' + text)
-
-    content = (R(C(row1)),                                          # with R & C
-               R(X(C4(row2col1), C4(row2col2), C4(row2col3))))      # with R & C4
-        """
-
-        # Create some text for two rows
-        text = LI([5], para=False)
-        row1 = MD('**Text in row 1** ' + text)
-        row2col1 = MD('**Text in row 2 col 1**' + text)
-        row2col2 = MD('**Text in row 2 col 2**' + text)
-        row2col3 = MD('**Text in row 2 col 3**' + text)
-
-        content = (R(C(row1)),                                          # with R & C
-                   R(X(C4(row2col1), C4(row2col2), C4(row2col3))))      # with R & C4
-        self.content = page_content(self, doc, content)
+        content = T(R(C6(LI(5), LI(2, 3), style='border:1px solid;')),
+                    R(C(LI(20, style='background-color:powderblue;'))))
+        self.content = page_content_3(self, code, content)
         return self
 
 
 class TestRC(DPage):
-    title = 'Layout: RowColumn/RC convenience methods'
+    title = 'Layout: Bootstrap 3 RowColumn/RC'
     description = 'Demonstrate ' + title
     tags = ['layout']
 
     def page(self):
-        doc = """
+        code = """
  * RowColumn(content, [width=n]), or
- * RC(content, [width=n])
- * RCn(content, [width=n])  where n specified the column width
-
-where
-
- * content is the content to place in the column
- * width is the bootstrap 3 width, default 12
-
-RowColumn addresses the common case Row(Column(content, ...)).
-
-#### Code
-    # Create content
-    text = MD('**Text in a row column.** '+LI([5], para=False))
-    content = RC(text)
         """
 
         # Create content
-        text = MD('**Text in a row column.** '+LI([5], para=False))
-        content = RC(text)
-        self.content = page_content(self, doc, content)
+        content = RowColumn(LI(8), LI(5), width=6)
+        self.content = page_content_3(self, code, content)
         return self
 
 
-class TestRCList(DPage):
-    title = 'Layout: RC list'
+class TestMapRC(DPage):
+    title = 'Layout: Map RC'
     description = 'Demonstrate ' + title
     tags = ['layout']
 
     def page(self):
-        doc = """
-
- * RCn([[row 1 col 1, row 1 col 2], ...])
-
-RCn creates multiple rows each containing multiple columns in a single statement.
-
-#### Code
-    # Create content
-    text = MD('**Text in a row column.** '+LI([5], para=False))
-    content = RC6([[text, text], [text, text]])C6([[text, text], [text, text]])
-        """
-
-        # Create content
-        text = MD('**Text in a row column.** '+LI([5], para=False))
-        content = RC6([[text, text], [text, text]])
-        self.content = page_content(self, doc, content)
-        return self
-
-
-class TestRList1(DPage):
-    """
-    """
-    title = 'Layout: R list with individual column widths'
-    description = 'Demonstrate ' + title
-    tags = ['layout']
-
-    def page(self):
-        doc = """
+        code = """
 
  * R([Cn([row 1 col 1, row 1 col 2]), ...])
 
-R([Cn(),...]) creates multiple rows each containing multiple columns of different specified widths.
-
-#### Code
-    # Create content
-    text = MD('**Text in a row column.** '+LI([5], para=False))
-    content = R([C(text),
-                 C6([text, text]),
-                 C4([text, text, text])])
         """
 
         # Create content
-        text = MD('**Text in a row column.** '+LI([5], para=False))
-        content = R([C(text),
-                     C6([text, text]),
-                     C4([text, text, text])])
-        self.content = page_content(self, doc, content)
+        li = LI(5, para=False).render()[0]
+        t = MD('**Text in a row column.** ' + li)
+        content = RC6M((t, t),
+                       (t, t), style='border:1px solid;')
+        self.content = page_content_3(self, code, content)
         return self
 
 

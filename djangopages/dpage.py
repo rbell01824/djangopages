@@ -399,7 +399,6 @@ def _renderstr(content):
     return out
 
 
-
 def unique_name(base_name='x'):
     """ Returns a unique name of the form 'base_name'_counter.
 

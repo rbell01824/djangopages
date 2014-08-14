@@ -132,14 +132,20 @@ class LI(DWidget):
         return
 
     def generate(self, template, content, classes, style, kwargs):
-        out = ''
         assert isinstance(content, tuple)
+        para = kwargs.get('para', True)
+        out = tuple()
         for pl in content:
             if pl > 0:
                 content = ' '.join(loremipsum.get_sentences(pl))
             else:
                 content = loremipsum.get_paragraph()
-            out += template.format(content=content, classes=classes, style=style)
+            if para:
+                out += (template.format(content=content, classes=classes, style=style),)
+            else:
+                out += (content, )
+        if para:
+            out = ''.join(out)
         return out
 
 
