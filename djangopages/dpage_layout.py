@@ -165,6 +165,9 @@ class RowColumn(DWidget):
     | RC11(...), default width 12
     | RC12(...), default width 11
     """
+    template = Column.template
+    row_template = Row.template
+
     def __init__(self, *content, **kwargs):
         super(RowColumn, self).__init__(content, kwargs)
         return
@@ -172,10 +175,11 @@ class RowColumn(DWidget):
     def generate(self, template, content, classes, style, kwargs):
         assert isinstance(content, tuple)
         width = kwargs.get('width', 12)
+        col_classes = self.add_classes(classes, 'col-md-{}'.format(width))
         out = ''
-        for con in self.content:
-            out += Column(con, classes=classes, style=style, width=width).render()
-        out = Row(out).render()
+        for c in content:
+            out += template.format(content=c, classes=col_classes, style=style)
+        out = self.row_template.format(classes='class="row"', style='', content=out)
         return out
 RC = functools.partial(RowColumn, width=12)
 RC1 = functools.partial(RowColumn, width=1)
@@ -227,6 +231,9 @@ class RowColumnMap(DWidget):
     | RC11M(...), default width 12
     | RC12M(...), default width 11
     """
+    template = Column.template
+    row_template = Row.template
+
     def __init__(self, *content, **kwargs):
         super(RowColumnMap, self).__init__(content, kwargs)
         return
@@ -234,14 +241,16 @@ class RowColumnMap(DWidget):
     def generate(self, template, content, classes, style, kwargs):
         assert isinstance(content, tuple)
         width = kwargs.get('width', 12)
-        out = ''
-        for r in self.content:
+        col_classes = self.add_classes(classes, 'col-md-{}'.format(width))
+        rows = tuple()
+        for r in content:
             assert isinstance(r, tuple)
             rout = ''
             for c in r:
-                rout += Column(c, classes=self.classes, style=self.style, width=width).render()
-            rout = Row(rout).render()
-            out += rout
+                rout += template.format(content=c, classes=col_classes, style=style)
+            rout = self.row_template.format(classes='class="row"', style='', content=rout)
+            rows += (rout,)
+        out = ''.join(rows)
         return out
 RCM = functools.partial(RowColumnMap, width=12)
 RC1M = functools.partial(RowColumnMap, width=1)

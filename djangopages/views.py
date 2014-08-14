@@ -434,7 +434,7 @@ class TestMapRC(DPage):
 class TestButton(DPage):
     title = 'Buttons'
     description = 'Demonstrate ' + title
-    tags = ['buttons']
+    tags = ['bootstrap', 'buttons']
 
     def page(self):
         code = """
@@ -444,6 +444,8 @@ content = RC2M((btn,),
                (BTN('Button 4'), BTN('Button 5')),
                (BTN('Button 6')+BTN('Button 7'),),
                style='margin-top:2px;')
+
+Note: These 6 lines of djangopage code generated approximately 170 lines of html! 30x productivity.
         """
 
         # define content objects
@@ -460,32 +462,18 @@ content = RC2M((btn,),
 class TestGlyphicons(DPage):
     title = 'Glyphicons'
     description = 'Demonstrate ' + title
-    tags = ['glyphicons', 'text']
+    tags = ['bootstrap', 'glyphicons', 'text']
 
     def page(self):
-        doc = """
- * Gliphicon(content, classes='', style='', template=None)
- * GL(content, classes='', style='', template=None)
-
-where
-
- * content: the glypy name, ex. star is glyphicon-star.
- * classes: other class for the widget
- * style: styles for the widget
- * template: override default template
-
-####Code
-    # define the content
-    glyphs = [(Glyphicon('star'), GL('heart'), GL('music')),
-              (GL('zoom-in'), GL('refresh'), GL('qrcode'))]
-    content = RC(glyphs))
+        code = """
+content = RCM((Glyphicon('star'), GL('heart'), GL('music')),
+              (GL('zoom-in'), GL('refresh'), GL('qrcode')))
         """
 
         # define the content
-        glyphs = [(Glyphicon('star'), GL('heart'), GL('music')),
-                  (GL('zoom-in'), GL('refresh'), GL('qrcode'))]
-        content = RC(glyphs)
-        self.content = page_content(self, doc, content)
+        content = RC2M((T('Three glyphs on a line: '), Glyphicon('star'), GL('heart'), GL('music')),
+                       (T('Two then one glyph on a line:'), GL('zoom-in', 'refresh'), GL('qrcode')))
+        self.content = page_content_3(self, code, content)
         return self
 
 

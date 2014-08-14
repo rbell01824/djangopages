@@ -38,7 +38,8 @@ from django.template import Template
 from django.template import Context
 from django.core.context_processors import csrf
 
-from djangopages.dpage import DWidget, _render, unique_name
+# noinspection PyProtectedMember
+from djangopages.dpage import DWidget, unique_name, _render
 
 ########################################################################################################################
 #
@@ -58,6 +59,8 @@ from djangopages.dpage import DWidget, _render, unique_name
 
 class Button(DWidget):
     """ Outputs a bootstrap 3 button
+
+    ex. Button('Button 1', type='btn-success btn-sm')
 
     | Synonym: BTN(...), useful abbreviation
 
@@ -86,8 +89,8 @@ class Button(DWidget):
     def generate(self, template, content, classes, style, kwargs):
         assert isinstance(content, tuple)
         disabled = kwargs.get('disabled', '')
-        type = kwargs.get('type', 'btn-default')
-        classes = self.add_classes(classes, 'btn {}'.format(type))
+        btn_type = kwargs.get('type', 'btn-default')
+        classes = self.add_classes(classes, 'btn {}'.format(btn_type))
         out = ''
         for c in content:
             out += template.format(content=c, classes=classes, style=style, disabled=disabled)
@@ -96,24 +99,29 @@ BTN = functools.partial(Button)
 
 
 class Glyphicon(DWidget):
-    """
-    Convenience method to output bootstrap 3 glyphicons
-    """
-    template = """
-    <span {classes} {style}></span>
-    """
+    """ Outputs bootstrap 3 glyphicons
 
-    def __init__(self, content, classes='', style='', template=None):
-        super(Glyphicon, self).__init__(content, classes, style, template)
+    ex. Glyphicon('star')
+
+    | Synonym: GL(...), useful abbreviation
+
+    :param content: content
+    :type content: basestring or tuple or DWidget
+    :param kwargs: standard kwargs
+    :type kwargs: dict
+    """
+    template = '<span {classes} {style}></span>'
+
+    def __init__(self, *content, **kwargs):
+        super(Glyphicon, self).__init__(content, kwargs)
         return
 
-    def render(self):
-        extra = 'glyphicon glyphicon-{}'.format(self.content)
-        content, classes, style, template = self.render_setup(extra_classes=extra)
-        out = template.format(style=style,
-                              classes=classes)
+    def generate(self, template, content, classes, style, kwargs):
+        out = ''
+        for c in content:
+            gl_cls = self.add_classes(classes, 'glyphicon glyphicon-{}'.format(c))
+            out += template.format(classes=gl_cls, style=style)
         return out
-
 GL = functools.partial(Glyphicon)
 
 
