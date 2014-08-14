@@ -189,15 +189,15 @@ def page_content_v(dpage, text, content):
 def page_content_3(dpage, code, output):
     template = '<h4>{title}</h4>' \
                '<a href="/dpages/DPagesList">Home </a>' \
-               '<a href="/dpages/{prev}">Prev </a>' \
-               '<a href="/dpages/{next}">Next</a>' \
+               '<a href="/dpages/{prv}">Prev </a>' \
+               '<a href="/dpages/{nxt}">Next</a>' \
                '<pre>{code}</pre>' \
                '<h4>Output for this code</h4>' \
                '<hr style="box-shadow: 0 0 10px 1px black;">' \
                '{output}'
-    next = dpage.next()
-    prev = dpage.prev()
-    return template.format(title=dpage.title, code=code, output=output, next=next, prev=prev)
+    nxt = dpage.next()
+    prv = dpage.prev()
+    return template.format(title=dpage.title, code=code, output=output, nxt=nxt, prv=prv)
 
 ########################################################################################################################
 #
@@ -216,8 +216,8 @@ class TestText(DPage):
 doc1 = Text('This is some Text content. ',
              'This is some more Text content.',
              '&lt;/br&gt;Text can also output HTML.')
-doc2 = Text('Bisque packground style para', para=True, style='background-color:bisque;')
-doc3 = Text('Red templated text', template='&lt;font color="red"&gt;{content}&lt;/font&gt;')
+doc2 = T('Bisque packground style para', para=True, style='background-color:bisque;')
+doc3 = T('Red templated text', template='&lt;font color="red"&gt;{content}&lt;/font&gt;')
 content = doc1 + doc2 + doc3
 self.content = content
 return self
@@ -225,8 +225,8 @@ return self
         doc1 = Text('This is some Text content. ',
                     'This is some more Text content.',
                     '</br>Text can also output HTML.')
-        doc2 = Text('Bisque packground style para', para=True, style='background-color:bisque;')
-        doc3 = Text('Red templated text', template='<font color="red">{content}</font>')
+        doc2 = T('Bisque packground style para', para=True, style='background-color:bisque;')
+        doc3 = T('Red templated text', template='<font color="red">{content}</font>')
         # content = RC([doc1, doc2, doc3])
         content = doc1 + doc2 + doc3
         # self.content = page_content_v(self, content, None)
@@ -312,8 +312,8 @@ class TestMultipleWidgets(DPage):
     def page(self):
         doc = """
 content = T(Markdown('**Some bold Markdown text**'),
-            HTML('<i><b>Some italic bold HTML text</b></i>'),
-            Text('</br>Some Text text'),
+            HTML('&lt;i&gt;&lt;b&gt;Some italic bold HTML text&lt;/b&gt;&lt;/i&gt;'),
+            Text('&lt;/br&gt;Some Text text'),
             LI(3, 5))
         """
 
@@ -335,8 +335,8 @@ class TestColumn(DPage):
         doc = """
 t = '<b>Some text</b> ' + 'Be kind to your web footed friends. ' * 15
 content = T('&lt;div class="row"&gt;',
-            C3(t, style='background-color:powderblue'),
-            C(t+'mighty ducks '*30, width=6, style='background-color:bisque;'),
+            C(t, width=3, style='background-color:powderblue'),
+            C6(t+'mighty ducks '*30, width=6, style='background-color:bisque;'),
             C3(t, style='background-color:violet'),
             '&lt;/div&gt;')
         """
@@ -344,8 +344,8 @@ content = T('&lt;div class="row"&gt;',
         # Create some text for two rows
         t = '<b>Some text</b> ' + 'Be kind to your web footed friends. ' * 15
         content = T('<div class="row">',
-                    C3(t, style='background-color:powderblue'),
-                    C(t+'mighty ducks '*30, width=6, style='background-color:bisque;'),
+                    C(t, width=3, style='background-color:powderblue'),
+                    C6(t+'mighty ducks '*30, width=6, style='background-color:bisque;'),
                     C3(t, style='background-color:violet'),
                     '</div>')
         self.content = page_content_3(self, doc, content)
@@ -353,23 +353,28 @@ content = T('&lt;div class="row"&gt;',
 
 
 class TestColumnList(DPage):
-    title = 'Layout: Column List'
+    title = 'Layout: Bootstrap 3 Column List'
     description = 'Demonstrate ' + title
     tags = ['layout']
 
     def page(self):
         doc = """
- * Row(content, classes='', style='', template=None)
-        """
+t1 = '&lt;b&gt;Some text&lt;/b&gt; ' + 'Be kind to your web footed friends. ' * 15
+t2 = '&lt;b&gt;Ducks&lt;/b&gt;' + 'Ducks ' * 70
+content = T('&lt;div class="row"&gt;',
+            C6(t1, t2, style='border:1px solid;'),
+            '&lt;/div&gt;')
+       """
 
         # Create some text for two rows
         t1 = '<b>Some text</b> ' + 'Be kind to your web footed friends. ' * 15
-        t2 = '<b>Ducks</b>' + 'Ducks ' * 30
+        t2 = '<b>Ducks</b>' + 'Ducks ' * 70
         content = T('<div class="row">',
-                    C3([t1, t2], style='background-color:powderblue'),
+                    C6(t1, t2, style='border:1px solid;'),
                     '</div>')
         self.content = page_content_3(self, doc, content)
         return self
+
 
 class TestRow(DPage):
     title = 'Layout: Bootstrap 3 Row'

@@ -70,7 +70,7 @@ class Text(DWidget):
         return
 
     def generate(self, template, content, classes, style, kwargs):
-        # todo 2: support [] and render multiple T
+        assert isinstance(content, tuple)
         c = ' '.join(content)
         if kwargs.get('para', None):
             return Text.template_para.format(content=c, classes=classes, style=style)
@@ -98,7 +98,7 @@ class Markdown(DWidget):
         return
 
     def generate(self, template, content, classes, style, kwargs):
-        # todo 2: support [] and render multiple MD
+        assert isinstance(content, tuple)
         extensions = kwargs.get('extensions', [])
         c = ' '.join(content)
         out = markdown.markdown(force_unicode(c),
@@ -133,6 +133,7 @@ class LI(DWidget):
 
     def generate(self, template, content, classes, style, kwargs):
         out = ''
+        assert isinstance(content, tuple)
         for pl in content:
             if pl > 0:
                 content = ' '.join(loremipsum.get_sentences(pl))
@@ -140,8 +141,6 @@ class LI(DWidget):
                 content = loremipsum.get_paragraph()
             out += template.format(content=content, classes=classes, style=style)
         return out
-
-# todo 1: turn SP & BR & NBSP methods into classes
 
 
 class AmountStr(DWidget):
@@ -165,6 +164,8 @@ class AmountStr(DWidget):
         return
 
     def generate(self, template, content, classes, style, kwargs):
+        assert isinstance(content, tuple)
+        assert len(content) > 0
         amt = 1
         if len(content) > 1:
             amt = content[1]

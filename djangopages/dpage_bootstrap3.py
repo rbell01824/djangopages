@@ -36,7 +36,7 @@ from django.template import Template
 from django.template import Context
 from django.core.context_processors import csrf
 
-from djangopages.dpage import DWidget, render_objects, unique_name
+from djangopages.dpage import DWidget, _render, unique_name
 
 ########################################################################################################################
 #
@@ -175,7 +175,7 @@ class Panel(DWidget):
     def generate(self, template, content, classes, style, kwargs):
         heading = kwargs.get('heading', None)
         if heading:
-            heading = render_objects(heading)
+            heading = _render(heading)
         if heading and template == Panel.template:
             template = Panel.heading_template
         out = template.format(content=content, classes=classes, style=style, heading=heading)
@@ -260,16 +260,16 @@ class Modal(object):
                 '</div>\n' \
                 '<!-- modal end -->\n'
         out = ''
-        body = render_objects(self.content)
+        body = _render(self.content)
         if self.button:
             out += t_btn.format(id=self.id, btn_text=self.button)
         out += t_top.format(id=self.id, modal_label=self.modal_label)
         if self.header:
-            hdr = render_objects(self.header)
+            hdr = _render(self.header)
             out += t_hdr.format(modal_label=self.modal_label, modal_header=hdr)
         out += t_bdy.format(body=body)
         if self.footer:
-            ftr = render_objects(self.footer)
+            ftr = _render(self.footer)
             out += t_ftr.format(modal_footer=ftr)
         out += t_btm
         return out
@@ -337,7 +337,7 @@ class Panel_fixme(object):
                 '<!-- panel end -->\n'
 
         out = ''
-        content = render_objects(self.content, **kwargs)
+        content = _render(self.content, **kwargs)
 
         if self.button:
             out += t_btn.format(id=self.id, btn_text=self.button)
@@ -374,7 +374,7 @@ class Accordion(object):
                    '    {content}\n' \
                    '</div>\n' \
                    '<!-- End of accordion -->\n'
-        content = render_objects(self.content, accordion_id=self.id, **kwargs)
+        content = _render(self.content, accordion_id=self.id, **kwargs)
         return template.format(accordion_id=self.id, content=content)
 
 
@@ -427,7 +427,7 @@ class AccordionPanel(object):
                    '        </div>\n' \
                    '    </div>\n' \
                    '<!-- end of panel -->\n'
-        content = render_objects(self.content, **kwargs)
+        content = _render(self.content, **kwargs)
         out = template.format(accordion_id=self.accordion_id,
                               panel_collapsed='' if self.panel_collapsed else 'in',
                               panel_id=self.id,
@@ -485,7 +485,7 @@ class AccordionMultiPanel(object):
                    '        </div>\n' \
                    '    </div>\n' \
                    '<!-- end of panel -->\n'
-        content = render_objects(self.content, **kwargs)
+        content = _render(self.content, **kwargs)
         out = template.format(accordion_id=self.accordion_id,
                               panel_collapsed='' if self.panel_collapsed else 'in',
                               panel_id=self.id,
@@ -539,9 +539,9 @@ class TableRow(object):
         out = ''
         for con in self.content:
             if isinstance(con, TableCell):
-                out += render_objects(con)
+                out += _render(con)
             else:
-                out += '<td>' + render_objects(con) + '</td>'
+                out += '<td>' + _render(con) + '</td>'
         tr_start = '<tr>'
         if self.tr_class:
             tr_start = '<tr class="{tr_class}" >'.format(self.tr_class)
@@ -579,7 +579,7 @@ class TableCell(object):
             td_start = '<td class="{td_class}" >'.format(td_class=self.td_class)
         out = ''
         for con in self.content:
-            out += td_start + render_objects(con) + '</td>\n'
+            out += td_start + _render(con) + '</td>\n'
         return out
 
 

@@ -35,7 +35,7 @@ __email__ = 'rbell01824@gmail.com'
 
 import functools
 
-from djangopages.dpage import DWidget, render_objects
+from djangopages.dpage import DWidget
 
 ########################################################################################################################
 #
@@ -88,18 +88,12 @@ class Column(DWidget):
         return
 
     def generate(self, template, content, classes, style, kwargs):
+        assert isinstance(content, tuple)
         width = kwargs.get('width', 12)
         classes = self.add_classes(classes, 'col-md-{}'.format(width))
-        try:
-            c = ' '.join(content)
-            out = template.format(content=c, classes=classes, style=style)
-            return out
-        except TypeError:
-            pass
         out = ''
-        for con in content:
-            c = Column(con, width=width, template=template, classes=classes, style=style).render()
-            out += c
+        for c in content:
+            out += template.format(content=c, classes=classes, style=style)
         return out
 C = functools.partial(Column)
 C1 = functools.partial(Column, width=1)

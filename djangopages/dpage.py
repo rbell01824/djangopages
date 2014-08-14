@@ -147,8 +147,7 @@ class DPage(object):
             self.context = {}
 
         # render all our objects
-        c = render_objects(self.content)
-        content = ' '.join(c)
+        content = _render(self.content)
 
         # if there was nothing, use the default content
         if len(content) == 0:
@@ -260,7 +259,7 @@ class DWidget(object):
 
     as a convenience.
 
-    .. note:: Add (+) and mul (*) force immediate rendering of the widget.
+    .. note:: add (+) and mul (*) force immediate rendering of the widget.
     """
     template = ''
 
@@ -279,15 +278,15 @@ class DWidget(object):
         Invoke the generate method, likely the child class generate, to actually
         create the output HTML.
         """
-        content = render_objects(self.content)
+        content = _render(self.content)
         classes = ''
         if self.classes:
-            classes = 'class="{}"'.format(render_objects(self.classes)[0])
+            classes = 'class="{}"'.format(_renderstr(self.classes))
         style = ''
         if self.style:
-            style = 'style="{}"'.format(render_objects(self.style)[0])
-        template = render_objects(self.template)[0]
-        # todo 2: apply render_objects to kwargs
+            style = 'style="{}"'.format(_renderstr(self.style))
+        template = _renderstr(self.template)
+        # todo 2: apply _render to kwargs
         kwargs = self.kwargs
         out = self.generate(template, content, classes, style, kwargs)
         return out
@@ -351,7 +350,7 @@ class DWidget(object):
 ########################################################################################################################
 
 
-def render_objects(*content):
+def _render(content):
     """ Render the content.
 
     | Synonym: X
@@ -362,32 +361,43 @@ def render_objects(*content):
     :return: content list
     :rtype: list
 
-    Renders each element of *content*.  If it returns a string, appends to
+    Renders each element of content.  If it returns a string, appends to
     content_string.  Otherwise, extends content_list
     """
-    rtn = []
-    for con in content:
-        if isinstance(con, basestring):                     # strings are just themselves
-            rtn.append(con)
-        elif hasattr(con, 'render'):                        # objects with render methods know how to render themselves
-            rtn.append(con.render())
-        elif isinstance(con, tuple):                        # tuples are walked
-            for con1 in con:
-                c = render_objects(con1)                    # recurse to render this collection item
-                rtn.extend(c)
-            pass
-        # fixme: resume work here to get list working properly should result in a list appended
-        elif isinstance(con, list):
-            for con1 in con:
-                c = render_objects(con1)
-                rtn.append(c)
-            pass
-        elif isinstance(con, int):
-            rtn.append(con)
-        else:                                               # everything else is put in the list
-            raise ValueError('Unknown content type in render_objects {}'.format(con))
-    return rtn
-X = functools.partial(render_objects)                       # convenience method for render objects
+    if isinstance(content, basestring):
+        return content
+    if hasattr(content, 'render'):
+        return content.render()
+    if isinstance(content, int):
+        return content
+    if isinstance(content, tuple):
+        tpl = tuple()
+        for con in content:
+            tpl += (_render(con),)
+        return tpl
+    if isinstance(content, list):
+        lst = list()
+        for con in content:
+            lst.append(_render(con))
+        return lst
+    # everything else is an error
+    raise ValueError('Unknown content type in _render {}'.format(content))
+
+
+def _renderstr(content):
+    """ Render content, concatenate result basestrings.
+
+    :param content: content to render
+    :return: str
+    :rtype: str
+    """
+    rtn = _render(content)
+    out = ''
+    for r in rtn:
+        if isinstance(r, basestring):
+            out += r
+    return out
+
 
 
 def unique_name(base_name='x'):
