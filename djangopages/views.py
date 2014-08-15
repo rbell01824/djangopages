@@ -440,8 +440,8 @@ class TestButton(DPage):
         code = """
 btn = Button('Button 1', 'Button 2')
 content = RC2M((btn,),
-               (BTN('Button 3', type='btn-success btn-xs'),),
-               (BTN('Button 4'), BTN('Button 5')),
+               (BTN('Success', button='btn-success btn-xs'),),
+               (BTN('Default'), BTN('Large button', button='btn-lg')),
                (BTN('Button 6')+BTN('Button 7'),),
                style='margin-top:2px;')
 
@@ -451,8 +451,8 @@ Note: These 6 lines of djangopage code generated approximately 170 lines of html
         # define content objects
         btn = Button('Button 1', 'Button 2')
         content = RC2M((btn,),
-                       (BTN('Button 3', type='btn-success btn-xs'),),
-                       (BTN('Button 4'), BTN('Button 5')),
+                       (BTN('Success', button='btn-success btn-xs'),),
+                       (BTN('Default'), BTN('Large button', button='btn-lg')),
                        (BTN('Button 6')+BTN('Button 7'),),
                        style='margin-top:2px;')
         self.content = page_content_3(self, code, content)
@@ -483,40 +483,32 @@ class TestLink(DPage):
     tags = ['link']
 
     def page(self):
-        doc = """
-Link(href, content, button='', classes='', style='', template=None)
-
- * href: link href
- * content: link content
- * button: button classes, ex. 'btn-success btn-sm'
- * classes: other class for the widget
- * style: styles for the widget
- * template: override default template
-
-####Code
-    # define content objects
-    r1 = Link('/dpages/DPagesList', 'Link to DPagesList')
-    r2 = Link('/dpages/DPagesList', 'Button link to DPagesList',
-              button='btn-info btn-xs')
-    r3 = Link('/dpages/DPagesList', 'Button with style and classes to DpagesList',
-              button='btn-success btn-sm',
-              style='color:white;width:r00px;margin-top:5px;')
-
-    # put into layout
-    content = RC([r1, r2, r3])
+        code = """
+r1 = Link('/dpages/DPagesList', 'DPagesList link')
+r2 = Link('/dpages/DPagesList', 'DPagesList link',
+          button='btn-info btn-xs')
+r3 = Link('/dpages/DPagesList', 'Button with style and classes to DpagesList',
+          button='btn-success btn-lg',
+          style='color:white;width:400px;margin-top:5px;margin-bottom:5px;')
+r4 = Link('/dpages/DPagesList', 'DPagesList link',
+          '/dpages/DPagesList', 'DPagesList link',
+          button='btn-xs', style='margin:2px;')
         """
 
         # define content objects
-        r1 = Link('/dpages/DPagesList', 'Link to DPagesList')
-        r2 = Link('/dpages/DPagesList', 'Button link to DPagesList',
+        r1 = Link('/dpages/DPagesList', 'DPagesList link')
+        r2 = Link('/dpages/DPagesList', 'DPagesList link',
                   button='btn-info btn-xs')
-        r3 = Link('/dpages/DPagesList', 'Button with style and classes to DpagesList',
-                  button='btn-success btn-sm',
-                  style='color:white;width:r00px;margin-top:5px;')
+        r3 = Link('/dpages/DPagesList', 'DPagesList link with style and classes',
+                  button='btn-success btn-lg',
+                  style='color:white;width:400px;margin-top:5px;margin-bottom:5px;')
+        r4 = Link('/dpages/DPagesList', 'DPagesList link',
+                  '/dpages/DPagesList', 'DPagesList link',
+                  button='btn-xs', style='margin:2px;')
 
         # put into layout
-        content = RC([r1, r2, r3])
-        self.content = page_content(self, doc, content)
+        content = RC(r1, r2, r3, r4)
+        self.content = page_content_3(self, code, content)
         return self
 
 

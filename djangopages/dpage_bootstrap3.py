@@ -60,7 +60,7 @@ from djangopages.dpage import DWidget, unique_name, _render
 class Button(DWidget):
     """ Outputs a bootstrap 3 button
 
-    ex. Button('Button 1', type='btn-success btn-sm')
+    ex. Button('Button 1', button='btn-success btn-sm')
 
     | Synonym: BTN(...), useful abbreviation
 
@@ -73,7 +73,7 @@ class Button(DWidget):
 
     :param disabled: default False, if true button is disabled
     :type width: bool
-    :param type: default 'btn-default', button type
+    :param button: default 'btn-default', button definition per bootstrap 3
     :type type: str
     """
     template = '<!-- start of button -->\n' \
@@ -89,8 +89,14 @@ class Button(DWidget):
     def generate(self, template, content, classes, style, kwargs):
         assert isinstance(content, tuple)
         disabled = kwargs.get('disabled', '')
-        btn_type = kwargs.get('type', 'btn-default')
-        classes = self.add_classes(classes, 'btn {}'.format(btn_type))
+        button = kwargs.get('button', 'btn-default')
+        # make sure have a button type specified
+        for t in ('btn-default', 'btn-primary', 'btn-success', 'btn-info', 'btn-warning', 'btn-danger', 'btn-link'):
+            if t in button:
+                break
+        else:
+            button += ' btn-default'
+        classes = self.add_classes(classes, 'btn {button}'.format(button=button))
         out = ''
         for c in content:
             out += template.format(content=c, classes=classes, style=style, disabled=disabled)
@@ -126,31 +132,47 @@ GL = functools.partial(Glyphicon)
 
 
 class Link(DWidget):
-    """
-    Link text support.  Link renders its content and wraps in a link.
-    """
-    template = '<a href="{href}" {classes} {style}>{content}</a>'
+    """ Creates bootstrap 3 link with default button
 
-    def __init__(self, href, content, button='', classes='', style='', template=None):
-        """
-        Create a DPage Link object and initialize it.
-        """
-        super(Link, self).__init__(content, classes, style, template)
-        self.href = href
-        self.button = button
+    ex. Link('/dpages/somepage', 'link to somepage', '/dpages/anotherpage', 'link to anotherpage')
 
-    def render(self):
-        """
-        Render link.
-        """
-        extra = ''
-        if self.button:
-            extra = 'btn {}'.format(self.button)
-        content, classes, style, template = self.render_setup(extra_classes=extra)
-        out = template.format(href=self.href,
-                              classes=classes,
-                              style=style,
-                              content=content)
+    :param content: content
+    :type content: basestring or tuple or DWidget
+    :param kwargs: standard kwargs
+    :type kwargs: dict
+
+    additional kwargs
+
+    :param button: default 'btn-default', button type for the link
+    :type width: str
+    :param disabled: default False, if true button is disabled
+    :type width: bool
+    """
+
+    template = '<a href="{href}" {classes} {style} {disabled} {role}>{content}</a>'
+
+    def __init__(self, *content, **kwargs):
+        super(Link, self).__init__(content, kwargs)
+        return
+
+    def generate(self, template, content, classes, style, kwargs):
+        assert isinstance(content, tuple)
+        disabled = kwargs.get('disabled', '')
+        button = kwargs.get('button', 'btn-default')
+        role = ''
+        if button:
+            # make sure have a button type specified
+            for t in ('btn-default', 'btn-primary', 'btn-success', 'btn-info', 'btn-warning', 'btn-danger', 'btn-link'):
+                if t in button:
+                    break
+            else:
+                button += ' btn-default'
+            classes = self.add_classes(classes, 'btn {button}'.format(button=button))
+            role = 'role="button"'
+        out = ''
+        for hr, con in zip(content[::2], content[1::2]):
+            out += template.format(href=hr, classes=classes, style=style, disabled=disabled, role=role,
+                                   content=con)
         return out
 
 
