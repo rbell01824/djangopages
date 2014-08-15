@@ -354,7 +354,6 @@ def _render(content):
     """ Render the content.
 
     | Synonym: X
-    | Synonym: RO
 
     :param content: content to render
     :type content: varies
@@ -382,10 +381,13 @@ def _render(content):
         return lst
     # everything else is an error
     raise ValueError('Unknown content type in _render {}'.format(content))
+X = functools.partial(_render)
 
 
 def _renderstr(content):
     """ Render content, concatenate result basestrings.
+
+    | Synonym: XS(...)
 
     :param content: content to render
     :return: str
@@ -397,6 +399,7 @@ def _renderstr(content):
         if isinstance(r, basestring):
             out += r
     return out
+XS = functools.partial(_renderstr)
 
 
 def unique_name(base_name='x'):

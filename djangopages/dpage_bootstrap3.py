@@ -178,18 +178,13 @@ class Link(DWidget):
 
 class Panel(DWidget):
     """ Bootstrap 3 panel
-    | Panel(\*content, \*\*kwargs)
 
-        :param content: content
-        :type content: basestring or tuple or DWidget
-        :param kwargs: standard kwargs
-        :type kwargs: dict
+    ex. Panel( 'content', 'heading', 'content2', 'heading2', ... )
 
-    additional kwargs
-
-        :param heading: Panel heading
-        :type para: basestring or tuple or DWidget
-
+    :param content: content
+    :type content: basestring or tuple or DWidget
+    :param kwargs: standard kwargs
+    :type kwargs: dict
     """
     template = """
     <div class="panel panel-default">
@@ -213,12 +208,13 @@ class Panel(DWidget):
         return
 
     def generate(self, template, content, classes, style, kwargs):
-        heading = kwargs.get('heading', None)
-        if heading:
-            heading = _render(heading)
-        if heading and template == Panel.template:
-            template = Panel.heading_template
-        out = template.format(content=content, classes=classes, style=style, heading=heading)
+        out = ''
+        for con, hd in zip(content[::2], content[1::2]):
+            if hd and template == Panel.template:
+                tpl = Panel.heading_template
+            else:
+                tpl = template
+            out += tpl.format(content=con, heading=hd, classes=classes, style=style)
         return out
 
 

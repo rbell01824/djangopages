@@ -123,70 +123,70 @@ class DPagesList(DPage):
 ########################################################################################################################
 
 
-def page_list_for_pages(pages):
-    """
-    Return content that will list the pages in pages.
-    """
-    out = []
-    for page in pages:
-        # get the class definition for this page
-        cls = page['cls']
-        # make a link button object to execute an instance of the class
-        lnk = Link('/dpages/{name}'.format(name=cls.__name__), SP()+cls.title,
-                   button='btn-default btn-sm btn-block',
-                   style='margin-top:5px; text-align:left;')
-        line = RC4(lnk)
-        # lnk = Link('/dpages/{name}'.format(name=cls.__name__), cls.title,
-        #            button='btn-primary btn-xs btn-block',
-        #            style='margin-top:5px; text-align:left;')
-        # lnkbtn = Button(lnk, btn_size='btn-xs')
-        # Output a line with the link button, test title, and test description
-        # line = R(X(C3(lnk), C6(cls.description)))
-        # line = RC(lnk)
-        out.append(line)
-    return out
+# def page_list_for_pages(pages):
+#     """
+#     Return content that will list the pages in pages.
+#     """
+#     out = []
+#     for page in pages:
+#         # get the class definition for this page
+#         cls = page['cls']
+#         # make a link button object to execute an instance of the class
+#         lnk = Link('/dpages/{name}'.format(name=cls.__name__), SP()+cls.title,
+#                    button='btn-default btn-sm btn-block',
+#                    style='margin-top:5px; text-align:left;')
+#         line = RC4(lnk)
+#         # lnk = Link('/dpages/{name}'.format(name=cls.__name__), cls.title,
+#         #            button='btn-primary btn-xs btn-block',
+#         #            style='margin-top:5px; text-align:left;')
+#         # lnkbtn = Button(lnk, btn_size='btn-xs')
+#         # Output a line with the link button, test title, and test description
+#         # line = R(X(C3(lnk), C6(cls.description)))
+#         # line = RC(lnk)
+#         out.append(line)
+#     return out
+#
+
+# def doc_panel(dpage, text):
+#     """
+#     Support method to create the documentation panel for the examples/tests.
+#     """
+#     doc = Markdown(text)
+#     doc_heading = Markdown('###{title}\n'
+#                            '[Home](/dpages/DPagesList) [Prev](/dpages/{prev}) [Next](/dpages/{next})'
+#                            .format(title=dpage.title, next=dpage.next(), prev=dpage.prev()))
+#     panel = Panel(doc, heading=doc_heading)
+#     return panel
+#
+#
+# def content_panel(content):
+#     """
+#     Support function for content.
+#     """
+#     return Panel(content, heading=Markdown('###Output'))
+#
+#
+# def page_content(dpage, text, content):
+#     """
+#     """
+#     doc = doc_panel(dpage, text)
+#     content = content_panel(content)
+#     return R(C6(doc), C6(content))
+#
+#
+# def page_content_v(dpage, text, content):
+#     """
+#     """
+#     if content and len(content) > 0:
+#         return R(C(doc_panel(dpage, text),
+#                      MD('Below is the output for this page.'
+#                         '<hr style="box-shadow: 0 0 10px 1px black;">'),
+#                      content_panel(content)))
+#     else:
+#         return R(C(doc_panel(dpage, text)))
 
 
-def doc_panel(dpage, text):
-    """
-    Support method to create the documentation panel for the examples/tests.
-    """
-    doc = Markdown(text)
-    doc_heading = Markdown('###{title}\n'
-                           '[Home](/dpages/DPagesList) [Prev](/dpages/{prev}) [Next](/dpages/{next})'
-                           .format(title=dpage.title, next=dpage.next(), prev=dpage.prev()))
-    panel = Panel(doc, heading=doc_heading)
-    return panel
-
-
-def content_panel(content):
-    """
-    Support function for content.
-    """
-    return Panel(content, heading=Markdown('###Output'))
-
-
-def page_content(dpage, text, content):
-    """
-    """
-    doc = doc_panel(dpage, text)
-    content = content_panel(content)
-    return R(C6(doc), C6(content))
-
-
-def page_content_v(dpage, text, content):
-    """
-    """
-    if content and len(content) > 0:
-        return R(C(doc_panel(dpage, text),
-                     MD('Below is the output for this page.'
-                        '<hr style="box-shadow: 0 0 10px 1px black;">'),
-                     content_panel(content)))
-    else:
-        return R(C(doc_panel(dpage, text)))
-
-
-def page_content_3(dpage, code, output):
+def page_content(dpage, code, output):
     template = '<h4>{title}</h4>' \
                '<a href="/dpages/DPagesList">Home </a>' \
                '<a href="/dpages/{prv}">Prev </a>' \
@@ -230,7 +230,7 @@ return self
         # content = RC([doc1, doc2, doc3])
         content = doc1 + doc2 + doc3
         # self.content = page_content_v(self, content, None)
-        self.content = page_content_3(self, code, content)
+        self.content = page_content(self, code, content)
         return self
 
 
@@ -248,7 +248,7 @@ content = Markdown('###Markdown h3\\n',
         content = Markdown('###Markdown h3\n',
                            '**Markdown bold text**',
                            Markdown('*Embedded markdown object italic text.*'))
-        self.content = page_content_3(self, code, content)
+        self.content = page_content(self, code, content)
         return self
 
 
@@ -266,7 +266,7 @@ content = T(LI(1, 2, 5),                                # make 3 paragraphs with
         # content = LI(1,2,3)
         content = T(LI(1, 2, 5),                                # make 3 paragraphs with different number of sentences
                     LI(15, style='background-color:bisque;'))   # paragraph with background
-        self.content = page_content_3(self, code, content)
+        self.content = page_content(self, code, content)
         return self
 
 
@@ -285,7 +285,7 @@ content = li + li * 2
         li = LI(12, style='background-color:bisque;')
         content = li + li * 2
 
-        self.content = page_content_3(self, code, content)
+        self.content = page_content(self, code, content)
         return self
 
 
@@ -300,7 +300,7 @@ content = T('line brake here', BR(), 'second line', BR(2), 'third', SP(5), 'line
         """
 
         content = T('line brake here', BR(), 'second line', BR(2), 'third', SP(5), 'line', BR(), AS('*** ', 2))
-        self.content = page_content_3(self, code, content)
+        self.content = page_content(self, code, content)
         return self
 
 
@@ -322,7 +322,7 @@ content = T(Markdown('**Some bold Markdown text**'),
                     HTML('<i><b>Some italic bold HTML text</b></i>'),
                     Text('</br>Some Text text'),
                     LI(3, 5))
-        self.content = page_content_3(self, code, content)
+        self.content = page_content(self, code, content)
         return self
 
 
@@ -348,7 +348,7 @@ content = T('&lt;div class="row"&gt;',
                     C6(t+'mighty ducks '*30, width=6, style='background-color:bisque;'),
                     C3(t, style='background-color:violet'),
                     '</div>')
-        self.content = page_content_3(self, code, content)
+        self.content = page_content(self, code, content)
         return self
 
 
@@ -372,7 +372,7 @@ content = T('&lt;div class="row"&gt;',
         content = T('<div class="row">',
                     C6(t1, t2, style='border:1px solid;'),
                     '</div>')
-        self.content = page_content_3(self, code, content)
+        self.content = page_content(self, code, content)
         return self
 
 
@@ -390,7 +390,7 @@ content = T(R(C6(LI(5), LI(2, 3), style='border:1px solid;')),
         # Create some text for two rows
         content = T(R(C6(LI(5), LI(2, 3), style='border:1px solid;')),
                     R(C(LI(20, style='background-color:powderblue;'))))
-        self.content = page_content_3(self, code, content)
+        self.content = page_content(self, code, content)
         return self
 
 
@@ -406,7 +406,7 @@ class TestRC(DPage):
 
         # Create content
         content = RowColumn(LI(8), LI(5), width=6)
-        self.content = page_content_3(self, code, content)
+        self.content = page_content(self, code, content)
         return self
 
 
@@ -427,7 +427,7 @@ class TestMapRC(DPage):
         t = MD('**Text in a row column.** ' + li)
         content = RC6M((t, t),
                        (t, t), style='border:1px solid;')
-        self.content = page_content_3(self, code, content)
+        self.content = page_content(self, code, content)
         return self
 
 
@@ -455,7 +455,7 @@ Note: These 6 lines of djangopage code generated approximately 170 lines of html
                        (BTN('Default'), BTN('Large button', button='btn-lg')),
                        (BTN('Button 6')+BTN('Button 7'),),
                        style='margin-top:2px;')
-        self.content = page_content_3(self, code, content)
+        self.content = page_content(self, code, content)
         return self
 
 
@@ -473,14 +473,14 @@ content = RCM((Glyphicon('star'), GL('heart'), GL('music')),
         # define the content
         content = RC2M((T('Three glyphs on a line: '), Glyphicon('star'), GL('heart'), GL('music')),
                        (T('Two then one glyph on a line:'), GL('zoom-in', 'refresh'), GL('qrcode')))
-        self.content = page_content_3(self, code, content)
+        self.content = page_content(self, code, content)
         return self
 
 
 class TestLink(DPage):
     title = 'Link'
     description = 'Demonstrate ' + title
-    tags = ['link']
+    tags = ['bootstrap', 'link']
 
     def page(self):
         code = """
@@ -508,7 +508,32 @@ r4 = Link('/dpages/DPagesList', 'DPagesList link',
 
         # put into layout
         content = RC(r1, r2, r3, r4)
-        self.content = page_content_3(self, code, content)
+        self.content = page_content(self, code, content)
+        return self
+
+
+class TestPanel(DPage):
+    title = 'Panel'
+    description = 'Demonstrate ' + title
+    tags = ['panel', 'link']
+
+    def page(self):
+        code = """
+r1 = Panel(MD('Panel text 1'), '')
+r2 = Panel(MD('Panel text 2'), MD('####Panel heading 2'))
+r3 = Panel(MD('Panel text 3'), MD('####Panel heading 3'),
+           MD('Panel text 4'), MD('####Panel heading 4'))
+        """
+
+        # define content objects
+        r1 = Panel(MD('Panel text 1'), '')
+        r2 = Panel(MD('Panel text 2'), MD('####Panel heading 2'))
+        r3 = Panel(MD('Panel text 3'), MD('####Panel heading 3'),
+                   MD('Panel text 4'), MD('####Panel heading 4'))
+
+        # put into layout
+        content = RC(r1, r2, r3)
+        self.content = page_content(self, code, content)
         return self
 
 
