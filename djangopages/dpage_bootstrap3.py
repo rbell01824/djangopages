@@ -123,12 +123,66 @@ class Glyphicon(DWidget):
         return
 
     def generate(self, template, content, classes, style, kwargs):
+        assert isinstance(content, tuple)
         out = ''
         for c in content:
             gl_cls = self.add_classes(classes, 'glyphicon glyphicon-{}'.format(c))
             out += template.format(classes=gl_cls, style=style)
         return out
 GL = functools.partial(Glyphicon)
+
+
+class Jumbotron(DWidget):
+    """ Outputs bootstrap 3 jumbotron
+
+    ex. Label('default', 'text of default label')
+
+    :param content: content
+    :type content: basestring or tuple or DWidget
+    :param kwargs: standard kwargs
+    :type kwargs: dict
+    """
+    template = '<!-- jumbotron start -->' \
+               '<div class="jumbotron">\n' \
+               '{content}\n' \
+               '</div>\n' \
+               '<!-- jumbotron end -->'
+
+    def __init__(self, *content, **kwargs):
+        super(Jumbotron, self).__init__(content, kwargs)
+        return
+
+    def generate(self, template, content, classes, style, kwargs):
+        assert isinstance(content, tuple)
+        out = ''
+        for con in content:
+            out += template.format(classes=classes, style=style, content=con)
+        return out
+
+
+class Label(DWidget):
+    """ Outputs bootstrap 3 label
+
+    ex. Label('default', 'text of default label')
+
+    :param content: content
+    :type content: basestring or tuple or DWidget
+    :param kwargs: standard kwargs
+    :type kwargs: dict
+    """
+    template = '<span {classes} {style}>{content}</span>'
+
+    def __init__(self, *content, **kwargs):
+        super(Label, self).__init__(content, kwargs)
+        return
+
+    def generate(self, template, content, classes, style, kwargs):
+        assert isinstance(content, tuple)
+        out = ''
+        for typ, con in zip(content[::2], content[1::2]):
+            cls = self.add_classes(classes, 'label label-{}'.format(typ))
+            out += template.format(classes=cls, style=style, content=con)
+        return out
 
 
 class Link(DWidget):
@@ -144,9 +198,9 @@ class Link(DWidget):
     additional kwargs
 
     :param button: default 'btn-default', button type for the link
-    :type width: str
+    :type button: str
     :param disabled: default False, if true button is disabled
-    :type width: bool
+    :type disabled: bool
     """
 
     template = '<a href="{href}" {classes} {style} {disabled} {role}>{content}</a>'
@@ -179,7 +233,7 @@ class Link(DWidget):
 class Panel(DWidget):
     """ Bootstrap 3 panel
 
-    ex. Panel( 'content', 'heading', 'content2', 'heading2', ... )
+    ex. Panel( 'heading', 'content', 'heading2', 'content2', ... )
 
     :param content: content
     :type content: basestring or tuple or DWidget
@@ -208,8 +262,9 @@ class Panel(DWidget):
         return
 
     def generate(self, template, content, classes, style, kwargs):
+        assert isinstance(content, tuple)
         out = ''
-        for con, hd in zip(content[::2], content[1::2]):
+        for hd, con in zip(content[::2], content[1::2]):
             if hd and template == Panel.template:
                 tpl = Panel.heading_template
             else:
@@ -218,167 +273,85 @@ class Panel(DWidget):
         return out
 
 
-################################################################################
-################################################################################
-#
-# fixme: Put these in alpha order
-#
+class Modal(DWidget):
+    """ Bootstrap 3 panel
+
+    ex. Modal( 'heading', 'content', 'footer')
+
+    :param content: content
+    :type content: basestring or tuple or DWidget
+    :param kwargs: standard kwargs
+    :type kwargs: dict
+
+    additional kwargs
+
+    :param modal_size: default '', modal size per bootstrap 3
+    :type modal_size: str
+    :param button_type: default btn-primary, button type per bootstrap 3
+    :type button_type: str
+    """
+    template = """
+<!-- Button trigger modal -->
+<button class="btn {button_type}" data-toggle="modal" data-target="#{modal_id}">
+  {button}
+</button>
+<!-- / Button trigger modal -->
+
+<!-- .modal -->
+<div class="modal fade " id={modal_id} tabindex="-1" role="dialog" aria-labelledby="{modal_label}" aria-hidden="true">
+  <!-- .modal-dialog -->
+  <div class="modal-dialog {modal_size}">
+    <!-- .modal-content -->
+    <div class="modal-content">
+      <!-- .modal-header -->
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">
+          <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+        </button>
+        <h4 class="modal-title" id={modal_label}>{heading}</h4>
+      </div>
+      <!-- /.modal-header -->
+      <!-- .modal-body -->
+      <div class="modal-body">
+        {body}
+      </div>
+      <!-- /.modal-body -->
+      <!-- .modal-footer -->
+      <div class="modal-footer">
+        {footer}
+      </div>
+      <!-- /.modal-footer -->
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+    """
+
+    def __init__(self, heading='', body='', footer='', button='Show', **kwargs):
+        super(Modal, self).__init__((heading, body, footer, button), kwargs)
+        return
+
+    def generate(self, template, content, classes, style, kwargs):
+        assert isinstance(content, tuple)
+        heading, body, footer, button = content[0:5]
+        modal_size = kwargs.get('modal_size', '')
+        button_type = kwargs.get('button_type', 'btn-primary')
+        modal_id = unique_name('id_m_')
+        modal_label = unique_name('lbl_m_')
+        out = ''
+        out = template.format(heading=heading, body=body, footer=footer,
+                              modal_id=modal_id, modal_label=modal_label,
+                              modal_size=modal_size,
+                              button=button, button_type=button_type)
+        return out
+
 ################################################################################
 ################################################################################
 
 # fixme: resume work here btn-block, diabled, active, active state support
-
-
-class ButtonModal(Button):
-    """
-    Button to control modal object.  Modal must exist so that its id is available.
-    """
-    def __init__(self, button, modal, btn_type='btn-default', btn_size=None, **kwargs):
-        """
-
-        """
-        self.modal = modal
-        self.button = button
-        btn_extra = 'data-toggle="modal" data-target="#{modal_id}" '.format(modal_id=modal.id)
-        super(ButtonModal, self).__init__(btn_text, btn_type, btn_size, btn_extra=btn_extra, **kwargs)   #fixme rjb
-        return
-
-    def render(self):
-        out = super(ButtonModal, self).render()
-        out += self.modal.render()
-        return out
-
-
-class Modal(object):
-    """
-    Modal object
-    """
-    def __init__(self, *content, **kwargs):
-        """
-        Initialize a Modal.
-
-        :param
-        """
-        self.content = content
-        self.button = kwargs.pop('button', None)
-        self.header = kwargs.pop('header', None)
-        self.footer = kwargs.pop('footer', None)
-        self.id = kwargs.pop('id', unique_name('modal'))                                # id's the modal proper
-        self.modal_label = kwargs.pop('modal_label', unique_name('modal_label'))        # labels the modal header
-        self.kwargs = kwargs
-        return
-
-    def render(self):
-        t_btn = '<!-- modal button start -->\n' \
-                '<button class="btn btn-primary" data-toggle="modal" data-target="#{id}">\n' \
-                '    {btn_text}\n' \
-                '</button>\n' \
-                '<!-- modal button end -->'
-        t_top = '<!-- modal start -->\n' \
-                '<div class="modal fade" id="{id}" tabindex="-1" role="dialog" \n' \
-                '     aria-labelledby="{modal_label}" aria-hidden="true">\n' \
-                '    <div class="modal-dialog">\n' \
-                '        <div class="modal-content">\n'
-        t_hdr = '            <div class="modal-header">\n' \
-                '                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">' \
-                '                    &times;' \
-                '                </button>\n' \
-                '                {modal_header}\n' \
-                '            </div>\n'
-        t_bdy = '            <div class="modal-body">\n' \
-                '                {body}\n' \
-                '            </div>\n'
-        t_ftr = '            <div class="modal-footer">\n' \
-                '                {modal_footer}\n' \
-                '           </div>\n'
-        t_btm = '        </div>\n' \
-                '    </div>\n' \
-                '</div>\n' \
-                '<!-- modal end -->\n'
-        out = ''
-        body = _render(self.content)
-        if self.button:
-            out += t_btn.format(id=self.id, btn_text=self.button)
-        out += t_top.format(id=self.id, modal_label=self.modal_label)
-        if self.header:
-            hdr = _render(self.header)
-            out += t_hdr.format(modal_label=self.modal_label, modal_header=hdr)
-        out += t_bdy.format(body=body)
-        if self.footer:
-            ftr = _render(self.footer)
-            out += t_ftr.format(modal_footer=ftr)
-        out += t_btm
-        return out
-
-
-class ButtonPanel(Button):
-    """
-    Button to control panel object
-    """
-    def __init__(self, btn_text, panel, btn_type='btn-default', btn_size=None, **kwargs):
-        """
-        Create a button panel.
-
-        :param btn_text: Text of the button
-        :param panel: Panel to attach.  Must be declared before button.
-        :param btn_type: Button type per Button.
-        :param btn_size: Button size per Button
-        :param kwargs: RFU
-        """
-        self.panel = panel
-        btn_extra = 'data-toggle="collapse" data-target="#{panel_id}" '.format(panel_id=panel.id)
-        super(ButtonPanel, self).__init__(btn_text, btn_type, btn_size, btn_extra=btn_extra, **kwargs)
-        return
-
-    def render(self):
-        out = ''
-        out += super(ButtonPanel, self).render()
-        return out
-
-
-class Panel_fixme(object):
-    """
-    Collapsible button panel
-    """
-    # todo 2: add panel heading and footer to buttonpanel
-    def __init__(self, *content, **kwargs):
-        """
-        Create a collapsible panel.
-
-        :param content: Content
-        :type content: list
-        :param kwargs: Keyword arguments. button=None
-        :type kwargs: dict
-        """
-        self.content = content
-        self.button = kwargs.pop('button', None)
-        self.id = kwargs.pop('id', unique_name('panel'))
-        self.kwargs = kwargs
-        # todo 2: add header, footer, and panel class attributes here
-        pass
-
-    def render(self, **kwargs):
-        """
-        Render button collapsible panel.
-        """
-        t_btn = '<!-- panel button start -->\n' \
-                '<button class="btn btn-primary" data-toggle="collapse" data-target="#{id}">\n' \
-                '    {btn_text}\n' \
-                '</button>\n' \
-                '<!-- panel button end -->'
-        t_bdy = '<!-- panel start -->\n' \
-                '    <div id="{id}" class="collapse">\n' \
-                '        {content}\n' \
-                '    </div>\n' \
-                '<!-- panel end -->\n'
-
-        out = ''
-        content = _render(self.content, **kwargs)
-
-        if self.button:
-            out += t_btn.format(id=self.id, btn_text=self.button)
-        out += t_bdy.format(id=self.id, content=content)
-        return out
+# fixme: Put these in alpha order
 
 
 class Accordion(object):

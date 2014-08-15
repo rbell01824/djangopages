@@ -406,7 +406,7 @@ def unique_name(base_name='x'):
     """ Returns a unique name of the form 'base_name'_counter.
 
     :param base_name: the base name
-    :type base_name: str
+    :type base_name: str or unicode
     :return: basenamen, ex. x0, x1, ...
     :rtype: str
 
