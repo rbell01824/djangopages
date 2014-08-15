@@ -137,7 +137,9 @@ class DPage(object):
 
     def render(self):
         """
-        Render this DPage and return a Django response object.
+        .. sourcecode:: python
+
+            render()
 
         :return: response object
         :rtype: HttpResponse
@@ -166,11 +168,14 @@ class DPage(object):
     @staticmethod
     def find(tag):
         """
-        Find all the DPage(s) with this tag.
-            :param tag: Tag
-            :type tag: unicode
-            :return: List of DPage(s) with this tag.
-            :rtype: list
+        .. sourcecode:: python
+
+            find('tag_to_find')
+
+        :param tag: to find
+        :type tag: unicode
+        :return: List of DPage(s) with this tag.
+        :rtype: list
         """
         # noinspection PyUnresolvedReferences
         pages = DPage.pages_list
@@ -183,9 +188,14 @@ class DPage(object):
 
     def next(self, obj=False):
         """
-        Return next dpage in the dpage list.
-            :param obj: If true, return the object.  Otherwise return the name.
-            :type obj: bool
+        .. sourcecode:: python
+
+            next()
+
+        :param obj: If true, return the object.  Otherwise return the name.
+        :type obj: bool
+        :return: Next dpage in the list
+        :rtype: str or DPage object
         """
         # noinspection PyUnresolvedReferences
         pl = DPage.pages_list
@@ -201,9 +211,14 @@ class DPage(object):
 
     def prev(self, obj=False):
         """
-        Return previous dpage in the dpage list.
-            :param obj: If true, return the object.  Otherwise return the name.
-            :type obj: bool
+        .. sourcecode:: python
+
+            prev()
+
+        :param obj: If true, return the object.  Otherwise return the name.
+        :type obj: bool
+        :return: Previous page in the list
+        :rtype: str or DPage object
         """
         # noinspection PyUnresolvedReferences
         pl = DPage.pages_list
@@ -219,9 +234,14 @@ class DPage(object):
 
     def siblings(self, obj=False):
         """
-        Return the prev and next dpage objects from the list
-            :param obj: If true, return the object.  Otherwise return the name.
-            :type obj: bool
+        .. sourcecode:: python
+
+            siblings()
+
+        :param obj: If true, return the objects.  Otherwise return the names.
+        :type obj: bool
+        :return: Siblings in the list
+        :rtype: tuple
         """
         return self.prev(obj), self.next(obj)
 
@@ -272,11 +292,17 @@ class DWidget(object):
         return
 
     def render(self):
-        """ Render this widget.
+        """
+        .. sourcecode:: python
 
-        Apply render_object to the widget's content, classes, style, and template.
+            render()
+
+        Render the widget's content, classes, style, and template.
         Invoke the generate method, likely the child class generate, to actually
         create the output HTML.
+
+        :return: widgets HTML
+        :rtype: str
         """
         content = _render(self.content)
         classes = ''
@@ -315,7 +341,12 @@ class DWidget(object):
 
     @staticmethod
     def add_classes(existing, new):
-        """ Add classes to existing classes.
+        """
+        .. sourcecode:: python
+
+            add( existing_classes, 'classes_to_add')
+
+        Add classes to existing classes.
 
         :param existing: Existing class string, ex. class="someclass another_class"
         :type existing: str
@@ -330,7 +361,12 @@ class DWidget(object):
 
     @staticmethod
     def add_style(existing, new):
-        """ Add classes to existing classes.
+        """
+        .. sourcecode:: python
+
+            add_style( existing_styles, 'styles_to_add')
+
+        Add styles to existing styles.
 
         :param existing: Existing style string, ex. style="style1;style2;"
         :type existing: str
@@ -351,17 +387,19 @@ class DWidget(object):
 
 
 def _render(content):
-    """ Render the content.
+    """
+    .. sourcecode:: python
+
+        _render(content)
+
+    Render the content.
 
     | Synonym: X
 
     :param content: content to render
     :type content: varies
-    :return: content list
-    :rtype: list
-
-    Renders each element of content.  If it returns a string, appends to
-    content_string.  Otherwise, extends content_list
+    :return: the rendered content
+    :rtype: varies
     """
     if isinstance(content, basestring):
         return content
@@ -385,7 +423,12 @@ X = functools.partial(_render)
 
 
 def _renderstr(content):
-    """ Render content, concatenate result basestrings.
+    """
+    .. sourcecode:: python
+
+        _renderstr(content)
+
+    Render content, concatenate result basestrings.
 
     | Synonym: XS(...)
 
@@ -403,14 +446,19 @@ XS = functools.partial(_renderstr)
 
 
 def unique_name(base_name='x'):
-    """ Returns a unique name of the form 'base_name'_counter.
+    """
+    .. sourcecode:: python
+
+        unique_name('basename')
+
+    Returns a unique name of the form 'base_name'_counter.
 
     :param base_name: the base name
     :type base_name: str or unicode
-    :return: basenamen, ex. x0, x1, ...
+    :return: basename+n, ie. x0, x1, ...
     :rtype: str
 
-    This function is used by widgets and for other internal purporse to
+    This function is used by widgets and for other internal purposes to
     create unique names for id(s) and other purposes.
     """
     if not hasattr(unique_name, "counter"):

@@ -47,7 +47,8 @@ from djangopages.dpage import DWidget, unique_name, _render
 #
 #
 #
-# todo: add heading small support
+# todo: add remaining bootstrap 3 widgets
+# todo: heading small support
 # todo: add lead body copy support
 # todo: add small, bold, italics
 # todo: add alignment, abbreviations, initialism, addresses, blockquote, etc
@@ -57,10 +58,160 @@ from djangopages.dpage import DWidget, unique_name, _render
 ########################################################################################################################
 
 
-class Button(DWidget):
-    """ Outputs a bootstrap 3 button
+class Accordion(DWidget):
+    """
+    .. sourcecode:: python
 
-    ex. Button('Button 1', button='btn-success btn-sm')
+        Accordion('heading 1', 'content 1',
+                  'haeding 2', 'content 2',
+                  ...)
+
+    :param content: content
+    :type content: basestring or tuple or DWidget
+    :param kwargs: standard kwargs
+    :type kwargs: dict
+
+    additional kwargs
+
+    :param disabled: default False, if true button is disabled
+    :type width: bool
+    :param button: default 'btn-default', button definition per bootstrap 3
+    :type type: str
+
+    """
+    xtemplate = """
+<div class="panel-group" id="accordion">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+          Collapsible Group Item #1
+        </a>
+      </h4>
+    </div>
+    <div id="collapseOne" class="panel-collapse collapse in">
+      <div class="panel-body">
+        Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
+          Collapsible Group Item #2
+        </a>
+      </h4>
+    </div>
+    <div id="collapseTwo" class="panel-collapse collapse">
+      <div class="panel-body">
+        Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree">
+          Collapsible Group Item #3
+        </a>
+      </h4>
+    </div>
+    <div id="collapseThree" class="panel-collapse collapse">
+      <div class="panel-body">
+        Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+      </div>
+    </div>
+  </div>
+</div>
+
+<h4>see http://jsfiddle.net/KyleMit/Wc4xt/ </h4>
+
+<div class="panel-group" id="Xaccordion">
+  <div class="panel panel-default" id="panel1">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-target="#XcollapseOne" href="#XcollapseOne">
+          Collapsible Group Item #1
+        </a>
+      </h4>
+    </div>
+    <div id="XcollapseOne" class="panel-collapse collapse in">
+      <div class="panel-body">
+        Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default" id="panel2">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-target="#XcollapseTwo"
+           href="#XcollapseTwo" class="collapsed">
+          Collapsible Group Item #2
+        </a>
+      </h4>
+    </div>
+    <div id="XcollapseTwo" class="panel-collapse collapse">
+      <div class="panel-body">
+        Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default" id="panel3">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-target="#XcollapseThree"
+           href="#XcollapseThree" class="collapsed">
+          Collapsible Group Item #3
+        </a>
+      </h4>
+    </div>
+    <div id="XcollapseThree" class="panel-collapse collapse">
+      <div class="panel-body">
+        Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+      </div>
+    </div>
+  </div>
+</div>
+    """
+
+# .panel-heading a:after {
+#     font-family: 'Glyphicons Halflings';
+#     content: "\e114";
+#     float: right;
+#     color: grey;
+# }
+# .panel-heading a.collapsed:after {
+#     content: "\e080";
+# }
+
+    def __init__(self, *content, **kwargs):
+        super(Accordion, self).__init__(content, kwargs)
+        return
+
+    def generate(self, template, content, classes, style, kwargs):
+        assert isinstance(content, tuple)
+        # disabled = kwargs.get('disabled', '')
+        # button = kwargs.get('button', 'btn-default')
+        # # make sure have a button type specified
+        # for t in ('btn-default', 'btn-primary', 'btn-success', 'btn-info', 'btn-warning', 'btn-danger', 'btn-link'):
+        #     if t in button:
+        #         break
+        # else:
+        #     button += ' btn-default'
+        # classes = self.add_classes(classes, 'btn {button}'.format(button=button))
+        # out = ''
+        # for c in content:
+        #     out += template.format(content=c, classes=classes, style=style, disabled=disabled)
+        out = self.xtemplate
+        return out
+
+
+class Button(DWidget):
+    """
+    .. sourcecode:: python
+
+        Button('Button 1', button='btn-success btn-sm')
 
     | Synonym: BTN(...), useful abbreviation
 
@@ -105,9 +256,10 @@ BTN = functools.partial(Button)
 
 
 class Glyphicon(DWidget):
-    """ Outputs bootstrap 3 glyphicons
+    """
+    .. sourcecode:: python
 
-    ex. Glyphicon('star')
+        Glyphicon('star')
 
     | Synonym: GL(...), useful abbreviation
 
@@ -133,9 +285,10 @@ GL = functools.partial(Glyphicon)
 
 
 class Jumbotron(DWidget):
-    """ Outputs bootstrap 3 jumbotron
+    """
+    .. sourcecode:: python
 
-    ex. Label('default', 'text of default label')
+        Jumbotro('Jumbotron content')
 
     :param content: content
     :type content: basestring or tuple or DWidget
@@ -161,11 +314,13 @@ class Jumbotron(DWidget):
 
 
 class Label(DWidget):
-    """ Outputs bootstrap 3 label
+    """
+    .. sourcecode:: python
 
-    ex. Label('default', 'text of default label')
+        Label('default', 'text of default label',
+              'primary', 'text of primary label')
 
-    :param content: content
+    :param content: content, label_type, label_text, ...
     :type content: basestring or tuple or DWidget
     :param kwargs: standard kwargs
     :type kwargs: dict
@@ -186,9 +341,11 @@ class Label(DWidget):
 
 
 class Link(DWidget):
-    """ Creates bootstrap 3 link with default button
+    """
+    .. sourcecode:: python
 
-    ex. Link('/dpages/somepage', 'link to somepage', '/dpages/anotherpage', 'link to anotherpage')
+        Link('/dpages/somepage', 'link to somepage',
+             '/dpages/anotherpage', 'link to anotherpage')
 
     :param content: content
     :type content: basestring or tuple or DWidget
@@ -231,9 +388,11 @@ class Link(DWidget):
 
 
 class Panel(DWidget):
-    """ Bootstrap 3 panel
+    """
+    .. sourcecode:: python
 
-    ex. Panel( 'heading', 'content', 'heading2', 'content2', ... )
+        Panel( 'heading', 'content',
+               'heading2', 'content2', ... )
 
     :param content: content
     :type content: basestring or tuple or DWidget
@@ -274,9 +433,10 @@ class Panel(DWidget):
 
 
 class Modal(DWidget):
-    """ Bootstrap 3 panel
+    """
+    .. sourcecode:: python
 
-    ex. Modal( 'heading', 'content', 'footer')
+        Modal( 'heading', 'content', 'footer', 'button text')
 
     :param content: content
     :type content: basestring or tuple or DWidget
@@ -329,15 +489,13 @@ class Modal(DWidget):
 <!-- /.modal -->
     """
 
-    def __init__(self, heading='', body='', footer='', button='Show', **kwargs):
-        super(Modal, self).__init__((heading, body, footer, button), kwargs)
+    def __init__(self, heading='', body='', footer='', button='Show', modal_size='', button_type='btn-primary', **kwargs):
+        super(Modal, self).__init__((heading, body, footer, button, modal_size, button_type), kwargs)
         return
 
     def generate(self, template, content, classes, style, kwargs):
         assert isinstance(content, tuple)
-        heading, body, footer, button = content[0:5]
-        modal_size = kwargs.get('modal_size', '')
-        button_type = kwargs.get('button_type', 'btn-primary')
+        heading, body, footer, button, modal_size, button_type = content[0:7]
         modal_id = unique_name('id_m_')
         modal_label = unique_name('lbl_m_')
         out = ''
@@ -354,7 +512,7 @@ class Modal(DWidget):
 # fixme: Put these in alpha order
 
 
-class Accordion(object):
+class AccordionX(object):
     """
     Accordion support
     """
@@ -387,7 +545,7 @@ class Accordion(object):
         return template.format(accordion_id=self.id, content=content)
 
 
-class AccordionPanel(object):
+class AccordionPanelX(object):
     """
     Panel within an Accordion
     """

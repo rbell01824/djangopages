@@ -45,6 +45,7 @@ from django.utils.encoding import force_unicode
 #
 ########################################################################################################################
 
+# fixme: update doc strings
 
 class Text(DWidget):
     """ Renders text content to the page.
