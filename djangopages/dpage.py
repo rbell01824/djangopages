@@ -360,11 +360,14 @@ class DWidget(object):
     template = ''
 
     def __init__(self, content, kwargs):
+        from copy import deepcopy
+        # log.debug('-----in dwidget init')
         self.content = content
         self.template = kwargs.pop('template', self.template)
         self.classes = kwargs.pop('classes', None)
         self.style = kwargs.pop('style', None)
         self.kwargs = kwargs
+        # log.debug('-----done dwidget init')
         return
 
     def render(self):
@@ -381,6 +384,7 @@ class DWidget(object):
 
         .. note:: Widgets may, though probably shouldn't, override the default render method.
         """
+        # log.debug('##### in dwidget render')
         content = _render(self.content)
         classes = ''
         if self.classes:
@@ -388,10 +392,13 @@ class DWidget(object):
         style = ''
         if self.style:
             style = 'style="{}"'.format(_renderstr(self.style))
-        template = _renderstr(self.template)
-        # todo 2: apply _render to kwargs
+        template = ''
+        if self.template:
+            template = _renderstr(self.template)
+        # todo: should _render be applied to kwargs
         kwargs = self.kwargs
         out = self.generate(template, content, classes, style, kwargs)
+        # log.debug('##### done dwidget render')
         return out
 
     def generate(self, template, content, classes, style, kwargs):
@@ -412,6 +419,7 @@ class DWidget(object):
 
         .. note:: Widgets should almost always override this method.
         """
+        log.debug('!!!!! in DWidget generate')
         try:
             c = ' '.join(content)
             return template.format(content=c, classes=classes, style=style)
@@ -495,11 +503,12 @@ def _render(content):
     :return: the rendered content
     :rtype: varies
     """
+    # log.debug('in _render with <<{}>> type {}'.format(content, type(content)))
     if isinstance(content, basestring):
         return content
     if hasattr(content, 'render'):
         return content.render()
-    if isinstance(content, int):
+    if isinstance(content, (int, long, float)):
         return content
     if isinstance(content, tuple):
         tpl = tuple()
@@ -511,8 +520,7 @@ def _render(content):
         for con in content:
             lst.append(_render(con))
         return lst
-    # everything else is an error
-    raise ValueError('Unknown content type in _render {}'.format(content))
+    return content
 X = functools.partial(_render)
 
 

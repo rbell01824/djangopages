@@ -693,6 +693,7 @@ content = RC(r1)
         self.content = page_content(self, code, content)
         return self
 
+
 class TestBasicGraphs(DPage):
     """
     Basic test of Graph facility.
@@ -702,20 +703,8 @@ class TestBasicGraphs(DPage):
     tags = ['graphs']
 
     def page(self):
-        doc = """
- * Graph(graph_type, data, options=None, **kwargs)
-
-where
-
- * graph_type: is one of the supported graph types
-    * line
-    * pie
-    * column
-    * bar
-    * area
- * data: is the data for the graph
- * options: the 'with' options for chartkick
- * kwargs: rfu
+        code = """
+ddddd
         """
 
         # data for chart
@@ -726,16 +715,20 @@ where
                          ['Safari', 4]]
 
         # create the pie chart and set it's title & subtitle
+        # log.debug('@@@@@ define Graph')
         pie_graph = Graph('pie', browser_stats)
+        # log.debug('@@@@@ set graph options')
         pie_graph.options = {'height': '400px',
                              'title.text': 'Browser Stats',
                              'subtitle.text': 'Graphs may have subtitles'}
 
         # Layout the content on the page
-        content = RC([MD('##Can have other DjangoPage content on the page with the graph.'),
-                      pie_graph,
-                      MD('####Explanation of graph') + LI([8, 5])])
-        self.content = page_content(self, doc, content)
+        # content = RC(T(MD('##Can have other DjangoPage content on the page with the graph.'),
+        #               pie_graph,
+        #               MD('####Explanation of graph') + LI(8, 5)))
+        content = pie_graph
+        # log.debug('@@@@@ page_content')
+        self.content = page_content(self, code, content)
         return self
 
 
