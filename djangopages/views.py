@@ -25,18 +25,18 @@ __email__ = "rbell01824@gmail.com"
 import datetime
 import qsstats
 
-from django.views.generic import View
 from django.db.models import Count
 from django import forms
-from django.http import HttpResponseNotFound
 
 from djangopages.dpage import *
 from djangopages.dpage_layout import *
 from djangopages.dpage_bootstrap3 import *
 from djangopages.dpage_graphs import *
 from djangopages.dpage_texthtml import *
+from django.http import HttpResponseNotFound
+from django.views.generic import View
 
-#todo 3: unused imports, shouldn't I have examples for these
+# todo 3: unused imports, shouldn't I have examples for these
 from test_data.models import syslog_query, syslog_event_graph, VNode, VCompany
 
 ########################################################################################################################
@@ -47,8 +47,22 @@ from test_data.models import syslog_query, syslog_event_graph, VNode, VCompany
 
 
 class DPagesView(View):
-    """
-    View class for dev testing.
+    """ DPagesView provide url processing for DPage(s). The following url **must** be somewhere in the system.
+
+    .. sourcecode:: python
+
+        from djangopages.dpage import DPagesView
+
+        urlpatterns = patterns('',
+                               url(r'^dpages$', RedirectView.as_view(url='/dpages/DPagesList'),
+                                                                     name='dpages_list_view'),
+                               )
+
+    :param request: the request object
+    :type request: basestring or tuple or DWidget
+    :param name: DPage object class name
+    :type name: str
+
     """
     @staticmethod
     def get(request, name):
@@ -74,6 +88,7 @@ class DPagesView(View):
         dt = DPage.pages_dict[name]
         dpage = dt(request).page()
         return dpage.render()
+
 
 ########################################################################################################################
 #
@@ -632,17 +647,51 @@ class TestAccordion(DPage):
 
     def page(self):
         code = escape("""
-Accordion
+# define content objects
+r1 = Accordion('Heading 1', LI(5,6),
+               'Heading 2', LI(3,4,5),
+               'Heading 3', LI(7,4,2))
+
+# put into layout
+content = RC(r1)
         """)
 
         # define content objects
-        r1 = Accordion()
+        r1 = Accordion('Heading 1', LI(5,6),
+                       'Heading 2', LI(3,4,5),
+                       'Heading 3', LI(7,4,2))
 
         # put into layout
         content = RC(r1)
         self.content = page_content(self, code, content)
         return self
 
+
+class TestAccordionM(DPage):
+    title = 'AccordionM'
+    description = 'Demonstrate ' + title
+    tags = ['bootstrap', 'accordionm']
+
+    def page(self):
+        code = escape("""
+# define content objects
+r1 = Accordion('Heading 1', LI(5,6),
+               'Heading 2', LI(3,4,5),
+               'Heading 3', LI(7,4,2))
+
+# put into layout
+content = RC(r1)
+        """)
+
+        # define content objects
+        r1 = AccordionM('Heading 1', LI(5,6),
+                        'Heading 2', LI(3,4,5),
+                        'Heading 3', LI(7,4,2))
+
+        # put into layout
+        content = RC(r1)
+        self.content = page_content(self, code, content)
+        return self
 
 class TestBasicGraphs(DPage):
     """

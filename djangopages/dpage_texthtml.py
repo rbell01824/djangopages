@@ -14,7 +14,7 @@ DjangoPages provides a number of widgets to create text on pages.
 
 8/4/14 - Initial creation
 
-**Widgets**
+
 """
 
 from __future__ import unicode_literals
@@ -45,10 +45,13 @@ from django.utils.encoding import force_unicode
 #
 ########################################################################################################################
 
-# fixme: update doc strings
 
 class Text(DWidget):
     """ Renders text content to the page.
+
+    .. sourcecode:: python
+
+        Text('this is some text content', 'more text content', '<b>Can contain html</b>')
 
     | Synonym: T(...), useful abbreviation
     | Synonym: HTML(...), useful to indicate intent
@@ -82,6 +85,10 @@ HTML = functools.partial(Text)
 
 class Markdown(DWidget):
     """ Renders markdown content to the page.
+
+    .. sourcecode:: python
+
+        Markdown('##Title', 'Other **markdown** text', '<b>Can contain html</b>')
 
     Synonyms: MD()
 
@@ -120,9 +127,9 @@ MD = functools.partial(Markdown)
 class LI(DWidget):
     """ Generate loremipsum paragraphs of sentence specified lengths.
 
-    ex.
-        LI(3, 5) creates two paragraphs wrapping each in an HTML paragraph.
-        The first has 3 sentences.  The second 5 sentences.
+    .. sourcecode:: python
+
+        LI(3, 5)        # Creates two paragraphs. The first has 3 sentences.  The second 5 sentences.
     """
     template = '<p {classes} {style}>' \
                '{content}' \
@@ -159,12 +166,17 @@ class LI(DWidget):
 class AmountStr(DWidget):
     """ Generate amount occuranced of a string.
 
+    .. sourcecode:: python
+
+        AmountStr('xxx ', 2)    # generates 'xxx xxx '
+        BR(2)                   # generates '<br/><br/>'
+        SP(2)                   # generates '&nbsp;&nbsp;'
+
+
     :param content[0]: the string to use
     :type content[0]:
     :param content[1]: the number of times to repeat the string
     :type content[2]: int
-
-    ex. AmountStr('xxx ', 2) generates 'xxx xxx '
 
     | Variations:
     | BR, generates one or more HTML line breaks
@@ -187,4 +199,4 @@ AS = functools.partial(AmountStr)
 BR = functools.partial(AmountStr, '<br/>')
 SP = functools.partial(AmountStr, '&nbsp;')
 
-# todo 2: add html sysbols see http://www.w3schools.com/html/html_entities.asp and subsequent pages
+# todo: add html sysbols see http://www.w3schools.com/html/html_entities.asp and subsequent pages

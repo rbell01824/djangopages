@@ -15,7 +15,6 @@ grid layouts.
 
 8/4/14 - Initial creation
 
-**Widgets**
 """
 
 from __future__ import unicode_literals
@@ -46,6 +45,10 @@ from djangopages.dpage import DWidget
 class Column(DWidget):
     """ Outputs a bootstrap 3 column
 
+    .. sourcecode:: python
+
+        Column(MD('##Markdown in a bootstrap3 column'))
+
     | Synonym: C(...), useful abbreviation
 
     :param content: content
@@ -71,6 +74,12 @@ class Column(DWidget):
     | C10(...), default width 10
     | C11(...), default width 12
     | C121(...), default width 11
+
+    Typically the Column widget is used within a Row widget.
+
+    .. sourcecode:: python
+
+        Row(Column(MD("##Bootstrap 3 row', '##Bootstrap 3 column', 'Other text in row/column')))
     """
     template = '<!-- Start of dpage col -->\n' \
                '<div {classes} {style}>\n' \
@@ -108,6 +117,10 @@ C12 = functools.partial(Column, width=12)
 class Row(DWidget):
     """ Outputs a bootstrap 3 row
 
+    .. sourcecode:: python
+
+        Row(Column(MD("##Bootstrap 3 row', '##Bootstrap 3 column', 'Other text in row/column')))
+
     | Synonym: R(...), useful abbreviation
 
     :param content: content
@@ -137,6 +150,10 @@ R = functools.partial(Row)
 
 class RowColumn(DWidget):
     """ Equivalent to Row(Column(...))
+
+    .. sourcecode:: python
+
+        RC(MD("##Bootstrap 3 row', '##Bootstrap 3 column', 'Other text in row/column'))
 
     | Synonym: RC(...), useful abbreviation
 
@@ -198,9 +215,11 @@ RC12 = functools.partial(RowColumn, width=12)
 
 class RowColumnMap(DWidget):
     """ Equivalent to map(Row(Column(...)), ... )
+
+    .. sourcecode:: python
     
-    ex. content = RC6M((t, t), 
-                       (t, t), style='border:1px solid;')
+        content = RCM((t, t),
+                      (t, t), style='border:1px solid;')
     
     Generates two rows with C6 content.  
     

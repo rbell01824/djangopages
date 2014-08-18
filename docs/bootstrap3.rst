@@ -3,6 +3,7 @@
 .. automodule:: djangopages.dpage_bootstrap3
 
 .. autoclass:: djangopages.dpage_bootstrap3.Accordion
+.. autoclass:: djangopages.dpage_bootstrap3.AccordionM
 .. autoclass:: djangopages.dpage_bootstrap3.Button
 .. autoclass:: djangopages.dpage_bootstrap3.Glyphicon
 .. autoclass:: djangopages.dpage_bootstrap3.Label
