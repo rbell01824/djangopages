@@ -53,7 +53,7 @@ class GraphCK(DWidget):
     """ Chartkick widget
 
     .. sourcecode:: python
-    
+
         pie_graph = GraphCK('pie', browser_stats, options={'height': '400px',
                                                            'title.text': 'Browser Stats',
                                                            'subtitle.text': 'Graphs may have subtitles'})
@@ -90,11 +90,9 @@ class GraphCK(DWidget):
         :param kwargs: RFU
         :type kwargs: dict
         """
-        # if not graph_type in LEGAL_GRAPH_TYPES:
-        #     raise ValueError('In Graph illegal graph type {}'.format(graph_type))
-        log.debug('.....graph def begin')
+        if not graph_type in LEGAL_GRAPH_TYPES:
+            raise ValueError('In Graph illegal graph type {}'.format(graph_type))
         super(GraphCK, self).__init__((graph_type, data, options,), kwargs)
-        log.debug('.....graph def end')
         return
 
     def generate(self, template, content, classes, style, kwargs):
@@ -120,7 +118,7 @@ class GraphCK(DWidget):
         t = Template('{% load chartkick %}' + out_chart)
         c = Context({'data': data})
         out = t.render(c)
-        log.debug('+++++ out <<{}>>'.format(out))
+        # log.debug('+++++ out <<{}>>'.format(out))
         return out
 
     def set_options(self, options):
