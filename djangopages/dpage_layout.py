@@ -218,12 +218,11 @@ class RowColumnMap(DWidget):
 
     .. sourcecode:: python
     
-        content = RCM((t, t),
-                      (t, t), style='border:1px solid;')
+        content = RC6M((t, t),
+                       (t, t), style='border:1px solid;')
     
     Generates two rows with C6 content.  
     
-    | Synonym: RCM(...), useful abbreviation
 
     :param content: content
     :type content: basestring or tuple or DWidget
@@ -235,7 +234,7 @@ class RowColumnMap(DWidget):
     :param width: column width, default 12
     :type width: int
 
-    | Additional synonyms:
+    | Synonyms:
     | RCM(...), default width 12
     | RC1M(...), default width 1
     | RC2M(...), default width 2

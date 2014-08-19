@@ -2,4 +2,5 @@
 
 .. automodule:: djangopages.dpage_graphs
 
-.. autoclass:: djangopages.dpage_graphs.Graph
+.. autoclass:: djangopages.dpage_graphs.GraphCK
+   :members: __init__
