@@ -51,21 +51,10 @@
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <img src="{% static 'images/demo.png' %}" />Demos<b class="caret"></b>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li class="dropdown-header">Underlying technology demos</li>
-                        <li><a href="/chartkick"><img src="{% static 'images/graphs.png' %}" />Chartkick</a></li>
-                        <li><a href="/table2"><img src="{% static 'images/datatable.png' %}" />Django-table 2</a></li>
-                        {# <li class="divider"></li>#}
-                    </ul>
-                </li>
                 <li>
                     <a href="/dpages/dpages">
                         <img src="{% static 'images/tests.png' %}" />
-                        Django Pages
+                        <!--Django Pages-->
                     </a>
                 </li>
                 <li class="dropdown">
@@ -79,6 +68,17 @@
                         <li><a href="/test_data/demo8b">BMC_1 Critical/Error All Hosts; All events each host</a></li>
                         <li><a href="/test_data/demo8c">BMC_1 Critical/Error All Hosts; All events each host better charts</a></li>
                         <li><a href="/test_data/demo8d">BMC_1 Syslogs/hour, all events time series</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <img src="{% static 'images/demo.png' %}" />Demos<b class="caret"></b>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-header">Underlying technology demos</li>
+                        <li><a href="/chartkick"><img src="{% static 'images/graphs.png' %}" />Chartkick</a></li>
+                        <li><a href="/table2"><img src="{% static 'images/datatable.png' %}" />Django-table 2</a></li>
+                        {# <li class="divider"></li>#}
                     </ul>
                 </li>
                 {#                <li><a href=""><i class="fa fa-plus fa-2x"></i>Add</a></li>#}
