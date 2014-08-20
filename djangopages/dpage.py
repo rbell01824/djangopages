@@ -33,7 +33,7 @@ are used. Typically a DjangoPage looks something like this::
         description = 'Longer description'                  # Longer description
         tags = ['example', 'MD', 'RC']                      # Queryable tags
 
-        def page(self):                                     # Must override page
+        def get(self, *args, **kwargs):                                     # Must override page
             page_content = MD('This is the panel body')     # Create markdown page content with MD DWidget
             self.content = RC(page_content)                 # Put content in a bootstrap 3 row & column with RC DWidget
             return self
@@ -105,6 +105,7 @@ import functools
 from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.views.generic import View
 
 # todo 3: add class to deal with file like objects and queryset objects
 # todo 3: add support for select2 https://github.com/applegrew/django-select2
@@ -144,7 +145,7 @@ class _DPageRegister(type):
             cls.pages_dict[name] = cls                              # Put in dict
 
 
-class DPage(object):
+class DPage(View):
     """
     DPage classes define Django Page objects, ie. pages that can be displayed.
 
@@ -174,10 +175,11 @@ class DPage(object):
     __metaclass__ = _DPageRegister              # use DPageRegister to register child classes
 
     def __init__(self, request=None, context=None, template=None,
-                 title='', description='', tags=None):
+                 title='', description='', tags=None, **kwargs):
         """
         Initialize the DPage.
         """
+        super(DPage, self).__init__(**kwargs)
         self.request = request
         self.context = context
         self.template = template if template else settings.DPAGE_DEFAULT_TEMPLATE
@@ -193,19 +195,19 @@ class DPage(object):
         self.content = []
         return
 
-    def page(self):
+    def get(self, *args, **kwargs):
         """ Define the page.  The subclass must define this method to create the page content.
 
         .. sourcecode:: python
 
-            def page(self):
+            def get(self, *args, **kwargs):
                 xr1 = Text('This text comes from dpage.Text')
                 xr2 = Markdown('**Bold Markdown Text**')
                 xr3 = HTML('<h3>H3 text from DPageHTML</h3>')
                 self.content(RC([xr1, xr2, xr3])
                 return self
         """
-        raise NotImplementedError("Subclasses should implement DPage.page!")
+        raise NotImplementedError("Subclasses should implement DPage.get!")
 
     def render(self):
         """ Render the page's content.  The subclass may, though probably shouldn't, override this class.

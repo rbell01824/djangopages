@@ -51,21 +51,26 @@
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                <li>
-                    <a href="/display_graph_pages">
-                        <img src="{% static "img/graphs.png" %}" />
-                        Graphs
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <img src="{% static 'images/demo.png' %}" />Demos<b class="caret"></b>
                     </a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-header">Underlying technology demos</li>
+                        <li><a href="/chartkick"><img src="{% static 'images/graphs.png' %}" />Chartkick</a></li>
+                        <li><a href="/table2"><img src="{% static 'images/datatable.png' %}" />Django-table 2</a></li>
+                        {# <li class="divider"></li>#}
+                    </ul>
                 </li>
                 <li>
                     <a href="/dpages/dpages">
-                        <img src="{% static "img/djangopages.png" %}" />
+                        <img src="{% static 'images/tests.png' %}" />
                         Django Pages
                     </a>
                 </li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <img src="{% static "img/djangopages.png" %}" />Django Pages<b class="caret"></b>
+                        <img src="{% static 'images/djangopages.png' %}" />Django Pages<b class="caret"></b>
                     </a>
                     <ul class="dropdown-menu">
 {#                        <li class="divider"></li>#}
@@ -78,21 +83,10 @@
                 </li>
                 {#                <li><a href=""><i class="fa fa-plus fa-2x"></i>Add</a></li>#}
                 {#                <li><a href=""><i class="fa fa-pencil-square-o fa-2x"></i>Edit</a></li>#}
+                {# <li><img src="{% static 'images/forms.png' %}" /> </li>#}
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <img src="{% static "img/demo.png" %}" />Demos<b class="caret"></b>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li class="dropdown-header">Underlying technology demos</li>
-                        <li><a href="/chartkick"><img src="{% static "img/graphs.png" %}" />Chartkick</a></li>
-                        <li><a href="/table2"><img src="{% static "img/datatable.png" %}" />Django-table 2</a></li>
-                        {# <li class="divider"></li>#}
-                    </ul>
-                </li>
-                {# <li><img src="{% static "img/forms.png" %}" /> </li>#}
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <img src="{% static "img/datatable.png" %}" />Data List <b class="caret"></b>
+                        <img src="{% static 'images/datatable.png' %}" />Data List <b class="caret"></b>
                     </a>
                     <ul class="dropdown-menu">
                         <li><a href="/admin/test_data/cia/">CIA World Factbook</a></li>
@@ -104,7 +98,13 @@
                         {# <li class="dropdown-header">Nav header</li>#}
                     </ul>
                 </li>
-                <li><a href="/admin"><img src="{% static "img/gears.png" %}" />Admin</a></li>
+                <li><a href="/admin"><img src="{% static 'images/gears.png' %}" />Admin</a></li>
+                <li>
+                    <a href="/display_graph_pages">
+                        <img src="{% static 'images/graphs.png' %}" />
+                        Graphs
+                    </a>
+                </li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li><a href="/admin/logout"><i class="glyphicon glyphicon-log-out fa-2x"></i>Logout {{ request.user }}</a></li>

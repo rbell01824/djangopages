@@ -72,7 +72,7 @@ class DPageView(View):
         try:
             # noinspection PyUnresolvedReferences
             dt = DPage.pages_dict[name]
-            dpage = dt(request).page()
+            dpage = dt(request).get()
             return dpage.render()
         except KeyError:
             return HttpResponseNotFound('<h1>Page &lt;{}&gt; not found</h1>'.format(name))
@@ -86,10 +86,13 @@ class DPageView(View):
         :param name: DPage object class name
         :type name: str
         """
-        # noinspection PyUnresolvedReferences
-        dt = DPage.pages_dict[name]
-        dpage = dt(request).page()
-        return dpage.render()
+        try:
+            # noinspection PyUnresolvedReferences
+            dt = DPage.pages_dict[name]
+            dpage = dt(request).get()
+            return dpage.render()
+        except KeyError:
+            return HttpResponseNotFound('<h1>Page &lt;{}&gt; not found</h1>'.format(name))
 
 
 ########################################################################################################################
@@ -107,7 +110,7 @@ class DPagesList(DPage):
     description = 'List the test/demo DPages'
     tags = ['list_test']
 
-    def page(self):
+    def get(self, *args, **kwargs):
         """
         List available pages
         """
@@ -237,7 +240,7 @@ class TestText(DPage):
     description = 'Demonstrate ' + title
     tags = ['text']
 
-    def page(self):
+    def get(self, *args, **kwargs):
         code = escape("""
 doc1 = Text('This is some Text content. ',
             'This is some more Text content.',
@@ -263,7 +266,7 @@ class TestMarkdown(DPage):
     description = 'Demonstrate ' + title
     tags = ['text']
 
-    def page(self):
+    def get(self, *args, **kwargs):
         code = """
 content = Markdown('###Markdown h3\\n',
                    '**Markdown bold text**',
@@ -282,7 +285,7 @@ class TestLI(DPage):
     description = 'Demonstrate ' + title
     tags = ['text']
 
-    def page(self):
+    def get(self, *args, **kwargs):
         code = """
 content = T(LI(1, 2, 5),                                # make 3 paragraphs with different number of sentences
             LI(15, style='background-color:bisque;'))   # paragraph with background
@@ -301,7 +304,7 @@ class TestPlusMul(DPage):
     description = 'Demonstrate ' + title
     tags = ['text', 'content']
 
-    def page(self):
+    def get(self, *args, **kwargs):
         code = """
 li = LI(12, style='background-color:bisque;')
 content = li + li * 2
@@ -321,7 +324,7 @@ class TestBRSP(DPage):
     description = 'Demonstrate ' + title
     tags = ['text']
 
-    def page(self):
+    def get(self, *args, **kwargs):
         code = """
 content = T('line brake here', BR(), 'second line', BR(2), 'third', SP(5), 'line', BR(), AS('*** ', 2))
         """
@@ -337,7 +340,7 @@ class TestMultipleWidgets(DPage):
     description = 'Demonstrate ' + title
     tags = ['content']
 
-    def page(self):
+    def get(self, *args, **kwargs):
         code = escape("""
 content = T(Markdown('**Some bold Markdown text**'),
             HTML('<i><b>Some italic bold HTML text</b></i>'),
@@ -360,7 +363,7 @@ class TestColumn(DPage):
     description = 'Demonstrate ' + title
     tags = ['layout']
 
-    def page(self):
+    def get(self, *args, **kwargs):
         code = escape("""
 t = '<b>Some text</b> ' + 'Be kind to your web footed friends. ' * 15
 content = T('<div class="row">',
@@ -387,7 +390,7 @@ class TestColumnList(DPage):
     description = 'Demonstrate ' + title
     tags = ['layout']
 
-    def page(self):
+    def get(self, *args, **kwargs):
         code = escape("""
 t1 = '<b>Some text</b> ' + 'Be kind to your web footed friends. ' * 15
 t2 = '<b>Ducks</b>' + 'Ducks ' * 70
@@ -411,7 +414,7 @@ class TestRow(DPage):
     description = 'Demonstrate ' + title
     tags = ['layout']
 
-    def page(self):
+    def get(self, *args, **kwargs):
         code = """
 content = T(R(C6(LI(5), LI(2, 3), style='border:1px solid;')),
             R(C(LI(20, style='background-color:powderblue;'))))
@@ -430,7 +433,7 @@ class TestRowColumn(DPage):
     description = 'Demonstrate ' + title
     tags = ['layout']
 
-    def page(self):
+    def get(self, *args, **kwargs):
         code = """
  * RowColumn(content, [width=n]), or
         """
@@ -447,7 +450,7 @@ class TestMapRowColumn(DPage):
     description = 'Demonstrate ' + title
     tags = ['layout']
 
-    def page(self):
+    def get(self, *args, **kwargs):
         code = escape("""
 li = LI(5, para=False).render()[0]
 t = MD('**Text in a row column.** ' + li)
@@ -469,7 +472,7 @@ class TestButton(DPage):
     description = 'Demonstrate ' + title
     tags = ['bootstrap', 'buttons']
 
-    def page(self):
+    def get(self, *args, **kwargs):
         code = """
 btn = Button('Button 1', 'Button 2')
 content = RC2M((btn,),
@@ -498,7 +501,7 @@ class TestGlyphicons(DPage):
     description = 'Demonstrate ' + title
     tags = ['bootstrap', 'glyphicons', 'text']
 
-    def page(self):
+    def get(self, *args, **kwargs):
         code = """
 content = RCM((Glyphicon('star'), GL('heart'), GL('music')),
               (GL('zoom-in'), GL('refresh'), GL('qrcode')))
@@ -517,7 +520,7 @@ class TestJumbotron(DPage):
     description = 'Demonstrate ' + title
     tags = ['bootstrap', 'jumbotron', 'text']
 
-    def page(self):
+    def get(self, *args, **kwargs):
         code = escape("""
 t = '#Heading\n' \
     'Some text after the heading.'
@@ -542,7 +545,7 @@ class TestLabel(DPage):
     description = 'Demonstrate ' + title
     tags = ['bootstrap', 'label', 'text']
 
-    def page(self):
+    def get(self, *args, **kwargs):
         code = escape("""
 r1 = Label('default', 'Default',
            'primary', 'Primary',
@@ -567,7 +570,7 @@ class TestLink(DPage):
     description = 'Demonstrate ' + title
     tags = ['bootstrap', 'link']
 
-    def page(self):
+    def get(self, *args, **kwargs):
         code = """
 # define content objects
 r1 = Link('/dpages/DPagesList', 'DPagesList link')
@@ -607,7 +610,7 @@ class TestModal(DPage):
     description = 'Demonstrate ' + title
     tags = ['bootstrap', 'modal']
 
-    def page(self):
+    def get(self, *args, **kwargs):
         code = escape("""
 mt = MD('####Modal title')
 mb = T(MD('**Body**'), LI(5, 5, 5, 2))
@@ -640,7 +643,7 @@ class TestPanel(DPage):
     description = 'Demonstrate ' + title
     tags = ['bootstrap', 'panel']
 
-    def page(self):
+    def get(self, *args, **kwargs):
         code = escape("""
 r1 = Panel(MD('Panel text 1'), '')
 r2 = Panel(MD('Panel text 2'), MD('####Panel heading 2'))
@@ -666,7 +669,7 @@ class TestAccordion(DPage):
     description = 'Demonstrate ' + title
     tags = ['bootstrap', 'accordion']
 
-    def page(self):
+    def get(self, *args, **kwargs):
         code = escape("""
 # define content objects
 r1 = Accordion('Heading 1', LI(5,6),
@@ -694,7 +697,7 @@ class TestAccordionM(DPage):
     description = 'Demonstrate ' + title
     tags = ['bootstrap', 'accordionm']
 
-    def page(self):
+    def get(self, *args, **kwargs):
         code = escape("""
 # define content objects
 r1 = Accordion('Heading 1', LI(5,6),
@@ -722,7 +725,7 @@ class TestBasicGraphs(DPage):
     description = 'Demonstrate ' + title
     tags = ['graphs']
 
-    def page(self):
+    def get(self, *args, **kwargs):
         code = """
 #
 # see example source for data definitions
@@ -860,7 +863,7 @@ class TestMultipleGraphs(DPage):
     description = 'Demonstrate ' + title
     tags = ['graphs']
 
-    def page(self):
+    def get(self, *args, **kwargs):
         code = """
 browser_stats = [['Chrome', 52.9],
                  ['Firefox', 27.7],
@@ -908,7 +911,7 @@ class TestMultipleGraphsInAccordionM(DPage):
     description = 'Demonstrate ' + title
     tags = ['graphs']
 
-    def page(self):
+    def get(self, *args, **kwargs):
         code = """
 browser_stats = [['Chrome', 52.9], ['Firefox', 27.7], ['Opera', 1.6], ['Internet Explorer', 12.6], ['Safari', 4]]
 
@@ -956,7 +959,7 @@ class TestMultipleGraphsInAccordionMInRow(DPage):
     description = 'Demonstrate ' + title
     tags = ['graphs']
 
-    def page(self):
+    def get(self, *args, **kwargs):
         code = """
 
         """
@@ -990,7 +993,7 @@ class TestMultipleGraphsInAccordionMInRow(DPage):
 #     description = 'Demonstrate ' + title
 #     tags = ['graphs']
 #
-#     def page(self):
+#     def get(self, *args, **kwargs):
 #         """
 #         Override
 #         """
@@ -1057,7 +1060,7 @@ class TestMultipleGraphsInAccordionMInRow(DPage):
 #     description = 'Demonstrate syslog graphs and multi-panels'
 #     tags = []
 #
-#     def page(self):
+#     def get(self, *args, **kwargs):
 #         """
 #         For specified company, display a summary report and details by node.
 #         """
@@ -1291,7 +1294,7 @@ class TestMultipleGraphsInAccordionMInRow(DPage):
 #     description = 'Demonstrate accordion with text widgets'
 #     tags = []
 #
-#     def page(self):
+#     def get(self, *args, **kwargs):
 #         """
 #         Create simple accordion page
 #         """
@@ -1322,7 +1325,7 @@ class TestMultipleGraphsInAccordionMInRow(DPage):
 #     description = 'Demonstrate basic form widgets with off page link'
 #     tags = []
 #
-#     def page(self):
+#     def get(self, *args, **kwargs):
 #         """
 #         Override
 #         """
@@ -1363,7 +1366,7 @@ class TestMultipleGraphsInAccordionMInRow(DPage):
 #     description = 'Demonstrate DB driven table2 widget'
 #     tags = []
 #
-#     def page(self):
+#     def get(self, *args, **kwargs):
 #         """
 #         Override
 #         """
@@ -1418,7 +1421,7 @@ class TestMultipleGraphsInAccordionMInRow(DPage):
 #     description = 'Demonstrate button panel'
 #     tags = []
 #
-#     def page(self):
+#     def get(self, *args, **kwargs):
 #         """
 #         Override
 #         """
@@ -1473,7 +1476,7 @@ class TestMultipleGraphsInAccordionMInRow(DPage):
 #     description = 'Demonstrate basic buttons'
 #     tags = []
 #
-#     def page(self):
+#     def get(self, *args, **kwargs):
 #         """
 #         Build button test page
 #         """
@@ -1507,7 +1510,7 @@ class TestMultipleGraphsInAccordionMInRow(DPage):
 #     description = 'Demonstrate modal linked to button'
 #     tags = []
 #
-#     def page(self):
+#     def get(self, *args, **kwargs):
 #         """
 #         Build modal test page
 #         """
@@ -1535,7 +1538,7 @@ class TestMultipleGraphsInAccordionMInRow(DPage):
 #     description = 'Demonstrate carousel'
 #     tags = []
 #
-#     def page(self):
+#     def get(self, *args, **kwargs):
 #         """
 #         Build carousel test page
 #         """
@@ -1563,7 +1566,7 @@ class TestMultipleGraphsInAccordionMInRow(DPage):
 #     description = 'Demonstrate links'
 #     tags = []
 #
-#     def page(self):
+#     def get(self, *args, **kwargs):
 #         self.content = (RC(Link('/dpages/DPagesList', 'Link to list page')),
 #                         RC(Link('/dpages/Test07', 'Link to the form test page')),
 #                         RC(Markdown('#### Link buttons')),

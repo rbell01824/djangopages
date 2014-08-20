@@ -32,7 +32,8 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import login
 
-from djangopages_demo.views import index
+from djangopages.views import DPageView
+from djangopages_demo.views import index, DPagesList2
 from graphpages.views import GraphPageListView
 
 urlpatterns = patterns('',
@@ -43,6 +44,7 @@ urlpatterns = patterns('',
     url(r'^chartkick/', include('chartkick_demo.urls')),
     url(r'^table2/', include('django_tables2_demo.urls')),
     url(r'^$', login_required(index), name='index'),
+    url(r'^xxxyyy$', DPagesList2.as_view(), name='DpagesList2'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^login/$', login, {'template_name': 'admin/login.html'}),
 )
