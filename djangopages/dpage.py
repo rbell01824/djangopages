@@ -360,7 +360,6 @@ class DWidget(object):
     template = ''
 
     def __init__(self, content, kwargs):
-        from copy import deepcopy
         # log.debug('-----in dwidget init')
         self.content = content
         self.template = kwargs.pop('template', self.template)
@@ -451,9 +450,9 @@ class DWidget(object):
             add( existing_classes, 'classes_to_add')
 
         :param existing: Existing class string, ex. class="someclass another_class"
-        :type existing: str
+        :type existing: str or unicode
         :param new: Classes to add, ex. "a_class_to_add"
-        :type new: str
+        :type new: str or unicode
         :return: new class string, ex. class="someclass another_class a_class_to_add"
         :rtype: str
         """
@@ -471,9 +470,9 @@ class DWidget(object):
             add_style( existing_styles, 'styles_to_add')
 
         :param existing: Existing style string, ex. style="style1;style2;"
-        :type existing: str
+        :type existing: str or unicode
         :param new: Styles to add, ex. "style3;style4;"
-        :type new: str
+        :type new: str or unicode
         :return: new style string, ex. style="style1;style2;style3;style4;"
         :rtype: str
         """

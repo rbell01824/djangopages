@@ -5,11 +5,6 @@
 Details
 *******
 
-urls.py
-=======
-
-.. autoclass:: djangopages.views.DPagesView
-
 DPage
 =====
 

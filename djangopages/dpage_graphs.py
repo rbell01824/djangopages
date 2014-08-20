@@ -35,7 +35,7 @@ __email__ = 'rbell01824@gmail.com'
 from django.template import Context, Template
 
 from djangopages.libs import dict_nested_set
-from djangopages.dpage import DWidget, unique_name
+from djangopages.dpage import DWidget
 
 ########################################################################################################################
 #
@@ -121,7 +121,8 @@ class GraphCK(DWidget):
         # log.debug('+++++ out <<{}>>'.format(out))
         return out
 
-    def set_options(self, options):
+    @staticmethod
+    def set_options(options):
         """
         Set chartkick & highchart options
             options = "height='500px' library=" + str(library)
