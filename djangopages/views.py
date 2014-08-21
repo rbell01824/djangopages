@@ -71,9 +71,10 @@ class DPageView(View):
         """
         try:
             # noinspection PyUnresolvedReferences
-            dt = DPage.pages_dict[name]
-            dpage = dt(request).get()
-            return dpage.render()
+            dpage_obj = DPage.pages_dict[name]
+            cls_obj = dpage_obj()
+            rtn = cls_obj.get(request)
+            return rtn
         except KeyError:
             return HttpResponseNotFound('<h1>Page &lt;{}&gt; not found</h1>'.format(name))
 
@@ -88,9 +89,10 @@ class DPageView(View):
         """
         try:
             # noinspection PyUnresolvedReferences
-            dt = DPage.pages_dict[name]
-            dpage = dt(request).get()
-            return dpage.render()
+            dpage_obj = DPage.pages_dict[name]
+            cls_obj = dpage_obj()
+            rtn = cls_obj.get(request)
+            return rtn
         except KeyError:
             return HttpResponseNotFound('<h1>Page &lt;{}&gt; not found</h1>'.format(name))
 
@@ -177,7 +179,8 @@ class TestText(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'text']
 
-    def get(self, *args, **kwargs):
+    # def get(self, *args, **kwargs):
+    def get(self, request):
         code = escape("""
 doc1 = Text('This is some Text content. ',
             'This is some more Text content.',
@@ -187,14 +190,12 @@ doc3 = T('Red templated text', template='<font color="red">{content}</font>')
 content = doc1 + doc2 + doc3
         """)
 
-        doc1 = Text('This is some Text content. ',
-                    'This is some more Text content.',
-                    '</br>Text can also output HTML.')
-        doc2 = T('Bisque packground style para', para=True, style='background-color:bisque;')
-        doc3 = T('Red templated text', template='<font color="red">{content}</font>')
+        doc1 = 'This is some Text content. This is some more Text content. </br>Text can also output HTML.'
+        doc2 = TText('Bisque packground style para', para=True, style='background-color:bisque;')
+        doc3 = TText('Red templated text', template='<font color="red">{content}</font>')
         content = doc1 + doc2 + doc3
-        self.content = page_content(self, code, content)
-        return self
+        content = page_content(self, code, content)
+        return render(request, self.template, {'content': content})
 
 
 class TestMarkdown(DPage):

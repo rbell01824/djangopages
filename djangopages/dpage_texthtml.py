@@ -46,6 +46,41 @@ from django.utils.encoding import force_unicode
 ########################################################################################################################
 
 
+# noinspection PyPep8Naming
+def TText(content, para=False, classes='', style='', template=None):
+# def TText(content, para=False, **kwargs):
+    """ Renders text content to the page.
+
+    .. sourcecode:: python
+
+        Text('this is some text content', 'more text content', '<b>Can contain html</b>')
+
+    | Synonym: T(...), useful abbreviation
+    | Synonym: HTML(...), useful to indicate intent
+
+    :param content: content
+    :type content: basestring or tuple or DWidget
+    :param kwargs: standard kwargs
+    :type kwargs: dict
+
+    additional kwargs
+
+    :param para: if True wrap output in a paragraph
+    :type para: bool
+    """
+    if classes:
+        classes = 'class={}'.format(classes)
+    if style:
+        style = 'style={}'.format(style)
+    if template:
+        return template.format(content=content)
+    if para:
+        return '<p {classes} {style}>{content}</p>'.format(classes=classes, style=style, content=content)
+    if classes or style:
+        return '<span {classes} {style}>{content}</span>'.format(classes=classes, style=style, content=content)
+    return content
+
+
 class Text(DWidget):
     """ Renders text content to the page.
 

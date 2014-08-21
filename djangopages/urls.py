@@ -24,11 +24,12 @@ __email__ = "rbell01824@gmail.com"
 from django.conf.urls import patterns, include, url
 from django.views.generic import RedirectView
 
-from djangopages.views import DPageView
+from djangopages.views import DPageView, DPagesList
+from djangopages.dpage import DPage
 
 ########################################################################################################################
 
 urlpatterns = patterns('',
-                       url(r'^dpages$', RedirectView.as_view(url='/dpages/DPagesList'), name='dpages_list_view'),
+                       url(r'^$', DPagesList.as_view(), name='DPagesList'),
                        url(r'^(.*$)', DPageView.as_view(), name='dpagesview'),
                        )
