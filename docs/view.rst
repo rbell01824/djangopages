@@ -9,9 +9,7 @@ Details
 .. autoclass:: djangopages.views.TestText
 .. autoclass:: djangopages.views.TestMarkdown
 .. autoclass:: djangopages.views.TestLI
-.. autoclass:: djangopages.views.TestPlusMul
 .. autoclass:: djangopages.views.TestBRSP
-.. autoclass:: djangopages.views.TestMultipleWidgets
 .. autoclass:: djangopages.views.TestColumn
 .. autoclass:: djangopages.views.TestColumnList
 .. autoclass:: djangopages.views.TestRow

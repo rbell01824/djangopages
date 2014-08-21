@@ -47,26 +47,26 @@ from django.utils.encoding import force_unicode
 
 
 # noinspection PyPep8Naming
-def TText(content, para=False, classes='', style='', template=None):
-# def TText(content, para=False, **kwargs):
+def Text(content, para=False, classes='', style='', template=None):
     """ Renders text content to the page.
 
     .. sourcecode:: python
 
-        Text('this is some text content', 'more text content', '<b>Can contain html</b>')
+        Text('this is some text content.  More text content. <b>Can contain html</b>')
 
     | Synonym: T(...), useful abbreviation
     | Synonym: HTML(...), useful to indicate intent
 
     :param content: content
-    :type content: basestring or tuple or DWidget
-    :param kwargs: standard kwargs
-    :type kwargs: dict
-
-    additional kwargs
-
+    :type content: str or unicode
     :param para: if True wrap output in a paragraph
     :type para: bool
+    :param classes: classes to add to output
+    :type classes: str or unicode
+    :param style: styles to add to output
+    :type style: str or unicode
+    :param template: override template
+    :type template: str or unicode
     """
     if classes:
         classes = 'class={}'.format(classes)
@@ -79,77 +79,37 @@ def TText(content, para=False, classes='', style='', template=None):
     if classes or style:
         return '<span {classes} {style}>{content}</span>'.format(classes=classes, style=style, content=content)
     return content
-
-
-class Text(DWidget):
-    """ Renders text content to the page.
-
-    .. sourcecode:: python
-
-        Text('this is some text content', 'more text content', '<b>Can contain html</b>')
-
-    | Synonym: T(...), useful abbreviation
-    | Synonym: HTML(...), useful to indicate intent
-
-    :param content: content
-    :type content: basestring or tuple or DWidget
-    :param kwargs: standard kwargs
-    :type kwargs: dict
-
-    additional kwargs
-
-    :param para: if True wrap output in a paragraph
-    :type para: bool
-    """
-    template = '{content}'
-    template_para = '<p {classes} {style}>{content}</p>'
-
-    def __init__(self, *content, **kwargs):
-        super(Text, self).__init__(content, kwargs)
-        return
-
-    def generate(self, template, content, classes, style, kwargs):
-        assert isinstance(content, tuple)
-        c = ' '.join(content)
-        if kwargs.get('para', None):
-            return Text.template_para.format(content=c, classes=classes, style=style)
-        return template.format(content=c, classes=classes, style=style)
 T = functools.partial(Text)
 HTML = functools.partial(Text)
 
 
-class Markdown(DWidget):
+# noinspection PyPep8Naming
+def Markdown(source, extensions=list()):
     """ Renders markdown content to the page.
 
     .. sourcecode:: python
 
-        Markdown('##Title', 'Other **markdown** text', '<b>Can contain html</b>')
+        Markdwon('Some *markdown text.')
+        Markdown(('##Title', 'Other **markdown** text', '<b>Can contain html</b>')
 
     Synonyms: MD()
 
-    :param content: content
-    :type content: basestring or tuple or DWidget
-    :param kwargs: standard kwargs plus
-    :type kwargs: dict
-
-    additional kwargs
-
-    :param extensions: see Markdown extensions in python documentation
+    :param source: source
+    :type source: str or unicode or tuple
+    :param extensions: defaults to []; see Markdown extensions in python documentation
+    :type extensions: list
     """
-    def __init__(self, *content, **kwargs):
-        super(Markdown, self).__init__(content, kwargs)
-        return
-
-    def generate(self, template, content, classes, style, kwargs):
-        assert isinstance(content, tuple)
-        extensions = kwargs.get('extensions', [])
-        c = ' '.join(content)
-        out = markdown.markdown(force_unicode(c),
-                                extensions,
-                                output_format='html5',
-                                safe_mode=False,
-                                enable_attributes=False)
-        return out
+    if isinstance(source, tuple):
+        rtn = ''
+        for s in source:
+            rtn += Markdown(s, extensions)
+        return rtn
+    rtn = markdown.markdown(force_unicode(source),
+                            extensions,
+                            output_format='html5',
+                            safe_mode=False,
+                            enable_attributes=False)
+    return rtn
 MD = functools.partial(Markdown)
 
 ########################################################################################################################
@@ -159,37 +119,44 @@ MD = functools.partial(Markdown)
 ########################################################################################################################
 
 
-class LI(DWidget):
-    """ Generate loremipsum paragraphs of sentence specified lengths.
+# noinspection PyPep8Naming
+def LI(line_count, para=True, classes='', style='', template=None):
+    """ Generate loremipsum paragraphs with line_count sentences.
 
     .. sourcecode:: python
 
-        LI(3, 5)        # Creates two paragraphs. The first has 3 sentences.  The second 5 sentences.
+        LI(3)           # Creates paragraph with 3 sentences.
+        LI((3, 5))      # Creates paragraph with 3 sentences and paragraph with 5 sentences
+
+    :param line_count: number of sentences in paragraph
+    :type line_count: int or tuple
+    :param para: if True wrap output in a paragraph
+    :type para: bool
+    :param classes: classes to add to output
+    :type classes: str or unicode
+    :param style: styles to add to output
+    :type style: str or unicode
+    :param template: override template
+    :type template: str or unicode
     """
+    if isinstance(line_count, tuple):
+        rtn = ''
+        for lc in line_count:
+            rtn += LI(lc, para, classes, style, template)
+        return rtn
+    content = ' '.join(loremipsum.get_sentences(line_count))
+    if classes:
+        classes = 'class={}'.format(classes)
+    if style:
+        style = 'style={}'.format(style)
+    if template:
+        return template.format(content=content)
     template = '<p {classes} {style}>' \
                '{content}' \
                '</p>'
-
-    def __init__(self, *content, **kwargs):
-        super(LI, self).__init__(content, kwargs)
-        return
-
-    def generate(self, template, content, classes, style, kwargs):
-        assert isinstance(content, tuple)
-        para = kwargs.get('para', True)
-        out = tuple()
-        for pl in content:
-            if pl > 0:
-                content = ' '.join(loremipsum.get_sentences(pl))
-            else:
-                content = loremipsum.get_paragraph()
-            if para:
-                out += (template.format(content=content, classes=classes, style=style),)
-            else:
-                out += (content, )
-        if para:
-            out = ''.join(out)
-        return out
+    if para:
+        return template.format(content=content, classes=classes, style=style)
+    return content
 
 ########################################################################################################################
 #
@@ -198,20 +165,21 @@ class LI(DWidget):
 ########################################################################################################################
 
 
-class AmountStr(DWidget):
-    """ Generate amount occuranced of a string.
+# noinspection PyPep8Naming
+def StringDup(string, count=1):
+    """ Generate amount duplicates of a string.
 
     .. sourcecode:: python
 
-        AmountStr('xxx ', 2)    # generates 'xxx xxx '
+        StringDup('xxx ', 2)    # generates 'xxx xxx '
         BR(2)                   # generates '<br/><br/>'
         SP(2)                   # generates '&nbsp;&nbsp;'
 
 
-    :param content[0]: the string to use
-    :type content[0]:
-    :param content[1]: the number of times to repeat the string
-    :type content[2]: int
+    :param string: the string to use
+    :type string:
+    :param count: the number of times to repeat the string
+    :type count: int
 
     | Variations:
     | BR, generates one or more HTML line breaks
@@ -219,19 +187,13 @@ class AmountStr(DWidget):
     """
     template = '<span {classes} {style}>{content}</span>'
 
-    def __init__(self, *content, **kwargs):
-        super(AmountStr, self).__init__(content, kwargs)
-        return
-
-    def generate(self, template, content, classes, style, kwargs):
-        assert isinstance(content, tuple)
-        assert len(content) > 0
-        amt = 1
-        if len(content) > 1:
-            amt = content[1]
-        return template.format(content=content[0], classes=classes, style=style) * amt
-AS = functools.partial(AmountStr)
-BR = functools.partial(AmountStr, '<br/>')
-SP = functools.partial(AmountStr, '&nbsp;')
+    assert isinstance(string, (str, unicode))
+    assert len(string) > 0
+    assert isinstance(count, int)
+    assert count > 0
+    return string * count
+SD = functools.partial(StringDup)
+BR = functools.partial(StringDup, '<br/>')
+SP = functools.partial(StringDup, '&nbsp;')
 
 # todo: add html sysbols see http://www.w3schools.com/html/html_entities.asp and subsequent pages

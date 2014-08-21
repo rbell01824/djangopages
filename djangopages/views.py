@@ -156,7 +156,7 @@ def page_content(dpage, code, output):
                '{output}'
     nxt = dpage.next()
     prv = dpage.prev()
-    return template.format(title=dpage.title, code=code, output=output, nxt=nxt, prv=prv)
+    return template.format(title=dpage.description, code=code, output=output, nxt=nxt, prv=prv)
 
 
 def escape(t):
@@ -182,17 +182,15 @@ class TestText(DPage):
     # def get(self, *args, **kwargs):
     def get(self, request):
         code = escape("""
-doc1 = Text('This is some Text content. ',
-            'This is some more Text content.',
-            '</br>Text can also output HTML.')
-doc2 = T('Bisque packground style para', para=True, style='background-color:bisque;')
-doc3 = T('Red templated text', template='<font color="red">{content}</font>')
+doc1 = 'This is some Text content. This is some more Text content. </br>Text can also output HTML.'
+doc2 = Text('Bisque packground style para', para=True, style='background-color:bisque;')
+doc3 = Text('Red templated text', template='<font color="red">{content}</font>')
 content = doc1 + doc2 + doc3
         """)
 
         doc1 = 'This is some Text content. This is some more Text content. </br>Text can also output HTML.'
-        doc2 = TText('Bisque packground style para', para=True, style='background-color:bisque;')
-        doc3 = TText('Red templated text', template='<font color="red">{content}</font>')
+        doc2 = Text('Bisque packground style para', para=True, style='background-color:bisque;')
+        doc3 = Text('Red templated text', template='<font color="red">{content}</font>')
         content = doc1 + doc2 + doc3
         content = page_content(self, code, content)
         return render(request, self.template, {'content': content})
@@ -204,17 +202,21 @@ class TestMarkdown(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'text']
 
-    def get(self, *args, **kwargs):
+    def get(self, request):
         code = """
-content = Markdown('###Markdown h3\\n',
-                   '**Markdown bold text**',
-                   Markdown('*Embedded markdown object italic text.*'))
+c1 = Markdown('###Markdown h3')
+c2 = Markdown(('**Markdown bold text**',
+               '*Embedded markdown object italic text.*',
+               'Note: markdown always generates a paragraph.'))
+content = c1 + c2
         """
-        content = Markdown('###Markdown h3\n',
-                           '**Markdown bold text**',
-                           Markdown('*Embedded markdown object italic text.*'))
-        self.content = page_content(self, code, content)
-        return self
+        c1 = Markdown('###Markdown h3')
+        c2 = Markdown(('**Markdown bold text**',
+                       '*Embedded markdown object italic text.*',
+                       'Note: markdown always generates a paragraph.'))
+        content = c1 + c2
+        content = page_content(self, code, content)
+        return render(request, self.template, {'content': content})
 
 
 class TestLI(DPage):
@@ -223,76 +225,41 @@ class TestLI(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'text']
 
-    def get(self, *args, **kwargs):
+    def get(self, request):
         code = """
-content = T(LI(1, 2, 5),                                # make 3 paragraphs with different number of sentences
-            LI(15, style='background-color:bisque;'))   # paragraph with background
+content = (LI(5, style='background-color:azure;') +
+           LI((1, 2, 5)) +
+           LI(15, style='background-color:bisque;'))
         """
 
         # content = LI(1,2,3)
-        content = T(LI(1, 2, 5),                                # make 3 paragraphs with different number of sentences
-                    LI(15, style='background-color:bisque;'))   # paragraph with background
-        self.content = page_content(self, code, content)
-        return self
-
-
-class TestPlusMul(DPage):
-    """ TestPlusMul """
-    title = 'Text: + and *'
-    description = 'Demonstrate ' + title
-    tags = ['test', 'text', 'content']
-
-    def get(self, *args, **kwargs):
-        code = """
-li = LI(12, style='background-color:bisque;')
-content = li + li * 2
-
-+ and * force immediate rendering of the widget.
-        """
-        li = LI(12, style='background-color:bisque;')
-        content = li + li * 2
-
-        self.content = page_content(self, code, content)
-        return self
+        content = (LI(5, style='background-color:azure;') +
+                   LI((1, 2, 5)) +
+                   LI(15, style='background-color:bisque;'))
+        content = page_content(self, code, content)
+        return render(request, self.template, {'content': content})
 
 
 class TestBRSP(DPage):
     """ TestBRSP """
-    title = 'Text: BR & SP'
+    title = 'Text: StringDup, BR, & SP'
     description = 'Demonstrate ' + title
     tags = ['test', 'text']
 
-    def get(self, *args, **kwargs):
+    def get(self, request):
         code = """
-content = T('line brake here', BR(), 'second line', BR(2), 'third', SP(5), 'line', BR(), AS('*** ', 2))
+content = ('line brake here' + BR() +
+           'Second line followed by two newlines' + BR(2) +
+           'Third 5 spaces' + SP(5) + 'line' + BR() +
+           'Six * surrounded by ():(' + SD('***', 2) + ')')
         """
 
-        content = T('line brake here', BR(), 'second line', BR(2), 'third', SP(5), 'line', BR(), AS('*** ', 2))
-        self.content = page_content(self, code, content)
-        return self
-
-
-class TestMultipleWidgets(DPage):
-    """ TestMultipleWidgets """
-    title = 'Content: Multiple widgets on page'
-    description = 'Demonstrate ' + title
-    tags = ['test', 'content']
-
-    def get(self, *args, **kwargs):
-        code = escape("""
-content = T(Markdown('**Some bold Markdown text**'),
-            HTML('<i><b>Some italic bold HTML text</b></i>'),
-            Text('</br>Some Text text'),
-            LI(3, 5))
-        """)
-
-        # noinspection PyListCreation
-        content = T(Markdown('**Some bold Markdown text**'),
-                    HTML('<i><b>Some italic bold HTML text</b></i>'),
-                    Text('</br>Some Text text'),
-                    LI(3, 5))
-        self.content = page_content(self, code, content)
-        return self
+        content = ('line brake here' + BR() +
+                   'Second line followed by two newlines' + BR(2) +
+                   'Third 5 spaces' + SP(5) + 'line' + BR() +
+                   'Six * surrounded by ():(' + SD('***', 2) + ')')
+        content = page_content(self, code, content)
+        return render(request, self.template, {'content': content})
 
 
 class TestColumn(DPage):

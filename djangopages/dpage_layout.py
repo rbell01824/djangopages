@@ -47,7 +47,7 @@ class Column(DWidget):
 
     .. sourcecode:: python
 
-        Column(MD('##Markdown in a bootstrap3 column'))
+        Column(MD('##Markdown in a bootstrap 3 column'))
 
     | Synonym: C(...), useful abbreviation
 
