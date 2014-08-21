@@ -105,17 +105,12 @@ class DPageView(View):
 
 
 class DPagesList(DPage):
-    """
-    Page to list DPages
-    """
+    """ Page to list test DPages """
     title = 'DjangoPages List'
     description = 'List the test/demo DPages'
     tags = ['test', 'list']
 
-    def get(self, *args, **kwargs):
-        """
-        List available pages
-        """
+    def get(self, request):
         t = '<a href="/dpages/{name}" ' \
             'class="btn btn-default btn-xs" ' \
             'role="button" ' \
@@ -160,7 +155,17 @@ def page_content(dpage, code, output):
 
 
 def escape(t):
-    """HTML-escape the text in `t`."""
+    """HTML-escape the text in `t`.
+
+    .. sourcecode:: python
+
+        escape('<h3>A heading</h3>')
+
+    :param t: Text to escape
+    :type t: str or unicode
+    :return: string with html characters escaped
+    :rtype: str
+    """
     return (t
             .replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
             .replace("'", "&#39;").replace('"', "&quot;")
@@ -174,12 +179,11 @@ def escape(t):
 
 
 class TestText(DPage):
-    """ TestText """
+    """ Test Text widget """
     title = 'Text: Text'
     description = 'Demonstrate ' + title
     tags = ['test', 'text']
 
-    # def get(self, *args, **kwargs):
     def get(self, request):
         code = escape("""
 doc1 = 'This is some Text content. This is some more Text content. </br>Text can also output HTML.'
@@ -197,7 +201,7 @@ content = doc1 + doc2 + doc3
 
 
 class TestMarkdown(DPage):
-    """ TestMarkdown """
+    """ Test Markdown widget"""
     title = 'Text: Markdown'
     description = 'Demonstrate ' + title
     tags = ['test', 'text']
@@ -220,7 +224,7 @@ content = c1 + c2
 
 
 class TestLI(DPage):
-    """ TestLI """
+    """ Test LI widget"""
     title = 'Text: LI'
     description = 'Demonstrate ' + title
     tags = ['test', 'text']
@@ -241,7 +245,7 @@ content = (LI(5, style='background-color:azure;') +
 
 
 class TestBRSP(DPage):
-    """ TestBRSP """
+    """ Test StringDup, BR, & SP widgets """
     title = 'Text: StringDup, BR, & SP'
     description = 'Demonstrate ' + title
     tags = ['test', 'text']
@@ -263,628 +267,605 @@ content = ('line brake here' + BR() +
 
 
 class TestColumn(DPage):
-    """ TestColumn """
+    """ Test Column widget"""
     title = 'Layout: Bootstrap 3 Column'
     description = 'Demonstrate ' + title
     tags = ['test', 'layout']
 
-    def get(self, *args, **kwargs):
+    def get(self, request):
         code = escape("""
 t = '<b>Some text</b> ' + 'Be kind to your web footed friends. ' * 15
-content = T('<div class="row">',
-            C(t, width=3, style='background-color:powderblue;'),
-            C6(t+'mighty ducks '*30, width=6, style='background-color:bisque;'),
-            C3(t, style='background-color:violet'),
-            '</div>')
+c1 = C(t, width=3, style='background-color:powderblue;')
+c6 = C6(t+'mighty ducks '*30, width=6, style='background-color:bisque;')
+c3 = C3(t, style='background-color:violet')
+cl = C3((t, t, t))
+content = ('<div class="row">{}{}{}</div>'.format(c1, c6, c3) +
+           '<div class="row">{}</div>'.format(cl))
         """)
 
-        # Create some text for two rows
         t = '<b>Some text</b> ' + 'Be kind to your web footed friends. ' * 15
-        content = T('<div class="row">',
-                    C(t, width=3, style='background-color:powderblue;'),
-                    C6(t+'mighty ducks '*30, width=6, style='background-color:bisque;'),
-                    C3(t, style='background-color:violet'),
-                    '</div>')
-        self.content = page_content(self, code, content)
-        return self
-
-
-class TestColumnList(DPage):
-    """ TestColumnList """
-    title = 'Layout: Bootstrap 3 Column List'
-    description = 'Demonstrate ' + title
-    tags = ['test', 'layout']
-
-    def get(self, *args, **kwargs):
-        code = escape("""
-t1 = '<b>Some text</b> ' + 'Be kind to your web footed friends. ' * 15
-t2 = '<b>Ducks</b>' + 'Ducks ' * 70
-content = T('<div class="row">',
-            C6(t1, t2, style='border:1px solid;'),
-            '</div>')
-       """)
-
-        t1 = '<b>Some text</b> ' + 'Be kind to your web footed friends. ' * 15
-        t2 = '<b>Ducks</b>' + 'Ducks ' * 70
-        content = T('<div class="row">',
-                    C6(t1, t2, style='border:1px solid;'),
-                    '</div>')
-        self.content = page_content(self, code, content)
-        return self
-
-
-class TestRow(DPage):
-    """ TestRow """
-    title = 'Layout: Bootstrap 3 Row'
-    description = 'Demonstrate ' + title
-    tags = ['test', 'layout']
-
-    def get(self, *args, **kwargs):
-        code = """
-content = T(R(C6(LI(5), LI(2, 3), style='border:1px solid;')),
-            R(C(LI(20, style='background-color:powderblue;'))))
-        """
-
-        # Create some text for two rows
-        content = T(R(C6(LI(5), LI(2, 3), style='border:1px solid;')),
-                    R(C(LI(20, style='background-color:powderblue;'))))
-        self.content = page_content(self, code, content)
-        return self
-
-
-class TestRowColumn(DPage):
-    """ TestRowColumn """
-    title = 'Layout: Bootstrap 3 RowColumn/RC'
-    description = 'Demonstrate ' + title
-    tags = ['test', 'layout']
-
-    def get(self, *args, **kwargs):
-        code = """
- * RowColumn(content, [width=n]), or
-        """
-
-        # Create content
-        content = RowColumn(LI(8), LI(5), width=6)
-        self.content = page_content(self, code, content)
-        return self
-
-
-class TestMapRowColumn(DPage):
-    """ TestMapRowColumn """
-    title = 'Layout: Map RC'
-    description = 'Demonstrate ' + title
-    tags = ['test', 'layout']
-
-    def get(self, *args, **kwargs):
-        code = escape("""
-li = LI(5, para=False).render()[0]
-t = MD('**Text in a row column.** ' + li)
-content = RC6M((t, t),
-               (t, t), style='border:1px solid;')
-        """)
-
-        li = LI(5, para=False).render()[0]
-        t = MD('**Text in a row column.** ' + li)
-        content = RC6M((t, t),
-                       (t, t), style='border:1px solid;')
-        self.content = page_content(self, code, content)
-        return self
-
-
-class TestButton(DPage):
-    """ TestButton """
-    title = 'Buttons'
-    description = 'Demonstrate ' + title
-    tags = ['test', 'bootstrap', 'buttons']
-
-    def get(self, *args, **kwargs):
-        code = """
-btn = Button('Button 1', 'Button 2')
-content = RC2M((btn,),
-               (BTN('Success', button='btn-success btn-xs'),),
-               (BTN('Default'), BTN('Large button', button='btn-lg')),
-               (BTN('Button 6')+BTN('Button 7'),),
-               style='margin-top:2px;')
-
-Note: These 6 lines of djangopage code generated approximately 170 lines of html! 30x productivity.
-        """
-
-        # define content objects
-        btn = Button('Button 1', 'Button 2')
-        content = RC2M((btn,),
-                       (BTN('Success', button='btn-success btn-xs'),),
-                       (BTN('Default'), BTN('Large button', button='btn-lg')),
-                       (BTN('Button 6')+BTN('Button 7'),),
-                       style='margin-top:2px;')
-        self.content = page_content(self, code, content)
-        return self
-
-
-class TestGlyphicons(DPage):
-    """ TestGlyphicons """
-    title = 'Glyphicons'
-    description = 'Demonstrate ' + title
-    tags = ['test', 'bootstrap', 'glyphicons', 'text']
-
-    def get(self, *args, **kwargs):
-        code = """
-content = RCM((Glyphicon('star'), GL('heart'), GL('music')),
-              (GL('zoom-in'), GL('refresh'), GL('qrcode')))
-        """
-
-        # define the content
-        content = RC2M((T('Three glyphs on a line: '), Glyphicon('star'), GL('heart'), GL('music')),
-                       (T('Two then one glyph on a line:'), GL('zoom-in', 'refresh'), GL('qrcode')))
-        self.content = page_content(self, code, content)
-        return self
-
-
-class TestJumbotron(DPage):
-    """ TestJumbotron """
-    title = 'Jumbotron'
-    description = 'Demonstrate ' + title
-    tags = ['test', 'bootstrap', 'jumbotron', 'text']
-
-    def get(self, *args, **kwargs):
-        code = escape("""
-t = '#Heading\n' \
-    'Some text after the heading.'
-r1 = Jumbotron(MD(t))
-r2 = Jumbotron(T(MD('#Jumbotron 2'), T('Some text'), Button('Button')))
-content = RC(r1, r2)
-        """)
-
-        # define the content
-        t = '#Heading\n' \
-            'Some text after the heading.'
-        r1 = Jumbotron(MD(t))
-        r2 = Jumbotron(T(MD('#Jumbotron 2'), T('Some text'), Button('Button')))
-        content = RC(r1, r2)
-        self.content = page_content(self, code, content)
-        return self
-
-
-class TestLabel(DPage):
-    """ TestLabel """
-    title = 'Label'
-    description = 'Demonstrate ' + title
-    tags = ['test', 'bootstrap', 'label', 'text']
-
-    def get(self, *args, **kwargs):
-        code = escape("""
-r1 = Label('default', 'Default',
-           'primary', 'Primary',
-           'success', 'Success')
-r2 = '<h3>Example heading'+XS(Label('default', 'New'))+'</h3>'
-content = RC(r1, r2)
-        """)
-
-        # define the content
-        r1 = Label('default', 'Default',
-                   'primary', 'Primary',
-                   'success', 'Success')
-        r2 = '<h3>Example heading'+XS(Label('default', 'New'))+'</h3>'
-        content = RC(r1, r2)
-        self.content = page_content(self, code, content)
-        return self
-
-
-class TestLink(DPage):
-    """ TestLink """
-    title = 'Link'
-    description = 'Demonstrate ' + title
-    tags = ['test', 'bootstrap', 'link']
-
-    def get(self, *args, **kwargs):
-        code = """
-# define content objects
-r1 = Link('/dpages/DPagesList', 'DPagesList link')
-r2 = Link('/dpages/DPagesList', 'DPagesList link',
-          button='btn-info btn-xs')
-r3 = Link('/dpages/DPagesList', 'DPagesList link with style and classes',
-          button='btn-success btn-lg',
-          style='color:white;width:400px;margin-top:5px;margin-bottom:5px;')
-r4 = Link('/dpages/DPagesList', 'DPagesList link',
-          '/dpages/DPagesList', 'DPagesList link',
-          button='btn-xs', style='margin:2px;')
-
-# put into layout
-content = RC(r1, r2, r3, r4)
-        """
-
-        # define content objects
-        r1 = Link('/dpages/DPagesList', 'DPagesList link')
-        r2 = Link('/dpages/DPagesList', 'DPagesList link',
-                  button='btn-info btn-xs')
-        r3 = Link('/dpages/DPagesList', 'DPagesList link with style and classes',
-                  button='btn-success btn-lg',
-                  style='color:white;width:400px;margin-top:5px;margin-bottom:5px;')
-        r4 = Link('/dpages/DPagesList', 'DPagesList link',
-                  '/dpages/DPagesList', 'DPagesList link',
-                  button='btn-xs', style='margin:2px;')
-
-        # put into layout
-        content = RC(r1, r2, r3, r4)
-        self.content = page_content(self, code, content)
-        return self
-
-
-class TestModal(DPage):
-    """ TestModal """
-    title = 'Modal'
-    description = 'Demonstrate ' + title
-    tags = ['test', 'bootstrap', 'modal']
-
-    def get(self, *args, **kwargs):
-        code = escape("""
-mt = MD('####Modal title')
-mb = T(MD('**Body**'), LI(5, 5, 5, 2))
-mf = MD('**Modal footer**')
-r1 = Modal(mt, mb, mf, 'Show modal')
-r2 = Modal(mt, mb, mf, 'Show modal small', modal_size='modal-sm')
-r3 = Modal(mt, mb, mf, 'Show modal button', button_type='btn-success btn-xs')
-
-Note: Modal() generates 18 lines of active HTML for 1 line of definition!
-Note: Actual HTML generated by 6 line test is 124!
-        """)
-
-        # define content objects
-        mt = MD('####Modal title')
-        mb = T(MD('**Body**'), LI(5, 5, 5, 2))
-        mf = MD('**Modal footer**')
-        r1 = Modal(mt, mb, mf, 'Show modal')
-        r2 = Modal(mt, mb, mf, 'Show modal small', modal_size='modal-sm')
-        r3 = Modal(mt, mb, mf, 'Show modal button', button_type='btn-success btn-xs')
-
-        # put into layout
-        content = RC(T(r1, r2), r3, style='padding-top:5px;')
-        self.content = page_content(self, code, content)
-        return self
-
-
-class TestPanel(DPage):
-    """ TestPanel """
-    title = 'Panel'
-    description = 'Demonstrate ' + title
-    tags = ['test', 'bootstrap', 'panel']
-
-    def get(self, *args, **kwargs):
-        code = escape("""
-r1 = Panel(MD('Panel text 1'), '')
-r2 = Panel(MD('Panel text 2'), MD('####Panel heading 2'))
-r3 = Panel(MD('Panel text 3'), MD('####Panel heading 3'),
-           MD('Panel text 4'), MD('####Panel heading 4'))
-        """)
-
-        # define content objects
-        r1 = Panel(MD('', 'Panel text 1'))
-        r2 = Panel(MD('####Panel heading 2'), MD('Panel text 2'))
-        r3 = Panel(MD('####Panel heading 3'), MD('Panel text 3'),
-                   MD('####Panel heading 4'), MD('Panel text 4'))
-
-        # put into layout
-        content = RC(r1, r2, r3)
-        self.content = page_content(self, code, content)
-        return self
-
-
-class TestAccordion(DPage):
-    """ TestAccordion """
-    title = 'Accordion'
-    description = 'Demonstrate ' + title
-    tags = ['test', 'bootstrap', 'accordion']
-
-    def get(self, *args, **kwargs):
-        code = escape("""
-# define content objects
-r1 = Accordion('Heading 1', LI(5,6),
-               'Heading 2', LI(3,4,5),
-               'Heading 3', LI(7,4,2))
-
-# put into layout
-content = RC(r1)
-        """)
-
-        # define content objects
-        r1 = Accordion('Heading 1', LI(5, 6),
-                       'Heading 2', LI(3, 4, 5),
-                       'Heading 3', LI(7, 4, 2))
-
-        # put into layout
-        content = RC(r1)
-        self.content = page_content(self, code, content)
-        return self
-
-
-class TestAccordionM(DPage):
-    """ TestAccordionM """
-    title = 'AccordionM'
-    description = 'Demonstrate ' + title
-    tags = ['test', 'bootstrap', 'accordionm']
-
-    def get(self, *args, **kwargs):
-        code = escape("""
-# define content objects
-r1 = Accordion('Heading 1', LI(5,6),
-               'Heading 2', LI(3,4,5),
-               'Heading 3', LI(7,4,2))
-
-# put into layout
-content = RC(r1)
-        """)
-
-        # define content objects
-        r1 = AccordionM('Heading 1', LI(5, 6),
-                        'Heading 2', LI(3, 4, 5),
-                        'Heading 3', LI(7, 4, 2))
-
-        # put into layout
-        content = RC(r1)
-        self.content = page_content(self, code, content)
-        return self
-
-
-class TestBasicGraphs(DPage):
-    """ TestBasicGraphs """
-    title = 'Graphs'
-    description = 'Demonstrate ' + title
-    tags = ['test', 'graphs']
-
-    def get(self, *args, **kwargs):
-        code = """
+        c1 = C(t, width=3, style='background-color:powderblue;')
+        c6 = C6(t+'mighty ducks '*30, width=6, style='background-color:bisque;')
+        c3 = C3(t, style='background-color:violet')
+        cl = C3((t, t, t))
+        content = ('<div class="row">{}{}{}</div>'.format(c1, c6, c3) +
+                   '<div class="row">{}</div>'.format(cl))
+        content = page_content(self, code, content)
+        return render(request, self.template, {'content': content})
+
+
+# class TestRow(DPage):
+#     """ Test Row  widget"""
+#     title = 'Layout: Bootstrap 3 Row'
+#     description = 'Demonstrate ' + title
+#     tags = ['test', 'layout']
 #
-# see example source for data definitions
+#     def get(self, *args, **kwargs):
+#         code = """
+# content = T(R(C6(LI(5), LI(2, 3), style='border:1px solid;')),
+#             R(C(LI(20, style='background-color:powderblue;'))))
+#         """
 #
-
-pie_graph = GraphCK('pie', browser_stats, options={'height': '400px',
-                                                   'title.text': 'Browser Stats',
-                                                   'subtitle.text': 'Graphs may have subtitles'})
-column_graph = GraphCK('column', browser_stats, options={'height': '400px',
-                                                         'title.text': 'Browser Stats',
-                                                         'subtitle.text': 'Graphs may have subtitles'})
-bar_graph = GraphCK('bar', browser_stats, options={'height': '400px',
-                                                   'title.text': 'Browser Stats',
-                                                   'subtitle.text': 'Graphs may have subtitles'})
-line_graph = GraphCK('line', exchange, options={'height': '400px',
-                                                'title.text': 'Exchange Rates Chart',
-                                                'subtitle.text': 'Graphs may have subtitles'})
-multi_line_graph = GraphCK('line', temperature, options={'height': '400px',
-                                                         'title.text': 'Temperature Chart',
-                                                         'subtitle.text': 'Tokyo/London/NY/Berlin'})
-area_graph = GraphCK('area', areas, options={'height': '400px',
-                                             'title.text': 'Areas Chart',
-                                             'subtitle.text': 'Graphs may have subtitles'})
-        """
-
-        # data for chart
-        browser_stats = [['Chrome', 52.9],
-                         ['Firefox', 27.7],
-                         ['Opera', 1.6],
-                         ['Internet Explorer', 12.6],
-                         ['Safari', 4]]
-        exchange = {'2001-01-31': 1.064, '2002-01-31': 1.1305,
-                    '2003-01-31': 0.9417, '2004-01-31': 0.7937,
-                    '2005-01-31': 0.7609, '2006-01-31': 0.827,
-                    '2007-01-31': 0.7692, '2008-01-31': 0.6801,
-                    '2009-01-31': 0.7491, '2010-01-31': 0.7002,
-                    '2011-01-31': 0.7489, '2012-01-31': 0.7755,
-                    '2013-01-31': 0.7531,
-                    }
-        temperature = [{u'data': {'2012-00-01 00:00:00 -0700': 7,
-                                  '2012-01-01 00:00:00 -0700': 6.9,
-                                  '2012-02-01 00:00:00 -0700': 9.5,
-                                  '2012-03-01 00:00:00 -0700': 14.5,
-                                  '2012-04-01 00:00:00 -0700': 18.2,
-                                  '2012-05-01 00:00:00 -0700': 21.5,
-                                  '2012-06-01 00:00:00 -0700': 25.2,
-                                  '2012-07-01 00:00:00 -0700': 26.5,
-                                  '2012-08-01 00:00:00 -0700': 23.3,
-                                  '2012-09-01 00:00:00 -0700': 18.3,
-                                  '2012-10-01 00:00:00 -0700': 13.9,
-                                  '2012-11-01 00:00:00 -0700': 9.6},
-                        u'name': u'Tokyo'},
-                       {u'data': {'2012-00-01 00:00:00 -0700': -0.2,
-                                  '2012-01-01 00:00:00 -0700': 0.8,
-                                  '2012-02-01 00:00:00 -0700': 5.7,
-                                  '2012-03-01 00:00:00 -0700': 11.3,
-                                  '2012-04-01 00:00:00 -0700': 17,
-                                  '2012-05-01 00:00:00 -0700': 22,
-                                  '2012-06-01 00:00:00 -0700': 24.8,
-                                  '2012-07-01 00:00:00 -0700': 24.1,
-                                  '2012-08-01 00:00:00 -0700': 20.1,
-                                  '2012-09-01 00:00:00 -0700': 14.1,
-                                  '2012-10-01 00:00:00 -0700': 8.6,
-                                  '2012-11-01 00:00:00 -0700': 2.5},
-                        u'name': u'New York'},
-                       {u'data': {'2012-00-01 00:00:00 -0700': -0.9,
-                                  '2012-01-01 00:00:00 -0700': 0.6,
-                                  '2012-02-01 00:00:00 -0700': 3.5,
-                                  '2012-03-01 00:00:00 -0700': 8.4,
-                                  '2012-04-01 00:00:00 -0700': 13.5,
-                                  '2012-05-01 00:00:00 -0700': 17,
-                                  '2012-06-01 00:00:00 -0700': 18.6,
-                                  '2012-07-01 00:00:00 -0700': 17.9,
-                                  '2012-08-01 00:00:00 -0700': 14.3,
-                                  '2012-09-01 00:00:00 -0700': 9,
-                                  '2012-10-01 00:00:00 -0700': 3.9,
-                                  '2012-11-01 00:00:00 -0700': 1},
-                        u'name': u'Berlin'},
-                       {u'data': {'2012-00-01 00:00:00 -0700': 3.9,
-                                  '2012-01-01 00:00:00 -0700': 4.2,
-                                  '2012-02-01 00:00:00 -0700': 5.7,
-                                  '2012-03-01 00:00:00 -0700': 8.5,
-                                  '2012-04-01 00:00:00 -0700': 11.9,
-                                  '2012-05-01 00:00:00 -0700': 15.2,
-                                  '2012-06-01 00:00:00 -0700': 17,
-                                  '2012-07-01 00:00:00 -0700': 16.6,
-                                  '2012-08-01 00:00:00 -0700': 14.2,
-                                  '2012-09-01 00:00:00 -0700': 10.3,
-                                  '2012-10-01 00:00:00 -0700': 6.6,
-                                  '2012-11-01 00:00:00 -0700': 4.8},
-                        u'name': u'London'}]
-        areas = {'2013-07-27 07:08:00 UTC': 4, '2013-07-27 07:09:00 UTC': 3,
-                 '2013-07-27 07:10:00 UTC': 2, '2013-07-27 07:04:00 UTC': 2,
-                 '2013-07-27 07:02:00 UTC': 3, '2013-07-27 07:00:00 UTC': 2,
-                 '2013-07-27 07:06:00 UTC': 1, '2013-07-27 07:01:00 UTC': 5,
-                 '2013-07-27 07:05:00 UTC': 5, '2013-07-27 07:03:00 UTC': 3,
-                 '2013-07-27 07:07:00 UTC': 3}
-
-        # create the pie chart and set it's title & subtitle
-        # log.debug('@@@@@ define Graph')
-        pie_graph = GraphCK('pie', browser_stats, options={'height': '400px',
-                                                           'title.text': 'Browser Stats',
-                                                           'subtitle.text': 'Graphs may have subtitles'})
-        column_graph = GraphCK('column', browser_stats, options={'height': '400px',
-                                                                 'title.text': 'Browser Stats',
-                                                                 'subtitle.text': 'Graphs may have subtitles'})
-        bar_graph = GraphCK('bar', browser_stats, options={'height': '400px',
-                                                           'title.text': 'Browser Stats',
-                                                           'subtitle.text': 'Graphs may have subtitles'})
-        line_graph = GraphCK('line', exchange, options={'height': '400px',
-                                                        'title.text': 'Exchange Rates Chart',
-                                                        'subtitle.text': 'Graphs may have subtitles'})
-        multi_line_graph = GraphCK('line', temperature, options={'height': '400px',
-                                                                 'title.text': 'Temperature Chart',
-                                                                 'subtitle.text': 'Tokyo/London/NY/Berlin'})
-        area_graph = GraphCK('area', areas, options={'height': '400px',
-                                                     'title.text': 'Areas Chart',
-                                                     'subtitle.text': 'Graphs may have subtitles'})
-
-        # Layout the content on the page
-        # content = RC(T(MD('##Can have other DjangoPage content on the page with the graph.'),
-        #               pie_graph,
-        #               MD('####Explanation of graph') + LI(8, 5)))
-        content = T(pie_graph, column_graph, bar_graph,
-                    line_graph, multi_line_graph,
-                    area_graph)
-        # log.debug('@@@@@ page_content')
-        self.content = page_content(self, code, content)
-        return self
-
-
-class TestMultipleGraphs(DPage):
-    """ TestMultipleGraphs """
-    title = 'Multiple Graphs'
-    description = 'Demonstrate ' + title
-    tags = ['test', 'graphs']
-
-    def get(self, *args, **kwargs):
-        code = """
-browser_stats = [['Chrome', 52.9],
-                 ['Firefox', 27.7],
-                 ['Opera', 1.6],
-                 ['Internet Explorer', 12.6],
-                 ['Safari', 4]]
-
-pie_graph = GraphCK('pie', browser_stats, options={'height': '400px',
-                                                   'title.text': 'Browser Stats',
-                                                   'subtitle.text': 'Graphs may have subtitles'})
-column_graph = GraphCK('column', browser_stats, options={'height': '400px',
-                                                         'title.text': 'Browser Stats',
-                                                         'subtitle.text': 'Graphs may have subtitles'})
-bar_graph = GraphCK('bar', browser_stats, options={'height': '400px',
-                                                   'title.text': 'Browser Stats',
-                                                   'subtitle.text': 'Graphs may have subtitles'})
-        """
-        # data for chart
-        browser_stats = [['Chrome', 52.9],
-                         ['Firefox', 27.7],
-                         ['Opera', 1.6],
-                         ['Internet Explorer', 12.6],
-                         ['Safari', 4]]
-
-        pie_graph = GraphCK('pie', browser_stats, options={'height': '400px',
-                                                           'title.text': 'Browser Stats',
-                                                           'subtitle.text': 'Graphs may have subtitles'})
-        column_graph = GraphCK('column', browser_stats, options={'height': '400px',
-                                                                 'title.text': 'Browser Stats',
-                                                                 'subtitle.text': 'Graphs may have subtitles'})
-        bar_graph = GraphCK('bar', browser_stats, options={'height': '400px',
-                                                           'title.text': 'Browser Stats',
-                                                           'subtitle.text': 'Graphs may have subtitles'})
-
-        content = T(RC(MD('##Can have other DjangoPage content on the page with the graph.')),
-                    RC4(pie_graph, column_graph, bar_graph),
-                    RC(MD('####Explanation of graph') + LI(8, 5)))
-        self.content = page_content(self, code, content)
-        return self
-
-
-class TestMultipleGraphsInAccordionM(DPage):
-    """ TestMultipleGraphsInAccordionM """
-    title = 'Multiple Graphs in AccordionM'
-    description = 'Demonstrate ' + title
-    tags = ['test', 'graphs']
-
-    def get(self, *args, **kwargs):
-        code = """
-browser_stats = [['Chrome', 52.9], ['Firefox', 27.7], ['Opera', 1.6], ['Internet Explorer', 12.6], ['Safari', 4]]
-
-pie_graph = GraphCK('pie', browser_stats, options={'height': '400px',
-                                                   'title.text': 'Browser Stats',
-                                                   'subtitle.text': 'Graphs may have subtitles'})
-column_graph = GraphCK('column', browser_stats, options={'height': '400px',
-                                                         'title.text': 'Browser Stats',
-                                                         'subtitle.text': 'Graphs may have subtitles'})
-bar_graph = GraphCK('bar', browser_stats, options={'height': '400px',
-                                                   'title.text': 'Browser Stats',
-                                                   'subtitle.text': 'Graphs may have subtitles'})
-
-content = T(RC(MD('##Can have other DjangoPage content on the page with the graph.')),
-            AccordionM('Pie', pie_graph,
-                       'Column', column_graph,
-                       'Bar', bar_graph),
-            RC(MD('####Explanation of graph') + LI(8, 5)))
-        """
-        browser_stats = [['Chrome', 52.9], ['Firefox', 27.7], ['Opera', 1.6],
-                         ['Internet Explorer', 12.6], ['Safari', 4]]
-
-        pie_graph = GraphCK('pie', browser_stats, options={'height': '400px',
-                                                           'title.text': 'Browser Stats',
-                                                           'subtitle.text': 'Graphs may have subtitles'})
-        column_graph = GraphCK('column', browser_stats, options={'height': '400px',
-                                                                 'title.text': 'Browser Stats',
-                                                                 'subtitle.text': 'Graphs may have subtitles'})
-        bar_graph = GraphCK('bar', browser_stats, options={'height': '400px',
-                                                           'title.text': 'Browser Stats',
-                                                           'subtitle.text': 'Graphs may have subtitles'})
-
-        content = T(RC(MD('##Can have other DjangoPage content on the page with the graph.')),
-                    AccordionM('Pie', pie_graph,
-                               'Column', column_graph,
-                               'Bar', bar_graph),
-                    RC(MD('####Explanation of graph') + LI(8, 5)))
-        self.content = page_content(self, code, content)
-        return self
-
-
-class TestMultipleGraphsInAccordionMInRow(DPage):
-    """ TestMultipleGraphsInAccordionMInRow """
-    title = 'Multiple Graphs in AccordionM in RC'
-    description = 'Demonstrate ' + title
-    tags = ['test', 'graphs']
-
-    def get(self, *args, **kwargs):
-        code = """
-
-        """
-        browser_stats = [['Chrome', 52.9], ['Firefox', 27.7],
-                         ['Opera', 1.6], ['Internet Explorer', 12.6], ['Safari', 4]]
-
-        pie_graph = GraphCK('pie', browser_stats, options={'height': '400px',
-                                                           'title.text': 'Browser Stats',
-                                                           'subtitle.text': 'Graphs may have subtitles'})
-        column_graph = GraphCK('column', browser_stats, options={'height': '400px',
-                                                                 'title.text': 'Browser Stats',
-                                                                 'subtitle.text': 'Graphs may have subtitles'})
-        bar_graph = GraphCK('bar', browser_stats, options={'height': '400px',
-                                                           'title.text': 'Browser Stats',
-                                                           'subtitle.text': 'Graphs may have subtitles'})
-
-        content = T(RC(MD('##Can have other DjangoPage content on the page with the graph.')),
-                    RC4(AccordionM('Pie', pie_graph),
-                        AccordionM('Column', column_graph),
-                        AccordionM('Bar', bar_graph)),
-                    RC(MD('####Explanation of graph') + LI(8, 5)))
-        self.content = page_content(self, code, content)
-        return self
+#         # Create some text for two rows
+#         content = T(R(C6(LI(5), LI(2, 3), style='border:1px solid;')),
+#                     R(C(LI(20, style='background-color:powderblue;'))))
+#         self.content = page_content(self, code, content)
+#         return self
+#
+#
+# class TestRowColumn(DPage):
+#     """ Test RowColumn widget """
+#     title = 'Layout: Bootstrap 3 RowColumn/RC'
+#     description = 'Demonstrate ' + title
+#     tags = ['test', 'layout']
+#
+#     def get(self, *args, **kwargs):
+#         code = """
+#  * RowColumn(content, [width=n]), or
+#         """
+#
+#         # Create content
+#         content = RowColumn(LI(8), LI(5), width=6)
+#         self.content = page_content(self, code, content)
+#         return self
+#
+#
+# class TestMapRowColumn(DPage):
+#     """ Test MapRowColumn widget """
+#     title = 'Layout: Map RC'
+#     description = 'Demonstrate ' + title
+#     tags = ['test', 'layout']
+#
+#     def get(self, *args, **kwargs):
+#         code = escape("""
+# li = LI(5, para=False).render()[0]
+# t = MD('**Text in a row column.** ' + li)
+# content = RC6M((t, t),
+#                (t, t), style='border:1px solid;')
+#         """)
+#
+#         li = LI(5, para=False).render()[0]
+#         t = MD('**Text in a row column.** ' + li)
+#         content = RC6M((t, t),
+#                        (t, t), style='border:1px solid;')
+#         self.content = page_content(self, code, content)
+#         return self
+#
+#
+# class TestButton(DPage):
+#     """ Test Button widget """
+#     title = 'Buttons'
+#     description = 'Demonstrate ' + title
+#     tags = ['test', 'bootstrap', 'buttons']
+#
+#     def get(self, *args, **kwargs):
+#         code = """
+# btn = Button('Button 1', 'Button 2')
+# content = RC2M((btn,),
+#                (BTN('Success', button='btn-success btn-xs'),),
+#                (BTN('Default'), BTN('Large button', button='btn-lg')),
+#                (BTN('Button 6')+BTN('Button 7'),),
+#                style='margin-top:2px;')
+#
+# Note: These 6 lines of djangopage code generated approximately 170 lines of html! 30x productivity.
+#         """
+#
+#         # define content objects
+#         btn = Button('Button 1', 'Button 2')
+#         content = RC2M((btn,),
+#                        (BTN('Success', button='btn-success btn-xs'),),
+#                        (BTN('Default'), BTN('Large button', button='btn-lg')),
+#                        (BTN('Button 6')+BTN('Button 7'),),
+#                        style='margin-top:2px;')
+#         self.content = page_content(self, code, content)
+#         return self
+#
+#
+# class TestGlyphicons(DPage):
+#     """ Test Glyphicons widget """
+#     title = 'Glyphicons'
+#     description = 'Demonstrate ' + title
+#     tags = ['test', 'bootstrap', 'glyphicons', 'text']
+#
+#     def get(self, *args, **kwargs):
+#         code = """
+# content = RCM((Glyphicon('star'), GL('heart'), GL('music')),
+#               (GL('zoom-in'), GL('refresh'), GL('qrcode')))
+#         """
+#
+#         # define the content
+#         content = RC2M((T('Three glyphs on a line: '), Glyphicon('star'), GL('heart'), GL('music')),
+#                        (T('Two then one glyph on a line:'), GL('zoom-in', 'refresh'), GL('qrcode')))
+#         self.content = page_content(self, code, content)
+#         return self
+#
+#
+# class TestJumbotron(DPage):
+#     """ Test Jumbotron widget """
+#     title = 'Jumbotron'
+#     description = 'Demonstrate ' + title
+#     tags = ['test', 'bootstrap', 'jumbotron', 'text']
+#
+#     def get(self, *args, **kwargs):
+#         code = escape("""
+# t = '#Heading\n' \
+#     'Some text after the heading.'
+# r1 = Jumbotron(MD(t))
+# r2 = Jumbotron(T(MD('#Jumbotron 2'), T('Some text'), Button('Button')))
+# content = RC(r1, r2)
+#         """)
+#
+#         # define the content
+#         t = '#Heading\n' \
+#             'Some text after the heading.'
+#         r1 = Jumbotron(MD(t))
+#         r2 = Jumbotron(T(MD('#Jumbotron 2'), T('Some text'), Button('Button')))
+#         content = RC(r1, r2)
+#         self.content = page_content(self, code, content)
+#         return self
+#
+#
+# class TestLabel(DPage):
+#     """ Test Label widget """
+#     title = 'Label'
+#     description = 'Demonstrate ' + title
+#     tags = ['test', 'bootstrap', 'label', 'text']
+#
+#     def get(self, *args, **kwargs):
+#         code = escape("""
+# r1 = Label('default', 'Default',
+#            'primary', 'Primary',
+#            'success', 'Success')
+# r2 = '<h3>Example heading'+XS(Label('default', 'New'))+'</h3>'
+# content = RC(r1, r2)
+#         """)
+#
+#         # define the content
+#         r1 = Label('default', 'Default',
+#                    'primary', 'Primary',
+#                    'success', 'Success')
+#         r2 = '<h3>Example heading'+XS(Label('default', 'New'))+'</h3>'
+#         content = RC(r1, r2)
+#         self.content = page_content(self, code, content)
+#         return self
+#
+#
+# class TestLink(DPage):
+#     """ Test Link widget """
+#     title = 'Link'
+#     description = 'Demonstrate ' + title
+#     tags = ['test', 'bootstrap', 'link']
+#
+#     def get(self, *args, **kwargs):
+#         code = """
+# # define content objects
+# r1 = Link('/dpages/DPagesList', 'DPagesList link')
+# r2 = Link('/dpages/DPagesList', 'DPagesList link',
+#           button='btn-info btn-xs')
+# r3 = Link('/dpages/DPagesList', 'DPagesList link with style and classes',
+#           button='btn-success btn-lg',
+#           style='color:white;width:400px;margin-top:5px;margin-bottom:5px;')
+# r4 = Link('/dpages/DPagesList', 'DPagesList link',
+#           '/dpages/DPagesList', 'DPagesList link',
+#           button='btn-xs', style='margin:2px;')
+#
+# # put into layout
+# content = RC(r1, r2, r3, r4)
+#         """
+#
+#         # define content objects
+#         r1 = Link('/dpages/DPagesList', 'DPagesList link')
+#         r2 = Link('/dpages/DPagesList', 'DPagesList link',
+#                   button='btn-info btn-xs')
+#         r3 = Link('/dpages/DPagesList', 'DPagesList link with style and classes',
+#                   button='btn-success btn-lg',
+#                   style='color:white;width:400px;margin-top:5px;margin-bottom:5px;')
+#         r4 = Link('/dpages/DPagesList', 'DPagesList link',
+#                   '/dpages/DPagesList', 'DPagesList link',
+#                   button='btn-xs', style='margin:2px;')
+#
+#         # put into layout
+#         content = RC(r1, r2, r3, r4)
+#         self.content = page_content(self, code, content)
+#         return self
+#
+#
+# class TestModal(DPage):
+#     """ Test Modal widget """
+#     title = 'Modal'
+#     description = 'Demonstrate ' + title
+#     tags = ['test', 'bootstrap', 'modal']
+#
+#     def get(self, *args, **kwargs):
+#         code = escape("""
+# mt = MD('####Modal title')
+# mb = T(MD('**Body**'), LI(5, 5, 5, 2))
+# mf = MD('**Modal footer**')
+# r1 = Modal(mt, mb, mf, 'Show modal')
+# r2 = Modal(mt, mb, mf, 'Show modal small', modal_size='modal-sm')
+# r3 = Modal(mt, mb, mf, 'Show modal button', button_type='btn-success btn-xs')
+#
+# Note: Modal() generates 18 lines of active HTML for 1 line of definition!
+# Note: Actual HTML generated by 6 line test is 124!
+#         """)
+#
+#         # define content objects
+#         mt = MD('####Modal title')
+#         mb = T(MD('**Body**'), LI(5, 5, 5, 2))
+#         mf = MD('**Modal footer**')
+#         r1 = Modal(mt, mb, mf, 'Show modal')
+#         r2 = Modal(mt, mb, mf, 'Show modal small', modal_size='modal-sm')
+#         r3 = Modal(mt, mb, mf, 'Show modal button', button_type='btn-success btn-xs')
+#
+#         # put into layout
+#         content = RC(T(r1, r2), r3, style='padding-top:5px;')
+#         self.content = page_content(self, code, content)
+#         return self
+#
+#
+# class TestPanel(DPage):
+#     """ Test Panel widget """
+#     title = 'Panel'
+#     description = 'Demonstrate ' + title
+#     tags = ['test', 'bootstrap', 'panel']
+#
+#     def get(self, *args, **kwargs):
+#         code = escape("""
+# r1 = Panel(MD('Panel text 1'), '')
+# r2 = Panel(MD('Panel text 2'), MD('####Panel heading 2'))
+# r3 = Panel(MD('Panel text 3'), MD('####Panel heading 3'),
+#            MD('Panel text 4'), MD('####Panel heading 4'))
+#         """)
+#
+#         # define content objects
+#         r1 = Panel(MD('', 'Panel text 1'))
+#         r2 = Panel(MD('####Panel heading 2'), MD('Panel text 2'))
+#         r3 = Panel(MD('####Panel heading 3'), MD('Panel text 3'),
+#                    MD('####Panel heading 4'), MD('Panel text 4'))
+#
+#         # put into layout
+#         content = RC(r1, r2, r3)
+#         self.content = page_content(self, code, content)
+#         return self
+#
+#
+# class TestAccordion(DPage):
+#     """ Test Accordion widget """
+#     title = 'Accordion'
+#     description = 'Demonstrate ' + title
+#     tags = ['test', 'bootstrap', 'accordion']
+#
+#     def get(self, *args, **kwargs):
+#         code = escape("""
+# # define content objects
+# r1 = Accordion('Heading 1', LI(5,6),
+#                'Heading 2', LI(3,4,5),
+#                'Heading 3', LI(7,4,2))
+#
+# # put into layout
+# content = RC(r1)
+#         """)
+#
+#         # define content objects
+#         r1 = Accordion('Heading 1', LI(5, 6),
+#                        'Heading 2', LI(3, 4, 5),
+#                        'Heading 3', LI(7, 4, 2))
+#
+#         # put into layout
+#         content = RC(r1)
+#         self.content = page_content(self, code, content)
+#         return self
+#
+#
+# class TestAccordionM(DPage):
+#     """ Test AccordionM widget """
+#     title = 'AccordionM'
+#     description = 'Demonstrate ' + title
+#     tags = ['test', 'bootstrap', 'accordionm']
+#
+#     def get(self, *args, **kwargs):
+#         code = escape("""
+# # define content objects
+# r1 = Accordion('Heading 1', LI(5,6),
+#                'Heading 2', LI(3,4,5),
+#                'Heading 3', LI(7,4,2))
+#
+# # put into layout
+# content = RC(r1)
+#         """)
+#
+#         # define content objects
+#         r1 = AccordionM('Heading 1', LI(5, 6),
+#                         'Heading 2', LI(3, 4, 5),
+#                         'Heading 3', LI(7, 4, 2))
+#
+#         # put into layout
+#         content = RC(r1)
+#         self.content = page_content(self, code, content)
+#         return self
+#
+#
+# class TestBasicGraphs(DPage):
+#     """ Test BasicGraphs widget """
+#     title = 'Graphs'
+#     description = 'Demonstrate ' + title
+#     tags = ['test', 'graphs']
+#
+#     def get(self, *args, **kwargs):
+#         code = """
+# #
+# # see example source for data definitions
+# #
+#
+# pie_graph = GraphCK('pie', browser_stats, options={'height': '400px',
+#                                                    'title.text': 'Browser Stats',
+#                                                    'subtitle.text': 'Graphs may have subtitles'})
+# column_graph = GraphCK('column', browser_stats, options={'height': '400px',
+#                                                          'title.text': 'Browser Stats',
+#                                                          'subtitle.text': 'Graphs may have subtitles'})
+# bar_graph = GraphCK('bar', browser_stats, options={'height': '400px',
+#                                                    'title.text': 'Browser Stats',
+#                                                    'subtitle.text': 'Graphs may have subtitles'})
+# line_graph = GraphCK('line', exchange, options={'height': '400px',
+#                                                 'title.text': 'Exchange Rates Chart',
+#                                                 'subtitle.text': 'Graphs may have subtitles'})
+# multi_line_graph = GraphCK('line', temperature, options={'height': '400px',
+#                                                          'title.text': 'Temperature Chart',
+#                                                          'subtitle.text': 'Tokyo/London/NY/Berlin'})
+# area_graph = GraphCK('area', areas, options={'height': '400px',
+#                                              'title.text': 'Areas Chart',
+#                                              'subtitle.text': 'Graphs may have subtitles'})
+#         """
+#
+#         # data for chart
+#         browser_stats = [['Chrome', 52.9],
+#                          ['Firefox', 27.7],
+#                          ['Opera', 1.6],
+#                          ['Internet Explorer', 12.6],
+#                          ['Safari', 4]]
+#         exchange = {'2001-01-31': 1.064, '2002-01-31': 1.1305,
+#                     '2003-01-31': 0.9417, '2004-01-31': 0.7937,
+#                     '2005-01-31': 0.7609, '2006-01-31': 0.827,
+#                     '2007-01-31': 0.7692, '2008-01-31': 0.6801,
+#                     '2009-01-31': 0.7491, '2010-01-31': 0.7002,
+#                     '2011-01-31': 0.7489, '2012-01-31': 0.7755,
+#                     '2013-01-31': 0.7531,
+#                     }
+#         temperature = [{u'data': {'2012-00-01 00:00:00 -0700': 7,
+#                                   '2012-01-01 00:00:00 -0700': 6.9,
+#                                   '2012-02-01 00:00:00 -0700': 9.5,
+#                                   '2012-03-01 00:00:00 -0700': 14.5,
+#                                   '2012-04-01 00:00:00 -0700': 18.2,
+#                                   '2012-05-01 00:00:00 -0700': 21.5,
+#                                   '2012-06-01 00:00:00 -0700': 25.2,
+#                                   '2012-07-01 00:00:00 -0700': 26.5,
+#                                   '2012-08-01 00:00:00 -0700': 23.3,
+#                                   '2012-09-01 00:00:00 -0700': 18.3,
+#                                   '2012-10-01 00:00:00 -0700': 13.9,
+#                                   '2012-11-01 00:00:00 -0700': 9.6},
+#                         u'name': u'Tokyo'},
+#                        {u'data': {'2012-00-01 00:00:00 -0700': -0.2,
+#                                   '2012-01-01 00:00:00 -0700': 0.8,
+#                                   '2012-02-01 00:00:00 -0700': 5.7,
+#                                   '2012-03-01 00:00:00 -0700': 11.3,
+#                                   '2012-04-01 00:00:00 -0700': 17,
+#                                   '2012-05-01 00:00:00 -0700': 22,
+#                                   '2012-06-01 00:00:00 -0700': 24.8,
+#                                   '2012-07-01 00:00:00 -0700': 24.1,
+#                                   '2012-08-01 00:00:00 -0700': 20.1,
+#                                   '2012-09-01 00:00:00 -0700': 14.1,
+#                                   '2012-10-01 00:00:00 -0700': 8.6,
+#                                   '2012-11-01 00:00:00 -0700': 2.5},
+#                         u'name': u'New York'},
+#                        {u'data': {'2012-00-01 00:00:00 -0700': -0.9,
+#                                   '2012-01-01 00:00:00 -0700': 0.6,
+#                                   '2012-02-01 00:00:00 -0700': 3.5,
+#                                   '2012-03-01 00:00:00 -0700': 8.4,
+#                                   '2012-04-01 00:00:00 -0700': 13.5,
+#                                   '2012-05-01 00:00:00 -0700': 17,
+#                                   '2012-06-01 00:00:00 -0700': 18.6,
+#                                   '2012-07-01 00:00:00 -0700': 17.9,
+#                                   '2012-08-01 00:00:00 -0700': 14.3,
+#                                   '2012-09-01 00:00:00 -0700': 9,
+#                                   '2012-10-01 00:00:00 -0700': 3.9,
+#                                   '2012-11-01 00:00:00 -0700': 1},
+#                         u'name': u'Berlin'},
+#                        {u'data': {'2012-00-01 00:00:00 -0700': 3.9,
+#                                   '2012-01-01 00:00:00 -0700': 4.2,
+#                                   '2012-02-01 00:00:00 -0700': 5.7,
+#                                   '2012-03-01 00:00:00 -0700': 8.5,
+#                                   '2012-04-01 00:00:00 -0700': 11.9,
+#                                   '2012-05-01 00:00:00 -0700': 15.2,
+#                                   '2012-06-01 00:00:00 -0700': 17,
+#                                   '2012-07-01 00:00:00 -0700': 16.6,
+#                                   '2012-08-01 00:00:00 -0700': 14.2,
+#                                   '2012-09-01 00:00:00 -0700': 10.3,
+#                                   '2012-10-01 00:00:00 -0700': 6.6,
+#                                   '2012-11-01 00:00:00 -0700': 4.8},
+#                         u'name': u'London'}]
+#         areas = {'2013-07-27 07:08:00 UTC': 4, '2013-07-27 07:09:00 UTC': 3,
+#                  '2013-07-27 07:10:00 UTC': 2, '2013-07-27 07:04:00 UTC': 2,
+#                  '2013-07-27 07:02:00 UTC': 3, '2013-07-27 07:00:00 UTC': 2,
+#                  '2013-07-27 07:06:00 UTC': 1, '2013-07-27 07:01:00 UTC': 5,
+#                  '2013-07-27 07:05:00 UTC': 5, '2013-07-27 07:03:00 UTC': 3,
+#                  '2013-07-27 07:07:00 UTC': 3}
+#
+#         # create the pie chart and set it's title & subtitle
+#         # log.debug('@@@@@ define Graph')
+#         pie_graph = GraphCK('pie', browser_stats, options={'height': '400px',
+#                                                            'title.text': 'Browser Stats',
+#                                                            'subtitle.text': 'Graphs may have subtitles'})
+#         column_graph = GraphCK('column', browser_stats, options={'height': '400px',
+#                                                                  'title.text': 'Browser Stats',
+#                                                                  'subtitle.text': 'Graphs may have subtitles'})
+#         bar_graph = GraphCK('bar', browser_stats, options={'height': '400px',
+#                                                            'title.text': 'Browser Stats',
+#                                                            'subtitle.text': 'Graphs may have subtitles'})
+#         line_graph = GraphCK('line', exchange, options={'height': '400px',
+#                                                         'title.text': 'Exchange Rates Chart',
+#                                                         'subtitle.text': 'Graphs may have subtitles'})
+#         multi_line_graph = GraphCK('line', temperature, options={'height': '400px',
+#                                                                  'title.text': 'Temperature Chart',
+#                                                                  'subtitle.text': 'Tokyo/London/NY/Berlin'})
+#         area_graph = GraphCK('area', areas, options={'height': '400px',
+#                                                      'title.text': 'Areas Chart',
+#                                                      'subtitle.text': 'Graphs may have subtitles'})
+#
+#         # Layout the content on the page
+#         # content = RC(T(MD('##Can have other DjangoPage content on the page with the graph.'),
+#         #               pie_graph,
+#         #               MD('####Explanation of graph') + LI(8, 5)))
+#         content = T(pie_graph, column_graph, bar_graph,
+#                     line_graph, multi_line_graph,
+#                     area_graph)
+#         # log.debug('@@@@@ page_content')
+#         self.content = page_content(self, code, content)
+#         return self
+#
+#
+# class TestMultipleGraphs(DPage):
+#     """ Test MultipleGraphs widget """
+#     title = 'Multiple Graphs'
+#     description = 'Demonstrate ' + title
+#     tags = ['test', 'graphs']
+#
+#     def get(self, *args, **kwargs):
+#         code = """
+# browser_stats = [['Chrome', 52.9],
+#                  ['Firefox', 27.7],
+#                  ['Opera', 1.6],
+#                  ['Internet Explorer', 12.6],
+#                  ['Safari', 4]]
+#
+# pie_graph = GraphCK('pie', browser_stats, options={'height': '400px',
+#                                                    'title.text': 'Browser Stats',
+#                                                    'subtitle.text': 'Graphs may have subtitles'})
+# column_graph = GraphCK('column', browser_stats, options={'height': '400px',
+#                                                          'title.text': 'Browser Stats',
+#                                                          'subtitle.text': 'Graphs may have subtitles'})
+# bar_graph = GraphCK('bar', browser_stats, options={'height': '400px',
+#                                                    'title.text': 'Browser Stats',
+#                                                    'subtitle.text': 'Graphs may have subtitles'})
+#         """
+#         # data for chart
+#         browser_stats = [['Chrome', 52.9],
+#                          ['Firefox', 27.7],
+#                          ['Opera', 1.6],
+#                          ['Internet Explorer', 12.6],
+#                          ['Safari', 4]]
+#
+#         pie_graph = GraphCK('pie', browser_stats, options={'height': '400px',
+#                                                            'title.text': 'Browser Stats',
+#                                                            'subtitle.text': 'Graphs may have subtitles'})
+#         column_graph = GraphCK('column', browser_stats, options={'height': '400px',
+#                                                                  'title.text': 'Browser Stats',
+#                                                                  'subtitle.text': 'Graphs may have subtitles'})
+#         bar_graph = GraphCK('bar', browser_stats, options={'height': '400px',
+#                                                            'title.text': 'Browser Stats',
+#                                                            'subtitle.text': 'Graphs may have subtitles'})
+#
+#         content = T(RC(MD('##Can have other DjangoPage content on the page with the graph.')),
+#                     RC4(pie_graph, column_graph, bar_graph),
+#                     RC(MD('####Explanation of graph') + LI(8, 5)))
+#         self.content = page_content(self, code, content)
+#         return self
+#
+#
+# class TestMultipleGraphsInAccordionM(DPage):
+#     """ Test MultipleGraphsInAccordionM widget """
+#     title = 'Multiple Graphs in AccordionM'
+#     description = 'Demonstrate ' + title
+#     tags = ['test', 'graphs']
+#
+#     def get(self, *args, **kwargs):
+#         code = """
+# browser_stats = [['Chrome', 52.9], ['Firefox', 27.7], ['Opera', 1.6], ['Internet Explorer', 12.6], ['Safari', 4]]
+#
+# pie_graph = GraphCK('pie', browser_stats, options={'height': '400px',
+#                                                    'title.text': 'Browser Stats',
+#                                                    'subtitle.text': 'Graphs may have subtitles'})
+# column_graph = GraphCK('column', browser_stats, options={'height': '400px',
+#                                                          'title.text': 'Browser Stats',
+#                                                          'subtitle.text': 'Graphs may have subtitles'})
+# bar_graph = GraphCK('bar', browser_stats, options={'height': '400px',
+#                                                    'title.text': 'Browser Stats',
+#                                                    'subtitle.text': 'Graphs may have subtitles'})
+#
+# content = T(RC(MD('##Can have other DjangoPage content on the page with the graph.')),
+#             AccordionM('Pie', pie_graph,
+#                        'Column', column_graph,
+#                        'Bar', bar_graph),
+#             RC(MD('####Explanation of graph') + LI(8, 5)))
+#         """
+#         browser_stats = [['Chrome', 52.9], ['Firefox', 27.7], ['Opera', 1.6],
+#                          ['Internet Explorer', 12.6], ['Safari', 4]]
+#
+#         pie_graph = GraphCK('pie', browser_stats, options={'height': '400px',
+#                                                            'title.text': 'Browser Stats',
+#                                                            'subtitle.text': 'Graphs may have subtitles'})
+#         column_graph = GraphCK('column', browser_stats, options={'height': '400px',
+#                                                                  'title.text': 'Browser Stats',
+#                                                                  'subtitle.text': 'Graphs may have subtitles'})
+#         bar_graph = GraphCK('bar', browser_stats, options={'height': '400px',
+#                                                            'title.text': 'Browser Stats',
+#                                                            'subtitle.text': 'Graphs may have subtitles'})
+#
+#         content = T(RC(MD('##Can have other DjangoPage content on the page with the graph.')),
+#                     AccordionM('Pie', pie_graph,
+#                                'Column', column_graph,
+#                                'Bar', bar_graph),
+#                     RC(MD('####Explanation of graph') + LI(8, 5)))
+#         self.content = page_content(self, code, content)
+#         return self
+#
+#
+# class TestMultipleGraphsInAccordionMInRow(DPage):
+#     """ Test MultipleGraphsInAccordionMInRow widget """
+#     title = 'Multiple Graphs in AccordionM in RC'
+#     description = 'Demonstrate ' + title
+#     tags = ['test', 'graphs']
+#
+#     def get(self, *args, **kwargs):
+#         code = """
+#
+#         """
+#         browser_stats = [['Chrome', 52.9], ['Firefox', 27.7],
+#                          ['Opera', 1.6], ['Internet Explorer', 12.6], ['Safari', 4]]
+#
+#         pie_graph = GraphCK('pie', browser_stats, options={'height': '400px',
+#                                                            'title.text': 'Browser Stats',
+#                                                            'subtitle.text': 'Graphs may have subtitles'})
+#         column_graph = GraphCK('column', browser_stats, options={'height': '400px',
+#                                                                  'title.text': 'Browser Stats',
+#                                                                  'subtitle.text': 'Graphs may have subtitles'})
+#         bar_graph = GraphCK('bar', browser_stats, options={'height': '400px',
+#                                                            'title.text': 'Browser Stats',
+#                                                            'subtitle.text': 'Graphs may have subtitles'})
+#
+#         content = T(RC(MD('##Can have other DjangoPage content on the page with the graph.')),
+#                     RC4(AccordionM('Pie', pie_graph),
+#                         AccordionM('Column', column_graph),
+#                         AccordionM('Bar', bar_graph)),
+#                     RC(MD('####Explanation of graph') + LI(8, 5)))
+#         self.content = page_content(self, code, content)
+#         return self

@@ -88,7 +88,7 @@ def Markdown(source, extensions=list()):
 
     .. sourcecode:: python
 
-        Markdwon('Some *markdown text.')
+        Markdown('Some *markdown text.')
         Markdown(('##Title', 'Other **markdown** text', '<b>Can contain html</b>')
 
     Synonyms: MD()
