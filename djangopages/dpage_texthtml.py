@@ -36,7 +36,6 @@ import markdown
 import loremipsum
 import functools
 
-from djangopages.dpage import DWidget
 from django.utils.encoding import force_unicode
 
 ########################################################################################################################
@@ -69,9 +68,9 @@ def Text(content, para=False, classes='', style='', template=None):
     :type template: str or unicode
     """
     if classes:
-        classes = 'class={}'.format(classes)
+        classes = 'class="{}" '.format(classes)
     if style:
-        style = 'style={}'.format(style)
+        style = 'style="{}" '.format(style)
     if template:
         return template.format(content=content)
     if para:
@@ -146,9 +145,9 @@ def LI(line_count, para=True, classes='', style='', template=None):
         return rtn
     content = ' '.join(loremipsum.get_sentences(line_count))
     if classes:
-        classes = 'class={}'.format(classes)
+        classes = 'class="{}" '.format(classes)
     if style:
-        style = 'style={}'.format(style)
+        style = 'style="{}" '.format(style)
     if template:
         return template.format(content=content)
     template = '<p {classes} {style}>' \
@@ -166,7 +165,7 @@ def LI(line_count, para=True, classes='', style='', template=None):
 
 
 # noinspection PyPep8Naming
-def StringDup(string, count=1):
+def StringDup(string, count=1, classes='', style='', template=None):
     """ Generate amount duplicates of a string.
 
     .. sourcecode:: python
@@ -180,18 +179,32 @@ def StringDup(string, count=1):
     :type string:
     :param count: the number of times to repeat the string
     :type count: int
+    :param classes: classes to add to output
+    :type classes: str or unicode
+    :param style: styles to add to output
+    :type style: str or unicode
+    :param template: override template
+    :type template: str or unicode
 
     | Variations:
     | BR, generates one or more HTML line breaks
     | SP, generates one or more non-breaking HTML spaces
     """
-    template = '<span {classes} {style}>{content}</span>'
-
     assert isinstance(string, (str, unicode))
     assert len(string) > 0
     assert isinstance(count, int)
     assert count > 0
-    return string * count
+    content = string * count
+    if classes:
+        classes = 'class="{}" '.format(classes)
+    if style:
+        style = 'style="{}" '.format(style)
+    if template:
+        return template.format(content=content)
+    if classes or style:
+        template = '<span {classes} {style}>{content}</span>'
+        return template.format(content=content, classes=classes, style=style)
+    return content
 SD = functools.partial(StringDup)
 BR = functools.partial(StringDup, '<br/>')
 SP = functools.partial(StringDup, '&nbsp;')

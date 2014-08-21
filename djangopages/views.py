@@ -251,13 +251,13 @@ class TestBRSP(DPage):
 content = ('line brake here' + BR() +
            'Second line followed by two newlines' + BR(2) +
            'Third 5 spaces' + SP(5) + 'line' + BR() +
-           'Six * surrounded by ():(' + SD('***', 2) + ')')
+           'Six red * surrounded by ():(' + SD('***', 2, style='color:red;') + ')')
         """
 
         content = ('line brake here' + BR() +
                    'Second line followed by two newlines' + BR(2) +
                    'Third 5 spaces' + SP(5) + 'line' + BR() +
-                   'Six * surrounded by ():(' + SD('***', 2) + ')')
+                   'Six red * surrounded by ():(' + SD('***', 2, style='color: red;') + ')')
         content = page_content(self, code, content)
         return render(request, self.template, {'content': content})
 

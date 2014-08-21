@@ -42,6 +42,7 @@ from djangopages.dpage import DWidget
 ########################################################################################################################
 
 
+# def Column(content, width=12, classes='', style='', template=None):
 class Column(DWidget):
     """ Outputs a bootstrap 3 column
 
