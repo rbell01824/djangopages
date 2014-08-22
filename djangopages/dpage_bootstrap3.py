@@ -106,6 +106,7 @@ def Accordion(content, classes='', style='', template=None):
     return out
 
 
+
 # class AccordionM(DWidget):
 #     """
 #     .. sourcecode:: python
@@ -352,53 +353,99 @@ def Accordion(content, classes='', style='', template=None):
 #             out += template.format(href=hr, classes=classes, style=style, disabled=disabled, role=role,
 #                                    content=con)
 #         return out
-#
-#
-# class Panel(DWidget):
-#     """
-#     .. sourcecode:: python
-#
-#         Panel( 'heading', 'content',
-#                'heading2', 'content2', ... )
-#
-#     :param content: content
-#     :type content: basestring or tuple or DWidget
-#     :param kwargs: standard kwargs
-#     :type kwargs: dict
-#     """
-#     template = """
-#     <div class="panel panel-default">
-#         <div class="panel-body">
-#             {content}
-#         </div>
-#     </div>
-#     """
-#
-#     heading_template = """
-#     <div class="panel panel-default">
-#         <div class="panel-heading">{heading}</div>
-#         <div class="panel-body">
-#             {content}
-#         </div>
-#     </div>
-#     """
-#
-#     def __init__(self, *content, **kwargs):
-#         super(Panel, self).__init__(content, kwargs)
-#         return
-#
-#     def generate(self, template, content, classes, style, kwargs):
-#         assert isinstance(content, tuple)
-#         out = ''
-#         for hd, con in zip(content[::2], content[1::2]):
-#             if hd and template == Panel.template:
-#                 tpl = Panel.heading_template
-#             else:
-#                 tpl = template
-#             out += tpl.format(content=con, heading=hd, classes=classes, style=style)
-#         return out
-#
-#
+
+
+
+# noinspection PyPep8Naming
+def PanelFooter(footer='', classes='', style=''):
+    """ Bootstrap 3 Panel footer
+
+    :param footer: footer
+    :type footer: str or unicode
+    :param classes: classes to add to output
+    :type classes: str or unicode
+    :param style: styles to add to output
+    :type style: str or unicode
+    :return:
+    """
+    classes = 'class="panel-footer {classes}" '.format(classes=classes)
+    if style:
+        style = 'style="{}" '.format(style)
+    template = '<div {classes} {style} >\n' \
+               '    {footer}\n' \
+               '</div>\n'
+    return template.format(classes=classes, style=style, footer=footer)
+
+
+# noinspection PyPep8Naming
+def PanelHeading(heading='', level=3, classes='', style=''):
+    """ Bootstrap 3 Panel heading
+
+    :param heading: heading
+    :type heading: str or unicode
+    :param level: if > 0, heading title level, otherwise no title component
+    :type level: int
+    :param classes: classes to add to output
+    :type classes: str or unicode
+    :param style: styles to add to output
+    :type style: str or unicode
+    :return: Bootstrap 3 heading HTML
+    :rtype: unicode
+    """
+    classes = 'class="panel-heading {classes}" '.format(classes=classes)
+    if style:
+        style = 'style="{}" '.format(style)
+    if level > 0:
+        template = '<div {classes} {style} >\n' \
+                   '    <h{level} class="panel-title" >\n' \
+                   '        {heading}\n' \
+                   '    </h{level}>' \
+                   '</div>\n'
+        return template.format(classes=classes, style=style, level=level, heading=heading)
+    template = '<div {classes} {style} >\n' \
+               '    {heading}\n' \
+               '</div>\n'
+    return template.format(classes=classes, style=style, heading=heading)
+
+
+# noinspection PyPep8Naming
+def Panel(body='', heading='', footer='', panel_type='panel-default'):
+    """ Bootstrap 3 panel
+
+    .. sourcecode:: python
+
+        Panel( 'heading', 'content',
+               'heading2', 'content2', ... )
+
+    :param body: body content for panel
+    :type body: str or unicode
+    :param heading: heading content for panel
+    :type heading: str or unicode
+    :param footer: footer content for panel
+    :type footer: str or unicode
+    :param panel_type: type for panel
+    :type panel_type: str or unicode
+    """
+    template = '<div class="panel {panel_type}" >\n ' \
+               '    {heading}\n' \
+               '    <div class="panel-body">\n' \
+               '        {body}' \
+               '    </div>\n ' \
+               '    {footer}\n' \
+               '</div>'
+    rtn = template.format(panel_type=panel_type,
+                          heading=heading,
+                          body=body,
+                          footer=footer)
+    return rtn
+PanelDefault = functools.partial(Panel, panel_type='panel-default')
+PanelPrimary = functools.partial(Panel, panel_type='panel-primary')
+PanelSuccess = functools.partial(Panel, panel_type='panel-success')
+PanelInfo = functools.partial(Panel, panel_type='panel-info')
+PanelWarning = functools.partial(Panel, panel_type='panel-warning')
+PanelDanger = functools.partial(Panel, panel_type='panel-danger')
+
+
 # class Modal(DWidget):
 #     """
 #     .. sourcecode:: python

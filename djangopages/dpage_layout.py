@@ -60,7 +60,7 @@ def Column(content, width=12, classes='', style='', template=None):
     :type template: str or unicode
 
     | Synonyms:
-    | Synonym: C(...), useful abbreviation
+    | C(...), useful abbreviation
     | C1(...), default width 1
     | C2(...), default width 2
     | C3(...), default width 3
@@ -97,7 +97,6 @@ def Column(content, width=12, classes='', style='', template=None):
                '<!-- End of dpage col -->\n'
     rtn = template.format(content=content, classes=classes, style=style)
     return rtn
-
 C = functools.partial(Column)
 C1 = functools.partial(Column, width=1)
 C2 = functools.partial(Column, width=2)

@@ -319,7 +319,7 @@ class TestRowColumn(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'layout']
 
-    def generate(self, *args, **kwargs):
+    def generate(self, request):
         code = """
 t = LI(5, para=False)
 content = RowColumn((('Row 1 Col 1 ' + t, 'Row 1 Col 2 ' + t),
@@ -333,6 +333,32 @@ content = RowColumn((('Row 1 Col 1 ' + t, 'Row 1 Col 2 ' + t),
         content = page_content(self, code, content)
         return content
 
+
+class TestPanel(DPage):
+    """ Test Panel widget """
+    title = 'Bootstrap: Panel'
+    description = 'Demonstrate ' + title
+    tags = ['test', 'bootstrap']
+
+    def generate(self, request):
+        code = """
+p1 = Panel('Default panel')
+p2 = PanelPrimary('Primary panel')
+p3 = PanelSuccess('Panel 3 success with heading', PanelHeading('Panel 3 heading success'))
+p4 = PanelWarning('Panel 4 warning with heading and footer',
+                  PanelHeading('Panel 4 heading warning'),
+                  PanelFooter('Panel 4 footer'))
+content = RC((p1, p2, p3, p4))
+        """
+        p1 = Panel('Default panel')
+        p2 = PanelPrimary('Primary panel')
+        p3 = PanelSuccess('Panel 3 success with heading', PanelHeading('Panel 3 heading success'))
+        p4 = PanelWarning('Panel 4 warning with heading and footer',
+                          PanelHeading('Panel 4 heading warning'),
+                          PanelFooter('Panel 4 footer'))
+        content = RC((p1, p2, p3, p4))
+        content = page_content(self, code, content)
+        return content
 
 # class TestButton(DPage):
 #     """ Test Button widget """
