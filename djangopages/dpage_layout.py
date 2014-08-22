@@ -2,15 +2,15 @@
 # coding=utf-8
 
 """
-Layout Bootstrap 3 Widgets
+Layout Bootstrap Widgets
 ==========================
 
 .. module:: dpage_layout
-   :synopsis: Provides DjangoPage widgets to create bootstrap 3 layouts
+   :synopsis: Provides DjangoPage widgets to create bootstrap layouts
 
 .. moduleauthor:: Richard Bell <rbell01824@gmail.com>
 
-DjangoPages provides a number of widgets to create bootstrap 3 responsive
+DjangoPages provides a number of widgets to create bootstrap responsive
 grid layouts.
 
 8/4/14 - Initial creation
@@ -42,15 +42,15 @@ import functools
 
 # noinspection PyPep8Naming
 def Column(content, width=12, classes='', style='', template=None):
-    """ Outputs a bootstrap 3 column
+    """ Outputs a bootstrap column
 
     .. sourcecode:: python
 
-        Column(MD('##Markdown in a bootstrap 3 column'))
+        Column(MD('##Markdown in a bootstrap column'))
 
     :param content: content
     :type content: str or unicode or tuple
-    :param width: bootstrap 3 width, see bootstrap 3 docs
+    :param width: bootstrap width, see bootstrap docs
     :type width: int
     :param classes: classes to add to output
     :type classes: str or unicode
@@ -78,7 +78,7 @@ def Column(content, width=12, classes='', style='', template=None):
 
     .. sourcecode:: python
 
-        Row(Column(MD("##Bootstrap 3 row', '##Bootstrap 3 column', 'Other text in row/column')))
+        Row(Column(MD("##Bootstrap row', '##Bootstrap column', 'Other text in row/column')))
     """
     if isinstance(content, tuple):
         rtn = ''
@@ -114,11 +114,11 @@ C12 = functools.partial(Column, width=12)
 
 # noinspection PyPep8Naming
 def Row(content, classes='', style='', template=None):
-    """ Outputs a bootstrap 3 row
+    """ Outputs a bootstrap row
 
     .. sourcecode:: python
 
-        Row(Column(MD(("##Bootstrap 3 row', '##Bootstrap 3 column', 'Other text in row/column'))))
+        Row(Column(MD(("##Bootstrap row', '##Bootstrap column', 'Other text in row/column'))))
 
     | Synonym: R(...), useful abbreviation
 
@@ -157,13 +157,13 @@ def RowColumn(content, width=12, classes='', style='', template=None):
 
     .. sourcecode:: python
 
-        RC(MD(("##Bootstrap 3 row', '##Bootstrap 3 column', 'Other text in row/column')))
+        RC(MD(("##Bootstrap row', '##Bootstrap column', 'Other text in row/column')))
 
     .. note:: **All** parameters are passed to Column.  Row uses defaults.
 
     :param content: content
     :type content: str or unicode or tuple
-    :param width: bootstrap 3 width, see bootstrap 3 docs
+    :param width: bootstrap width, see bootstrap docs
     :type width: int
     :param classes: classes to add to output
     :type classes: str or unicode

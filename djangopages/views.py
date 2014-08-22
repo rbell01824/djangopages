@@ -268,9 +268,9 @@ content = ('line brake here' + BR() +
 
 class TestColumn(DPage):
     """ Test Column widget"""
-    title = 'Layout: Bootstrap 3 Column'
+    title = 'Bootstrap: Column'
     description = 'Demonstrate ' + title
-    tags = ['test', 'layout']
+    tags = ['test', 'bootstrap', 'layout']
 
     def generate(self, request):
         code = escape("""
@@ -296,9 +296,9 @@ content = ('<div class="row">{}{}{}</div>'.format(c1, c6, c3) +
 
 class TestRow(DPage):
     """ Test Row  widget"""
-    title = 'Layout: Bootstrap 3 Row'
+    title = 'Bootstrap: Row'
     description = 'Demonstrate ' + title
-    tags = ['test', 'layout']
+    tags = ['test', 'bootstrap', 'layout']
 
     def generate(self, request):
         code = """
@@ -315,9 +315,9 @@ content = (R(C6((LI(5), LI((2, 3))), style='border:1px solid;')) +
 
 class TestRowColumn(DPage):
     """ Test RowColumn widget """
-    title = 'Layout: Bootstrap 3 RowColumn/RC'
+    title = 'Bootstrap: RowColumn/RC'
     description = 'Demonstrate ' + title
-    tags = ['test', 'layout']
+    tags = ['test', 'bootstrap', 'layout']
 
     def generate(self, request):
         code = """
@@ -359,6 +359,24 @@ content = RC((p1, p2, p3, p4))
         content = RC((p1, p2, p3, p4))
         content = page_content(self, code, content)
         return content
+
+
+class TestAccordion(DPage):
+    """ Test Accordion widget """
+    title = 'Bootstrap: Accordion'
+    description = 'Demonstrate ' + title
+    tags = ['test', 'bootstrap']
+
+    def generate(self, request):
+        code = """
+content = Accordion((AccordionPanel('heading 1', 'content 1', expand=True),
+                     AccordionPanel('heading 2', 'content 2')))
+        """
+        content = Accordion((AccordionPanel('heading 1', 'content 1', expand=True, panel_type='panel-success'),
+                             AccordionPanel('heading 2', 'content 2')))
+        content = page_content(self, code, content)
+        return content
+
 
 # class TestButton(DPage):
 #     """ Test Button widget """

@@ -2,19 +2,18 @@
 # coding=utf-8
 
 """
-Bootstrap 3 Widgets
-===================
+Bootstrap Widgets
+=================
 
 .. module:: dpage_bootstrap3
-   :synopsis: Provides DjangoPage widgets to create various bootstrap 3 elements
+   :synopsis: Provides DjangoPage widgets to create various bootstrap elements
 
 .. moduleauthor:: Richard Bell <rbell01824@gmail.com>
 
-DjangoPages provides a number of widgets to create various bootstrap 3 elements.
+DjangoPages provides a number of widgets to create various bootstrap elements.
 
 8/4/14 - Initial creation
 
-**Details**
 """
 
 from __future__ import unicode_literals
@@ -39,11 +38,11 @@ from djangopages.dpage import unique_name
 
 ########################################################################################################################
 #
-# Various Bootstrap 3 widgets.
+# Various Bootstrap widgets.
 #
 #
 #
-# todo: add remaining bootstrap 3 widgets
+# todo: add remaining bootstrap widgets
 # todo: heading small support
 # todo: add lead body copy support
 # todo: add small, bold, italics
@@ -55,56 +54,108 @@ from djangopages.dpage import unique_name
 
 
 # noinspection PyPep8Naming
-def Accordion(content, classes='', style='', template=None):
-    """
+def Accordion(accordion_panels):
+    """ Bootstrap accordion
+
     .. sourcecode:: python
 
-        Accordion('heading 1', 'content 1',
-                  'heading 2', 'content 2',
-                  ...)
-    :param content: tuple of (heading, content) pairs, ex. ((heading1, content1), (heading2, content2),...)
-    :type content: tuple
-    :param classes: classes to add to output
-    :type classes: str or unicode
-    :param style: styles to add to output
-    :type style: str or unicode
-    :param template: override template
-    :type template: str or unicode
+        Accordion((AccordionPanel('heading 1', 'content 1', expand=True),
+                   AccordionPanel('heading 2', 'content 2'))
+
+    :param accordion_panels: accordion panels
+    :type accordion_panels: list or tuple
+    :return: HTML for bootstrap accordion
+    :rtype: unicode
     """
-    template_top = '<!-- Accordion start -->' \
-                   '  <div class="panel-group" id="{accordion_id}">\n' \
-                   '    {panels}\n' \
-                   '  </div>\n' \
-                   '<!--Accordion end -->'
-    template = '<!-- Accordion panel start -->\n' \
-               '  <div class="panel panel-default">\n' \
-               '    <div class="panel-heading">\n' \
-               '      <h4 class="panel-title">\n' \
-               '        <a data-toggle="collapse" data-parent="#{accordion_id}" href="#{panel_id}">\n' \
-               '          {heading}\n' \
-               '        </a>\n' \
-               '      </h4>\n' \
-               '    </div>\n' \
-               '    <div id="{panel_id}" class="panel-collapse collapse">\n' \
-               '      <div class="panel-body">\n' \
-               '        {content}\n' \
-               '      </div>\n' \
-               '    </div>\n' \
-               '  </div>\n' \
-               '<!-- Accordion panel end -->'
-    assert isinstance(content, tuple)
+    assert isinstance(accordion_panels, (list, tuple))
     accordion_id = unique_name('aid')
     panels = ''
-    for hd, con in zip(content[::2], content[1::2]):
-        panel_id = unique_name('pid')
-        panels += template.format(accordion_id=accordion_id,
-                                  panel_id=panel_id,
-                                  heading=hd,
-                                  content=con)
-    out = template_top.format(accordion_id=accordion_id,
-                              panels=panels)
-    return out
+    for p in accordion_panels:
+        panels += p.generate(accordion_id)
+    template = '<!-- Accordion start -->' \
+               '    <div class="panel-group" id="{accordion_id}">\n' \
+               '        {panels}\n' \
+               '    </div>\n' \
+               '<!--Accordion end -->'
+    rtn = template.format(accordion_id=accordion_id,
+                          panels=panels)
+    return rtn
 
+
+# noinspection PyPep8Naming
+class AccordionPanel(object):
+    """ Defines an accordion panel
+
+    .. sourcecode::
+
+        AccordinPanel('Panel title', 'Panel body')
+
+    :param title: Panel title
+    :type title: str or unicode
+    :param body: Panel body
+    :type body: str or unicode
+    :param expand: if true, panel is initially expanded, otherwise collapsed
+    :type expand: bool
+    :param panel_type: type for panel
+    :type panel_type: str or unicode
+
+    | Synonyms:
+    | AccordionPanelDefault = functools.partial(AccordionPanel, panel_type='panel-default')
+    | AccordionPanelPrimary = functools.partial(AccordionPanel, panel_type='panel-primary')
+    | AccordionPanelSuccess = functools.partial(AccordionPanel, panel_type='panel-success')
+    | AccordionPanelInfo = functools.partial(AccordionPanel, panel_type='panel-info')
+    | AccordionPanelWarning = functools.partial(AccordionPanel, panel_type='panel-warning')
+    | AccordionPanelDanger = functools.partial(AccordionPanel, panel_type='panel-danger')
+    """
+    def __init__(self, title='', body='', expand=False, panel_type='panel-default'):
+        """
+        :param title: Panel title
+        :type title: str or unicode
+        :param body: Panel body
+        :type body: str or unicode
+        :param expand: if true, panel is initially expanded, otherwise collapsed
+        :type expand: bool
+        :param panel_type: type for panel
+        :type panel_type: str or unicode
+        """
+        self.title = title
+        self.body = body
+        self.expand = expand
+        self.panel_type = panel_type
+        return
+
+    def generate(self, accordion_id):
+        template = '<!-- Accordion panel start -->\n' \
+                   '  <div class="panel {panel_type}">\n' \
+                   '    <div class="panel-heading">\n' \
+                   '      <h4 class="panel-title">\n' \
+                   '        <a data-toggle="collapse" data-parent="#{accordion_id}" href="#{panel_id}">\n' \
+                   '          {heading}\n' \
+                   '        </a>\n' \
+                   '      </h4>\n' \
+                   '    </div>\n' \
+                   '    <div id="{panel_id}" class="panel-collapse collapse {expand}">\n' \
+                   '      <div class="panel-body">\n' \
+                   '        {content}\n' \
+                   '      </div>\n' \
+                   '    </div>\n' \
+                   '  </div>\n' \
+                   '<!-- Accordion panel end -->'
+        panel_id = unique_name('apid')
+        expand = 'in' if self.expand else ''
+        rtn = template.format(accordion_id=accordion_id,
+                              panel_id=panel_id,
+                              panel_type=self.panel_type,
+                              heading=self.title,
+                              content=self.body,
+                              expand=expand)
+        return rtn
+AccordionPanelDefault = functools.partial(AccordionPanel, panel_type='panel-default')
+AccordionPanelPrimary = functools.partial(AccordionPanel, panel_type='panel-primary')
+AccordionPanelSuccess = functools.partial(AccordionPanel, panel_type='panel-success')
+AccordionPanelInfo = functools.partial(AccordionPanel, panel_type='panel-info')
+AccordionPanelWarning = functools.partial(AccordionPanel, panel_type='panel-warning')
+AccordionPanelDanger = functools.partial(AccordionPanel, panel_type='panel-danger')
 
 
 # class AccordionM(DWidget):
@@ -192,7 +243,7 @@ def Accordion(content, classes='', style='', template=None):
 #
 #     :param disabled: default False, if true button is disabled
 #     :type width: bool
-#     :param button: default 'btn-default', button definition per bootstrap 3
+#     :param button: default 'btn-default', button definition per bootstrap
 #     :type type: str
 #     """
 #     template = '<!-- start of button -->\n' \
@@ -355,10 +406,13 @@ def Accordion(content, classes='', style='', template=None):
 #         return out
 
 
-
 # noinspection PyPep8Naming
 def PanelFooter(footer='', classes='', style=''):
-    """ Bootstrap 3 Panel footer
+    """ Bootstrap Panel footer
+
+    .. sourcecode:: python
+
+        PanelFooter('Text for panel footer')
 
     :param footer: footer
     :type footer: str or unicode
@@ -366,7 +420,8 @@ def PanelFooter(footer='', classes='', style=''):
     :type classes: str or unicode
     :param style: styles to add to output
     :type style: str or unicode
-    :return:
+    :return: HTML for panel footer
+    :rtype: unicode
     """
     classes = 'class="panel-footer {classes}" '.format(classes=classes)
     if style:
@@ -379,7 +434,11 @@ def PanelFooter(footer='', classes='', style=''):
 
 # noinspection PyPep8Naming
 def PanelHeading(heading='', level=3, classes='', style=''):
-    """ Bootstrap 3 Panel heading
+    """ Bootstrap Panel heading
+
+    .. sourcecode:: python
+
+        PanelHeading('Text for panel heading')
 
     :param heading: heading
     :type heading: str or unicode
@@ -389,7 +448,7 @@ def PanelHeading(heading='', level=3, classes='', style=''):
     :type classes: str or unicode
     :param style: styles to add to output
     :type style: str or unicode
-    :return: Bootstrap 3 heading HTML
+    :return: HTML for panel heading
     :rtype: unicode
     """
     classes = 'class="panel-heading {classes}" '.format(classes=classes)
@@ -410,12 +469,13 @@ def PanelHeading(heading='', level=3, classes='', style=''):
 
 # noinspection PyPep8Naming
 def Panel(body='', heading='', footer='', panel_type='panel-default'):
-    """ Bootstrap 3 panel
+    """ Bootstrap panel
 
     .. sourcecode:: python
 
-        Panel( 'heading', 'content',
-               'heading2', 'content2', ... )
+        Panel('panel body',
+              PanelHeading('panel heading'),
+              PanelFooter('panel footer'))
 
     :param body: body content for panel
     :type body: str or unicode
@@ -425,6 +485,16 @@ def Panel(body='', heading='', footer='', panel_type='panel-default'):
     :type footer: str or unicode
     :param panel_type: type for panel
     :type panel_type: str or unicode
+    :return: HTML for panel
+    :rtype: unicode
+
+    | Synonyms:
+    | PanelDefault = functools.partial(Panel, panel_type='panel-default')
+    | PanelPrimary = functools.partial(Panel, panel_type='panel-primary')
+    | PanelSuccess = functools.partial(Panel, panel_type='panel-success')
+    | PanelInfo = functools.partial(Panel, panel_type='panel-info')
+    | PanelWarning = functools.partial(Panel, panel_type='panel-warning')
+    | PanelDanger = functools.partial(Panel, panel_type='panel-danger')
     """
     template = '<div class="panel {panel_type}" >\n ' \
                '    {heading}\n' \
@@ -460,7 +530,7 @@ PanelDanger = functools.partial(Panel, panel_type='panel-danger')
 #     :type footer: basestring or DWidget
 #     :param button: text for modal button
 #     :type button: basestring or DWidget
-#     :param modal_size: modal size per bootstrap 3
+#     :param modal_size: modal size per bootstrap
 #     :type modal_size: basestring or DWidget
 #     :param button_type: button type
 #     :type button_type: basestring or DWidget
@@ -819,7 +889,7 @@ PanelDanger = functools.partial(Panel, panel_type='panel-danger')
 # #         return output
 # #         # return template
 # #
-# # # todo 1: add support for normal bootstrap 3 forms
+# # # todo 1: add support for normal bootstrap forms
 # # # todo 1: add id to Form
 # #
 # ########################################################################################################################

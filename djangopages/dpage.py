@@ -35,7 +35,7 @@ are used to create content. Typically a DPage looks something like this::
 
         def generate(self, *args, **kwargs):                # Must override generate
             page_content = MD('This is the panel body')     # Create markdown page content with MD DWidget
-            content = RC(page_content)                      # Put content in a bootstrap 3 row & column with RC DWidget
+            content = RC(page_content)                      # Put content in a bootstrap row & column with RC DWidget
             return content
 
 Generally, DPage(s) define some content and then place that content in a layout.
@@ -76,7 +76,7 @@ from django.views.generic import View
 # todo 3: https://github.com/digi604/django-smart-selects provides chained selects for django models
 
 # todo 3: allow form to specify custom template
-# todo 2: support rest of bootstrap 3 form attributes
+# todo 2: support rest of bootstrap form attributes
 # todo 2: syntactic suggar for Form
 
 # todo 3: here check text type and deal with file like objects and queryset objects
