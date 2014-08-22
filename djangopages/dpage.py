@@ -2,8 +2,8 @@
 # coding=utf-8
 
 """
-Overview
-********
+DPage
+*****
 
 .. module:: dpage
    :synopsis: Provides base DjangoPage DPage and DWidget
@@ -20,23 +20,23 @@ content on the page.
 DPage(s)
 ++++++++
 
-DjangoPages pages are created by subclassing DPage and overriding DPage.page.
+DjangoPages pages are created by subclassing DPage and overriding DPage.generate.
 
 .. note:: The DPage class name defines the page's url.  It is no longer necessary to maintain
           urls.py for DPage(s)!  That's one less thing to do.
 
-The override **page** method defines the page's content and layout. Generally, DWidget(s)
-are used. Typically a DjangoPage looks something like this::
+The override **generate** method defines the page's content and layout. Generally, widgets
+are used to create content. Typically a DPage looks something like this::
 
     class ExamplePage(DPage):                               # Class name defines URL
         title = 'Brief title'                               # Brief title useful in list, etc.
         description = 'Longer description'                  # Longer description
         tags = ['example', 'MD', 'RC']                      # Queryable tags
 
-        def get(self, *args, **kwargs):                                     # Must override page
+        def generate(self, *args, **kwargs):                # Must override generate
             page_content = MD('This is the panel body')     # Create markdown page content with MD DWidget
-            self.content = RC(page_content)                 # Put content in a bootstrap 3 row & column with RC DWidget
-            return self
+            content = RC(page_content)                      # Put content in a bootstrap 3 row & column with RC DWidget
+            return content
 
 Generally, DPage(s) define some content and then place that content in a layout.
 
@@ -46,44 +46,8 @@ DPage(s) typically define:
 * A longer description for the page.
 * Zero or more tages that are useful for organizing and querying pages.
 
-DPages are rendered follows:
-
-* The page's render method is executed.  As a general proposition DjangoPages need not and should not
-  override the DPage render method.
-* The Dpage render method renders each element of self.content
-* The results are concatenated
-* The results are passed to the page's template and a response object returned
-
-The end result is that DjangoPages render using the underlying Django render/response methods.
-
-DWidget(s)
-++++++++++
-
-DWidget(s) create content for DjangoPages. For example::
-
-    Text('Paragraph 1 text', 'Paragraph 2 text', para=True)         # outputs two paragraphs
-    Text('Sentence 1 ', 'Sentence 2')                               # outputs 'Sentence 1 Sentence 2'
-
-Widgets may contain other widgets. A DjangoPage will commonly contain code like this::
-
-    Column(                             # outputs a bootstrap 3 column
-            MD('##Some heading'),       # outputs a markdown level 2 heading
-            LI()                        # outputs 1 loremipsum paragraph
-           )
-
-Widgets:
-
-* Take an arbitrary number of positional arguments
-* Widgets have a default set of keyword arguments
-   * **classes** define extra classes to be added to any widget default classes
-   * **style** defines extra styles to be added to any widget default styles
-   * **template** may be used to override the widget's default template
-   * **kwargs** any remaining widget specific kwargs. Widgets are free to use these arguments as appropriate
-     for their purpose.  As a general rule
-
-You can see many examples DWidget examples in djangopages.dpage_texthtml.py and related modules.
-
-
+Details
++++++++
 """
 
 from __future__ import unicode_literals
@@ -127,9 +91,7 @@ from django.views.generic import View
 
 
 class _DPageRegister(type):
-    """
-    Internal metaclass to register DPage child objects.  Do not mess with this!
-    """
+    """ Internal metaclass to register DPage child objects.  Do not mess with this! """
     # noinspection PyMissingConstructor,PyUnusedLocal
     def __init__(cls, name, base, attrs):
         if not hasattr(cls, 'pages_list'):
@@ -146,8 +108,7 @@ class _DPageRegister(type):
 
 
 class DPage(View):
-    """
-    DPage classes define Django Page objects, ie. pages that can be displayed.
+    """ DPage classes define Django Page objects, ie. pages that can be displayed.
 
     .. note:: As a general rule, you need not perform initialization in the DPage child class.
               However, if you do these parameters are available.
@@ -195,44 +156,31 @@ class DPage(View):
         self.content = []
         return
 
-    def get(self, *args, **kwargs):
-        """ Define the page.  The subclass must define this method to create the page content.
+    def get(self, request):
+        """ Base class default get method
+
+        Child classes need not provide a get method but *MUST* provide a generate
+        method.
+        """
+        content = self.generate(request)
+        return render(request, self.template, {'content': content})
+
+    def generate(self, request):
+        """ Generate the page content. The subclass must define this method to create the page content.
 
         .. sourcecode:: python
 
-            def get(self, *args, **kwargs):
+            def generate(self, request):
                 xr1 = Text('This text comes from dpage.Text')
                 xr2 = Markdown('**Bold Markdown Text**')
                 xr3 = HTML('<h3>H3 text from DPageHTML</h3>')
                 self.content(RC([xr1, xr2, xr3])
                 return self
+
+        Conceptually, the page's generate method creates HTML content that will
+        subsequently be provided as a context value to the page's template.
         """
-        raise NotImplementedError("Subclasses should implement DPage.get!")
-
-    def render(self):
-        """ Render the page's content.  The subclass may, though probably shouldn't, override this class.
-
-        .. sourcecode:: python
-
-            render()
-
-        :return: response object
-        :rtype: HttpResponse
-        """
-        # init context if nothing in it
-        if not self.context:
-            self.context = {}
-
-        # render all our objects
-        content = _render(self.content)
-
-        # if there was nothing, use the default content
-        if len(content) == 0:
-            content = settings.DPAGE_DEFAULT_CONTENT
-
-        self.context['content'] = content
-
-        return render(self.request, self.template, self.context)
+        raise NotImplementedError("Subclasses should implement DPage.generate!")
 
     def __unicode__(self):
         return self.__class__.__name__
@@ -321,166 +269,166 @@ class DPage(View):
         """
         return self.prev(obj), self.next(obj)
 
-########################################################################################################################
+# ########################################################################################################################
+# #
+# # Content classes and methods
+# #
+# ########################################################################################################################
 #
-# Content classes and methods
 #
-########################################################################################################################
-
-
-class DWidget(object):
-    """ DWidget(s) provide content for DPage(s)
-
-    DWidgets have a signature that looks generally like this:
-
-    .. sourcecode:: python
-
-        some_widget( content1, content2, ..., kwargs)
-
-    The following kwargs are available to all widgets:
-        * template: template override for the widget
-        * classes: extra classes for the widget
-        * style: extra styles for the widget
-
-    Widgets are free to define other kwargs as required.
-
-    DWidget provides a default render and generate methods.
-    Derived classes **must** override (preferably) generate or (if needed) render.
-
-    DWidget implements
-
-    * __add__
-    * __radd__
-    * __mul__
-    * __str__
-    * __repr__
-
-    as a convenience.
-
-    .. note:: add (+) and mul (*) force immediate rendering of the widget.
-    """
-    template = ''
-
-    def __init__(self, content, kwargs):
-        # log.debug('-----in dwidget init')
-        self.content = content
-        self.template = kwargs.pop('template', self.template)
-        self.classes = kwargs.pop('classes', None)
-        self.style = kwargs.pop('style', None)
-        self.kwargs = kwargs
-        # log.debug('-----done dwidget init')
-        return
-
-    def render(self):
-        """ Render the widget's content, classes, style, and template.
-        Invoke the generate method, likely the child class generate, to actually
-        create the output HTML.
-
-        .. sourcecode:: python
-
-            render()
-
-        :return: widgets HTML
-        :rtype: str
-
-        .. note:: Widgets may, though probably shouldn't, override the default render method.
-        """
-        # log.debug('##### in dwidget render')
-        content = _render(self.content)
-        classes = ''
-        if self.classes:
-            classes = 'class="{}"'.format(_renderstr(self.classes))
-        style = ''
-        if self.style:
-            style = 'style="{}"'.format(_renderstr(self.style))
-        template = ''
-        if self.template:
-            template = _renderstr(self.template)
-        # todo: should _render be applied to kwargs
-        kwargs = self.kwargs
-        out = self.generate(template, content, classes, style, kwargs)
-        # log.debug('##### done dwidget render')
-        return out
-
-    def generate(self, template, content, classes, style, kwargs):
-        """ Generate the widget's content.
-
-        :param template: The widget's template with all objects rendered.
-        :type template: varies, typically str or tuple
-        :param content: The widget's content with all objects rendered.
-        :type content: varies, typically str or tuple
-        :param classes: The widget's classes with all objects rendered.
-        :type classes: varies, typically str
-        :param style: The widget's styles with all objects rendered.
-        :type style: varies, typically str
-        :param kwargs: The widget's kwargs.  Note, objects are **not rendered**.
-        :type kwargs: dict
-        :return: The widget's HTML
-        :rtype: str
-
-        .. note:: Widgets should almost always override this method.
-        """
-        log.debug('!!!!! in DWidget generate')
-        try:
-            c = ' '.join(content)
-            return template.format(content=c, classes=classes, style=style)
-        except TypeError:
-            raise TypeError('Non string content for default DWidget generate')
-
-    def __add__(self, other):
-        return self.render() + other
-
-    def __radd__(self, other):
-        return other + self.render()
-
-    def __mul__(self, other):
-        return self.render() * other
-
-    def __str__(self):
-        return self.render()
-
-    def __repr__(self):
-        return self.render()
-
-    @staticmethod
-    def add_classes(existing, new):
-        """ Add classes to existing classes for the widget.  Typically used by the widget's generate method
-        to add classes that the widget needs to those created by the widget definition.
-
-        .. sourcecode:: python
-
-            add( existing_classes, 'classes_to_add')
-
-        :param existing: Existing class string, ex. class="someclass another_class"
-        :type existing: str or unicode
-        :param new: Classes to add, ex. "a_class_to_add"
-        :type new: str or unicode
-        :return: new class string, ex. class="someclass another_class a_class_to_add"
-        :rtype: str
-        """
-        if existing == '':
-            return 'class="{}"'.format(new)
-        return existing[:-1] + ' ' + new + '"'
-
-    @staticmethod
-    def add_style(existing, new):
-        """Add style(s) to existing style(s) for the widget.  Typically used by the widget's generate method
-        to add styles that the widget needs to those created by the widget definition.
-
-        .. sourcecode:: python
-
-            add_style( existing_styles, 'styles_to_add')
-
-        :param existing: Existing style string, ex. style="style1;style2;"
-        :type existing: str or unicode
-        :param new: Styles to add, ex. "style3;style4;"
-        :type new: str or unicode
-        :return: new style string, ex. style="style1;style2;style3;style4;"
-        :rtype: str
-        """
-        if existing == '':
-            return 'style="{}"'.format(new)
-        return existing[:-1] + ' ' + new + '"'
+# class DWidget(object):
+#     """ DWidget(s) provide content for DPage(s)
+#
+#     DWidgets have a signature that looks generally like this:
+#
+#     .. sourcecode:: python
+#
+#         some_widget( content1, content2, ..., kwargs)
+#
+#     The following kwargs are available to all widgets:
+#         * template: template override for the widget
+#         * classes: extra classes for the widget
+#         * style: extra styles for the widget
+#
+#     Widgets are free to define other kwargs as required.
+#
+#     DWidget provides a default render and generate methods.
+#     Derived classes **must** override (preferably) generate or (if needed) render.
+#
+#     DWidget implements
+#
+#     * __add__
+#     * __radd__
+#     * __mul__
+#     * __str__
+#     * __repr__
+#
+#     as a convenience.
+#
+#     .. note:: add (+) and mul (*) force immediate rendering of the widget.
+#     """
+#     template = ''
+#
+#     def __init__(self, content, kwargs):
+#         # log.debug('-----in dwidget init')
+#         self.content = content
+#         self.template = kwargs.pop('template', self.template)
+#         self.classes = kwargs.pop('classes', None)
+#         self.style = kwargs.pop('style', None)
+#         self.kwargs = kwargs
+#         # log.debug('-----done dwidget init')
+#         return
+#
+#     def render(self):
+#         """ Render the widget's content, classes, style, and template.
+#         Invoke the generate method, likely the child class generate, to actually
+#         create the output HTML.
+#
+#         .. sourcecode:: python
+#
+#             render()
+#
+#         :return: widgets HTML
+#         :rtype: str
+#
+#         .. note:: Widgets may, though probably shouldn't, override the default render method.
+#         """
+#         # log.debug('##### in dwidget render')
+#         content = _render(self.content)
+#         classes = ''
+#         if self.classes:
+#             classes = 'class="{}"'.format(_renderstr(self.classes))
+#         style = ''
+#         if self.style:
+#             style = 'style="{}"'.format(_renderstr(self.style))
+#         template = ''
+#         if self.template:
+#             template = _renderstr(self.template)
+#         # todo: should _render be applied to kwargs
+#         kwargs = self.kwargs
+#         out = self.generate(template, content, classes, style, kwargs)
+#         # log.debug('##### done dwidget render')
+#         return out
+#
+#     def generate(self, template, content, classes, style, kwargs):
+#         """ Generate the widget's content.
+#
+#         :param template: The widget's template with all objects rendered.
+#         :type template: varies, typically str or tuple
+#         :param content: The widget's content with all objects rendered.
+#         :type content: varies, typically str or tuple
+#         :param classes: The widget's classes with all objects rendered.
+#         :type classes: varies, typically str
+#         :param style: The widget's styles with all objects rendered.
+#         :type style: varies, typically str
+#         :param kwargs: The widget's kwargs.  Note, objects are **not rendered**.
+#         :type kwargs: dict
+#         :return: The widget's HTML
+#         :rtype: str
+#
+#         .. note:: Widgets should almost always override this method.
+#         """
+#         log.debug('!!!!! in DWidget generate')
+#         try:
+#             c = ' '.join(content)
+#             return template.format(content=c, classes=classes, style=style)
+#         except TypeError:
+#             raise TypeError('Non string content for default DWidget generate')
+#
+#     def __add__(self, other):
+#         return self.render() + other
+#
+#     def __radd__(self, other):
+#         return other + self.render()
+#
+#     def __mul__(self, other):
+#         return self.render() * other
+#
+#     def __str__(self):
+#         return self.render()
+#
+#     def __repr__(self):
+#         return self.render()
+#
+#     @staticmethod
+#     def add_classes(existing, new):
+#         """ Add classes to existing classes for the widget.  Typically used by the widget's generate method
+#         to add classes that the widget needs to those created by the widget definition.
+#
+#         .. sourcecode:: python
+#
+#             add( existing_classes, 'classes_to_add')
+#
+#         :param existing: Existing class string, ex. class="someclass another_class"
+#         :type existing: str or unicode
+#         :param new: Classes to add, ex. "a_class_to_add"
+#         :type new: str or unicode
+#         :return: new class string, ex. class="someclass another_class a_class_to_add"
+#         :rtype: str
+#         """
+#         if existing == '':
+#             return 'class="{}"'.format(new)
+#         return existing[:-1] + ' ' + new + '"'
+#
+#     @staticmethod
+#     def add_style(existing, new):
+#         """Add style(s) to existing style(s) for the widget.  Typically used by the widget's generate method
+#         to add styles that the widget needs to those created by the widget definition.
+#
+#         .. sourcecode:: python
+#
+#             add_style( existing_styles, 'styles_to_add')
+#
+#         :param existing: Existing style string, ex. style="style1;style2;"
+#         :type existing: str or unicode
+#         :param new: Styles to add, ex. "style3;style4;"
+#         :type new: str or unicode
+#         :return: new style string, ex. style="style1;style2;style3;style4;"
+#         :rtype: str
+#         """
+#         if existing == '':
+#             return 'style="{}"'.format(new)
+#         return existing[:-1] + ' ' + new + '"'
 
 ########################################################################################################################
 #
@@ -489,63 +437,63 @@ class DWidget(object):
 ########################################################################################################################
 
 
-def _render(content):
-    """ Render the content.  As a general rule this internal method should **not** be used.  However,
-    there are exceptions.
-
-    .. sourcecode:: python
-
-        _render(content)
-
-    | Synonym: X
-
-    :param content: content to render
-    :type content: varies
-    :return: the rendered content
-    :rtype: varies
-    """
-    # log.debug('in _render with <<{}>> type {}'.format(content, type(content)))
-    if isinstance(content, basestring):
-        return content
-    if hasattr(content, 'render'):
-        return content.render()
-    if isinstance(content, (int, long, float)):
-        return content
-    if isinstance(content, tuple):
-        tpl = tuple()
-        for con in content:
-            tpl += (_render(con),)
-        return tpl
-    if isinstance(content, list):
-        lst = list()
-        for con in content:
-            lst.append(_render(con))
-        return lst
-    return content
-X = functools.partial(_render)
-
-
-def _renderstr(content):
-    """ Render content, concatenate result basestrings.
-
-    .. sourcecode:: python
-
-        _renderstr(content)
-
-
-    | Synonym: XS(...)
-
-    :param content: content to render
-    :return: rendered content
-    :rtype: basestring
-    """
-    rtn = _render(content)
-    out = ''
-    for r in rtn:
-        if isinstance(r, basestring):
-            out += r
-    return out
-XS = functools.partial(_renderstr)
+# def _render(content):
+#     """ Render the content.  As a general rule this internal method should **not** be used.  However,
+#     there are exceptions.
+#
+#     .. sourcecode:: python
+#
+#         _render(content)
+#
+#     | Synonym: X
+#
+#     :param content: content to render
+#     :type content: varies
+#     :return: the rendered content
+#     :rtype: varies
+#     """
+#     # log.debug('in _render with <<{}>> type {}'.format(content, type(content)))
+#     if isinstance(content, basestring):
+#         return content
+#     if hasattr(content, 'render'):
+#         return content.render()
+#     if isinstance(content, (int, long, float)):
+#         return content
+#     if isinstance(content, tuple):
+#         tpl = tuple()
+#         for con in content:
+#             tpl += (_render(con),)
+#         return tpl
+#     if isinstance(content, list):
+#         lst = list()
+#         for con in content:
+#             lst.append(_render(con))
+#         return lst
+#     return content
+# X = functools.partial(_render)
+#
+#
+# def _renderstr(content):
+#     """ Render content, concatenate result basestrings.
+#
+#     .. sourcecode:: python
+#
+#         _renderstr(content)
+#
+#
+#     | Synonym: XS(...)
+#
+#     :param content: content to render
+#     :return: rendered content
+#     :rtype: basestring
+#     """
+#     rtn = _render(content)
+#     out = ''
+#     for r in rtn:
+#         if isinstance(r, basestring):
+#             out += r
+#     return out
+# XS = functools.partial(_renderstr)
 
 
 def unique_name(base_name='x'):

@@ -110,7 +110,8 @@ class DPagesList(DPage):
     description = 'List the test/demo DPages'
     tags = ['test', 'list']
 
-    def get(self, request):
+    # noinspection PyMethodMayBeStatic
+    def generate(self, request):
         t = '<a href="/dpages/{name}" ' \
             'class="btn btn-default btn-xs" ' \
             'role="button" ' \
@@ -129,8 +130,7 @@ class DPagesList(DPage):
             # Output a line with the link button, test title, and test description
             line = t.format(name=cls.__name__, text=cls.title)
             out += line
-        self.content = out
-        return self
+        return out
 
 
 ########################################################################################################################
@@ -184,7 +184,7 @@ class TestText(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'text']
 
-    def get(self, request):
+    def generate(self, request):
         code = escape("""
 doc1 = 'This is some Text content. This is some more Text content. </br>Text can also output HTML.'
 doc2 = Text('Bisque packground style para', para=True, style='background-color:bisque;')
@@ -197,7 +197,7 @@ content = doc1 + doc2 + doc3
         doc3 = Text('Red templated text', template='<font color="red">{content}</font>')
         content = doc1 + doc2 + doc3
         content = page_content(self, code, content)
-        return render(request, self.template, {'content': content})
+        return content
 
 
 class TestMarkdown(DPage):
@@ -206,7 +206,7 @@ class TestMarkdown(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'text']
 
-    def get(self, request):
+    def generate(self, request):
         code = """
 c1 = Markdown('###Markdown h3')
 c2 = Markdown(('**Markdown bold text**',
@@ -220,7 +220,7 @@ content = c1 + c2
                        'Note: markdown always generates a paragraph.'))
         content = c1 + c2
         content = page_content(self, code, content)
-        return render(request, self.template, {'content': content})
+        return content
 
 
 class TestLI(DPage):
@@ -229,7 +229,7 @@ class TestLI(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'text']
 
-    def get(self, request):
+    def generate(self, request):
         code = """
 content = (LI(5, style='background-color:azure;') +
            LI((1, 2, 5)) +
@@ -241,7 +241,7 @@ content = (LI(5, style='background-color:azure;') +
                    LI((1, 2, 5)) +
                    LI(15, style='background-color:bisque;'))
         content = page_content(self, code, content)
-        return render(request, self.template, {'content': content})
+        return content
 
 
 class TestBRSP(DPage):
@@ -250,7 +250,7 @@ class TestBRSP(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'text']
 
-    def get(self, request):
+    def generate(self, request):
         code = """
 content = ('line brake here' + BR() +
            'Second line followed by two newlines' + BR(2) +
@@ -263,7 +263,7 @@ content = ('line brake here' + BR() +
                    'Third 5 spaces' + SP(5) + 'line' + BR() +
                    'Six red * surrounded by ():(' + SD('***', 2, style='color: red;') + ')')
         content = page_content(self, code, content)
-        return render(request, self.template, {'content': content})
+        return content
 
 
 class TestColumn(DPage):
@@ -272,7 +272,7 @@ class TestColumn(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'layout']
 
-    def get(self, request):
+    def generate(self, request):
         code = escape("""
 t = '<b>Some text</b> ' + 'Be kind to your web footed friends. ' * 15
 c1 = C(t, width=3, style='background-color:powderblue;')
@@ -291,67 +291,49 @@ content = ('<div class="row">{}{}{}</div>'.format(c1, c6, c3) +
         content = ('<div class="row">{}{}{}</div>'.format(c1, c6, c3) +
                    '<div class="row">{}</div>'.format(cl))
         content = page_content(self, code, content)
-        return render(request, self.template, {'content': content})
+        return content
 
 
-# class TestRow(DPage):
-#     """ Test Row  widget"""
-#     title = 'Layout: Bootstrap 3 Row'
-#     description = 'Demonstrate ' + title
-#     tags = ['test', 'layout']
-#
-#     def get(self, *args, **kwargs):
-#         code = """
-# content = T(R(C6(LI(5), LI(2, 3), style='border:1px solid;')),
-#             R(C(LI(20, style='background-color:powderblue;'))))
-#         """
-#
-#         # Create some text for two rows
-#         content = T(R(C6(LI(5), LI(2, 3), style='border:1px solid;')),
-#                     R(C(LI(20, style='background-color:powderblue;'))))
-#         self.content = page_content(self, code, content)
-#         return self
-#
-#
-# class TestRowColumn(DPage):
-#     """ Test RowColumn widget """
-#     title = 'Layout: Bootstrap 3 RowColumn/RC'
-#     description = 'Demonstrate ' + title
-#     tags = ['test', 'layout']
-#
-#     def get(self, *args, **kwargs):
-#         code = """
-#  * RowColumn(content, [width=n]), or
-#         """
-#
-#         # Create content
-#         content = RowColumn(LI(8), LI(5), width=6)
-#         self.content = page_content(self, code, content)
-#         return self
-#
-#
-# class TestMapRowColumn(DPage):
-#     """ Test MapRowColumn widget """
-#     title = 'Layout: Map RC'
-#     description = 'Demonstrate ' + title
-#     tags = ['test', 'layout']
-#
-#     def get(self, *args, **kwargs):
-#         code = escape("""
-# li = LI(5, para=False).render()[0]
-# t = MD('**Text in a row column.** ' + li)
-# content = RC6M((t, t),
-#                (t, t), style='border:1px solid;')
-#         """)
-#
-#         li = LI(5, para=False).render()[0]
-#         t = MD('**Text in a row column.** ' + li)
-#         content = RC6M((t, t),
-#                        (t, t), style='border:1px solid;')
-#         self.content = page_content(self, code, content)
-#         return self
-#
-#
+class TestRow(DPage):
+    """ Test Row  widget"""
+    title = 'Layout: Bootstrap 3 Row'
+    description = 'Demonstrate ' + title
+    tags = ['test', 'layout']
+
+    def generate(self, request):
+        code = """
+content = (R(C6((LI(5), LI((2, 3))), style='border:1px solid;')) +
+           R(C(LI(20, style='background-color:powderblue;'))))
+        """
+
+        # Create some text for two rows
+        content = (R(C6((LI(5), LI((2, 3))), style='border:1px solid;')) +
+                   R(C(LI(20, style='background-color:powderblue;'))))
+        content = page_content(self, code, content)
+        return content
+
+
+class TestRowColumn(DPage):
+    """ Test RowColumn widget """
+    title = 'Layout: Bootstrap 3 RowColumn/RC'
+    description = 'Demonstrate ' + title
+    tags = ['test', 'layout']
+
+    def generate(self, *args, **kwargs):
+        code = """
+t = LI(5, para=False)
+content = RowColumn((('Row 1 Col 1 ' + t, 'Row 1 Col 2 ' + t),
+                     ('Row 2 Col 1 ' + t, 'Row 2 Col 2 ' + t)),
+                    width=6)
+        """
+        t = LI(5, para=False)
+        content = RowColumn((('Row 1 Col 1 ' + t, 'Row 1 Col 2 ' + t),
+                             ('Row 2 Col 1 ' + t, 'Row 2 Col 2 ' + t)),
+                            width=6)
+        content = page_content(self, code, content)
+        return content
+
+
 # class TestButton(DPage):
 #     """ Test Button widget """
 #     title = 'Buttons'

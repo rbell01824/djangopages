@@ -67,6 +67,11 @@ def Text(content, para=False, classes='', style='', template=None):
     :param template: override template
     :type template: str or unicode
     """
+    if isinstance(content, tuple):
+        rtn = ''
+        for c in content:
+            rtn += Text(c, para, classes, style, template)
+        return rtn
     if classes:
         classes = 'class="{}" '.format(classes)
     if style:
@@ -176,7 +181,7 @@ def StringDup(string, count=1, classes='', style='', template=None):
 
 
     :param string: the string to use
-    :type string:
+    :type string: str or unicode or tuple
     :param count: the number of times to repeat the string
     :type count: int
     :param classes: classes to add to output
@@ -190,6 +195,12 @@ def StringDup(string, count=1, classes='', style='', template=None):
     | BR, generates one or more HTML line breaks
     | SP, generates one or more non-breaking HTML spaces
     """
+    if isinstance(string, tuple):
+        rtn = ''
+        for lc in string:
+            rtn += StringDup(lc, count, classes, style, template)
+        return rtn
+
     assert isinstance(string, (str, unicode))
     assert len(string) > 0
     assert isinstance(count, int)

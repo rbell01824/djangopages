@@ -21,12 +21,13 @@ content creation and layout.
 .. toctree::
    :maxdepth: 2
 
-   overview
-   view
+   dpage
+   widgets
    text
    layout
    bootstrap3
    graphs
+   view
 
 Indices and tables
 ==================
