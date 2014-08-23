@@ -449,52 +449,95 @@ def Label(content, label_type='label-default', classes='', style=''):
     return rtn
 
 
-# class Link(DWidget):
-#     """
-#     .. sourcecode:: python
-#
-#         Link('/dpages/somepage', 'link to somepage',
-#              '/dpages/anotherpage', 'link to anotherpage')
-#
-#     :param content: content
-#     :type content: basestring or tuple or DWidget
-#     :param kwargs: standard kwargs
-#     :type kwargs: dict
-#
-#     additional kwargs
-#
-#     :param button: default 'btn-default', button type for the link
-#     :type button: str
-#     :param disabled: default False, if true button is disabled
-#     :type disabled: bool
-#     """
-#
-#     template = '<a href="{href}" {classes} {style} {disabled} {role}>{content}</a>'
-#
-#     def __init__(self, *content, **kwargs):
-#         super(Link, self).__init__(content, kwargs)
-#         return
-#
-#     def generate(self, template, content, classes, style, kwargs):
-#         assert isinstance(content, tuple)
-#         disabled = kwargs.get('disabled', '')
-#         button = kwargs.get('button', 'btn-default')
-#         role = ''
-#         if button:
-#             # make sure have a button type specified
-#             for t in ('btn-default', 'btn-primary', 'btn-success', 'btn-info', 'btn-warning',
-#                   'btn-danger', 'btn-link'):
-#                 if t in button:
-#                     break
-#             else:
-#                 button += ' btn-default'
-#             classes = self.add_classes(classes, 'btn {button}'.format(button=button))
-#             role = 'role="button"'
-#         out = ''
-#         for hr, con in zip(content[::2], content[1::2]):
-#             out += template.format(href=hr, classes=classes, style=style, disabled=disabled, role=role,
-#                                    content=con)
-#         return out
+# noinspection PyPep8Naming
+def Link(href, text, button='btn-default', size='', disabled=False, classes='', style=''):
+    """ Bootstrap link button
+    
+    .. sourcecode:: python
+
+        Link('/dpages/somepage', 'link to somepage',
+             '/dpages/anotherpage', 'link to anotherpage')
+
+    :param href: href url
+    :type href: str or unicode
+    :param text: text
+    :type text: str or unicode
+    :param button: default 'btn-default', button type per bootstrap
+    :type button: str or unicode
+    :param size: default '', button size per bootstrap
+    :type size: str or unicode
+    :param disabled: default False, if true button is disabled
+    :type disabled: bool
+    :param classes: classes to add to output
+    :type classes: str or unicode
+    :param style: styles to add to output
+    :type style: str or unicode
+    :return: HTML for bootstrap button
+    :rtype: unicode
+    
+    | Synonyms:
+    | LNK = functools.partial(Link)
+    | LNKPrimary = functools.partial(Link, button='btn-primary')
+    | LNKSuccess = functools.partial(Link, button='btn-success')
+    | LNKInfo = functools.partial(Link, button='btn-info')
+    | LNKWarning = functools.partial(Link, button='btn-warning')
+    | LNKDanger = functools.partial(Link, button='btn-danger')
+    | LNKL = functools.partial(Link, size='btn-lg')
+    | LNKLPrimary = functools.partial(Link, button='btn-primary', size='btn-lg')
+    | LNKLSuccess = functools.partial(Link, button='btn-success', size='btn-lg')
+    | LNKLInfo = functools.partial(Link, button='btn-info', size='btn-lg')
+    | LNKLWarning = functools.partial(Link, button='btn-warning', size='btn-lg')
+    | LNKLDanger = functools.partial(Link, button='btn-danger', size='btn-lg')
+    | LNKS = functools.partial(Link, size='btn-sm')
+    | LNKSPrimary = functools.partial(Link, button='btn-primary', size='btn-sm')
+    | LNKSSuccess = functools.partial(Link, button='btn-success', size='btn-sm')
+    | LNKSInfo = functools.partial(Link, button='btn-info', size='btn-sm')
+    | LNKSWarning = functools.partial(Link, button='btn-warning', size='btn-sm')
+    | LNKSDanger = functools.partial(Link, button='btn-danger', size='btn-sm')
+    | LNKXS = functools.partial(Link, size='btn-xs')
+    | LNKXSPrimary = functools.partial(Link, button='btn-primary', size='btn-xs')
+    | LNKXSSuccess = functools.partial(Link, button='btn-success', size='btn-xs')
+    | LNKXSInfo = functools.partial(Link, button='btn-info', size='btn-xs')
+    | LNKXSWarning = functools.partial(Link, button='btn-warning', size='btn-xs')
+    | LNKXSDanger = functools.partial(Link, button='btn-danger', size='btn-xs')    
+    """
+
+    template = '<a href="{href}" {classes} {style} {disabled} {role}>{text}</a>'
+
+    if disabled:
+        disabled = 'disabled="disabled" '
+    classes = 'class="btn {button} {size} {classes}" '.format(button=button, size=size, classes=classes)
+    if style:
+        style = 'style="{}" '.format(style)
+    role = ''
+    if button:
+        role = 'role="button" '
+    rtn = template.format(href=href, classes=classes, style=style, disabled=disabled, role=role, text=text)
+    return rtn
+LNK = functools.partial(Link)
+LNKPrimary = functools.partial(Link, button='btn-primary')
+LNKSuccess = functools.partial(Link, button='btn-success')
+LNKInfo = functools.partial(Link, button='btn-info')
+LNKWarning = functools.partial(Link, button='btn-warning')
+LNKDanger = functools.partial(Link, button='btn-danger')
+LNKL = functools.partial(Link, size='btn-lg')
+LNKLPrimary = functools.partial(Link, button='btn-primary', size='btn-lg')
+LNKLSuccess = functools.partial(Link, button='btn-success', size='btn-lg')
+LNKLInfo = functools.partial(Link, button='btn-info', size='btn-lg')
+LNKLWarning = functools.partial(Link, button='btn-warning', size='btn-lg')
+LNKLDanger = functools.partial(Link, button='btn-danger', size='btn-lg')
+LNKS = functools.partial(Link, size='btn-sm')
+LNKSPrimary = functools.partial(Link, button='btn-primary', size='btn-sm')
+LNKSSuccess = functools.partial(Link, button='btn-success', size='btn-sm')
+LNKSInfo = functools.partial(Link, button='btn-info', size='btn-sm')
+LNKSWarning = functools.partial(Link, button='btn-warning', size='btn-sm')
+LNKSDanger = functools.partial(Link, button='btn-danger', size='btn-sm')
+LNKXS = functools.partial(Link, size='btn-xs')
+LNKXSPrimary = functools.partial(Link, button='btn-primary', size='btn-xs')
+LNKXSSuccess = functools.partial(Link, button='btn-success', size='btn-xs')
+LNKXSInfo = functools.partial(Link, button='btn-info', size='btn-xs')
+LNKXSWarning = functools.partial(Link, button='btn-warning', size='btn-xs')
+LNKXSDanger = functools.partial(Link, button='btn-danger', size='btn-xs')
 
 
 # noinspection PyPep8Naming
@@ -558,6 +601,7 @@ def PanelHeading(heading='', level=3, classes='', style=''):
     return template.format(classes=classes, style=style, heading=heading)
 
 
+# todo 1: validate Panel works properly with tables and list, see http://getbootstrap.com/components/#panels
 # noinspection PyPep8Naming
 def Panel(body='', heading='', footer='', panel_type='panel-default'):
     """ Bootstrap panel

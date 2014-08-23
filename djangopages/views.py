@@ -334,33 +334,6 @@ content = RowColumn((('Row 1 Col 1 ' + t, 'Row 1 Col 2 ' + t),
         return content
 
 
-class TestPanel(DPage):
-    """ Test Panel widget """
-    title = 'Bootstrap: Panel'
-    description = 'Demonstrate ' + title
-    tags = ['test', 'bootstrap']
-
-    def generate(self, request):
-        code = """
-p1 = Panel('Default panel')
-p2 = PanelPrimary('Primary panel')
-p3 = PanelSuccess('Panel 3 success with heading', PanelHeading('Panel 3 heading success'))
-p4 = PanelWarning('Panel 4 warning with heading and footer',
-                  PanelHeading('Panel 4 heading warning'),
-                  PanelFooter('Panel 4 footer'))
-content = RC((p1, p2, p3, p4))
-        """
-        p1 = Panel('Default panel')
-        p2 = PanelPrimary('Primary panel')
-        p3 = PanelSuccess('Panel 3 success with heading', PanelHeading('Panel 3 heading success'))
-        p4 = PanelWarning('Panel 4 warning with heading and footer',
-                          PanelHeading('Panel 4 heading warning'),
-                          PanelFooter('Panel 4 footer'))
-        content = RC((p1, p2, p3, p4))
-        content = page_content(self, code, content)
-        return content
-
-
 class TestAccordion(DPage):
     """ Test Accordion widget """
     title = 'Bootstrap: Accordion'
@@ -426,50 +399,6 @@ content = RC2((T('Three glyphs on a line: ') + Glyphicon('star') + GL('heart') +
         return content
 
 
-class TestJumbotron(DPage):
-    """ Test Jumbotron widget """
-    title = 'Jumbotron'
-    description = 'Demonstrate ' + title
-    tags = ['test', 'bootstrap']
-
-    def generate(self, request):
-        code = escape("""
-t = '#Heading\n' \
-    'Some text after the heading.'
-r1 = Jumbotron(MD(t))
-r2 = Jumbotron(T(MD('#Jumbotron 2'), T('Some text'), Button('Button')))
-content = RC(r1, r2)
-        """)
-
-        t = '#Heading\n' \
-            'Some text after the heading.'
-        r1 = Jumbotron(MD(t))
-        r2 = Jumbotron(MD('#Jumbotron 2') + 'Some text' + BTNSInfo('Button'))
-        content = RC((r1, r2))
-        content = page_content(self, code, content)
-        return content
-
-
-class TestLabel(DPage):
-    """ Test Label widget """
-    title = 'Label'
-    description = 'Demonstrate ' + title
-    tags = ['test', 'bootstrap']
-
-    def generate(self, request):
-        code = escape("""
-r1 = Label('default', 'Default',
-           'primary', 'Primary',
-           'success', 'Success')
-r2 = '<h3>Example heading'+XS(Label('default', 'New'))+'</h3>'
-content = RC(r1, r2)
-        """)
-
-        content = RC('<h3>Example label ' + Label('New') + '</h3>')
-        content = page_content(self, code, content)
-        return content
-
-
 class TestHn(DPage):
     """ Test Hn widget """
     title = 'Hn'
@@ -502,46 +431,127 @@ content = RC(H3('Level 3 heading'+Small(' subheading text')))
         return content
 
 
-# class TestLink(DPage):
-#     """ Test Link widget """
-#     title = 'Link'
-#     description = 'Demonstrate ' + title
-#     tags = ['test', 'bootstrap', 'link']
-#
-#     def generate(self, request):
-#         code = """
-# # define content objects
-# r1 = Link('/dpages/DPagesList', 'DPagesList link')
-# r2 = Link('/dpages/DPagesList', 'DPagesList link',
-#           button='btn-info btn-xs')
-# r3 = Link('/dpages/DPagesList', 'DPagesList link with style and classes',
-#           button='btn-success btn-lg',
-#           style='color:white;width:400px;margin-top:5px;margin-bottom:5px;')
-# r4 = Link('/dpages/DPagesList', 'DPagesList link',
-#           '/dpages/DPagesList', 'DPagesList link',
-#           button='btn-xs', style='margin:2px;')
-#
-# # put into layout
-# content = RC(r1, r2, r3, r4)
-#         """
-#
-#         # define content objects
-#         r1 = Link('/dpages/DPagesList', 'DPagesList link')
-#         r2 = Link('/dpages/DPagesList', 'DPagesList link',
-#                   button='btn-info btn-xs')
-#         r3 = Link('/dpages/DPagesList', 'DPagesList link with style and classes',
-#                   button='btn-success btn-lg',
-#                   style='color:white;width:400px;margin-top:5px;margin-bottom:5px;')
-#         r4 = Link('/dpages/DPagesList', 'DPagesList link',
-#                   '/dpages/DPagesList', 'DPagesList link',
-#                   button='btn-xs', style='margin:2px;')
-#
-#         # put into layout
-#         content = RC(r1, r2, r3, r4)
-#         self.content = page_content(self, code, content)
-#         return self
-#
-#
+class TestHeader(DPage):
+    """ Test Header widget """
+    title = 'Header'
+    description = 'Demonstrate ' + title
+    tags = ['test', 'bootstrap']
+
+    def generate(self, request):
+        code = escape("""
+content = Header(H2('Level 2 heading'+Small(' subheading text')))
+        """)
+
+        content = Header(H2('Level 2 heading'+Small(' subheading text')))
+        content = page_content(self, code, content)
+        return content
+
+
+class TestJumbotron(DPage):
+    """ Test Jumbotron widget """
+    title = 'Jumbotron'
+    description = 'Demonstrate ' + title
+    tags = ['test', 'bootstrap']
+
+    def generate(self, request):
+        code = escape("""
+t = '#Heading\n' \
+    'Some text after the heading.'
+r1 = Jumbotron(MD(t))
+r2 = Jumbotron(T(MD('#Jumbotron 2'), T('Some text'), Button('Button')))
+content = RC(r1, r2)
+        """)
+
+        t = '#Heading\n' \
+            'Some text after the heading.'
+        r1 = Jumbotron(MD(t))
+        r2 = Jumbotron(MD('#Jumbotron 2') + 'Some text' + BTNSInfo('Button'))
+        content = RC((r1, r2))
+        content = page_content(self, code, content)
+        return content
+
+
+class TestLabel(DPage):
+    """ Test Label widget """
+    title = 'Label'
+    description = 'Demonstrate ' + title
+    tags = ['test', 'bootstrap']
+
+    def generate(self, request):
+        code = escape("""
+content = RC('<h3>Example label ' + Label('New') + '</h3>')
+        """)
+
+        content = RC('<h3>Example label ' + Label('New') + '</h3>')
+        content = page_content(self, code, content)
+        return content
+
+
+class TestLink(DPage):
+    """ Test Link widget """
+    title = 'Link'
+    description = 'Demonstrate ' + title
+    tags = ['test', 'bootstrap', 'link']
+
+    def generate(self, request):
+        code = """
+# define content objects
+r1 = Link('/dpages/DPagesList', 'DPagesList link')
+r2 = Link('/dpages/DPagesList', 'DPagesList link',
+          button='btn-info btn-xs')
+r3 = Link('/dpages/DPagesList', 'DPagesList link with style and classes',
+          button='btn-success btn-lg',
+          style='color:white;width:400px;margin-top:5px;margin-bottom:5px;')
+r4 = Link('/dpages/DPagesList', 'DPagesList link',
+          '/dpages/DPagesList', 'DPagesList link',
+          button='btn-xs', style='margin:2px;')
+
+# put into layout
+content = RC(r1, r2, r3, r4)
+        """
+
+        # define content objects
+        r1 = Link('/dpages/DPagesList', 'DPagesList link')
+        r2 = Link('/dpages/DPagesList', 'DPagesList link',
+                  button='btn-info btn-xs', style='margin-top:5px;')
+        r3 = Link('/dpages/DPagesList', 'DPagesList link with style and classes',
+                  button='btn-success btn-lg',
+                  style='color:white;width:400px;margin-top:5px;margin-bottom:5px;')
+        r4 = LNKXSDanger('/dpages/DPagesList', 'DPagesList link')
+        r5 = LNK('/dpages/DPagesList', 'DPagesList link', button='')
+
+        content = RC((r1, r2, r3, r4, r5))
+        content = page_content(self, code, content)
+        return content
+
+
+class TestPanel(DPage):
+    """ Test Panel widget """
+    title = 'Bootstrap: Panel'
+    description = 'Demonstrate ' + title
+    tags = ['test', 'bootstrap']
+
+    def generate(self, request):
+        code = """
+p1 = Panel('Default panel')
+p2 = PanelPrimary('Primary panel')
+p3 = PanelSuccess('Panel 3 success with heading', PanelHeading('Panel 3 heading success'))
+p4 = PanelWarning('Panel 4 warning with heading and footer',
+                  PanelHeading('Panel 4 heading warning'),
+                  PanelFooter('Panel 4 footer'))
+content = RC((p1, p2, p3, p4))
+        """
+        p1 = Panel('Default panel')
+        p2 = PanelPrimary('Primary panel')
+        p3 = PanelSuccess('Panel 3 success with heading', PanelHeading('Panel 3 heading success'))
+        p4 = PanelWarning('Panel 4 warning with heading and footer',
+                          PanelHeading('Panel 4 heading warning'),
+                          PanelFooter('Panel 4 footer'))
+        content = RC((p1, p2, p3, p4))
+        content = page_content(self, code, content)
+        return content
+
+
 # class TestModal(DPage):
 #     """ Test Modal widget """
 #     title = 'Modal'
