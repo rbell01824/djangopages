@@ -378,54 +378,55 @@ content = Accordion((AccordionPanel('heading 1', 'content 1', expand=True),
         return content
 
 
-# class TestButton(DPage):
-#     """ Test Button widget """
-#     title = 'Buttons'
-#     description = 'Demonstrate ' + title
-#     tags = ['test', 'bootstrap', 'buttons']
-#
-#     def get(self, *args, **kwargs):
-#         code = """
-# btn = Button('Button 1', 'Button 2')
-# content = RC2M((btn,),
-#                (BTN('Success', button='btn-success btn-xs'),),
-#                (BTN('Default'), BTN('Large button', button='btn-lg')),
-#                (BTN('Button 6')+BTN('Button 7'),),
-#                style='margin-top:2px;')
-#
-# Note: These 6 lines of djangopage code generated approximately 170 lines of html! 30x productivity.
-#         """
-#
-#         # define content objects
-#         btn = Button('Button 1', 'Button 2')
-#         content = RC2M((btn,),
-#                        (BTN('Success', button='btn-success btn-xs'),),
-#                        (BTN('Default'), BTN('Large button', button='btn-lg')),
-#                        (BTN('Button 6')+BTN('Button 7'),),
-#                        style='margin-top:2px;')
-#         self.content = page_content(self, code, content)
-#         return self
-#
-#
-# class TestGlyphicons(DPage):
-#     """ Test Glyphicons widget """
-#     title = 'Glyphicons'
-#     description = 'Demonstrate ' + title
-#     tags = ['test', 'bootstrap', 'glyphicons', 'text']
-#
-#     def get(self, *args, **kwargs):
-#         code = """
-# content = RCM((Glyphicon('star'), GL('heart'), GL('music')),
-#               (GL('zoom-in'), GL('refresh'), GL('qrcode')))
-#         """
-#
-#         # define the content
-#         content = RC2M((T('Three glyphs on a line: '), Glyphicon('star'), GL('heart'), GL('music')),
-#                        (T('Two then one glyph on a line:'), GL('zoom-in', 'refresh'), GL('qrcode')))
-#         self.content = page_content(self, code, content)
-#         return self
-#
-#
+class TestButton(DPage):
+    """ Test Button widget """
+    title = 'Buttons'
+    description = 'Demonstrate ' + title
+    tags = ['test', 'bootstrap']
+
+    def generate(self, request):
+        code = """
+btn = Button(('Button 1', 'Button 2'))
+content = RC2((btn,
+               BTN('Success', button='btn-success btn-xs'),
+               BTN('Default') + BTN('Large info button', button='btn-lg btn-info'),
+               BTNXS('XSButton 6')+BTNXSSuccess('XS Sucess Button 7'),),
+              style='margin-top:2px;')
+
+Note: These 6 lines of djangopage code generated approximately 57 lines of html! 9x productivity!
+        """
+
+        btn = Button(('Button 1', 'Button 2'))
+        content = RC6((btn,
+                       BTN('Success', button='btn-success btn-xs'),
+                       BTN('Default') + BTN('Large info button', button='btn-lg btn-info'),
+                       BTNXS('XSButton 6')+BTNXSSuccess('XS Sucess Button 7'),),
+                      style='margin-top:2px;')
+        content = page_content(self, code, content)
+        return content
+
+
+class TestGlyphicons(DPage):
+    """ Test Glyphicons widget """
+    title = 'Glyphicons'
+    description = 'Demonstrate ' + title
+    tags = ['test', 'bootstrap']
+
+    def generate(self, *args, **kwargs):
+        code = """
+content = RC2((T('Three glyphs on a line: ') + Glyphicon('star') + GL('heart') + GL('music'),
+               T('Two then one glyph on a line:') + GL(('zoom-in', 'refresh')) + GL('qrcode'),
+               BTNSSuccess(GL('star')+'Success')))
+        """
+
+        content = RC2((T('Three glyphs on a line: ') + Glyphicon('star') + GL('heart') + GL('music'),
+                       T('Two then one glyph on a line:') + GL(('zoom-in', 'refresh')) + GL('qrcode'),
+                       BTNSSuccess(GL('star')+'Success')))
+        self.content = page_content(self, code, content)
+        content = page_content(self, code, content)
+        return content
+
+
 # class TestJumbotron(DPage):
 #     """ Test Jumbotron widget """
 #     title = 'Jumbotron'

@@ -84,7 +84,7 @@ def Accordion(accordion_panels):
 
 # noinspection PyPep8Naming
 class AccordionPanel(object):
-    """ Defines an accordion panel
+    """ Defines an accordion panel for use in Accordion.  See Accordion.
 
     .. sourcecode::
 
@@ -158,151 +158,135 @@ AccordionPanelWarning = functools.partial(AccordionPanel, panel_type='panel-warn
 AccordionPanelDanger = functools.partial(AccordionPanel, panel_type='panel-danger')
 
 
-# class AccordionM(DWidget):
-#     """
-#     .. sourcecode:: python
-#
-#         AccordionM('heading 1', 'content 1',
-#                    'heading 2', 'content 2',
-#                    ...)
-#
-#     :param heading: accordion panel heading
-#     :type heading: basestring or DWidget
-#     :param content: accordion panel content
-#     :type content: basestring or DWidget
-#     :param kwargs: standard kwargs
-#     :type kwargs: dict
-#
-#     .. note:: see http://jsfiddle.net/KyleMit/Wc4xt/
-#
-#     """
-#     template_top = '<!-- Accordion start -->' \
-#                    '  <div class="panel-group" id="{accordion_id}">\n' \
-#                    '    {panels}\n' \
-#                    '  </div>\n' \
-#                    '<!--Accordion end -->'
-#     template = '<!-- Accordion panel start -->\n' \
-#                '  <div class="panel panel-default">\n' \
-#                '    <div class="panel-heading">\n' \
-#                '      <h4 class="panel-title">\n' \
-#                '        <a data-toggle="collapse" data-target="#{panel_id}" href="#{panel_id}">\n' \
-#                '          {heading}\n' \
-#                '        </a>\n' \
-#                '      </h4>\n' \
-#                '    </div>\n' \
-#                '    <div id="{panel_id}" class="panel-collapse collapse">\n' \
-#                '      <div class="panel-body">\n' \
-#                '        {content}\n' \
-#                '      </div>\n' \
-#                '    </div>\n' \
-#                '  </div>\n' \
-#                '<!-- Accordion panel end -->'
-#
-# # .panel-heading a:after {
-# #     font-family: 'Glyphicons Halflings';
-# #     content: "\e114";
-# #     float: right;
-# #     color: grey;
-# # }
-# # .panel-heading a.collapsed:after {
-# #     content: "\e080";
-# # }
-#
-#     def __init__(self, *content, **kwargs):
-#         super(AccordionM, self).__init__(content, kwargs)
-#         return
-#
-#     def generate(self, template, content, classes, style, kwargs):
-#         assert isinstance(content, tuple)
-#         accordion_id = unique_name('aid')
-#         panels = ''
-#         for hd, con in zip(content[::2], content[1::2]):
-#             panel_id = unique_name('pid')
-#             panels += template.format(panel_id=panel_id,
-#                                       heading=hd,
-#                                       content=con)
-#         out = self.template_top.format(accordion_id=accordion_id,
-#                                        panels=panels)
-#         return out
-#
-#
-# class Button(DWidget):
-#     """
-#     .. sourcecode:: python
-#
-#         Button('Button 1', button='btn-success btn-sm')
-#
-#     | Synonym: BTN(...), useful abbreviation
-#
-#     :param content: content
-#     :type content: basestring or tuple or DWidget
-#     :param kwargs: standard kwargs
-#     :type kwargs: dict
-#
-#     additional kwargs
-#
-#     :param disabled: default False, if true button is disabled
-#     :type width: bool
-#     :param button: default 'btn-default', button definition per bootstrap
-#     :type type: str
-#     """
-#     template = '<!-- start of button -->\n' \
-#                '    <button type="button" {classes} {disabled} {style}>\n' \
-#                '        {content}\n' \
-#                '    </button>\n' \
-#                '<!-- end of button -->\n'
-#
-#     def __init__(self, *content, **kwargs):
-#         super(Button, self).__init__(content, kwargs)
-#         return
-#
-#     def generate(self, template, content, classes, style, kwargs):
-#         assert isinstance(content, tuple)
-#         disabled = kwargs.get('disabled', '')
-#         button = kwargs.get('button', 'btn-default')
-#         # make sure have a button type specified
-#         for t in ('btn-default', 'btn-primary', 'btn-success', 'btn-info', 'btn-warning', 'btn-danger', 'btn-link'):
-#             if t in button:
-#                 break
-#         else:
-#             button += ' btn-default'
-#         classes = self.add_classes(classes, 'btn {button}'.format(button=button))
-#         out = ''
-#         for c in content:
-#             out += template.format(content=c, classes=classes, style=style, disabled=disabled)
-#         return out
-# BTN = functools.partial(Button)
-#
-#
-# class Glyphicon(DWidget):
-#     """
-#     .. sourcecode:: python
-#
-#         Glyphicon('star')
-#
-#     | Synonym: GL(...), useful abbreviation
-#
-#     :param content: content
-#     :type content: basestring or tuple or DWidget
-#     :param kwargs: standard kwargs
-#     :type kwargs: dict
-#     """
-#     template = '<span {classes} {style}></span>'
-#
-#     def __init__(self, *content, **kwargs):
-#         super(Glyphicon, self).__init__(content, kwargs)
-#         return
-#
-#     def generate(self, template, content, classes, style, kwargs):
-#         assert isinstance(content, tuple)
-#         out = ''
-#         for c in content:
-#             gl_cls = self.add_classes(classes, 'glyphicon glyphicon-{}'.format(c))
-#             out += template.format(classes=gl_cls, style=style)
-#         return out
-# GL = functools.partial(Glyphicon)
-#
-#
+# noinspection PyPep8Naming
+def Button(text, button='btn-default', size='', disabled=False, classes='', style=''):
+    """ Bootstrap button
+
+    .. sourcecode:: python
+
+        Button('Button 1', button='btn-success btn-sm')
+
+    :param text: text
+    :type text: str or unicode or tuple
+    :param button: default 'btn-default', button type per bootstrap
+    :type button: str or unicode
+    :param size: default '', button size per bootstrap
+    :type size: str or unicode
+    :param disabled: default False, if true button is disabled
+    :type disabled: bool
+    :param classes: classes to add to output
+    :type classes: str or unicode
+    :param style: styles to add to output
+    :type style: str or unicode
+    :return: HTML for bootstrap button
+    :rtype: unicode
+
+    | Synonyms:
+    | BTN = functools.partial(Button)
+    | BTNPrimary = functools.partial(Button, button='btn-primary')
+    | BTNSuccess = functools.partial(Button, button='btn-success')
+    | BTNInfo = functools.partial(Button, button='btn-info')
+    | BTNWarning = functools.partial(Button, button='btn-warning')
+    | BTNDanger = functools.partial(Button, button='btn-danger')
+    | BTNL = functools.partial(Button, size='btn-lg')
+    | BTNLPrimary = functools.partial(Button, button='btn-primary', size='btn-lg')
+    | BTNLSuccess = functools.partial(Button, button='btn-success', size='btn-lg')
+    | BTNLInfo = functools.partial(Button, button='btn-info', size='btn-lg')
+    | BTNLWarning = functools.partial(Button, button='btn-warning', size='btn-lg')
+    | BTNLDanger = functools.partial(Button, button='btn-danger', size='btn-lg')
+    | BTNS = functools.partial(Button, size='btn-sm')
+    | BTNSPrimary = functools.partial(Button, button='btn-primary', size='btn-sm')
+    | BTNSSuccess = functools.partial(Button, button='btn-success', size='btn-sm')
+    | BTNSInfo = functools.partial(Button, button='btn-info', size='btn-sm')
+    | BTNSWarning = functools.partial(Button, button='btn-warning', size='btn-sm')
+    | BTNSDanger = functools.partial(Button, button='btn-danger', size='btn-sm')
+    | BTNXS = functools.partial(Button, size='btn-xs')
+    | BTNXSPrimary = functools.partial(Button, button='btn-primary', size='btn-xs')
+    | BTNXSSuccess = functools.partial(Button, button='btn-success', size='btn-xs')
+    | BTNXSInfo = functools.partial(Button, button='btn-info', size='btn-xs')
+    | BTNXSWarning = functools.partial(Button, button='btn-warning', size='btn-xs')
+    | BTNXSDanger = functools.partial(Button, button='btn-danger', size='btn-xs')
+    """
+    template = '<!-- start of button -->\n' \
+               '    <button type="button" {classes} {disabled} {style}>\n' \
+               '        {text}\n' \
+               '    </button>\n' \
+               '<!-- end of button -->\n'
+    if isinstance(text, (tuple, list)):
+        rtn = ''
+        for t in text:
+            rtn += Button(t, button, size, disabled, classes, style)
+        return rtn
+    if disabled:
+        disabled = 'disabled="disabled" '
+    classes = 'class="btn {button} {size} {classes}" '.format(button=button, size=size, classes=classes)
+    if style:
+        style = 'style="{}" '.format(style)
+    rtn = template.format(classes=classes, disabled=disabled, style=style, text=text)
+    return rtn
+BTN = functools.partial(Button)
+BTNPrimary = functools.partial(Button, button='btn-primary')
+BTNSuccess = functools.partial(Button, button='btn-success')
+BTNInfo = functools.partial(Button, button='btn-info')
+BTNWarning = functools.partial(Button, button='btn-warning')
+BTNDanger = functools.partial(Button, button='btn-danger')
+BTNL = functools.partial(Button, size='btn-lg')
+BTNLPrimary = functools.partial(Button, button='btn-primary', size='btn-lg')
+BTNLSuccess = functools.partial(Button, button='btn-success', size='btn-lg')
+BTNLInfo = functools.partial(Button, button='btn-info', size='btn-lg')
+BTNLWarning = functools.partial(Button, button='btn-warning', size='btn-lg')
+BTNLDanger = functools.partial(Button, button='btn-danger', size='btn-lg')
+BTNS = functools.partial(Button, size='btn-sm')
+BTNSPrimary = functools.partial(Button, button='btn-primary', size='btn-sm')
+BTNSSuccess = functools.partial(Button, button='btn-success', size='btn-sm')
+BTNSInfo = functools.partial(Button, button='btn-info', size='btn-sm')
+BTNSWarning = functools.partial(Button, button='btn-warning', size='btn-sm')
+BTNSDanger = functools.partial(Button, button='btn-danger', size='btn-sm')
+BTNXS = functools.partial(Button, size='btn-xs')
+BTNXSPrimary = functools.partial(Button, button='btn-primary', size='btn-xs')
+BTNXSSuccess = functools.partial(Button, button='btn-success', size='btn-xs')
+BTNXSInfo = functools.partial(Button, button='btn-info', size='btn-xs')
+BTNXSWarning = functools.partial(Button, button='btn-warning', size='btn-xs')
+BTNXSDanger = functools.partial(Button, button='btn-danger', size='btn-xs')
+
+
+# noinspection PyPep8Naming
+def Glyphicon(glyph, classes='', style=''):
+    """ Bootstrap glyphicon
+
+    .. sourcecode:: python
+
+        Glyphicon('star')
+        Glyphicon('glyphicon-star')
+
+    :param glyph: glyph name in the form 'simple_name' or 'glyphicon-simple_name'
+    :type glyph: str or unicode or tuple
+    :param classes: classes to add to output
+    :type classes: str or unicode
+    :param style: styles to add to output
+    :type style: str or unicode
+    :return: Glyphicon html
+    :rtype: unicode
+
+    | Synonym: GL(...), useful abbreviation
+    """
+
+    if isinstance(glyph, (tuple, list)):
+        rtn = ''
+        for g in glyph:
+            rtn += Glyphicon(g, classes, style)
+        return rtn
+    template = '<span {classes} {style}></span>'
+    if not glyph.startswith('glyphicon-'):
+        glyph = 'glyphicon-' + glyph
+    classes = 'class="glyphicon {glyph} {classes}" '.format(glyph=glyph, classes=classes)
+    if style:
+        style = 'style="{}" '.format(style)
+    rtn = template.format(classes=classes, style=style)
+    return rtn
+GL = functools.partial(Glyphicon)
+
+
 # class Jumbotron(DWidget):
 #     """
 #     .. sourcecode:: python
@@ -1028,3 +1012,50 @@ PanelDanger = functools.partial(Panel, panel_type='panel-danger')
 # #                          background_color=self.background_color)
 # #         # out += t_jsf.replace('{carousel_id}', self.id)
 # #         return out
+
+
+
+# todo 1: add dropdowns support http://getbootstrap.com/components/#dropdowns
+# todo 1: add button group support http://getbootstrap.com/components/#btn-groups
+# todo 1: add Button groups
+# todo 1: add Button dropdowns
+# todo 1: add Input groups
+# todo 1: add Navs
+# todo 1: add Navbar
+# todo 1: add Breadcrumbs
+# todo 1: add Pagination
+# todo 1: add Labels
+# todo 1: add Badges
+# todo 1: add Jumbotron
+# todo 1: add Page header
+# todo 1: add Thumbnails
+# todo 1: add Alerts
+# todo 1: add Progress bars
+# todo 1: add Media object
+# todo 1: add List group
+# todo 1: add Panels (need to finish)
+# todo 1: add Responsive embed
+# todo 1: add Wells
+# todo 1: add Modal
+# todo 1: add Dropdown
+# todo 1: add Scrollspy
+# todo 1: add Tab
+# todo 1: add Tooltip
+# todo 1: add Popover
+# todo 1: add Alert
+# todo 1: add Button
+# todo 1: add Collapse
+# todo 1: add Carousel
+# todo 1: add Affix
+# todo 1: add Grid system
+# todo 1: add Typography
+# todo 1: add Code
+# todo 1: add Tables
+# todo 1: add Forms
+# todo 1: add Buttons
+# todo 1: add Options
+# todo 1: add Sizes
+# todo 1: add Active state
+# todo 1: add Disabled state
+# todo 1: add Button tags
+# todo 1: add Images
