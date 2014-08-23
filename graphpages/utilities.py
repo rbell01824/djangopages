@@ -307,17 +307,6 @@ CHARTKICK_AFTER_HTML = """
 LEGAL_GRAPH_TYPES = ['line', 'pie', 'column', 'bar', 'area']
 
 
-def static_name_generator(base_name='x'):
-    """
-    Returns a unique name of the form base_name_counter
-    :param base_name:
-    """
-    if not hasattr(static_name_generator, "counter"):
-        static_name_generator.counter = 0  # it doesn't exist yet, so initialize it
-    static_name_generator.counter += 1
-    return '{}_{}'.format(base_name, static_name_generator.counter)
-
-
 class XGraphCK(object):
     """
     Graph object class for Chartkick.  Class that actually holds the graph object definition.

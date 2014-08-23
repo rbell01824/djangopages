@@ -27,6 +27,7 @@ content creation and layout.
    layout
    bootstrap3
    graphs
+   libs
    view
 
 Indices and tables

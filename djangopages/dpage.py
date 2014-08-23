@@ -64,10 +64,7 @@ __version__ = "0.1"
 __maintainer__ = "rbell01824"
 __email__ = "rbell01824@gmail.com"
 
-import functools
-
 from django.conf import settings
-from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic import View
 
@@ -269,11 +266,11 @@ class DPage(View):
         """
         return self.prev(obj), self.next(obj)
 
-# ########################################################################################################################
-# #
-# # Content classes and methods
-# #
-# ########################################################################################################################
+########################################################################################################################
+#
+# Content classes and methods
+#
+########################################################################################################################
 #
 #
 # class DWidget(object):
@@ -494,25 +491,3 @@ class DPage(View):
 #             out += r
 #     return out
 # XS = functools.partial(_renderstr)
-
-
-def unique_name(base_name='x'):
-    """ Returns a unique name of the form 'base_name'_counter.
-
-    .. sourcecode:: python
-
-        unique_name('basename')
-
-
-    :param base_name: the base name
-    :type base_name: str or unicode
-    :return: basename+n, ie. x0, x1, ...
-    :rtype: str
-
-    .. note:: This function is used by widgets and for other internal purposes to
-              create unique names for id(s) and other purposes.
-    """
-    if not hasattr(unique_name, "counter"):
-        unique_name.counter = 0  # it doesn't exist yet, so initialize it
-    unique_name.counter += 1
-    return '{}_{}'.format(base_name, unique_name.counter)

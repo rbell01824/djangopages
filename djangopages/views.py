@@ -412,7 +412,7 @@ class TestGlyphicons(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'bootstrap']
 
-    def generate(self, *args, **kwargs):
+    def generate(self, request):
         code = """
 content = RC2((T('Three glyphs on a line: ') + Glyphicon('star') + GL('heart') + GL('music'),
                T('Two then one glyph on a line:') + GL(('zoom-in', 'refresh')) + GL('qrcode'),
@@ -420,70 +420,95 @@ content = RC2((T('Three glyphs on a line: ') + Glyphicon('star') + GL('heart') +
         """
 
         content = RC2((T('Three glyphs on a line: ') + Glyphicon('star') + GL('heart') + GL('music'),
-                       T('Two then one glyph on a line:') + GL(('zoom-in', 'refresh')) + GL('qrcode'),
+                       (T('Two then one glyph on a line:'), GL(('zoom-in', 'refresh')), GL('qrcode')),
                        BTNSSuccess(GL('star')+'Success')))
-        self.content = page_content(self, code, content)
         content = page_content(self, code, content)
         return content
 
 
-# class TestJumbotron(DPage):
-#     """ Test Jumbotron widget """
-#     title = 'Jumbotron'
-#     description = 'Demonstrate ' + title
-#     tags = ['test', 'bootstrap', 'jumbotron', 'text']
-#
-#     def get(self, *args, **kwargs):
-#         code = escape("""
-# t = '#Heading\n' \
-#     'Some text after the heading.'
-# r1 = Jumbotron(MD(t))
-# r2 = Jumbotron(T(MD('#Jumbotron 2'), T('Some text'), Button('Button')))
-# content = RC(r1, r2)
-#         """)
-#
-#         # define the content
-#         t = '#Heading\n' \
-#             'Some text after the heading.'
-#         r1 = Jumbotron(MD(t))
-#         r2 = Jumbotron(T(MD('#Jumbotron 2'), T('Some text'), Button('Button')))
-#         content = RC(r1, r2)
-#         self.content = page_content(self, code, content)
-#         return self
-#
-#
-# class TestLabel(DPage):
-#     """ Test Label widget """
-#     title = 'Label'
-#     description = 'Demonstrate ' + title
-#     tags = ['test', 'bootstrap', 'label', 'text']
-#
-#     def get(self, *args, **kwargs):
-#         code = escape("""
-# r1 = Label('default', 'Default',
-#            'primary', 'Primary',
-#            'success', 'Success')
-# r2 = '<h3>Example heading'+XS(Label('default', 'New'))+'</h3>'
-# content = RC(r1, r2)
-#         """)
-#
-#         # define the content
-#         r1 = Label('default', 'Default',
-#                    'primary', 'Primary',
-#                    'success', 'Success')
-#         r2 = '<h3>Example heading'+XS(Label('default', 'New'))+'</h3>'
-#         content = RC(r1, r2)
-#         self.content = page_content(self, code, content)
-#         return self
-#
-#
+class TestJumbotron(DPage):
+    """ Test Jumbotron widget """
+    title = 'Jumbotron'
+    description = 'Demonstrate ' + title
+    tags = ['test', 'bootstrap']
+
+    def generate(self, request):
+        code = escape("""
+t = '#Heading\n' \
+    'Some text after the heading.'
+r1 = Jumbotron(MD(t))
+r2 = Jumbotron(T(MD('#Jumbotron 2'), T('Some text'), Button('Button')))
+content = RC(r1, r2)
+        """)
+
+        t = '#Heading\n' \
+            'Some text after the heading.'
+        r1 = Jumbotron(MD(t))
+        r2 = Jumbotron(MD('#Jumbotron 2') + 'Some text' + BTNSInfo('Button'))
+        content = RC((r1, r2))
+        content = page_content(self, code, content)
+        return content
+
+
+class TestLabel(DPage):
+    """ Test Label widget """
+    title = 'Label'
+    description = 'Demonstrate ' + title
+    tags = ['test', 'bootstrap']
+
+    def generate(self, request):
+        code = escape("""
+r1 = Label('default', 'Default',
+           'primary', 'Primary',
+           'success', 'Success')
+r2 = '<h3>Example heading'+XS(Label('default', 'New'))+'</h3>'
+content = RC(r1, r2)
+        """)
+
+        content = RC('<h3>Example label ' + Label('New') + '</h3>')
+        content = page_content(self, code, content)
+        return content
+
+
+class TestHn(DPage):
+    """ Test Hn widget """
+    title = 'Hn'
+    description = 'Demonstrate ' + title
+    tags = ['test', 'bootstrap']
+
+    def generate(self, request):
+        code = escape("""
+content = RC(H3('Level 3 heading'))
+        """)
+
+        content = RC(H3('Level 3 heading'))
+        content = page_content(self, code, content)
+        return content
+
+
+class TestSmall(DPage):
+    """ Test Small widget """
+    title = 'Small'
+    description = 'Demonstrate ' + title
+    tags = ['test', 'bootstrap']
+
+    def generate(self, request):
+        code = escape("""
+content = RC(H3('Level 3 heading'+Small(' subheading text')))
+        """)
+
+        content = RC(H3('Level 3 heading'+Small(' subheading text')))
+        content = page_content(self, code, content)
+        return content
+
+
 # class TestLink(DPage):
 #     """ Test Link widget """
 #     title = 'Link'
 #     description = 'Demonstrate ' + title
 #     tags = ['test', 'bootstrap', 'link']
 #
-#     def get(self, *args, **kwargs):
+#     def generate(self, request):
 #         code = """
 # # define content objects
 # r1 = Link('/dpages/DPagesList', 'DPagesList link')
@@ -523,7 +548,7 @@ content = RC2((T('Three glyphs on a line: ') + Glyphicon('star') + GL('heart') +
 #     description = 'Demonstrate ' + title
 #     tags = ['test', 'bootstrap', 'modal']
 #
-#     def get(self, *args, **kwargs):
+#     def generate(self, request):
 #         code = escape("""
 # mt = MD('####Modal title')
 # mb = T(MD('**Body**'), LI(5, 5, 5, 2))
@@ -556,7 +581,7 @@ content = RC2((T('Three glyphs on a line: ') + Glyphicon('star') + GL('heart') +
 #     description = 'Demonstrate ' + title
 #     tags = ['test', 'bootstrap', 'panel']
 #
-#     def get(self, *args, **kwargs):
+#     def generate(self, request):
 #         code = escape("""
 # r1 = Panel(MD('Panel text 1'), '')
 # r2 = Panel(MD('Panel text 2'), MD('####Panel heading 2'))
@@ -582,7 +607,7 @@ content = RC2((T('Three glyphs on a line: ') + Glyphicon('star') + GL('heart') +
 #     description = 'Demonstrate ' + title
 #     tags = ['test', 'bootstrap', 'accordion']
 #
-#     def get(self, *args, **kwargs):
+#     def generate(self, request):
 #         code = escape("""
 # # define content objects
 # r1 = Accordion('Heading 1', LI(5,6),
@@ -610,7 +635,7 @@ content = RC2((T('Three glyphs on a line: ') + Glyphicon('star') + GL('heart') +
 #     description = 'Demonstrate ' + title
 #     tags = ['test', 'bootstrap', 'accordionm']
 #
-#     def get(self, *args, **kwargs):
+#     def generate(self, request):
 #         code = escape("""
 # # define content objects
 # r1 = Accordion('Heading 1', LI(5,6),
@@ -638,7 +663,7 @@ content = RC2((T('Three glyphs on a line: ') + Glyphicon('star') + GL('heart') +
 #     description = 'Demonstrate ' + title
 #     tags = ['test', 'graphs']
 #
-#     def get(self, *args, **kwargs):
+#     def generate(self, request):
 #         code = """
 # #
 # # see example source for data definitions
@@ -776,7 +801,7 @@ content = RC2((T('Three glyphs on a line: ') + Glyphicon('star') + GL('heart') +
 #     description = 'Demonstrate ' + title
 #     tags = ['test', 'graphs']
 #
-#     def get(self, *args, **kwargs):
+#     def generate(self, request):
 #         code = """
 # browser_stats = [['Chrome', 52.9],
 #                  ['Firefox', 27.7],
@@ -824,7 +849,7 @@ content = RC2((T('Three glyphs on a line: ') + Glyphicon('star') + GL('heart') +
 #     description = 'Demonstrate ' + title
 #     tags = ['test', 'graphs']
 #
-#     def get(self, *args, **kwargs):
+#     def generate(self, request):
 #         code = """
 # browser_stats = [['Chrome', 52.9], ['Firefox', 27.7], ['Opera', 1.6], ['Internet Explorer', 12.6], ['Safari', 4]]
 #
@@ -872,7 +897,7 @@ content = RC2((T('Three glyphs on a line: ') + Glyphicon('star') + GL('heart') +
 #     description = 'Demonstrate ' + title
 #     tags = ['test', 'graphs']
 #
-#     def get(self, *args, **kwargs):
+#     def generate(self, request):
 #         code = """
 #
 #         """

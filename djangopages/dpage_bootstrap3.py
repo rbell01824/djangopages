@@ -34,7 +34,7 @@ __email__ = 'rbell01824@gmail.com'
 import functools
 
 # noinspection PyProtectedMember
-from djangopages.dpage import unique_name
+from djangopages.libs import unique_name
 
 ########################################################################################################################
 #
@@ -287,62 +287,168 @@ def Glyphicon(glyph, classes='', style=''):
 GL = functools.partial(Glyphicon)
 
 
-# class Jumbotron(DWidget):
-#     """
-#     .. sourcecode:: python
-#
-#         Jumbotro('Jumbotron content')
-#
-#     :param content: content
-#     :type content: basestring or tuple or DWidget
-#     :param kwargs: standard kwargs
-#     :type kwargs: dict
-#     """
-#     template = '<!-- jumbotron start -->' \
-#                '<div class="jumbotron">\n' \
-#                '{content}\n' \
-#                '</div>\n' \
-#                '<!-- jumbotron end -->'
-#
-#     def __init__(self, *content, **kwargs):
-#         super(Jumbotron, self).__init__(content, kwargs)
-#         return
-#
-#     def generate(self, template, content, classes, style, kwargs):
-#         assert isinstance(content, tuple)
-#         out = ''
-#         for con in content:
-#             out += template.format(classes=classes, style=style, content=con)
-#         return out
-#
-#
-# class Label(DWidget):
-#     """
-#     .. sourcecode:: python
-#
-#         Label('default', 'text of default label',
-#               'primary', 'text of primary label')
-#
-#     :param content: content, label_type, label_text, ...
-#     :type content: basestring or tuple or DWidget
-#     :param kwargs: standard kwargs
-#     :type kwargs: dict
-#     """
-#     template = '<span {classes} {style}>{content}</span>'
-#
-#     def __init__(self, *content, **kwargs):
-#         super(Label, self).__init__(content, kwargs)
-#         return
-#
-#     def generate(self, template, content, classes, style, kwargs):
-#         assert isinstance(content, tuple)
-#         out = ''
-#         for typ, con in zip(content[::2], content[1::2]):
-#             cls = self.add_classes(classes, 'label label-{}'.format(typ))
-#             out += template.format(classes=cls, style=style, content=con)
-#         return out
-#
-#
+# noinspection PyPep8Naming
+def Hn(heading, level=3, classes='', style=''):
+    """ HTML heading
+
+    .. sourcecode:: python
+
+        Hn('Header text')
+        Hn('Header text' + Small('subtext'), level=2)
+
+    :param heading: heading text
+    :type heading: str or unicode
+    :param level: heading level
+    :type level: int
+    :param classes: classes to add to output
+    :type classes: str or unicode
+    :param style: styles to add to output
+    :type style: str or unicode
+    :return: HTML H html
+    :rtype: unicode
+
+    | Synonyms:
+    | H1 = functools.partial(Hn, level=1)
+    | H2 = functools.partial(Hn, level=2)
+    | H3 = functools.partial(Hn, level=3)
+    | H4 = functools.partial(Hn, level=4)
+    | H5 = functools.partial(Hn, level=5)
+    | H6 = functools.partial(Hn, level=6)
+    """
+    if isinstance(heading, (list, tuple)):
+        rtn = ''
+        for h in heading:
+            rtn += Hn(h, level, classes, style)
+        return rtn
+    template = '<h{level} {classes} {style}>\n' \
+               '    {heading}\n' \
+               '</h{level}>'
+    if classes:
+        classes = 'class="{}" '.format(classes)
+    if style:
+        style = 'style="{}" '.format(style)
+    level = str(level)
+    rtn = template.format(level=level, classes=classes, style=style, heading=heading)
+    return rtn
+H1 = functools.partial(Hn, level=1)
+H2 = functools.partial(Hn, level=2)
+H3 = functools.partial(Hn, level=3)
+H4 = functools.partial(Hn, level=4)
+H5 = functools.partial(Hn, level=5)
+H6 = functools.partial(Hn, level=6)
+
+
+# noinspection PyPep8Naming
+def Header(heading, classes='', style=''):
+    """ Bootstrap page-header component
+
+    .. sourcecode:: python
+
+        Header('Header text')
+        Header(H3('heading'+Small('subheading'))
+
+    :param heading: heading HTML
+    :type heading: str or unicode
+    :param classes: classes to add to output
+    :type classes: str or unicode
+    :param style: styles to add to output
+    :type style: str or unicode
+    :return: Header html
+    :rtype: unicode
+    """
+    if isinstance(heading, (tuple, list)):
+        rtn = ''
+        for h in heading:
+            rtn += Header(h, classes, style)
+        return rtn
+
+    template = '<!-- header start -->\n' \
+               '    <div class="page-header">\n' \
+               '        {heading}\n' \
+               '    </div>' \
+               '<!-- header end -->\n'
+    if classes:
+        classes = 'class="{}" '.format(classes)
+    if style:
+        style = 'style="{}" '.format(style)
+    rtn = template.format(classes=classes, style=style, heading=heading)
+    return rtn
+
+
+# noinspection PyPep8Naming
+def Jumbotron(content, classes='', style=''):
+    """ Bbootstrap jumbotron
+
+    .. sourcecode:: python
+
+        Jumbotro('Jumbotron content')
+        Jumbotron(MD('#Jumbotron 2') + 'Some text' + BTNSInfo('Button'))
+
+    :param content: content
+    :type content: basestring or tuple or DWidget
+    :param classes: classes to add to output
+    :type classes: str or unicode
+    :param style: styles to add to output
+    :type style: str or unicode
+    :return: Glyphicon html
+    :rtype: unicode
+    """
+    if isinstance(content, (tuple, list)):
+        rtn = ''
+        for c in content:
+            rtn += Jumbotron(c, classes, style)
+        return rtn
+    template = '<!-- jumbotron start -->' \
+               '<div class="jumbotron">\n' \
+               '{content}\n' \
+               '</div>\n' \
+               '<!-- jumbotron end -->'
+    assert isinstance(content, (str, unicode))
+    if classes:
+        classes = 'class="{}" '.format(classes)
+    if style:
+        style = 'style="{}" '.format(style)
+    rtn = template.format(classes=classes, style=style, content=content)
+    return rtn
+
+
+# noinspection PyPep8Naming
+def Label(content, label_type='label-default', classes='', style=''):
+    """ Bootstrap label
+
+    .. sourcecode:: python
+
+        Label('default', 'text of default label',
+              'primary', 'text of primary label')
+
+    :param content: content, label_type, label_text, ...
+    :type content: basestring or tuple or DWidget
+    :param label_type: label type in the form 'simple_label' or 'label-simple_label'
+    :type label_type: str or unicode
+    :param classes: classes to add to output
+    :type classes: str or unicode
+    :param style: styles to add to output
+    :type style: str or unicode
+    :return: label html
+    :rtype: unicode
+    """
+
+    if isinstance(content, (list, tuple)):
+        rtn = ''
+        for c in content:
+            rtn += Label(c, label_type, classes, style)
+        return rtn
+
+    template = '<span {classes} {style}>{content}</span>'
+    if not label_type.startswith('label-'):
+        label_type = 'label-' + label_type
+    classes = 'class="label {label_type} {classes}" '.format(label_type=label_type, classes=classes)
+    if style:
+        style = 'style="{}" '.format(style)
+    rtn = template.format(content=content, classes=classes, style=style)
+    return rtn
+
+
 # class Link(DWidget):
 #     """
 #     .. sourcecode:: python
@@ -376,7 +482,8 @@ GL = functools.partial(Glyphicon)
 #         role = ''
 #         if button:
 #             # make sure have a button type specified
-#             for t in ('btn-default', 'btn-primary', 'btn-success', 'btn-info', 'btn-warning', 'btn-danger', 'btn-link'):
+#             for t in ('btn-default', 'btn-primary', 'btn-success', 'btn-info', 'btn-warning',
+#                   'btn-danger', 'btn-link'):
 #                 if t in button:
 #                     break
 #             else:
@@ -575,7 +682,35 @@ PanelDanger = functools.partial(Panel, panel_type='panel-danger')
 #                               modal_size=modal_size,
 #                               button=button, button_type=button_type)
 #         return out
-#
+
+
+# noinspection PyPep8Naming
+def Small(text, classes='', style=''):
+    """
+    :param text: text to wrap
+    :type text: str or unicode
+    :param classes: classes to add to output
+    :type classes: str or unicode
+    :param style: styles to add to output
+    :type style: str or unicode
+    :return: small html
+    :rtype: unicode
+    """
+    if isinstance(text, (list, tuple)):
+        rtn = ''
+        for t in text:
+            rtn += Small(t, classes, style)
+        return rtn
+    template = '<small {classes} {style}>\n' \
+               '    {text}\n' \
+               '</small>\n'
+    if classes:
+        classes = 'class="{}" '.format(classes)
+    if style:
+        style = 'style="{}" '.format(style)
+    rtn = template.format(classes=classes, style=style, text=text)
+    return rtn
+
 # ################################################################################
 # ################################################################################
 #

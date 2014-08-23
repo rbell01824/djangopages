@@ -1,7 +1,16 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-""" Some description here
+"""
+
+Libs
+****
+
+.. module:: libs
+    :synopsis: support libs for DjangoPages
+
+
+.. moduleauthor:: Richard Bell <rbell01824@gmail.com>
 
 5/14/14 - Initial creation
 
@@ -162,14 +171,49 @@ def dict_nested_set(dic, key, value):
 ########################################################################################################################
 
 
-def static_name_generator(base_name='x'):
-    """
-    Returns a unique name of the form base_name_counter
+def unique_name(base_name='x'):
+    """ Returns a unique name of the form 'base_name'_counter.
 
-    :param base_name:
-    """
-    if not hasattr(static_name_generator, "counter"):
-        static_name_generator.counter = 0  # it doesn't exist yet, so initialize it
-    static_name_generator.counter += 1
-    return '{}_{}'.format(base_name, static_name_generator.counter)
+    .. sourcecode:: python
 
+        unique_name('basename')
+
+
+    :param base_name: the base name
+    :type base_name: str or unicode
+    :return: basename+n, ie. x0, x1, ...
+    :rtype: str
+
+    .. note:: This function is used by widgets and for other internal purposes to
+              create unique names for id(s) and other purposes.
+    """
+    if not hasattr(unique_name, "counter"):
+        unique_name.counter = 0  # it doesn't exist yet, so initialize it
+    unique_name.counter += 1
+    return '{}_{}'.format(base_name, unique_name.counter)
+
+# todo 3: consider using these instead of inline code.  somewhat briefer but opaque
+# def set_classes_style(classes, style, extra_classes=''):
+#     if classes or extra_classes:
+#         if extra_classes:
+#             extra_classes += ' '
+#         classes = 'class="{extra_classes}{classes}" '.format(classes=classes, extra_classes=extra_classes)
+#     if style:
+#         style = 'style="{}" '.format(style)
+#     return classes, style
+#
+#
+# def process_iterable(iterable, function, *arguments, **kwargs):
+#     print arguments
+#     print kwargs
+#     # noinspection PyBroadException
+#     if isinstance(iterable, basestring):
+#         return ''
+#     try:
+#         rtn = ''
+#         for i in iterable:
+#             rtn += function(i, *arguments, **kwargs)
+#             pass
+#         return rtn
+#     except:
+#         return ''
