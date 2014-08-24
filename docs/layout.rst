@@ -1,4 +1,4 @@
 .. DjangoPages layout widgets.
 
-.. automodule:: djangopages.dpage_layout
+.. automodule:: djangopages.widgets.dpage_layout
     :members:

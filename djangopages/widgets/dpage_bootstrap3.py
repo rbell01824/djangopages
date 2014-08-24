@@ -86,9 +86,9 @@ def Accordion(accordion_panels):
 class AccordionPanel(object):
     """ Defines an accordion panel for use in Accordion.  See Accordion.
 
-    .. sourcecode::
+    .. sourcecode:: python
 
-        AccordinPanel('Panel title', 'Panel body')
+        AccordionPanel('Panel title', 'Panel body')
 
     :param title: Panel title
     :type title: str or unicode

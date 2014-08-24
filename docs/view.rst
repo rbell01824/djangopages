@@ -1,6 +1,6 @@
 .. DjangoPages views.
 
-.. automodule:: djangopages.views
+.. automodule:: djangopages.pages.views
     :members:
 
 

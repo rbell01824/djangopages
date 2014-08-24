@@ -3,7 +3,7 @@
 Widgets
 +++++++
 
-Widgets create content for DjangoPages. For example::
+Widgets create content, including layouts, for DjangoPages. For example::
 
     Text(('Paragraph 1 text', 'Paragraph 2 text'), para=True)       # outputs two paragraphs
     Text('Sentence 1')                                              # outputs 'Sentence 1'
@@ -16,7 +16,7 @@ Widgets may contain other widgets. A DjangoPage will commonly contain code like 
            )
 
 
-Widgets typically look something like this::
+Widget implementations typically look something like this::
 
     # noinspection PyPep8Naming
     def Text(content, para=False, classes='', style='', template=None):
@@ -59,4 +59,7 @@ Widgets typically look something like this::
     T = functools.partial(Text)
     HTML = functools.partial(Text)
 
-You can see many examples DWidget examples in djangopages.dpage_texthtml.py and related modules.
+Widgets ultimately are responsible for returning well formed error free HTML based on the widget's
+arguments. Widgets are rather simple code generators and you are free to create/extend widgets.
+
+You can see many examples DWidget examples in djangopages.widgets.dpage_texthtml.py and related modules.

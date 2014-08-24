@@ -1,4 +1,4 @@
 .. DjangoPages text widgets.
 
-.. automodule:: djangopages.dpage_texthtml
+.. automodule:: djangopages.widgets.dpage_texthtml
     :members:
