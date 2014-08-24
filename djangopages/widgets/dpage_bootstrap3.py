@@ -651,81 +651,85 @@ PanelWarning = functools.partial(Panel, panel_type='panel-warning')
 PanelDanger = functools.partial(Panel, panel_type='panel-danger')
 
 
-# class Modal(DWidget):
-#     """
-#     .. sourcecode:: python
-#
-#         Modal( heading='', body='', footer='', button='Show', modal_size='', button_type='btn-primary', **kwargs):
-#
-#     :param heading: heading for modal panel
-#     :type heading: basestring or DWidget
-#     :param body: body for modal panel
-#     :type body: basestring or DWidget
-#     :param footer: footer modal panel
-#     :type footer: basestring or DWidget
-#     :param button: text for modal button
-#     :type button: basestring or DWidget
-#     :param modal_size: modal size per bootstrap
-#     :type modal_size: basestring or DWidget
-#     :param button_type: button type
-#     :type button_type: basestring or DWidget
-#     :param kwargs: standard kwargs
-#     :type kwargs: dict
-#     """
-#     template = """
-# <!-- Button trigger modal -->
-# <button class="btn {button_type}" data-toggle="modal" data-target="#{modal_id}">
-#   {button}
-# </button>
-# <!-- / Button trigger modal -->
-#
-# <!-- .modal -->
-# <div class="modal fade " id={modal_id} tabindex="-1" role="dialog" aria-labelledby="{modal_label}" aria-hidden="true">
-#   <!-- .modal-dialog -->
-#   <div class="modal-dialog {modal_size}">
-#     <!-- .modal-content -->
-#     <div class="modal-content">
-#       <!-- .modal-header -->
-#       <div class="modal-header">
-#         <button type="button" class="close" data-dismiss="modal">
-#           <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
-#         </button>
-#         <h4 class="modal-title" id={modal_label}>{heading}</h4>
-#       </div>
-#       <!-- /.modal-header -->
-#       <!-- .modal-body -->
-#       <div class="modal-body">
-#         {body}
-#       </div>
-#       <!-- /.modal-body -->
-#       <!-- .modal-footer -->
-#       <div class="modal-footer">
-#         {footer}
-#       </div>
-#       <!-- /.modal-footer -->
-#     </div>
-#     <!-- /.modal-content -->
-#   </div>
-#   <!-- /.modal-dialog -->
-# </div>
-# <!-- /.modal -->
-#     """
-#
-#     def __init__(self, heading='', body='', footer='',
-#                  button='Show', modal_size='', button_type='btn-primary', **kwargs):
-#         super(Modal, self).__init__((heading, body, footer, button, modal_size, button_type), kwargs)
-#         return
-#
-#     def generate(self, template, content, classes, style, kwargs):
-#         assert isinstance(content, tuple)
-#         heading, body, footer, button, modal_size, button_type = content[0:7]
-#         modal_id = unique_name('id_m_')
-#         modal_label = unique_name('lbl_m_')
-#         out = template.format(heading=heading, body=body, footer=footer,
-#                               modal_id=modal_id, modal_label=modal_label,
-#                               modal_size=modal_size,
-#                               button=button, button_type=button_type)
-#         return out
+# noinspection PyPep8Naming
+def Modal(heading='', body='', footer='', button='Show', modal_size=''):
+    """ Bootstrap modal
+
+    .. sourcecode:: python
+
+        Modal( heading='', body='', footer='', button='Show', modal_size='', button_type='btn-primary', **kwargs):
+
+    :param heading: heading for modal panel
+    :type heading: str or unicode
+    :param body: body for modal panel
+    :type body: str or unicode
+    :param footer: footer modal panel
+    :type footer: str or unicode
+    :param button: text for modal button or ModalButton object
+    :type button: str or unicode or ModalButton
+    :param modal_size: modal size per bootstrap
+    :type modal_size: str or unicode
+    """
+    template = """
+<!-- Button trigger modal -->
+<button class="btn {button_type}" data-toggle="modal" data-target="#{modal_id}">
+  {button}
+</button>
+<!-- / Button trigger modal -->
+
+<!-- .modal -->
+<div class="modal fade " id={modal_id} tabindex="-1" role="dialog" aria-labelledby="{modal_label}" aria-hidden="true">
+  <!-- .modal-dialog -->
+  <div class="modal-dialog {modal_size}">
+    <!-- .modal-content -->
+    <div class="modal-content">
+      <!-- .modal-header -->
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">
+          <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+        </button>
+        <h4 class="modal-title" id={modal_label}>{heading}</h4>
+      </div>
+      <!-- /.modal-header -->
+      <!-- .modal-body -->
+      <div class="modal-body">
+        {body}
+      </div>
+      <!-- /.modal-body -->
+      <!-- .modal-footer -->
+      <div class="modal-footer">
+        {footer}
+      </div>
+      <!-- /.modal-footer -->
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+    """
+    modal_id = unique_name('id_m_')
+    modal_label = unique_name('lbl_m_')
+    out = template.format(heading=heading, body=body, footer=footer,
+                          modal_id=modal_id, modal_label=modal_label,
+                          modal_size=modal_size,
+                          button=button, button_type=button_type)
+    return out
+
+
+class ModalButton(object):
+    """ Modal button definition """
+    def __index__(self, button='btn-default', size='', disabled=False, classes='', style=''):
+        self.button = button
+        self.size = size
+        self.disabled = disabled
+        self.classes = classes
+        self.style = style
+        return
+
+    def generate(self):
+        rtn = ''
+        return rtn
 
 
 # noinspection PyPep8Naming

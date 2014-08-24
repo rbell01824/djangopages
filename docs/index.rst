@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Welcome to DjangoPages's documentation!
-=======================================
+***************************************
 
 **DjangoPages** provides a set of technologies to quickly and easily create rich DB driven responsive
 web pages with graphs, tables, forms, and other elements.
