@@ -441,7 +441,8 @@ class TestHeader(DPage):
 content = Header(H2('Level 2 heading'+Small(' subheading text')))
         """)
 
-        content = Header(H2('Level 2 heading'+Small(' subheading text')))
+        content = Header((H2('Level 2 heading'+Small(' subheading text')),
+                          H3('Level 3 heading')))
         content = page_content(self, code, content)
         return content
 

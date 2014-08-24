@@ -223,9 +223,9 @@ class RowColumn(DWidget):
         if isinstance(content, tuple):
             rtn = ''
             for c in content:
-                rtn += Row(Column(c, width, classes, style, template))
+                rtn += Row(Column(c, width, classes, style, template)).render()
             return rtn
-        rtn = Row(Column(content, width, classes, style, template))
+        rtn = Row(Column(content, width, classes, style, template)).render()
         return rtn
 RC = functools.partial(RowColumn, width=12)
 RC1 = functools.partial(RowColumn, width=1)

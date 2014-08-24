@@ -118,6 +118,8 @@ class DWidget(object):
             args += (_render(a),)
         out = self.generate(*args)
         # log.debug('##### done dwidget render')
+        # if isinstance(out, DWidget):
+        #     out = out.render()
         return out
 
     def generate(self, template, content, classes, style, kwargs):
@@ -199,6 +201,40 @@ class DWidget(object):
     #     if existing == '':
     #         return 'style="{}"'.format(new)
     #     return existing[:-1] + ' ' + new + '"'
+
+
+# class DWidgetSimple(DWidget):
+#     """ Base class for simple widgets """
+#     def __init__(self, template, tformat, content, classes, style):
+#         super(DWidgetSimple, self).__init__(template, tformat, content, classes, style)
+#         return
+#
+#     # noinspection PyMethodOverriding
+#     def generate(self, template, tformat, content, classes, style):
+#         """ HTML heading
+#
+#         :param tremplate: widget template
+#         :type tremplate: str or unicode
+#         :param content: content text
+#         :type content: str or unicode
+#         :param classes: classes to add to output
+#         :type classes: str or unicode
+#         :param style: styles to add to output
+#         :type style: str or unicode
+#         :return: HTML H html
+#         :rtype: unicode
+#         """
+#         if isinstance(content, (list, tuple)):
+#             rtn = ''
+#             for c in content:
+#                 rtn += self.__class__(c, classes, style).render()
+#             return rtn
+#         if classes:
+#             classes = 'class="{}" '.format(classes)
+#         if style:
+#             style = 'style="{}" '.format(style)
+#         rtn = template.format(**tformat)
+#         return rtn
 
 ########################################################################################################################
 #

@@ -171,30 +171,14 @@ AccordionPanelWarning = functools.partial(AccordionPanel, panel_type='panel-warn
 AccordionPanelDanger = functools.partial(AccordionPanel, panel_type='panel-danger')
 
 
-# noinspection PyPep8Naming
-def Button(text, button='btn-default', size='', disabled=False, classes='', style=''):
+class Button(DWidget):
     """ Bootstrap button
 
     .. sourcecode:: python
 
         Button('Button 1', button='btn-success btn-sm')
 
-    :param text: text
-    :type text: str or unicode or tuple
-    :param button: default 'btn-default', button type per bootstrap
-    :type button: str or unicode
-    :param size: default '', button size per bootstrap
-    :type size: str or unicode
-    :param disabled: default False, if true button is disabled
-    :type disabled: bool
-    :param classes: classes to add to output
-    :type classes: str or unicode
-    :param style: styles to add to output
-    :type style: str or unicode
-    :return: HTML for bootstrap button
-    :rtype: unicode
-
-    | Synonyms:
+    | Shortcuts:
     | BTN = functools.partial(Button)
     | BTNPrimary = functools.partial(Button, button='btn-primary')
     | BTNSuccess = functools.partial(Button, button='btn-success')
@@ -220,23 +204,48 @@ def Button(text, button='btn-default', size='', disabled=False, classes='', styl
     | BTNXSWarning = functools.partial(Button, button='btn-warning', size='btn-xs')
     | BTNXSDanger = functools.partial(Button, button='btn-danger', size='btn-xs')
     """
-    template = '<!-- start of button -->\n' \
-               '    <button type="button" {classes} {disabled} {style}>\n' \
-               '        {text}\n' \
-               '    </button>\n' \
-               '<!-- end of button -->\n'
-    if isinstance(text, (tuple, list)):
-        rtn = ''
-        for t in text:
-            rtn += Button(t, button, size, disabled, classes, style)
+
+    def __init__(self, text, button='btn-default', size='', disabled=False, classes='', style=''):
+        super(Button, self).__init__(text, button, size, disabled, classes, style)
+        return
+
+    # noinspection PyMethodOverriding
+    @staticmethod
+    def generate(text, button, size, disabled, classes, style):
+        """ Bootstrap button
+
+        :param text: text
+        :type text: str or unicode or tuple
+        :param button: default 'btn-default', button type per bootstrap
+        :type button: str or unicode
+        :param size: default '', button size per bootstrap
+        :type size: str or unicode
+        :param disabled: default False, if true button is disabled
+        :type disabled: bool
+        :param classes: classes to add to output
+        :type classes: str or unicode
+        :param style: styles to add to output
+        :type style: str or unicode
+        :return: HTML for bootstrap button
+        :rtype: unicode
+        """
+        template = '<!-- start of button -->\n' \
+                   '    <button type="button" {classes} {disabled} {style}>\n' \
+                   '        {text}\n' \
+                   '    </button>\n' \
+                   '<!-- end of button -->\n'
+        if isinstance(text, (tuple, list)):
+            rtn = ''
+            for t in text:
+                rtn += Button(t, button, size, disabled, classes, style)
+            return rtn
+        if disabled:
+            disabled = 'disabled="disabled" '
+        classes = 'class="btn {button} {size} {classes}" '.format(button=button, size=size, classes=classes)
+        if style:
+            style = 'style="{}" '.format(style)
+        rtn = template.format(classes=classes, disabled=disabled, style=style, text=text)
         return rtn
-    if disabled:
-        disabled = 'disabled="disabled" '
-    classes = 'class="btn {button} {size} {classes}" '.format(button=button, size=size, classes=classes)
-    if style:
-        style = 'style="{}" '.format(style)
-    rtn = template.format(classes=classes, disabled=disabled, style=style, text=text)
-    return rtn
 BTN = functools.partial(Button)
 BTNPrimary = functools.partial(Button, button='btn-primary')
 BTNSuccess = functools.partial(Button, button='btn-success')
@@ -263,8 +272,7 @@ BTNXSWarning = functools.partial(Button, button='btn-warning', size='btn-xs')
 BTNXSDanger = functools.partial(Button, button='btn-danger', size='btn-xs')
 
 
-# noinspection PyPep8Naming
-def Glyphicon(glyph, classes='', style=''):
+class Glyphicon(DWidget):
     """ Bootstrap glyphicon
 
     .. sourcecode:: python
@@ -272,53 +280,50 @@ def Glyphicon(glyph, classes='', style=''):
         Glyphicon('star')
         Glyphicon('glyphicon-star')
 
-    :param glyph: glyph name in the form 'simple_name' or 'glyphicon-simple_name'
-    :type glyph: str or unicode or tuple
-    :param classes: classes to add to output
-    :type classes: str or unicode
-    :param style: styles to add to output
-    :type style: str or unicode
-    :return: Glyphicon html
-    :rtype: unicode
-
-    | Synonym: GL(...), useful abbreviation
+    | Shortcut: GL(...), useful abbreviation
     """
+    def __init__(self, glyph, classes='', style=''):
+        super(Glyphicon, self).__init__(glyph, classes, style)
+        return
 
-    if isinstance(glyph, (tuple, list)):
-        rtn = ''
-        for g in glyph:
-            rtn += Glyphicon(g, classes, style)
+    # noinspection PyMethodOverriding
+    @staticmethod
+    def generate(glyph, classes, style):
+        """ Bootstrap glyphicon
+
+        :param glyph: glyph name in the form 'simple_name' or 'glyphicon-simple_name'
+        :type glyph: str or unicode or tuple
+        :param classes: classes to add to output
+        :type classes: str or unicode
+        :param style: styles to add to output
+        :type style: str or unicode
+        :return: Glyphicon html
+        :rtype: unicode
+        """
+
+        if isinstance(glyph, (tuple, list)):
+            rtn = ''
+            for g in glyph:
+                rtn += Glyphicon(g, classes, style)
+            return rtn
+        template = '<span {classes} {style}></span>'
+        if not glyph.startswith('glyphicon-'):
+            glyph = 'glyphicon-' + glyph
+        classes = 'class="glyphicon {glyph} {classes}" '.format(glyph=glyph, classes=classes)
+        if style:
+            style = 'style="{}" '.format(style)
+        rtn = template.format(classes=classes, style=style)
         return rtn
-    template = '<span {classes} {style}></span>'
-    if not glyph.startswith('glyphicon-'):
-        glyph = 'glyphicon-' + glyph
-    classes = 'class="glyphicon {glyph} {classes}" '.format(glyph=glyph, classes=classes)
-    if style:
-        style = 'style="{}" '.format(style)
-    rtn = template.format(classes=classes, style=style)
-    return rtn
 GL = functools.partial(Glyphicon)
 
 
-# noinspection PyPep8Naming
-def Hn(heading, level=3, classes='', style=''):
+class Hn(DWidget):
     """ HTML heading
 
     .. sourcecode:: python
 
         Hn('Header text')
         Hn('Header text' + Small('subtext'), level=2)
-
-    :param heading: heading text
-    :type heading: str or unicode
-    :param level: heading level
-    :type level: int
-    :param classes: classes to add to output
-    :type classes: str or unicode
-    :param style: styles to add to output
-    :type style: str or unicode
-    :return: HTML H html
-    :rtype: unicode
 
     | Synonyms:
     | H1 = functools.partial(Hn, level=1)
@@ -328,21 +333,41 @@ def Hn(heading, level=3, classes='', style=''):
     | H5 = functools.partial(Hn, level=5)
     | H6 = functools.partial(Hn, level=6)
     """
-    if isinstance(heading, (list, tuple)):
-        rtn = ''
-        for h in heading:
-            rtn += Hn(h, level, classes, style)
+    def __init__(self, heading, level=3, classes='', style=''):
+        super(Hn, self).__init__(heading, level, classes, style)
+        return
+
+    # noinspection PyMethodOverriding
+    @staticmethod
+    def generate(heading, level, classes, style):
+        """ HTML heading
+
+        :param heading: heading text
+        :type heading: str or unicode
+        :param level: heading level
+        :type level: int
+        :param classes: classes to add to output
+        :type classes: str or unicode
+        :param style: styles to add to output
+        :type style: str or unicode
+        :return: HTML H html
+        :rtype: unicode
+        """
+        if isinstance(heading, (list, tuple)):
+            rtn = ''
+            for h in heading:
+                rtn += Hn(h, level, classes, style)
+            return rtn
+        template = '<h{level} {classes} {style}>\n' \
+                   '    {heading}\n' \
+                   '</h{level}>'
+        if classes:
+            classes = 'class="{}" '.format(classes)
+        if style:
+            style = 'style="{}" '.format(style)
+        level = str(level)
+        rtn = template.format(level=level, classes=classes, style=style, heading=heading)
         return rtn
-    template = '<h{level} {classes} {style}>\n' \
-               '    {heading}\n' \
-               '</h{level}>'
-    if classes:
-        classes = 'class="{}" '.format(classes)
-    if style:
-        style = 'style="{}" '.format(style)
-    level = str(level)
-    rtn = template.format(level=level, classes=classes, style=style, heading=heading)
-    return rtn
 H1 = functools.partial(Hn, level=1)
 H2 = functools.partial(Hn, level=2)
 H3 = functools.partial(Hn, level=3)
@@ -351,8 +376,20 @@ H5 = functools.partial(Hn, level=5)
 H6 = functools.partial(Hn, level=6)
 
 
-# noinspection PyPep8Naming
-def Header(heading, classes='', style=''):
+# from djangopages.widgets.widgets import DWidgetSimple
+# class Header(DWidgetSimple):
+#     def __init__(self, heading, classes='', style=''):
+#         template = '<!-- header start -->\n' \
+#                    '    <div {classes} {style}">\n' \
+#                    '        {content}\n' \
+#                    '    </div>' \
+#                    '<!-- header end -->\n'
+#         classes = ' '.join(('page-header', classes,))
+#         super(Header, self).__init__(template, {'content': heading, 'classes': classes, 'style': style},
+#                                      heading, classes, style)
+#         return
+
+class Header(DWidget):
     """ Bootstrap page-header component
 
     .. sourcecode:: python
@@ -360,36 +397,46 @@ def Header(heading, classes='', style=''):
         Header('Header text')
         Header(H3('heading'+Small('subheading'))
 
-    :param heading: heading HTML
-    :type heading: str or unicode
-    :param classes: classes to add to output
-    :type classes: str or unicode
-    :param style: styles to add to output
-    :type style: str or unicode
-    :return: Header html
-    :rtype: unicode
+    .. note:: The heading argument is typically a Hn widget.
     """
-    if isinstance(heading, (tuple, list)):
-        rtn = ''
-        for h in heading:
-            rtn += Header(h, classes, style)
+    def __init__(self, heading, classes='', style=''):
+        super(Header, self).__init__(heading, classes, style)
+        return
+
+    # noinspection PyMethodOverriding
+    @staticmethod
+    def generate(heading, classes, style):
+        """ Bootstrap page-header component
+
+        :param heading: heading HTML
+        :type heading: str or unicode or DWidget
+        :param classes: classes to add to output
+        :type classes: str or unicode
+        :param style: styles to add to output
+        :type style: str or unicode
+        :return: Header html
+        :rtype: unicode
+        """
+        if isinstance(heading, (tuple, list)):
+            rtn = ''
+            for h in heading:
+                rtn += Header(h, classes, style)
+            return rtn
+
+        template = '<!-- header start -->\n' \
+                   '    <div class="page-header">\n' \
+                   '        {heading}\n' \
+                   '    </div>' \
+                   '<!-- header end -->\n'
+        if classes:
+            classes = 'class="{}" '.format(classes)
+        if style:
+            style = 'style="{}" '.format(style)
+        rtn = template.format(classes=classes, style=style, heading=heading)
         return rtn
 
-    template = '<!-- header start -->\n' \
-               '    <div class="page-header">\n' \
-               '        {heading}\n' \
-               '    </div>' \
-               '<!-- header end -->\n'
-    if classes:
-        classes = 'class="{}" '.format(classes)
-    if style:
-        style = 'style="{}" '.format(style)
-    rtn = template.format(classes=classes, style=style, heading=heading)
-    return rtn
 
-
-# noinspection PyPep8Naming
-def Jumbotron(content, classes='', style=''):
+class Jumbotron(DWidget):
     """ Bbootstrap jumbotron
 
     .. sourcecode:: python
@@ -397,32 +444,42 @@ def Jumbotron(content, classes='', style=''):
         Jumbotro('Jumbotron content')
         Jumbotron(MD('#Jumbotron 2') + 'Some text' + BTNSInfo('Button'))
 
-    :param content: content
-    :type content: basestring or tuple or DWidget
-    :param classes: classes to add to output
-    :type classes: str or unicode
-    :param style: styles to add to output
-    :type style: str or unicode
-    :return: Glyphicon html
-    :rtype: unicode
     """
-    if isinstance(content, (tuple, list)):
-        rtn = ''
-        for c in content:
-            rtn += Jumbotron(c, classes, style)
+    def __init__(self, content, classes='', style=''):
+        super(Jumbotron, self).__init__(content, classes, style)
+        return
+
+    # noinspection PyMethodOverriding
+    @staticmethod
+    def generate(content, classes, style):
+        """ Bbootstrap jumbotron
+
+        :param content: content
+        :type content: basestring or tuple or DWidget
+        :param classes: classes to add to output
+        :type classes: str or unicode
+        :param style: styles to add to output
+        :type style: str or unicode
+        :return: Glyphicon html
+        :rtype: unicode
+        """
+        if isinstance(content, (tuple, list)):
+            rtn = ''
+            for c in content:
+                rtn += Jumbotron(c, classes, style)
+            return rtn
+        template = '<!-- jumbotron start -->' \
+                   '<div class="jumbotron">\n' \
+                   '{content}\n' \
+                   '</div>\n' \
+                   '<!-- jumbotron end -->'
+        assert isinstance(content, (str, unicode))
+        if classes:
+            classes = 'class="{}" '.format(classes)
+        if style:
+            style = 'style="{}" '.format(style)
+        rtn = template.format(classes=classes, style=style, content=content)
         return rtn
-    template = '<!-- jumbotron start -->' \
-               '<div class="jumbotron">\n' \
-               '{content}\n' \
-               '</div>\n' \
-               '<!-- jumbotron end -->'
-    assert isinstance(content, (str, unicode))
-    if classes:
-        classes = 'class="{}" '.format(classes)
-    if style:
-        style = 'style="{}" '.format(style)
-    rtn = template.format(classes=classes, style=style, content=content)
-    return rtn
 
 
 # noinspection PyPep8Naming
@@ -745,32 +802,45 @@ class ModalButton(object):
         return rtn
 
 
-# noinspection PyPep8Naming
-def Small(text, classes='', style=''):
+class Small(DWidget):
+    """ Small bootstrap widget
+
+    .. sourcecode:: python
+
+        Small('some text')
     """
-    :param text: text to wrap
-    :type text: str or unicode
-    :param classes: classes to add to output
-    :type classes: str or unicode
-    :param style: styles to add to output
-    :type style: str or unicode
-    :return: small html
-    :rtype: unicode
-    """
-    if isinstance(text, (list, tuple)):
-        rtn = ''
-        for t in text:
-            rtn += Small(t, classes, style)
+    def __init__(self, text, classes='', style=''):
+        super(Small, self).__init__(text, classes, style)
+        return
+
+    # noinspection PyMethodOverriding
+    @staticmethod
+    def generate(text,  classes, style):
+        """ Small bootstrap html
+
+        :param text: text to wrap
+        :type text: str or unicode
+        :param classes: classes to add to output
+        :type classes: str or unicode
+        :param style: styles to add to output
+        :type style: str or unicode
+        :return: small html
+        :rtype: unicode
+        """
+        if isinstance(text, (list, tuple)):
+            rtn = ''
+            for t in text:
+                rtn += Small(t, classes, style)
+            return rtn
+        template = '<small {classes} {style}>\n' \
+                   '    {text}\n' \
+                   '</small>\n'
+        if classes:
+            classes = 'class="{}" '.format(classes)
+        if style:
+            style = 'style="{}" '.format(style)
+        rtn = template.format(classes=classes, style=style, text=text)
         return rtn
-    template = '<small {classes} {style}>\n' \
-               '    {text}\n' \
-               '</small>\n'
-    if classes:
-        classes = 'class="{}" '.format(classes)
-    if style:
-        style = 'style="{}" '.format(style)
-    rtn = template.format(classes=classes, style=style, text=text)
-    return rtn
 
 # ################################################################################
 # ################################################################################
