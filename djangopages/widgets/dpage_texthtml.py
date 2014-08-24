@@ -14,7 +14,8 @@ DjangoPages provides a number of widgets to create text on pages.
 
 8/4/14 - Initial creation
 
-
+Widgets
+=======
 """
 
 from __future__ import unicode_literals

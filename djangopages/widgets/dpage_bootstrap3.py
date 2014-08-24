@@ -14,6 +14,8 @@ DjangoPages provides a number of widgets to create various bootstrap elements.
 
 8/4/14 - Initial creation
 
+Widgets
+=======
 """
 
 from __future__ import unicode_literals
@@ -35,6 +37,7 @@ import functools
 
 # noinspection PyProtectedMember
 from djangopages.libs import unique_name
+from djangopages.widgets.widgets import DWidget
 
 ########################################################################################################################
 #
@@ -53,33 +56,43 @@ from djangopages.libs import unique_name
 ########################################################################################################################
 
 
-# noinspection PyPep8Naming
-def Accordion(accordion_panels):
+class Accordion(DWidget):
     """ Bootstrap accordion
+
+    .. note:: The argument **MUST** be a list of AccordionPanel(s).
 
     .. sourcecode:: python
 
         Accordion((AccordionPanel('heading 1', 'content 1', expand=True),
                    AccordionPanel('heading 2', 'content 2'))
-
-    :param accordion_panels: accordion panels
-    :type accordion_panels: list or tuple
-    :return: HTML for bootstrap accordion
-    :rtype: unicode
     """
-    assert isinstance(accordion_panels, (list, tuple))
-    accordion_id = unique_name('aid')
-    panels = ''
-    for p in accordion_panels:
-        panels += p.generate(accordion_id)
-    template = '<!-- Accordion start -->' \
-               '    <div class="panel-group" id="{accordion_id}">\n' \
-               '        {panels}\n' \
-               '    </div>\n' \
-               '<!--Accordion end -->'
-    rtn = template.format(accordion_id=accordion_id,
-                          panels=panels)
-    return rtn
+    def __init__(self, accordion_panels):
+        super(Accordion, self).__init__(accordion_panels)
+        return
+
+    # noinspection PyMethodOverriding
+    @staticmethod
+    def generate(accordion_panels):
+        """ Bootstrap accordion
+
+        :param accordion_panels: accordion panels
+        :type accordion_panels: list or tuple of AccordionPanel
+        :return: HTML for bootstrap accordion
+        :rtype: unicode
+        """
+        assert isinstance(accordion_panels, (list, tuple))
+        accordion_id = unique_name('aid')
+        panels = ''
+        for p in accordion_panels:
+            panels += p.generate(accordion_id)
+        template = '<!-- Accordion start -->' \
+                   '    <div class="panel-group" id="{accordion_id}">\n' \
+                   '        {panels}\n' \
+                   '    </div>\n' \
+                   '<!--Accordion end -->'
+        rtn = template.format(accordion_id=accordion_id,
+                              panels=panels)
+        return rtn
 
 
 # noinspection PyPep8Naming
