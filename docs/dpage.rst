@@ -1,6 +1,6 @@
 .. DjangoPages overview.
 
-.. automodule:: djangopages.dpage
+.. automodule:: djangopages.pages.dpage
     :members:
 
 

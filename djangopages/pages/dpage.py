@@ -12,7 +12,7 @@ DPage
 
 5/9/14 - Initial creation
 
-DjangoPages replaces the conventional Django notion of HTML templates and view methods.
+DjangoPages replaces the conventional Django notion of HTML templates, views, and URLs.
 Instead, DjangoPages uses a declarative approach similar to Django's models.Model and
 forms.Form. This declarative approach is used both for page definition and creation of
 content on the page.
@@ -49,6 +49,7 @@ DPage(s) typically define:
 Details
 +++++++
 """
+
 
 from __future__ import unicode_literals
 import logging

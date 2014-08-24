@@ -25,18 +25,14 @@ import uuid
 import copy
 
 # from django.contrib.contenttypes.models import ContentType
-from django.http import HttpResponseRedirect
 # from django.utils.text import slugify
 from django.forms import Textarea, TextInput
 from django.contrib import admin
-from django.utils.translation import ugettext_lazy as _
-from django.contrib.admin import SimpleListFilter
 
 from django_ace import AceWidget
-from taggit.models import TaggedItem
 from taggit_suggest.utils import suggest_tags
 
-from djangopages.models import DjangoPage
+from djangopages.userpages.models import DjangoPage
 from djangopages.libs import TaggitListFilter
 
 

@@ -32,12 +32,13 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import login
 
-from djangopages.views import DPageView
 from djangopages_demo.views import index, DemoList
+from djangopages.pages.views import DPagesList, DPageView
 from graphpages.views import GraphPageListView
 
 urlpatterns = patterns('',
-    url(r'^dpages/', include('djangopages.urls')),
+    url(r'^dpages/$', DPagesList.as_view(), name='DPagesList'),
+    url(r'^dpages/(.*$)', DPageView.as_view(), name='dpagesview'),
     url(r'^test_data/', include('test_data.urls')),
     url(r'^display_graph_pages$', GraphPageListView.as_view(), name=GraphPageListView),
     url(r'^graphpages/', include('graphpages.urls')),
@@ -48,5 +49,4 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^login/$', login, {'template_name': 'admin/login.html'}),
 )
-
 urlpatterns += staticfiles_urlpatterns()

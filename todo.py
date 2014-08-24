@@ -40,6 +40,7 @@ Row doesn't scale properly for phones
 Check options on markdown wrt line wraps.
 """
 
+# todo 1: new application modeled after chartkick setup for distribution
 # todo 1: include css and js in the project
 # todo 1: write tests
 # todo 1: look into fixme_login.html and try to resolve issues

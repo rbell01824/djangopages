@@ -8,6 +8,7 @@
 """
 
 from __future__ import unicode_literals
+# noinspection PyUnresolvedReferences
 import logging
 
 log = logging.getLogger(__name__)
@@ -21,11 +22,10 @@ __version__ = "0.1"
 __maintainer__ = "rbell01824"
 __email__ = "rbell01824@gmail.com"
 
-from djangopages.dpage import *
-from djangopages.dpage_layout import *
-from djangopages.dpage_bootstrap3 import *
-from djangopages.dpage_graphs import *
-from djangopages.dpage_texthtml import *
+from djangopages.pages.dpage import *
+from djangopages.widgets.dpage_layout import *
+from djangopages.widgets.dpage_bootstrap3 import *
+from djangopages.widgets.dpage_texthtml import *
 
 from django.db.models import Count
 from test_data.models import VSyslog
