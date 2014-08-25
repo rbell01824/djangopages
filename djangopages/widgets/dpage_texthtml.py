@@ -2,8 +2,8 @@
 # coding=utf-8
 
 """
-Text Widgets
-============
+Text Widgets Overview
+*********************
 
 .. module:: dpage_texthtml
    :synopsis: Provides DjangoPage widgets to create text

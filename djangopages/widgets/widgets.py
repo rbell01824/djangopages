@@ -2,8 +2,8 @@
 # coding=utf-8
 
 """
-Widgets
-=======
+Widget Base Classes
+*******************
 
 .. module:: widgets
    :synopsis: Provides DjangoPage widgets to create text
@@ -14,8 +14,8 @@ DjangoPages provides a number of widgets to create text on pages.
 
 8/4/14 - Initial creation
 
-Widgets
-*******
+Overview
+========
 
 Widgets create content, including layouts, for DjangoPages. For example::
 
@@ -37,8 +37,8 @@ You can see many examples DWidget examples in djangopages.widgets.
 .. note:: Of necessity, widgets MUST be classes!  This allows widgets to accept other widgets
     as arguments a key feature/requirement for declarative page definition.
 
-Widgets
-=======
+Base Classes
+============
 """
 
 from __future__ import unicode_literals
@@ -203,38 +203,36 @@ class DWidget(object):
     #     return existing[:-1] + ' ' + new + '"'
 
 
-# class DWidgetSimple(DWidget):
-#     """ Base class for simple widgets """
-#     def __init__(self, template, tformat, content, classes, style):
-#         super(DWidgetSimple, self).__init__(template, tformat, content, classes, style)
-#         return
-#
-#     # noinspection PyMethodOverriding
-#     def generate(self, template, tformat, content, classes, style):
-#         """ HTML heading
-#
-#         :param tremplate: widget template
-#         :type tremplate: str or unicode
-#         :param content: content text
-#         :type content: str or unicode
-#         :param classes: classes to add to output
-#         :type classes: str or unicode
-#         :param style: styles to add to output
-#         :type style: str or unicode
-#         :return: HTML H html
-#         :rtype: unicode
-#         """
-#         if isinstance(content, (list, tuple)):
-#             rtn = ''
-#             for c in content:
-#                 rtn += self.__class__(c, classes, style).render()
-#             return rtn
-#         if classes:
-#             classes = 'class="{}" '.format(classes)
-#         if style:
-#             style = 'style="{}" '.format(style)
-#         rtn = template.format(**tformat)
-#         return rtn
+class DWidgetSimple(DWidget):
+    """ Base class for simple widgets
+
+    Many widgets simply return a string created from the widget's template and arguments.  Such widgets
+    can derive from DWidgetSimple and need not implement a generate method.
+
+    .. note:: See the code for the Header widget for a use case example.
+    """
+    def __init__(self, template, content, *args):
+        super(DWidgetSimple, self).__init__(template, content, *args)
+        return
+
+    # noinspection PyMethodOverriding
+    def generate(self, template, content, *args):
+        """ generate helper
+
+        :param content: widget's content
+        :type content: str or unicode
+        :param args: other widget arguments.
+        :type args: varies
+        :return: classes and style for widget
+        :rtype: tuple
+        """
+        if isinstance(content, (list, tuple)):
+            rtn = ''
+            for c in content:
+                rtn += self.__class__(c, *args).render()
+            return rtn
+        rtn = template.format(content, *args)
+        return rtn
 
 ########################################################################################################################
 #

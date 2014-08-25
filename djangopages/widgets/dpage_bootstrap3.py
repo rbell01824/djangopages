@@ -2,8 +2,8 @@
 # coding=utf-8
 
 """
-Bootstrap Widgets
-=================
+Bootstrap Widgets Overview
+**************************
 
 .. module:: dpage_bootstrap3
    :synopsis: Provides DjangoPage widgets to create various bootstrap elements
@@ -37,7 +37,7 @@ import functools
 
 # noinspection PyProtectedMember
 from djangopages.libs import unique_name
-from djangopages.widgets.widgets import DWidget
+from djangopages.widgets.widgets import DWidget, DWidgetSimple
 
 ########################################################################################################################
 #
@@ -317,7 +317,7 @@ class Glyphicon(DWidget):
 GL = functools.partial(Glyphicon)
 
 
-class Hn(DWidget):
+class Hn(DWidgetSimple):
     """ HTML heading
 
     .. sourcecode:: python
@@ -332,42 +332,76 @@ class Hn(DWidget):
     | H4 = functools.partial(Hn, level=4)
     | H5 = functools.partial(Hn, level=5)
     | H6 = functools.partial(Hn, level=6)
+
+    :param heading: heading text
+    :type heading: str or unicode
+    :param level: heading level
+    :type level: int
+    :param classes: classes to add to output
+    :type classes: str or unicode
+    :param style: styles to add to output
+    :type style: str or unicode
+    :return: HTML H html
+    :rtype: unicode
     """
     def __init__(self, heading, level=3, classes='', style=''):
-        super(Hn, self).__init__(heading, level, classes, style)
+        template = '<h{1} class="{2}" style="{3}">\n' \
+                   '    {0}\n' \
+                   '</h{1}>'
+        super(Hn, self).__init__(template, heading, str(level), classes, style)
         return
 
-    # noinspection PyMethodOverriding
-    @staticmethod
-    def generate(heading, level, classes, style):
-        """ HTML heading
-
-        :param heading: heading text
-        :type heading: str or unicode
-        :param level: heading level
-        :type level: int
-        :param classes: classes to add to output
-        :type classes: str or unicode
-        :param style: styles to add to output
-        :type style: str or unicode
-        :return: HTML H html
-        :rtype: unicode
-        """
-        if isinstance(heading, (list, tuple)):
-            rtn = ''
-            for h in heading:
-                rtn += Hn(h, level, classes, style)
-            return rtn
-        template = '<h{level} {classes} {style}>\n' \
-                   '    {heading}\n' \
-                   '</h{level}>'
-        if classes:
-            classes = 'class="{}" '.format(classes)
-        if style:
-            style = 'style="{}" '.format(style)
-        level = str(level)
-        rtn = template.format(level=level, classes=classes, style=style, heading=heading)
-        return rtn
+# class Hn(DWidget):
+#     """ HTML heading
+#
+#     .. sourcecode:: python
+#
+#         Hn('Header text')
+#         Hn('Header text' + Small('subtext'), level=2)
+#
+#     | Synonyms:
+#     | H1 = functools.partial(Hn, level=1)
+#     | H2 = functools.partial(Hn, level=2)
+#     | H3 = functools.partial(Hn, level=3)
+#     | H4 = functools.partial(Hn, level=4)
+#     | H5 = functools.partial(Hn, level=5)
+#     | H6 = functools.partial(Hn, level=6)
+#     """
+#     def __init__(self, heading, level=3, classes='', style=''):
+#         super(Hn, self).__init__(heading, level, classes, style)
+#         return
+#
+#     # noinspection PyMethodOverriding
+#     @staticmethod
+#     def generate(heading, level, classes, style):
+#         """ HTML heading
+#
+#         :param heading: heading text
+#         :type heading: str or unicode
+#         :param level: heading level
+#         :type level: int
+#         :param classes: classes to add to output
+#         :type classes: str or unicode
+#         :param style: styles to add to output
+#         :type style: str or unicode
+#         :return: HTML H html
+#         :rtype: unicode
+#         """
+#         if isinstance(heading, (list, tuple)):
+#             rtn = ''
+#             for h in heading:
+#                 rtn += Hn(h, level, classes, style)
+#             return rtn
+#         template = '<h{level} {classes} {style}>\n' \
+#                    '    {heading}\n' \
+#                    '</h{level}>'
+#         if classes:
+#             classes = 'class="{}" '.format(classes)
+#         if style:
+#             style = 'style="{}" '.format(style)
+#         level = str(level)
+#         rtn = template.format(level=level, classes=classes, style=style, heading=heading)
+#         return rtn
 H1 = functools.partial(Hn, level=1)
 H2 = functools.partial(Hn, level=2)
 H3 = functools.partial(Hn, level=3)
@@ -376,20 +410,7 @@ H5 = functools.partial(Hn, level=5)
 H6 = functools.partial(Hn, level=6)
 
 
-# from djangopages.widgets.widgets import DWidgetSimple
-# class Header(DWidgetSimple):
-#     def __init__(self, heading, classes='', style=''):
-#         template = '<!-- header start -->\n' \
-#                    '    <div {classes} {style}">\n' \
-#                    '        {content}\n' \
-#                    '    </div>' \
-#                    '<!-- header end -->\n'
-#         classes = ' '.join(('page-header', classes,))
-#         super(Header, self).__init__(template, {'content': heading, 'classes': classes, 'style': style},
-#                                      heading, classes, style)
-#         return
-
-class Header(DWidget):
+class Header(DWidgetSimple):
     """ Bootstrap page-header component
 
     .. sourcecode:: python
@@ -397,43 +418,68 @@ class Header(DWidget):
         Header('Header text')
         Header(H3('heading'+Small('subheading'))
 
-    .. note:: The heading argument is typically a Hn widget.
+    :param heading: heading HTML
+    :type heading: str or unicode or DWidget
+    :param classes: classes to add to output
+    :type classes: str or unicode
+    :param style: styles to add to output
+    :type style: str or unicode
+    :return: Header html
+    :rtype: unicode
+
+    .. note:: The heading argument is typically an Hn widget.
     """
     def __init__(self, heading, classes='', style=''):
-        super(Header, self).__init__(heading, classes, style)
-        return
-
-    # noinspection PyMethodOverriding
-    @staticmethod
-    def generate(heading, classes, style):
-        """ Bootstrap page-header component
-
-        :param heading: heading HTML
-        :type heading: str or unicode or DWidget
-        :param classes: classes to add to output
-        :type classes: str or unicode
-        :param style: styles to add to output
-        :type style: str or unicode
-        :return: Header html
-        :rtype: unicode
-        """
-        if isinstance(heading, (tuple, list)):
-            rtn = ''
-            for h in heading:
-                rtn += Header(h, classes, style)
-            return rtn
-
         template = '<!-- header start -->\n' \
-                   '    <div class="page-header">\n' \
-                   '        {heading}\n' \
+                   '    <div class="page-header {1}" style="{2}">\n' \
+                   '        {0}\n' \
                    '    </div>' \
                    '<!-- header end -->\n'
-        if classes:
-            classes = 'class="{}" '.format(classes)
-        if style:
-            style = 'style="{}" '.format(style)
-        rtn = template.format(classes=classes, style=style, heading=heading)
-        return rtn
+        super(Header, self).__init__(template, heading, classes, style)
+        return
+
+
+# class Header(DWidget):
+#     """ Bootstrap page-header component
+#
+#     .. sourcecode:: python
+#
+#         Header('Header text')
+#         Header(H3('heading'+Small('subheading'))
+#
+#     .. note:: The heading argument is typically a Hn widget.
+#     """
+#     def __init__(self, heading, classes='', style=''):
+#         super(Header, self).__init__(heading, classes, style)
+#         return
+#
+#     # noinspection PyMethodOverriding
+#     @staticmethod
+#     def generate(heading, classes, style):
+#         """ Bootstrap page-header component
+#
+#         :param heading: heading HTML
+#         :type heading: str or unicode or DWidget
+#         :param classes: classes to add to output
+#         :type classes: str or unicode
+#         :param style: styles to add to output
+#         :type style: str or unicode
+#         :return: Header html
+#         :rtype: unicode
+#         """
+#         if isinstance(heading, (tuple, list)):
+#             rtn = ''
+#             for h in heading:
+#                 rtn += Header(h, classes, style)
+#             return rtn
+#
+#         template = '<!-- header start -->\n' \
+#                    '    <div class="page-header {classes}" style="{style}">\n' \
+#                    '        {heading}\n' \
+#                    '    </div>' \
+#                    '<!-- header end -->\n'
+#         rtn = template.format(classes=classes, style=style, heading=heading)
+#         return rtn
 
 
 class Jumbotron(DWidget):

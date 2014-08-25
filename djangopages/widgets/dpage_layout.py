@@ -2,8 +2,8 @@
 # coding=utf-8
 
 """
-Layout Bootstrap Widgets
-************************
+Layout Widgets Overview
+***********************
 
 .. module:: dpage_layout
    :synopsis: Provides DjangoPage widgets to create bootstrap layouts
@@ -17,6 +17,7 @@ grid layouts.
 
 Widgets
 =======
+
 """
 
 from __future__ import unicode_literals
