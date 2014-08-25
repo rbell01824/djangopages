@@ -162,48 +162,8 @@ class DWidget(object):
     def __repr__(self):
         return self.render()
 
-    # @staticmethod
-    # def add_classes(existing, new):
-    #     """ Add classes to existing classes for the widget.  Typically used by the widget's generate method
-    #     to add classes that the widget needs to those created by the widget definition.
-    #
-    #     .. sourcecode:: python
-    #
-    #         add( existing_classes, 'classes_to_add')
-    #
-    #     :param existing: Existing class string, ex. class="someclass another_class"
-    #     :type existing: str or unicode
-    #     :param new: Classes to add, ex. "a_class_to_add"
-    #     :type new: str or unicode
-    #     :return: new class string, ex. class="someclass another_class a_class_to_add"
-    #     :rtype: str
-    #     """
-    #     if existing == '':
-    #         return 'class="{}"'.format(new)
-    #     return existing[:-1] + ' ' + new + '"'
-    #
-    # @staticmethod
-    # def add_style(existing, new):
-    #     """Add style(s) to existing style(s) for the widget.  Typically used by the widget's generate method
-    #     to add styles that the widget needs to those created by the widget definition.
-    #
-    #     .. sourcecode:: python
-    #
-    #         add_style( existing_styles, 'styles_to_add')
-    #
-    #     :param existing: Existing style string, ex. style="style1;style2;"
-    #     :type existing: str or unicode
-    #     :param new: Styles to add, ex. "style3;style4;"
-    #     :type new: str or unicode
-    #     :return: new style string, ex. style="style1;style2;style3;style4;"
-    #     :rtype: str
-    #     """
-    #     if existing == '':
-    #         return 'style="{}"'.format(new)
-    #     return existing[:-1] + ' ' + new + '"'
 
-
-class DWidgetSimple(DWidget):
+class DWidgetX(DWidget):
     """ Base class for simple widgets
 
     Many widgets simply return a string created from the widget's template and arguments.  Such widgets
@@ -211,12 +171,12 @@ class DWidgetSimple(DWidget):
 
     .. note:: See the code for the Header widget for a use case example.
     """
-    def __init__(self, template, content, *args):
-        super(DWidgetSimple, self).__init__(template, content, *args)
+    def __init__(self, content_name, template, args):
+        super(DWidgetX, self).__init__(content_name, template, args)
         return
 
     # noinspection PyMethodOverriding
-    def generate(self, template, content, *args):
+    def generate(self, content_name, template, args):
         """ generate helper
 
         :param content: widget's content
@@ -226,12 +186,14 @@ class DWidgetSimple(DWidget):
         :return: classes and style for widget
         :rtype: tuple
         """
-        if isinstance(content, (list, tuple)):
+        if isinstance(args[content_name], (list, tuple)):
             rtn = ''
+            content = args.pop(content_name)
             for c in content:
-                rtn += self.__class__(c, *args).render()
+                args[content_name] = c
+                rtn += self.__class__(**args).render()
             return rtn
-        rtn = template.format(content, *args)
+        rtn = template.format(**args)
         return rtn
 
 ########################################################################################################################

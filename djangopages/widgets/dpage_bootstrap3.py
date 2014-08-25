@@ -37,7 +37,7 @@ import functools
 
 # noinspection PyProtectedMember
 from djangopages.libs import unique_name
-from djangopages.widgets.widgets import DWidget, DWidgetSimple
+from djangopages.widgets.widgets import DWidget, DWidgetX
 
 ########################################################################################################################
 #
@@ -317,7 +317,7 @@ class Glyphicon(DWidget):
 GL = functools.partial(Glyphicon)
 
 
-class Hn(DWidgetSimple):
+class Hn(DWidgetX):
     """ HTML heading
 
     .. sourcecode:: python
@@ -345,10 +345,11 @@ class Hn(DWidgetSimple):
     :rtype: unicode
     """
     def __init__(self, heading, level=3, classes='', style=''):
-        template = '<h{1} class="{2}" style="{3}">\n' \
-                   '    {0}\n' \
-                   '</h{1}>'
-        super(Hn, self).__init__(template, heading, str(level), classes, style)
+        template = '<h{level} {classes} {style}>\n' \
+                   '    {heading}\n' \
+                   '</h{level}>'
+        super(Hn, self).__init__('heading', template,
+                                 {'heading': heading, 'level': str(level), 'classes': classes, 'style': style})
         return
 
 # class Hn(DWidget):
@@ -410,7 +411,7 @@ H5 = functools.partial(Hn, level=5)
 H6 = functools.partial(Hn, level=6)
 
 
-class Header(DWidgetSimple):
+class Header(DWidgetX):
     """ Bootstrap page-header component
 
     .. sourcecode:: python
@@ -429,13 +430,13 @@ class Header(DWidgetSimple):
 
     .. note:: The heading argument is typically an Hn widget.
     """
-    def __init__(self, heading, classes='', style=''):
+    def __init__(self, heading='', classes='', style=''):
         template = '<!-- header start -->\n' \
-                   '    <div class="page-header {1}" style="{2}">\n' \
-                   '        {0}\n' \
+                   '    <div class="page-header {classes}" style="{style}">\n' \
+                   '        {heading}\n' \
                    '    </div>' \
                    '<!-- header end -->\n'
-        super(Header, self).__init__(template, heading, classes, style)
+        super(Header, self).__init__('heading', template, {'heading': heading, 'classes': classes, 'style': style})
         return
 
 
@@ -528,8 +529,7 @@ class Jumbotron(DWidget):
         return rtn
 
 
-# noinspection PyPep8Naming
-def Label(content, label_type='label-default', classes='', style=''):
+class Label(DWidgetX):
     """ Bootstrap label
 
     .. sourcecode:: python
@@ -548,21 +548,48 @@ def Label(content, label_type='label-default', classes='', style=''):
     :return: label html
     :rtype: unicode
     """
+    def __init__(self, content, label_type='label-default', classes='', style=''):
+        template = '<span class="label {label_type} {classes}" style="{style}">{content}</span>'
+        super(Label, self).__init__('content', template,
+                                    {'label_type': label_type, 'content': content,
+                                     'classes': classes, 'style': style})
+        return
 
-    if isinstance(content, (list, tuple)):
-        rtn = ''
-        for c in content:
-            rtn += Label(c, label_type, classes, style)
-        return rtn
-
-    template = '<span {classes} {style}>{content}</span>'
-    if not label_type.startswith('label-'):
-        label_type = 'label-' + label_type
-    classes = 'class="label {label_type} {classes}" '.format(label_type=label_type, classes=classes)
-    if style:
-        style = 'style="{}" '.format(style)
-    rtn = template.format(content=content, classes=classes, style=style)
-    return rtn
+# # noinspection PyPep8Naming
+# def Label(content, label_type='label-default', classes='', style=''):
+#     """ Bootstrap label
+#
+#     .. sourcecode:: python
+#
+#         Label('default', 'text of default label',
+#               'primary', 'text of primary label')
+#
+#     :param content: content, label_type, label_text, ...
+#     :type content: basestring or tuple or DWidget
+#     :param label_type: label type in the form 'simple_label' or 'label-simple_label'
+#     :type label_type: str or unicode
+#     :param classes: classes to add to output
+#     :type classes: str or unicode
+#     :param style: styles to add to output
+#     :type style: str or unicode
+#     :return: label html
+#     :rtype: unicode
+#     """
+#
+#     if isinstance(content, (list, tuple)):
+#         rtn = ''
+#         for c in content:
+#             rtn += Label(c, label_type, classes, style)
+#         return rtn
+#
+#     template = '<span {classes} {style}>{content}</span>'
+#     if not label_type.startswith('label-'):
+#         label_type = 'label-' + label_type
+#     classes = 'class="label {label_type} {classes}" '.format(label_type=label_type, classes=classes)
+#     if style:
+#         style = 'style="{}" '.format(style)
+#     rtn = template.format(content=content, classes=classes, style=style)
+#     return rtn
 
 
 # noinspection PyPep8Naming
