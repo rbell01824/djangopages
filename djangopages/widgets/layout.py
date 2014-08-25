@@ -66,32 +66,32 @@ class Column(DWidget):
     | C11(...), default width 12
     | C121(...), default width 11
 
+    :param content: content
+    :type content: str or unicode or tuple or DWidget
+    :param width: bootstrap width, see bootstrap docs
+    :type width: int
+    :param classes: classes to add to output
+    :type classes: str or unicode or DWidget
+    :param style: styles to add to output
+    :type style: str or unicode or DWidget
+    :return: HTML for bootstrap column
+    :rtype: unicode
+
     Typically the Column widget is used within a Row widget.
 
     .. sourcecode:: python
 
         Row(Column(MD("##Bootstrap row', '##Bootstrap column', 'Other text in row/column')))
     """
+    # todo 2: convert to use default generate
     def __init__(self, content, width=12, classes='', style=''):
         super(Column, self).__init__(content, width, classes, style)
         return
 
     # noinspection PyMethodOverriding
-    @staticmethod
-    def generate(content, width, classes, style):
-        """ Outputs a bootstrap column
-
-        :param content: content
-        :type content: str or unicode or tuple or DWidget
-        :param width: bootstrap width, see bootstrap docs
-        :type width: int
-        :param classes: classes to add to output
-        :type classes: str or unicode or DWidget
-        :param style: styles to add to output
-        :type style: str or unicode or DWidget
-        :return: HTML for bootstrap column
-        :rtype: unicode
-        """
+    def generate(self):
+        """ Outputs a bootstrap column """
+        content, width, classes, style = self.args
         if isinstance(content, tuple):
             rtn = ''
             for c in content:
@@ -131,25 +131,24 @@ class Row(DWidget):
 
     | Shortcut: R(...), useful abbreviation
 
+    :param content: content
+    :type content: str or unicode or tuple or DWidget
+    :param classes: classes to add to output
+    :type classes: str or unicode or DWidget
+    :param style: styles to add to output
+    :type style: str or unicode or DWidget
+    :return: HTML for bootstrap row
+    :rtype: unicode
     """
+    # todo 2: convert to use default generate
     def __init__(self, content, classes='', style=''):
         super(Row, self).__init__(content, classes, style)
         return
 
     # noinspection PyMethodOverriding
-    @staticmethod
-    def generate(content, classes, style):
-        """ Outputs a bootstrap row
-
-        :param content: content
-        :type content: str or unicode or tuple or DWidget
-        :param classes: classes to add to output
-        :type classes: str or unicode or DWidget
-        :param style: styles to add to output
-        :type style: str or unicode or DWidget
-        :return: HTML for bootstrap row
-        :rtype: unicode
-        """
+    def generate(self):
+        """ Outputs a bootstrap row """
+        content, classes, style = self.args
         if isinstance(content, tuple):
             rtn = ''
             for c in content:
@@ -191,27 +190,27 @@ class RowColumn(DWidget):
     | RC10(...), default width 10
     | RC11(...), default width 12
     | RC12(...), default width 11
+
+
+    :param content: content
+    :type content: str or unicode or tuple
+    :param width: bootstrap width, see bootstrap docs
+    :type width: int
+    :param classes: classes to add to output
+    :type classes: str or unicode
+    :param style: styles to add to output
+    :type style: str or unicode
+    :return: HTML for Row(Column(...))
+    :rtype: unicode
     """
     def __init__(self, content, width=12, classes='', style=''):
         super(RowColumn, self).__init__(content, width, classes, style)
         return
 
     # noinspection PyMethodOverriding
-    @staticmethod
-    def generate(content, width, classes, style):
-        """ Equivalent to Row(Column(...))
-
-        :param content: content
-        :type content: str or unicode or tuple
-        :param width: bootstrap width, see bootstrap docs
-        :type width: int
-        :param classes: classes to add to output
-        :type classes: str or unicode
-        :param style: styles to add to output
-        :type style: str or unicode
-        :return: HTML for Row(Column(...))
-        :rtype: unicode
-        """
+    def generate(self):
+        """ Equivalent to Row(Column(...)) """
+        content, width, classes, style = self.args
         if isinstance(content, tuple):
             rtn = ''
             for c in content:

@@ -38,7 +38,7 @@ import loremipsum
 import functools
 
 from django.utils.encoding import force_unicode
-from djangopages.widgets.widgets import DWidget, DWidgetT
+from djangopages.widgets.widgets import DWidget
 
 ########################################################################################################################
 #
@@ -130,31 +130,30 @@ class LI(DWidget):
 
         LI(3)           # Creates paragraph with 3 sentences.
         LI((3, 5))      # Creates paragraph with 3 sentences and paragraph with 5 sentences
+
+    :param line_count: number of sentences in paragraph
+    :type line_count: int or tuple or DWidget
+    :param para: if True wrap output in a paragraph
+    :type para: bool
+    :param classes: classes to add to output
+    :type classes: str or unicode or DWidget
+    :param style: styles to add to output
+    :type style: str or unicode or DWidget
+    :return: HTML for loremipsum
+    :rtype: unicode
     """
     def __init__(self, line_count, para=True, classes='', style=''):
         super(LI, self).__init__(line_count, para, classes, style)
         return
 
     # noinspection PyMethodOverriding
-    @staticmethod
-    def generate(line_count, para, classes, style):
-        """ Generate loremipsum paragraphs with line_count sentences.
-
-        :param line_count: number of sentences in paragraph
-        :type line_count: int or tuple or DWidget
-        :param para: if True wrap output in a paragraph
-        :type para: bool
-        :param classes: classes to add to output
-        :type classes: str or unicode or DWidget
-        :param style: styles to add to output
-        :type style: str or unicode or DWidget
-        :return: HTML for loremipsum
-        :rtype: unicode
-        """
+    def generate(self):
+        """ Generate loremipsum paragraphs with line_count sentences. """
+        line_count, para, classes, style = self.args
         if isinstance(line_count, tuple):
             rtn = ''
             for lc in line_count:
-                rtn += LI(lc, para, classes, style, template)
+                rtn += LI(lc, para, classes, style)
             return rtn
         content = ' '.join(loremipsum.get_sentences(line_count))
         if classes:
@@ -181,27 +180,26 @@ class StringDup(DWidget):
     | Shortcuts:
     | BR, generates one or more HTML line breaks
     | SP, generates one or more non-breaking HTML spaces
+
+    :param string: the string to use
+    :type string: str or unicode or tuple or DWidget
+    :param count: the number of times to repeat the string
+    :type count: int
+    :param classes: classes to add to output
+    :type classes: str or unicode or DWidget
+    :param style: styles to add to output
+    :type style: str or unicode or DWidget
+    :return: HTML for string
+    :rtype: unicode
     """
     def __init__(self, string, count=1, classes='', style=''):
         super(StringDup, self).__init__(string, count, classes, style)
         return
 
     # noinspection PyMethodOverriding
-    @staticmethod
-    def generate(string, count, classes, style):
-        """ Generate amount duplicates of a string.
-
-        :param string: the string to use
-        :type string: str or unicode or tuple or DWidget
-        :param count: the number of times to repeat the string
-        :type count: int
-        :param classes: classes to add to output
-        :type classes: str or unicode or DWidget
-        :param style: styles to add to output
-        :type style: str or unicode or DWidget
-        :return: HTML for string
-        :rtype: unicode
-        """
+    def generate(self):
+        """ Generate amount duplicates of a string. """
+        string, count, classes, style = self.args
         if isinstance(string, tuple):
             rtn = ''
             for lc in string:

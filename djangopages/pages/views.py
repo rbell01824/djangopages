@@ -217,7 +217,7 @@ content = c1 + c2
         c2 = Markdown(('**Markdown bold text**',
                        '*Embedded markdown object italic text.*',
                        'Note: markdown always generates a paragraph.'))
-        content = c1
+        content = c1 + c2
         content = page_content(self, code, content)
         return content
 
