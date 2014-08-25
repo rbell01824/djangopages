@@ -5,7 +5,7 @@
 Text Widgets Overview
 *********************
 
-.. module:: dpage_texthtml
+.. module:: texthtml
    :synopsis: Provides DjangoPage widgets to create text
 
 .. moduleauthor:: Richard Bell <rbell01824@gmail.com>
@@ -59,13 +59,13 @@ class Text(DWidget):
     | HTML(...), useful to indicate intent
 
     """
-    def __init__(self, content, para=False, classes='', style='', template=None):
-        super(Text, self).__init__(content, para, classes, style, template)
+    def __init__(self, content, para=False, classes='', style=''):
+        super(Text, self).__init__(content, para, classes, style)
         return
 
     # noinspection PyMethodOverriding
     @staticmethod
-    def generate(content, para, classes, style, template):
+    def generate(content, para, classes, style):
         """ Renders text content to the page.
 
         :param content: content
@@ -76,22 +76,18 @@ class Text(DWidget):
         :type classes: str or unicode or DWidget
         :param style: styles to add to output
         :type style: str or unicode or DWidget
-        :param template: override template
-        :type template: str or unicode or DWidget
         :return: HTML for content
         :rtype: unicode
         """
         if isinstance(content, tuple):
             rtn = ''
             for c in content:
-                rtn += Text(c, para, classes, style, template)
+                rtn += Text(c, para, classes, style)
             return rtn
         if classes:
             classes = 'class="{}" '.format(classes)
         if style:
             style = 'style="{}" '.format(style)
-        if template:
-            return template.format(content=content)
         if para:
             return '<p {classes} {style}>{content}</p>'.format(classes=classes, style=style, content=content)
         if classes or style:
@@ -149,13 +145,13 @@ class LI(DWidget):
         LI(3)           # Creates paragraph with 3 sentences.
         LI((3, 5))      # Creates paragraph with 3 sentences and paragraph with 5 sentences
     """
-    def __init__(self, line_count, para=True, classes='', style='', template=None):
-        super(LI, self).__init__(line_count, para, classes, style, template)
+    def __init__(self, line_count, para=True, classes='', style=''):
+        super(LI, self).__init__(line_count, para, classes, style)
         return
 
     # noinspection PyMethodOverriding
     @staticmethod
-    def generate(line_count, para, classes, style, template):
+    def generate(line_count, para, classes, style):
         """ Generate loremipsum paragraphs with line_count sentences.
 
         :param line_count: number of sentences in paragraph
@@ -166,8 +162,6 @@ class LI(DWidget):
         :type classes: str or unicode or DWidget
         :param style: styles to add to output
         :type style: str or unicode or DWidget
-        :param template: override template
-        :type template: str or unicode or DWidget
         :return: HTML for loremipsum
         :rtype: unicode
         """
@@ -181,8 +175,6 @@ class LI(DWidget):
             classes = 'class="{}" '.format(classes)
         if style:
             style = 'style="{}" '.format(style)
-        if template:
-            return template.format(content=content)
         template = '<p {classes} {style}>' \
                    '{content}' \
                    '</p>'
@@ -204,13 +196,13 @@ class StringDup(DWidget):
     | BR, generates one or more HTML line breaks
     | SP, generates one or more non-breaking HTML spaces
     """
-    def __init__(self, string, count=1, classes='', style='', template=None):
-        super(StringDup, self).__init__(string, count, classes, style, template)
+    def __init__(self, string, count=1, classes='', style=''):
+        super(StringDup, self).__init__(string, count, classes, style)
         return
 
     # noinspection PyMethodOverriding
     @staticmethod
-    def generate(string, count, classes, style, template):
+    def generate(string, count, classes, style):
         """ Generate amount duplicates of a string.
 
         :param string: the string to use
@@ -221,15 +213,13 @@ class StringDup(DWidget):
         :type classes: str or unicode or DWidget
         :param style: styles to add to output
         :type style: str or unicode or DWidget
-        :param template: override template
-        :type template: str or unicode or DWidget
         :return: HTML for string
         :rtype: unicode
         """
         if isinstance(string, tuple):
             rtn = ''
             for lc in string:
-                rtn += StringDup(lc, count, classes, style, template)
+                rtn += StringDup(lc, count, classes, style)
             return rtn
 
         assert isinstance(string, (str, unicode))
@@ -241,8 +231,6 @@ class StringDup(DWidget):
             classes = 'class="{}" '.format(classes)
         if style:
             style = 'style="{}" '.format(style)
-        if template:
-            return template.format(content=content)
         if classes or style:
             template = '<span {classes} {style}>{content}</span>'
             return template.format(content=content, classes=classes, style=style)

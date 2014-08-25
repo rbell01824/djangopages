@@ -30,9 +30,9 @@ __maintainer__ = "rbell01824"
 __email__ = "rbell01824@gmail.com"
 
 from djangopages.pages.dpage import *
-from djangopages.widgets.dpage_layout import *
-from djangopages.widgets.dpage_bootstrap3 import *
-from djangopages.widgets.dpage_texthtml import *
+from djangopages.widgets.layout import *
+from djangopages.widgets.bootstrap import *
+from djangopages.widgets.texthtml import *
 from django.http import HttpResponseNotFound
 from django.views.generic import View
 

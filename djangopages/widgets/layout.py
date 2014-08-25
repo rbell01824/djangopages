@@ -5,7 +5,7 @@
 Layout Widgets Overview
 ***********************
 
-.. module:: dpage_layout
+.. module:: layout
    :synopsis: Provides DjangoPage widgets to create bootstrap layouts
 
 .. moduleauthor:: Richard Bell <rbell01824@gmail.com>
@@ -72,13 +72,13 @@ class Column(DWidget):
 
         Row(Column(MD("##Bootstrap row', '##Bootstrap column', 'Other text in row/column')))
     """
-    def __init__(self, content, width=12, classes='', style='', template=None):
-        super(Column, self).__init__(content, width, classes, style, template)
+    def __init__(self, content, width=12, classes='', style=''):
+        super(Column, self).__init__(content, width, classes, style)
         return
 
     # noinspection PyMethodOverriding
     @staticmethod
-    def generate(content, width, classes, style, template):
+    def generate(content, width, classes, style):
         """ Outputs a bootstrap column
 
         :param content: content
@@ -89,21 +89,17 @@ class Column(DWidget):
         :type classes: str or unicode or DWidget
         :param style: styles to add to output
         :type style: str or unicode or DWidget
-        :param template: override template
-        :type template: str or unicode or DWidget
         :return: HTML for bootstrap column
         :rtype: unicode
         """
         if isinstance(content, tuple):
             rtn = ''
             for c in content:
-                rtn += Column(c, width, classes, style, template)
+                rtn += Column(c, width, classes, style)
             return rtn
         classes = 'class="col-md-{width} {classes}" '.format(width=width, classes=classes)
         if style:
             style = 'style="{}" '.format(style)
-        if template:
-            return template.format(content=content)
         template = '<!-- Start of dpage col -->\n' \
                    '<div {classes} {style}>\n' \
                    '    {content}\n'  \
@@ -136,13 +132,13 @@ class Row(DWidget):
     | Shortcut: R(...), useful abbreviation
 
     """
-    def __init__(self, content, classes='', style='', template=None):
-        super(Row, self).__init__(content, classes, style, template)
+    def __init__(self, content, classes='', style=''):
+        super(Row, self).__init__(content, classes, style)
         return
 
     # noinspection PyMethodOverriding
     @staticmethod
-    def generate(content, classes, style, template):
+    def generate(content, classes, style):
         """ Outputs a bootstrap row
 
         :param content: content
@@ -151,21 +147,17 @@ class Row(DWidget):
         :type classes: str or unicode or DWidget
         :param style: styles to add to output
         :type style: str or unicode or DWidget
-        :param template: override template
-        :type template: str or unicode or DWidget
         :return: HTML for bootstrap row
         :rtype: unicode
         """
         if isinstance(content, tuple):
             rtn = ''
             for c in content:
-                rtn += Row(c, classes, style, template)
+                rtn += Row(c, classes, style)
             return rtn
         classes = 'class="row {classes}" '.format(classes=classes)
         if style:
             style = 'style="{}" '.format(style)
-        if template:
-            return template.format(content=content)
         template = '<!-- Start of dpage row -->\n' \
                    '<div {classes} {style}>\n' \
                    '    {content}\n' \
@@ -200,13 +192,13 @@ class RowColumn(DWidget):
     | RC11(...), default width 12
     | RC12(...), default width 11
     """
-    def __init__(self, content, width=12, classes='', style='', template=None):
-        super(RowColumn, self).__init__(content, width, classes, style, template)
+    def __init__(self, content, width=12, classes='', style=''):
+        super(RowColumn, self).__init__(content, width, classes, style)
         return
 
     # noinspection PyMethodOverriding
     @staticmethod
-    def generate(content, width, classes, style, template):
+    def generate(content, width, classes, style):
         """ Equivalent to Row(Column(...))
 
         :param content: content
@@ -217,16 +209,15 @@ class RowColumn(DWidget):
         :type classes: str or unicode
         :param style: styles to add to output
         :type style: str or unicode
-        :param template: override column template
-        :type template: str or unicode
-
+        :return: HTML for Row(Column(...))
+        :rtype: unicode
         """
         if isinstance(content, tuple):
             rtn = ''
             for c in content:
-                rtn += Row(Column(c, width, classes, style, template)).render()
+                rtn += Row(Column(c, width, classes, style)).render()
             return rtn
-        rtn = Row(Column(content, width, classes, style, template)).render()
+        rtn = Row(Column(content, width, classes, style)).render()
         return rtn
 RC = functools.partial(RowColumn, width=12)
 RC1 = functools.partial(RowColumn, width=1)

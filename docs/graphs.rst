@@ -1,6 +1,6 @@
 .. DjangoPages graph widgets.
 
-.. automodule:: djangopages.widgets.dpage_graphs
+.. automodule:: djangopages.widgets.graph
 
-.. autoclass:: djangopages.widgets.dpage_graphs.GraphCK
+.. autoclass:: djangopages.widgets.graph.GraphCK
    :members: __init__

@@ -5,7 +5,7 @@
 Graph Widgets
 =============
 
-.. module:: dpage_graphs
+.. module:: graph
    :synopsis: Provides DjangoPage widgets to create chartkick graphs
 
 .. moduleauthor:: Richard Bell <rbell01824@gmail.com>

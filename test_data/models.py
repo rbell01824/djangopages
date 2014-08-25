@@ -23,7 +23,7 @@ __status__ = "dev"
 from django.db import models
 from django.db.models import Count
 
-# from djangopages.dpage_graphs import GraphCK
+# from djangopages.widgets.graph import GraphCK
 
 
 class CIA(models.Model):

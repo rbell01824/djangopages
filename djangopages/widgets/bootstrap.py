@@ -5,7 +5,7 @@
 Bootstrap Widgets Overview
 **************************
 
-.. module:: dpage_bootstrap3
+.. module:: bootstrap
    :synopsis: Provides DjangoPage widgets to create various bootstrap elements
 
 .. moduleauthor:: Richard Bell <rbell01824@gmail.com>
