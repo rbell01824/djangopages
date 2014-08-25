@@ -38,7 +38,7 @@ import loremipsum
 import functools
 
 from django.utils.encoding import force_unicode
-from djangopages.widgets.widgets import DWidget
+from djangopages.widgets.widgets import DWidget, DWidgetT
 
 ########################################################################################################################
 #
@@ -58,41 +58,28 @@ class Text(DWidget):
     | T(...), useful abbreviation
     | HTML(...), useful to indicate intent
 
+
+    :param content: content to output
+    :type content: str or unicode or tuple or DWidget
+    :param para: if True wrap output in a paragraph
+    :type para: bool
+    :param classes: classes to add to output
+    :type classes: str or unicode or DWidget
+    :param style: styles to add to output
+    :type style: str or unicode or DWidget
+    :return: HTML for content
+    :rtype: unicode
     """
     def __init__(self, content, para=False, classes='', style=''):
-        super(Text, self).__init__(content, para, classes, style)
-        return
-
-    # noinspection PyMethodOverriding
-    @staticmethod
-    def generate(content, para, classes, style):
-        """ Renders text content to the page.
-
-        :param content: content
-        :type content: str or unicode or tuple or DWidget
-        :param para: if True wrap output in a paragraph
-        :type para: bool
-        :param classes: classes to add to output
-        :type classes: str or unicode or DWidget
-        :param style: styles to add to output
-        :type style: str or unicode or DWidget
-        :return: HTML for content
-        :rtype: unicode
-        """
-        if isinstance(content, tuple):
-            rtn = ''
-            for c in content:
-                rtn += Text(c, para, classes, style)
-            return rtn
-        if classes:
-            classes = 'class="{}" '.format(classes)
-        if style:
-            style = 'style="{}" '.format(style)
         if para:
-            return '<p {classes} {style}>{content}</p>'.format(classes=classes, style=style, content=content)
-        if classes or style:
-            return '<span {classes} {style}>{content}</span>'.format(classes=classes, style=style, content=content)
-        return content
+            template = '<p class="{classes}" style="{style}">{content}</p>'
+        elif classes or style:
+            template = '<span class="{classes}" style="{style}">{content}</span>'
+        else:
+            template = '{content}'
+        super(Text, self).__init__('content', template,
+                                   {'content': content, 'para': para, 'classes': classes, 'style': style})
+        return
 T = functools.partial(Text)
 HTML = functools.partial(Text)
 
@@ -106,27 +93,26 @@ class Markdown(DWidget):
         Markdown(('##Title', 'Other **markdown** text', '<b>Can contain html</b>')
 
     Shortcut: MD()
+
+    :param source: source
+    :type source: str or unicode or tuple or DWidget
+    :param extensions: defaults to []; see Markdown extensions in python documentation
+    :type extensions: list
+    :return: HTML for source
+    :rtype: unicode
     """
     def __init__(self, source, extensions=list()):
         super(Markdown, self).__init__(source, extensions)
         return
 
     # noinspection PyMethodOverriding
-    @staticmethod
-    def generate(source, extensions):
-        """ Renders markdown content to the page.
-
-        :param source: source
-        :type source: str or unicode or tuple or DWidget
-        :param extensions: defaults to []; see Markdown extensions in python documentation
-        :type extensions: list
-        :return: HTML for source
-        :rtype: unicode
-        """
+    def generate(self):
+        """ Renders markdown content to the page. """
+        source, extensions = self.args
         if isinstance(source, tuple):
             rtn = ''
             for s in source:
-                rtn += Markdown(s, extensions)
+                rtn += Markdown(s, extensions).generate()
             return rtn
         rtn = markdown.markdown(force_unicode(source),
                                 extensions,

@@ -116,36 +116,25 @@ class DWidget(object):
         args = tuple()
         for a in self.args:
             args += (_render(a),)
-        out = self.generate(*args)
+        self.args = args
+        out = self.generate()
         # log.debug('##### done dwidget render')
-        # if isinstance(out, DWidget):
-        #     out = out.render()
         return out
 
-    def generate(self, template, content, classes, style, kwargs):
-        """ Generate the widget's content.
-
-        .. note:: **Widgets MUST override this method.**
-
-        :param template: The widget's template with all objects rendered.
-        :type template: varies, typically str or tuple
-        :param content: The widget's content with all objects rendered.
-        :type content: varies, typically str or tuple
-        :param classes: The widget's classes with all objects rendered.
-        :type classes: varies, typically str
-        :param style: The widget's styles with all objects rendered.
-        :type style: varies, typically str
-        :param kwargs: The widget's kwargs.  Note, objects are **not rendered**.
-        :type kwargs: dict
-        :return: The widget's HTML
-        :rtype: str
-        """
-        log.debug('!!!!! in DWidget generate')
-        try:
-            c = ' '.join(content)
-            return template.format(content=c, classes=classes, style=style)
-        except TypeError:
-            raise TypeError('Non string content for default DWidget generate')
+    # noinspection PyMethodOverriding
+    def generate(self):
+        """ generate helper """
+        # log.debug('!!!!! in DWidget generate')
+        content_name, template, xargs = self.args
+        if content_name and isinstance(xargs[content_name], (list, tuple)):
+            rtn = ''
+            content = xargs.pop(content_name)
+            for c in content:
+                xargs[content_name] = c
+                rtn += self.__class__(**xargs).render()
+            return rtn
+        rtn = template.format(**xargs)
+        return rtn
 
     def __add__(self, other):
         return self.render() + other
@@ -163,37 +152,30 @@ class DWidget(object):
         return self.render()
 
 
-class DWidgetX(DWidget):
-    """ Base class for simple widgets
+class DWidgetT(DWidget):
+    """ Base class for widget template objects.
 
-    Many widgets simply return a string created from the widget's template and arguments.  Such widgets
-    can derive from DWidgetSimple and need not implement a generate method.
+    Many widgets need helper objects that simply format based on arguments.  DWidgetT supports that need.
 
-    .. note:: See the code for the Header widget for a use case example.
+    :param template: template for output
+    :type template: str or unicode
+    :param args: arguments for template
+    :type args: dict
+    :return: template formated with arguments
+    :rtype: unicode
     """
-    def __init__(self, content_name, template, args):
-        super(DWidgetX, self).__init__(content_name, template, args)
+    def __init__(self, template, args):
+        super(DWidgetT, self).__init__(template, args)
         return
 
     # noinspection PyMethodOverriding
-    def generate(self, content_name, template, args):
-        """ generate helper
-
-        :param content: widget's content
-        :type content: str or unicode
-        :param args: other widget arguments.
-        :type args: varies
-        :return: classes and style for widget
-        :rtype: tuple
+    def generate(self):
+        """ Return template formatted with arguments
+        :return: Template formatted with arguments
+        :rtype: unicode
         """
-        if isinstance(args[content_name], (list, tuple)):
-            rtn = ''
-            content = args.pop(content_name)
-            for c in content:
-                args[content_name] = c
-                rtn += self.__class__(**args).render()
-            return rtn
-        rtn = template.format(**args)
+        template, xargs = self.args
+        rtn = template.format(**xargs)
         return rtn
 
 ########################################################################################################################

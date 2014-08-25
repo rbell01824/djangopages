@@ -36,8 +36,8 @@ __email__ = 'rbell01824@gmail.com'
 import functools
 
 # noinspection PyProtectedMember
-from djangopages.libs import unique_name
-from djangopages.widgets.widgets import DWidget, DWidgetX
+from djangopages.libs import unique_name, ssw
+from djangopages.widgets.widgets import DWidget, DWidgetT
 
 ########################################################################################################################
 #
@@ -230,7 +230,7 @@ class Button(DWidget):
         :rtype: unicode
         """
         template = '<!-- start of button -->\n' \
-                   '    <button type="button" {classes} {disabled} {style}>\n' \
+                   '    <button type="button" class="btn {button} {size} {classes}" style="{style}" {disabled}>\n' \
                    '        {text}\n' \
                    '    </button>\n' \
                    '<!-- end of button -->\n'
@@ -239,12 +239,13 @@ class Button(DWidget):
             for t in text:
                 rtn += Button(t, button, size, disabled, classes, style)
             return rtn
+        button = ssw(button, 'btn-')
+        size = ssw(size, 'btn-')
         if disabled:
             disabled = 'disabled="disabled" '
-        classes = 'class="btn {button} {size} {classes}" '.format(button=button, size=size, classes=classes)
-        if style:
-            style = 'style="{}" '.format(style)
-        rtn = template.format(classes=classes, disabled=disabled, style=style, text=text)
+        else:
+            disabled = ''
+        rtn = template.format(button=button, size=size, classes=classes, style=style, disabled=disabled, text=text)
         return rtn
 BTN = functools.partial(Button)
 BTNPrimary = functools.partial(Button, button='btn-primary')
@@ -317,7 +318,7 @@ class Glyphicon(DWidget):
 GL = functools.partial(Glyphicon)
 
 
-class Hn(DWidgetX):
+class Hn(DWidget):
     """ HTML heading
 
     .. sourcecode:: python
@@ -351,58 +352,6 @@ class Hn(DWidgetX):
         super(Hn, self).__init__('heading', template,
                                  {'heading': heading, 'level': str(level), 'classes': classes, 'style': style})
         return
-
-# class Hn(DWidget):
-#     """ HTML heading
-#
-#     .. sourcecode:: python
-#
-#         Hn('Header text')
-#         Hn('Header text' + Small('subtext'), level=2)
-#
-#     | Synonyms:
-#     | H1 = functools.partial(Hn, level=1)
-#     | H2 = functools.partial(Hn, level=2)
-#     | H3 = functools.partial(Hn, level=3)
-#     | H4 = functools.partial(Hn, level=4)
-#     | H5 = functools.partial(Hn, level=5)
-#     | H6 = functools.partial(Hn, level=6)
-#     """
-#     def __init__(self, heading, level=3, classes='', style=''):
-#         super(Hn, self).__init__(heading, level, classes, style)
-#         return
-#
-#     # noinspection PyMethodOverriding
-#     @staticmethod
-#     def generate(heading, level, classes, style):
-#         """ HTML heading
-#
-#         :param heading: heading text
-#         :type heading: str or unicode
-#         :param level: heading level
-#         :type level: int
-#         :param classes: classes to add to output
-#         :type classes: str or unicode
-#         :param style: styles to add to output
-#         :type style: str or unicode
-#         :return: HTML H html
-#         :rtype: unicode
-#         """
-#         if isinstance(heading, (list, tuple)):
-#             rtn = ''
-#             for h in heading:
-#                 rtn += Hn(h, level, classes, style)
-#             return rtn
-#         template = '<h{level} {classes} {style}>\n' \
-#                    '    {heading}\n' \
-#                    '</h{level}>'
-#         if classes:
-#             classes = 'class="{}" '.format(classes)
-#         if style:
-#             style = 'style="{}" '.format(style)
-#         level = str(level)
-#         rtn = template.format(level=level, classes=classes, style=style, heading=heading)
-#         return rtn
 H1 = functools.partial(Hn, level=1)
 H2 = functools.partial(Hn, level=2)
 H3 = functools.partial(Hn, level=3)
@@ -411,7 +360,7 @@ H5 = functools.partial(Hn, level=5)
 H6 = functools.partial(Hn, level=6)
 
 
-class Header(DWidgetX):
+class Header(DWidget):
     """ Bootstrap page-header component
 
     .. sourcecode:: python
@@ -440,49 +389,6 @@ class Header(DWidgetX):
         return
 
 
-# class Header(DWidget):
-#     """ Bootstrap page-header component
-#
-#     .. sourcecode:: python
-#
-#         Header('Header text')
-#         Header(H3('heading'+Small('subheading'))
-#
-#     .. note:: The heading argument is typically a Hn widget.
-#     """
-#     def __init__(self, heading, classes='', style=''):
-#         super(Header, self).__init__(heading, classes, style)
-#         return
-#
-#     # noinspection PyMethodOverriding
-#     @staticmethod
-#     def generate(heading, classes, style):
-#         """ Bootstrap page-header component
-#
-#         :param heading: heading HTML
-#         :type heading: str or unicode or DWidget
-#         :param classes: classes to add to output
-#         :type classes: str or unicode
-#         :param style: styles to add to output
-#         :type style: str or unicode
-#         :return: Header html
-#         :rtype: unicode
-#         """
-#         if isinstance(heading, (tuple, list)):
-#             rtn = ''
-#             for h in heading:
-#                 rtn += Header(h, classes, style)
-#             return rtn
-#
-#         template = '<!-- header start -->\n' \
-#                    '    <div class="page-header {classes}" style="{style}">\n' \
-#                    '        {heading}\n' \
-#                    '    </div>' \
-#                    '<!-- header end -->\n'
-#         rtn = template.format(classes=classes, style=style, heading=heading)
-#         return rtn
-
-
 class Jumbotron(DWidget):
     """ Bbootstrap jumbotron
 
@@ -491,45 +397,27 @@ class Jumbotron(DWidget):
         Jumbotro('Jumbotron content')
         Jumbotron(MD('#Jumbotron 2') + 'Some text' + BTNSInfo('Button'))
 
+    :param content: content
+    :type content: basestring or tuple or DWidget
+    :param classes: classes to add to output
+    :type classes: str or unicode
+    :param style: styles to add to output
+    :type style: str or unicode
+    :return: Glyphicon html
+    :rtype: unicode
     """
     def __init__(self, content, classes='', style=''):
-        super(Jumbotron, self).__init__(content, classes, style)
-        return
-
-    # noinspection PyMethodOverriding
-    @staticmethod
-    def generate(content, classes, style):
-        """ Bbootstrap jumbotron
-
-        :param content: content
-        :type content: basestring or tuple or DWidget
-        :param classes: classes to add to output
-        :type classes: str or unicode
-        :param style: styles to add to output
-        :type style: str or unicode
-        :return: Glyphicon html
-        :rtype: unicode
-        """
-        if isinstance(content, (tuple, list)):
-            rtn = ''
-            for c in content:
-                rtn += Jumbotron(c, classes, style)
-            return rtn
         template = '<!-- jumbotron start -->' \
                    '<div class="jumbotron">\n' \
-                   '{content}\n' \
+                   '    {content}\n' \
                    '</div>\n' \
                    '<!-- jumbotron end -->'
-        assert isinstance(content, (str, unicode))
-        if classes:
-            classes = 'class="{}" '.format(classes)
-        if style:
-            style = 'style="{}" '.format(style)
-        rtn = template.format(classes=classes, style=style, content=content)
-        return rtn
+        super(Jumbotron, self).__init__('content', template,
+                                        {'content': content, 'classes': classes, 'style': style})
+        return
 
 
-class Label(DWidgetX):
+class Label(DWidget):
     """ Bootstrap label
 
     .. sourcecode:: python
@@ -555,45 +443,8 @@ class Label(DWidgetX):
                                      'classes': classes, 'style': style})
         return
 
-# # noinspection PyPep8Naming
-# def Label(content, label_type='label-default', classes='', style=''):
-#     """ Bootstrap label
-#
-#     .. sourcecode:: python
-#
-#         Label('default', 'text of default label',
-#               'primary', 'text of primary label')
-#
-#     :param content: content, label_type, label_text, ...
-#     :type content: basestring or tuple or DWidget
-#     :param label_type: label type in the form 'simple_label' or 'label-simple_label'
-#     :type label_type: str or unicode
-#     :param classes: classes to add to output
-#     :type classes: str or unicode
-#     :param style: styles to add to output
-#     :type style: str or unicode
-#     :return: label html
-#     :rtype: unicode
-#     """
-#
-#     if isinstance(content, (list, tuple)):
-#         rtn = ''
-#         for c in content:
-#             rtn += Label(c, label_type, classes, style)
-#         return rtn
-#
-#     template = '<span {classes} {style}>{content}</span>'
-#     if not label_type.startswith('label-'):
-#         label_type = 'label-' + label_type
-#     classes = 'class="label {label_type} {classes}" '.format(label_type=label_type, classes=classes)
-#     if style:
-#         style = 'style="{}" '.format(style)
-#     rtn = template.format(content=content, classes=classes, style=style)
-#     return rtn
 
-
-# noinspection PyPep8Naming
-def Link(href, text, button='btn-default', size='', disabled=False, classes='', style=''):
+class Link(DWidget):
     """ Bootstrap link button
     
     .. sourcecode:: python
@@ -645,18 +496,25 @@ def Link(href, text, button='btn-default', size='', disabled=False, classes='', 
     | LNKXSDanger = functools.partial(Link, button='btn-danger', size='btn-xs')    
     """
 
-    template = '<a href="{href}" {classes} {style} {disabled} {role}>{text}</a>'
-
-    if disabled:
-        disabled = 'disabled="disabled" '
-    classes = 'class="btn {button} {size} {classes}" '.format(button=button, size=size, classes=classes)
-    if style:
-        style = 'style="{}" '.format(style)
-    role = ''
-    if button:
-        role = 'role="button" '
-    rtn = template.format(href=href, classes=classes, style=style, disabled=disabled, role=role, text=text)
-    return rtn
+    def __init__(self, href, text, button='btn-default', size='', disabled=False, classes='', style=''):
+        template = '<a href="{href}" class="{classes}" style="{style}" ' \
+                   ' {disabled} {role}>{text}</a>'
+        if disabled:
+            disabled = 'disabled="disabled" '
+        else:
+            disabled = ''
+        role = ''
+        if button:
+            if not button.startswith('btn-'):
+                button = 'btn-' + button
+            if size and not size.startswith('btn-'):
+                size = 'btn-' + size
+            classes = 'btn {button} {size} {classes}'.format(button=button, size=size, classes=classes)
+            role = 'role="button" '
+        super(Link, self).__init__('', template,
+                                   {'href': href, 'classes': classes, 'style': style,
+                                    'disabled': disabled, 'role': role, 'text': text})
+        return
 LNK = functools.partial(Link)
 LNKPrimary = functools.partial(Link, button='btn-primary')
 LNKSuccess = functools.partial(Link, button='btn-success')
@@ -682,6 +540,7 @@ LNKXSInfo = functools.partial(Link, button='btn-info', size='btn-xs')
 LNKXSWarning = functools.partial(Link, button='btn-warning', size='btn-xs')
 LNKXSDanger = functools.partial(Link, button='btn-danger', size='btn-xs')
 
+# fixme: resume work here
 
 # noinspection PyPep8Naming
 def PanelFooter(footer='', classes='', style=''):
@@ -794,85 +653,164 @@ PanelWarning = functools.partial(Panel, panel_type='panel-warning')
 PanelDanger = functools.partial(Panel, panel_type='panel-danger')
 
 
-# noinspection PyPep8Naming
-def Modal(heading='', body='', footer='', button='Show', modal_size=''):
+class Modal(DWidget):
     """ Bootstrap modal
 
     .. sourcecode:: python
 
-        Modal( heading='', body='', footer='', button='Show', modal_size='', button_type='btn-primary', **kwargs):
+        Modal( heading='', body='', footer='', button='Show', modal_size='', button_type='btn-primary'):
 
-    :param heading: heading for modal panel
-    :type heading: str or unicode
-    :param body: body for modal panel
-    :type body: str or unicode
-    :param footer: footer modal panel
-    :type footer: str or unicode
-    :param button: text for modal button or ModalButton object
-    :type button: str or unicode or ModalButton
-    :param modal_size: modal size per bootstrap
-    :type modal_size: str or unicode
     """
-    template = """
-<!-- Button trigger modal -->
-<button class="btn {button_type}" data-toggle="modal" data-target="#{modal_id}">
-  {button}
-</button>
-<!-- / Button trigger modal -->
-
-<!-- .modal -->
-<div class="modal fade " id={modal_id} tabindex="-1" role="dialog" aria-labelledby="{modal_label}" aria-hidden="true">
-  <!-- .modal-dialog -->
-  <div class="modal-dialog {modal_size}">
-    <!-- .modal-content -->
-    <div class="modal-content">
-      <!-- .modal-header -->
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">
-          <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
-        </button>
-        <h4 class="modal-title" id={modal_label}>{heading}</h4>
-      </div>
-      <!-- /.modal-header -->
-      <!-- .modal-body -->
-      <div class="modal-body">
-        {body}
-      </div>
-      <!-- /.modal-body -->
-      <!-- .modal-footer -->
-      <div class="modal-footer">
-        {footer}
-      </div>
-      <!-- /.modal-footer -->
-    </div>
-    <!-- /.modal-content -->
-  </div>
-  <!-- /.modal-dialog -->
-</div>
-<!-- /.modal -->
-    """
-    modal_id = unique_name('id_m_')
-    modal_label = unique_name('lbl_m_')
-    out = template.format(heading=heading, body=body, footer=footer,
-                          modal_id=modal_id, modal_label=modal_label,
-                          modal_size=modal_size,
-                          button=button, button_type=button_type)
-    return out
-
-
-class ModalButton(object):
-    """ Modal button definition """
-    def __index__(self, button='btn-default', size='', disabled=False, classes='', style=''):
-        self.button = button
-        self.size = size
-        self.disabled = disabled
-        self.classes = classes
-        self.style = style
+    def __init__(self, heading='', body='', footer='', button='Show', modal_size=''):
+        super(Modal, self).__init__(heading, body, footer, button, modal_size)
         return
 
-    def generate(self):
-        rtn = ''
+    # noinspection PyMethodOverriding
+    @staticmethod
+    def generate(header, body, footer, button, modal_size):
+        """ Bootstrap modal
+
+        .. sourcecode:: python
+
+            Modal( header='some header', body='body stuff', footer='footer stuff', button='Show', modal_size=''):
+
+        :param header: header for modal
+        :type header: str or unicode
+        :param body: body for modal
+        :type body: str or unicode
+        :param footer: footer for modal
+        :type footer: str or unicode
+        :param button: text for modal button or ModalButton object
+        :type button: str or unicode or ModalButton
+        :param modal_size: modal size per bootstrap
+        :type modal_size: str or unicode
+        """
+        assert isinstance(header, (str, unicode, ModalHeader))
+        assert isinstance(body, (str, unicode, ModalBody))
+        assert isinstance(footer, (str, unicode, ModalFooter))
+        assert isinstance(button, (str, unicode, ModalButton))
+        assert isinstance(modal_size, (str, unicode))
+        modal_id = unique_name('id_m')
+        modal_label = unique_name('lbl_m')
+        template = '<!-- Modal --> \n' \
+                   '{button}\n' \
+                   '<div class="modal fade" id={modal_id} tabindex="-1" role="dialog" ' \
+                   '    aria-labelledby="{modal_label}" aria-hidden="True">\n' \
+                   '    <div class="Modal-dialog {modal_size}">\n' \
+                   '        <div class="modal-content">\n' \
+                   '            {header}\n' \
+                   '            {body}\n' \
+                   '            {footer}\n' \
+                   '        </div>' \
+                   '    </div>' \
+                   '</div>' \
+                   '<!-- / Modal --> \n'
+        modal_size = ssw(modal_size, 'modal-')
+        if button and isinstance(button, (str, unicode)):
+            button = ModalButton(modal_id, button)
+        if isinstance(header, (str, unicode)):
+            header = ModalHeader(header)
+        if isinstance(body, (str, unicode)):
+            body = ModalBody(body)
+        if isinstance(footer, (str, unicode)):
+            footer = ModalFooter(footer)
+        rtn = template.format(button=button,
+                              modal_id=modal_id, modal_label=modal_label, modal_size=modal_size,
+                              header=header, body=body, footer=footer
+                              )
         return rtn
+
+
+class ModalBody(DWidgetT):
+    """ Modal body definition
+
+    :param body: Modal body
+    :return: body HTML
+    :rtype: unicode
+    """
+    # noinspection PyMethodOverriding
+    def __init__(self, body):
+        template = '<div class="modal-body"> \n' \
+                   '    {body}\n' \
+                   '</div>\n'
+        super(ModalBody, self).__init__(template, {'body': body})
+        return
+
+
+class ModalButton(DWidgetT):
+    """ Modal button definition
+
+    .. sourcecode:: python
+
+        ModalButton('Text of button')
+
+    :param text: text
+    :type text: str or unicode or tuple
+    :param button: default 'btn-default', button type per bootstrap
+    :type button: str or unicode
+    :param size: default '', button size per bootstrap
+    :type size: str or unicode
+    :param disabled: default False, if true button is disabled
+    :type disabled: bool
+    :param classes: classes to add to output
+    :type classes: str or unicode
+    :param style: styles to add to output
+    :type style: str or unicode
+    :return: HTML for bootstrap button
+    :rtype: unicode
+    """
+    def __init__(self, modal_id=None, text='Show',
+                 button='btn-default', size='', disabled=False, classes='', style=''):
+        template = '<!-- Modal trigger button -->\n' \
+                   '<button class="btn {button} {size} {classes}" style="{style}" ' \
+                   '    {disabled} data-toggle="modal" data-target="#{modal_id}">\n' \
+                   '    {text}\n' \
+                   '</button>\n' \
+                   '<!-- / Modal trigger button -->\n'
+        button = ssw(button, 'btn-')
+        size = ssw(size, 'btn-')
+        disabled = 'disabled="disabled"' if disabled else ''
+        super(ModalButton, self).__init__(template, {'modal_id': modal_id, 'text': text,
+                                                     'button': button, 'size': size, 'disabled': disabled,
+                                                     'classes': classes, 'style': style})
+        return
+
+
+class ModalHeader(DWidgetT):
+    """ Bootstrap modal header object
+
+    :param text: header text
+    :type text: str or unicode or DWidget
+    :return: HTML for modal header
+    :rtype: unicode
+    """
+    # noinspection PyMethodOverriding
+    def __init__(self, text):
+        template = '<div class="modal-header"> \n' \
+                   '    <button type="button" class="close" data-dismiss="modal">' \
+                   '        <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>' \
+                   '    </button>\n' \
+                   '    {title}\n' \
+                   '</div>\n'
+        super(ModalHeader, self).__init__(template, {'title': text})
+        return
+
+
+class ModalFooter(DWidgetT):
+    """ Bootstrap modal footer object
+
+    :param text: footer text
+    :type text: str or unicode or DWidget
+    :return: HTML for modal footer
+    :rtype: unicode
+    """
+    # noinspection PyMethodOverriding
+    def __init__(self, text):
+        template = '<div class="modal-footer"> \n' \
+                   '    {footer}\n' \
+                   '</div>\n'
+        super(ModalFooter, self).__init__(template, {'text': text})
+        return
 
 
 class Small(DWidget):

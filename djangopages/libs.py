@@ -166,6 +166,27 @@ def dict_nested_set(dic, key, value):
 
 ########################################################################################################################
 #
+# Insure that a string startw with a value
+#
+########################################################################################################################
+
+
+def ssw(value, lead_string):
+    """ If value is not '', insure that it starts with lead_string.
+
+    :param value: current value
+    :type value: str or unicode
+    :param lead_string: lead string
+    :type lead_string: str or unicode
+    :return: string starting with lead_string if string is not ''
+    :rtype: unicode
+    """
+    if value and not value.startswith(lead_string):
+        return lead_string + value
+    return value
+
+########################################################################################################################
+#
 # Static name generator.  Generates names for ID's etc.
 #
 ########################################################################################################################
