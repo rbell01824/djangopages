@@ -112,13 +112,15 @@ class DWidget(object):
         .. note:: Widgets may, though probably shouldn't, override the default render method.
         """
 
-        # log.debug('##### in dwidget render')
+        # log.debug('##### DWidget render for {}'.format(self.__class__))
         args = tuple()
         for a in self.args:
             args += (_render(a),)
         self.args = args
         out = self.generate()
-        # log.debug('##### done dwidget render')
+        # log.debug('##### DWidget out for {}'.format(self.__class__))
+        # log.debug('{}'.format(out))
+        # log.debug('##### DWidget render done for {}'.format(self.__class__))
         return out
 
     # noinspection PyMethodOverriding

@@ -563,10 +563,6 @@ class Panel(DWidgetT):
                    '    </div>\n ' \
                    '    {footer}\n' \
                    '</div>'
-        # if heading and isinstance(heading, (str, unicode)):
-        #     heading = PanelHeading(heading)
-        # if footer and isinstance(footer, (str, unicode)):
-        #     footer = PanelFooter(footer)
         if heading and not isinstance(heading, PanelHeading):
             heading = PanelHeading(heading)
         if footer and not isinstance(footer, PanelFooter):
@@ -645,72 +641,54 @@ class PanelHeading(DWidgetT):
         return
 
 
-class Modal(DWidget):
+class Modal(DWidgetT):
     """ Bootstrap modal
 
     .. sourcecode:: python
 
-        Modal( heading='', body='', footer='', button='Show', modal_size='', button_type='btn-primary'):
+        Modal( header='some header', body='body stuff', footer='footer stuff', button='Show', modal_size=''):
 
+    :param header: header for modal
+    :type header: str or unicode
+    :param body: body for modal
+    :type body: str or unicode
+    :param footer: footer for modal
+    :type footer: str or unicode
+    :param button: text for modal button or ModalButton object
+    :type button: str or unicode or ModalButton
+    :param modal_size: modal size per bootstrap
+    :type modal_size: str or unicode
     """
-    def __init__(self, heading='', body='', footer='', button='Show', modal_size=''):
-        super(Modal, self).__init__(heading, body, footer, button, modal_size)
-        return
-
-    # noinspection PyMethodOverriding
-    @staticmethod
-    def generate(header, body, footer, button, modal_size):
-        """ Bootstrap modal
-
-        .. sourcecode:: python
-
-            Modal( header='some header', body='body stuff', footer='footer stuff', button='Show', modal_size=''):
-
-        :param header: header for modal
-        :type header: str or unicode
-        :param body: body for modal
-        :type body: str or unicode
-        :param footer: footer for modal
-        :type footer: str or unicode
-        :param button: text for modal button or ModalButton object
-        :type button: str or unicode or ModalButton
-        :param modal_size: modal size per bootstrap
-        :type modal_size: str or unicode
-        """
-        assert isinstance(header, (str, unicode, ModalHeader))
-        assert isinstance(body, (str, unicode, ModalBody))
-        assert isinstance(footer, (str, unicode, ModalFooter))
-        assert isinstance(button, (str, unicode, ModalButton))
-        assert isinstance(modal_size, (str, unicode))
+    def __init__(self, header='', body='Body must be defined', footer='', button='Show', modal_size=''):
         modal_id = unique_name('id_m')
         modal_label = unique_name('lbl_m')
+        if button and not isinstance(button, ModalButton):
+            button = ModalButton(button)
+        button.set_modal_id(modal_id)
+        if header and not isinstance(header, ModalHeader):
+            header = ModalHeader(header)
+        if body and not isinstance(body, ModalBody):
+            body = ModalBody(body)
+        if footer and not isinstance(footer, ModalFooter):
+            footer = ModalFooter(footer)
         template = '<!-- Modal --> \n' \
                    '{button}\n' \
                    '<div class="modal fade" id={modal_id} tabindex="-1" role="dialog" ' \
                    '    aria-labelledby="{modal_label}" aria-hidden="True">\n' \
-                   '    <div class="Modal-dialog {modal_size}">\n' \
+                   '    <div class="modal-dialog {modal_size}">\n' \
                    '        <div class="modal-content">\n' \
-                   '            {header}\n' \
-                   '            {body}\n' \
-                   '            {footer}\n' \
-                   '        </div>' \
-                   '    </div>' \
-                   '</div>' \
+                   '{header}\n' \
+                   '{body}\n' \
+                   '{footer}\n' \
+                   '        </div>\n' \
+                   '    </div>\n' \
+                   '</div>\n' \
                    '<!-- / Modal --> \n'
         modal_size = ssw(modal_size, 'modal-')
-        if button and isinstance(button, (str, unicode)):
-            button = ModalButton(modal_id, button)
-        if isinstance(header, (str, unicode)):
-            header = ModalHeader(header)
-        if isinstance(body, (str, unicode)):
-            body = ModalBody(body)
-        if isinstance(footer, (str, unicode)):
-            footer = ModalFooter(footer)
-        rtn = template.format(button=button,
-                              modal_id=modal_id, modal_label=modal_label, modal_size=modal_size,
-                              header=header, body=body, footer=footer
-                              )
-        return rtn
+        super(Modal, self).__init__(template,
+                                    {'header': header, 'body': body, 'footer': footer, 'button': button,
+                                     'modal_size': modal_size, 'modal_id': modal_id, 'modal_label': modal_label})
+        return
 
 
 class ModalBody(DWidgetT):
@@ -722,7 +700,7 @@ class ModalBody(DWidgetT):
     """
     # noinspection PyMethodOverriding
     def __init__(self, body):
-        template = '<div class="modal-body"> \n' \
+        template = '<div class="modal-body">\n' \
                    '    {body}\n' \
                    '</div>\n'
         super(ModalBody, self).__init__(template, {'body': body})
@@ -751,40 +729,42 @@ class ModalButton(DWidgetT):
     :return: HTML for bootstrap button
     :rtype: unicode
     """
-    def __init__(self, modal_id=None, text='Show',
-                 button='btn-default', size='', disabled=False, classes='', style=''):
-        template = '<!-- Modal trigger button -->\n' \
-                   '<button class="btn {button} {size} {classes}" style="{style}" ' \
+    def __init__(self, text='Show', button='btn-default', size='',
+                 disabled=False, classes='', style=''):
+        template = '<button class="btn {button} {size} {classes}" style="{style}" ' \
                    '    {disabled} data-toggle="modal" data-target="#{modal_id}">\n' \
                    '    {text}\n' \
-                   '</button>\n' \
-                   '<!-- / Modal trigger button -->\n'
+                   '</button>\n'
         button = ssw(button, 'btn-')
         size = ssw(size, 'btn-')
         disabled = 'disabled="disabled"' if disabled else ''
+        modal_id = None
         super(ModalButton, self).__init__(template, {'modal_id': modal_id, 'text': text,
                                                      'button': button, 'size': size, 'disabled': disabled,
                                                      'classes': classes, 'style': style})
+
+    def set_modal_id(self, modal_id):
+        self.args[1]['modal_id'] = modal_id
         return
 
 
 class ModalHeader(DWidgetT):
     """ Bootstrap modal header object
 
-    :param text: header text
-    :type text: str or unicode or DWidget
+    :param header: header
+    :type header: str or unicode or DWidget
     :return: HTML for modal header
     :rtype: unicode
     """
     # noinspection PyMethodOverriding
-    def __init__(self, text):
+    def __init__(self, header):
         template = '<div class="modal-header"> \n' \
                    '    <button type="button" class="close" data-dismiss="modal">' \
                    '        <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>' \
                    '    </button>\n' \
-                   '    {title}\n' \
+                   '    {header}\n' \
                    '</div>\n'
-        super(ModalHeader, self).__init__(template, {'title': text})
+        super(ModalHeader, self).__init__(template, {'header': header})
         return
 
 
@@ -797,11 +777,11 @@ class ModalFooter(DWidgetT):
     :rtype: unicode
     """
     # noinspection PyMethodOverriding
-    def __init__(self, text):
+    def __init__(self, footer):
         template = '<div class="modal-footer"> \n' \
                    '    {footer}\n' \
                    '</div>\n'
-        super(ModalFooter, self).__init__(template, {'text': text})
+        super(ModalFooter, self).__init__(template, {'footer': footer})
         return
 
 
