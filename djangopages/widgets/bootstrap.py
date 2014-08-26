@@ -771,8 +771,8 @@ class ModalHeader(DWidgetT):
 class ModalFooter(DWidgetT):
     """ Bootstrap modal footer object
 
-    :param text: footer text
-    :type text: str or unicode or DWidget
+    :param footer: footer text
+    :type footer: str or unicode or DWidget
     :return: HTML for modal footer
     :rtype: unicode
     """
