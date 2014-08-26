@@ -826,7 +826,7 @@ class PanelC(DWidget):
                    '        </a>\n' \
                    '      </h4>\n' \
                    '    </div>\n' \
-                   '    <div id="{panel_id}" class="panel-collapse collapse">\n' \
+                   '    <div id="{panel_id}" class="panel-collapse collapse {expand}">\n' \
                    '      <div class="panel-body">\n' \
                    '        {content}\n' \
                    '      </div>\n' \

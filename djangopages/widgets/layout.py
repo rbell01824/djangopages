@@ -212,9 +212,10 @@ class RowColumn(DWidget):
         """ Equivalent to Row(Column(...)) """
         content, width, classes, style = self.args
         if isinstance(content, tuple):
-            rtn = ''
+            cols = ''
             for c in content:
-                rtn += Row(Column(c, width, classes, style)).render()
+                cols += Column(c, width, classes, style).render()
+            rtn = Row(cols).render()
             return rtn
         rtn = Row(Column(content, width, classes, style)).render()
         return rtn

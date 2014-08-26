@@ -828,49 +828,17 @@ content = T([RC(MD('##Can have other DjangoPage content on the page with the gra
         pie_graph = GraphCK('pie', browser_stats, options={'height': '400px',
                                                            'title.text': 'Browser Stats',
                                                            'subtitle.text': 'Graphs may have subtitles'})
-        column_graph = GraphCK('column', browser_stats, options={'height': '400px',
+        column_graph = GraphCK('column', browser_stats, options={'height': '400px', 'chart.width': '400',
                                                                  'title.text': 'Browser Stats',
                                                                  'subtitle.text': 'Graphs may have subtitles'})
-        bar_graph = GraphCK('bar', browser_stats, options={'height': '400px',
+        bar_graph = GraphCK('bar', browser_stats, options={'height': '400px', 'chart.width': '400',
                                                            'title.text': 'Browser Stats',
                                                            'subtitle.text': 'Graphs may have subtitles'})
 
         content = T([RC(MD('##Can have other DjangoPage content on the page with the graph.')),
-                     PanelC('Pie graph', pie_graph),
-                     PanelC('Column graph', column_graph),
-                     PanelC('Bar graph', bar_graph),
+                     RC4((PanelCInfo('Pie graph', pie_graph, expand=True),
+                          PanelC('Column graph', column_graph),
+                          PanelCPrimary('Bar graph', bar_graph))),
                      RC(MD('####Explanation of graph') + LI(8, 5))])
         content = page_content(self, code, content)
         return content
-#
-#
-# class TestMultipleGraphsInAccordionMInRow(DPage):
-#     """ Test MultipleGraphsInAccordionMInRow widget """
-#     title = 'Multiple Graphs in AccordionM in RC'
-#     description = 'Demonstrate ' + title
-#     tags = ['test', 'graphs']
-#
-#     def generate(self, request):
-#         code = """
-#
-#         """
-#         browser_stats = [['Chrome', 52.9], ['Firefox', 27.7],
-#                          ['Opera', 1.6], ['Internet Explorer', 12.6], ['Safari', 4]]
-#
-#         pie_graph = GraphCK('pie', browser_stats, options={'height': '400px',
-#                                                            'title.text': 'Browser Stats',
-#                                                            'subtitle.text': 'Graphs may have subtitles'})
-#         column_graph = GraphCK('column', browser_stats, options={'height': '400px',
-#                                                                  'title.text': 'Browser Stats',
-#                                                                  'subtitle.text': 'Graphs may have subtitles'})
-#         bar_graph = GraphCK('bar', browser_stats, options={'height': '400px',
-#                                                            'title.text': 'Browser Stats',
-#                                                            'subtitle.text': 'Graphs may have subtitles'})
-#
-#         content = T(RC(MD('##Can have other DjangoPage content on the page with the graph.')),
-#                     RC4(AccordionM('Pie', pie_graph),
-#                         AccordionM('Column', column_graph),
-#                         AccordionM('Bar', bar_graph)),
-#                     RC(MD('####Explanation of graph') + LI(8, 5)))
-#         self.content = page_content(self, code, content)
-#         return self
