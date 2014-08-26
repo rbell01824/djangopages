@@ -65,43 +65,47 @@ class Accordion(DWidget):
 
         Accordion((AccordionPanel('heading 1', 'content 1', expand=True),
                    AccordionPanel('heading 2', 'content 2'))
+
+    :param accordion_panels: accordion panels
+    :type accordion_panels: list or tuple of AccordionPanel
+    :return: Accordion object.  Object.render returns HTML for bootstrap accordion
+    :rtype: object
     """
     def __init__(self, accordion_panels):
-        super(Accordion, self).__init__(accordion_panels)
-        return
-
-    # noinspection PyMethodOverriding
-    @staticmethod
-    def generate(accordion_panels):
-        """ Bootstrap accordion
-
-        :param accordion_panels: accordion panels
-        :type accordion_panels: list or tuple of AccordionPanel
-        :return: HTML for bootstrap accordion
-        :rtype: unicode
-        """
         assert isinstance(accordion_panels, (list, tuple))
         accordion_id = unique_name('aid')
-        panels = ''
-        for p in accordion_panels:
-            panels += p.generate(accordion_id)
+        for p in accordion_panels:                              # set accordion id in our panels
+            p.accordion_id = accordion_id
+        super(Accordion, self).__init__(accordion_id, accordion_panels)
+
+    def generate(self):
+        """ Generate accordion HTML """
         template = '<!-- Accordion start -->' \
                    '    <div class="panel-group" id="{accordion_id}">\n' \
                    '        {panels}\n' \
                    '    </div>\n' \
                    '<!--Accordion end -->'
-        rtn = template.format(accordion_id=accordion_id,
-                              panels=panels)
+        accordion_id, panels = self.args
+        panels = '\n'.join(panels)
+        rtn = template.format(accordion_id=accordion_id, panels=panels)
         return rtn
 
 
 # noinspection PyPep8Naming
-class AccordionPanel(object):
+class AccordionPanel(DWidget):
     """ Defines an accordion panel for use in Accordion.  See Accordion.
 
     .. sourcecode:: python
 
         AccordionPanel('Panel title', 'Panel body')
+
+    | Synonyms:
+    | AccordionPanelDefault = functools.partial(AccordionPanel, panel_type='panel-default')
+    | AccordionPanelPrimary = functools.partial(AccordionPanel, panel_type='panel-primary')
+    | AccordionPanelSuccess = functools.partial(AccordionPanel, panel_type='panel-success')
+    | AccordionPanelInfo = functools.partial(AccordionPanel, panel_type='panel-info')
+    | AccordionPanelWarning = functools.partial(AccordionPanel, panel_type='panel-warning')
+    | AccordionPanelDanger = functools.partial(AccordionPanel, panel_type='panel-danger')
 
     :param title: Panel title
     :type title: str or unicode
@@ -111,33 +115,16 @@ class AccordionPanel(object):
     :type expand: bool
     :param panel_type: type for panel
     :type panel_type: str or unicode
-
-    | Synonyms:
-    | AccordionPanelDefault = functools.partial(AccordionPanel, panel_type='panel-default')
-    | AccordionPanelPrimary = functools.partial(AccordionPanel, panel_type='panel-primary')
-    | AccordionPanelSuccess = functools.partial(AccordionPanel, panel_type='panel-success')
-    | AccordionPanelInfo = functools.partial(AccordionPanel, panel_type='panel-info')
-    | AccordionPanelWarning = functools.partial(AccordionPanel, panel_type='panel-warning')
-    | AccordionPanelDanger = functools.partial(AccordionPanel, panel_type='panel-danger')
     """
     def __init__(self, title='', body='', expand=False, panel_type='panel-default'):
-        """
-        :param title: Panel title
-        :type title: str or unicode
-        :param body: Panel body
-        :type body: str or unicode
-        :param expand: if true, panel is initially expanded, otherwise collapsed
-        :type expand: bool
-        :param panel_type: type for panel
-        :type panel_type: str or unicode
-        """
-        self.title = title
-        self.body = body
-        self.expand = expand
-        self.panel_type = panel_type
+        """ Accordion panel """
+        super(AccordionPanel, self).__init__(title, body, expand, panel_type)
         return
 
-    def generate(self, accordion_id):
+    def generate(self):
+        title, body, expand, panel_type = self.args
+        # noinspection PyUnresolvedReferences
+        accordion_id = self.accordion_id
         template = '<!-- Accordion panel start -->\n' \
                    '  <div class="panel {panel_type}">\n' \
                    '    <div class="panel-heading">\n' \
@@ -155,12 +142,12 @@ class AccordionPanel(object):
                    '  </div>\n' \
                    '<!-- Accordion panel end -->'
         panel_id = unique_name('apid')
-        expand = 'in' if self.expand else ''
+        expand = 'in' if expand else ''
         rtn = template.format(accordion_id=accordion_id,
                               panel_id=panel_id,
-                              panel_type=self.panel_type,
-                              heading=self.title,
-                              content=self.body,
+                              panel_type=panel_type,
+                              heading=title,
+                              content=body,
                               expand=expand)
         return rtn
 AccordionPanelDefault = functools.partial(AccordionPanel, panel_type='panel-default')

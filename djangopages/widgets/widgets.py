@@ -72,8 +72,10 @@ class DWidget(object):
 
     .. Note:: **Derived classes must override generate and/or (if needed) render.**
 
-    .. Note:: If you need to force rendering of the widget you can code **widget(...).generate()** or use
-        the convenience method **X(widget(...))**.
+    .. Note:: If you need to force rendering, generaton of object's HTML, of the widget you can
+        code **widget(...).render()** or use the convenience method **X(widget(...))**.
+
+    .. Note:: **widget().generate()** will generate HTML **without** evaluating imbedded objects.
 
     DWidget implements
 
@@ -87,8 +89,6 @@ class DWidget(object):
 
     .. note:: add (+) and mul (*) force immediate rendering of the widget.
     """
-    template = ''
-
     def __init__(self, *args):
         # log.debug('-----in dwidget init')
         self.args = args
