@@ -341,11 +341,11 @@ class TestAccordion(DPage):
 
     def generate(self, request):
         code = """
-content = Accordion((AccordionPanel('heading 1', 'content 1', expand=True),
-                     AccordionPanel('heading 2', 'content 2')))
+content = Accordion((AccordionPanel('<h3>heading 1</h3>', 'content 1', expand=True),
+                     AccordionPanel(MD('###heading 2'), LI((3, 5, 12))))
         """
-        content = Accordion((AccordionPanel('heading 1', 'content 1', expand=True, panel_type='panel-success'),
-                             AccordionPanel('heading 2', 'content 2')))
+        content = Accordion((AccordionPanel('<h3>heading 1</h3>', 'content 1', expand=True),
+                             AccordionPanelSuccess(MD('###heading 2'), LI((3, 5, 12)))))
         content = page_content(self, code, content)
         return content
 
@@ -394,6 +394,7 @@ content = RC2((T('Three glyphs on a line: ') + Glyphicon('star') + GL('heart') +
         content = RC2((T('Three glyphs on a line: ') + Glyphicon('star') + GL('heart') + GL('music'),
                        (T('Two then one glyph on a line:'), GL(('zoom-in', 'refresh')), GL('qrcode')),
                        BTNSSuccess(GL('star')+'Success')))
+        # content = GL('star')
         content = page_content(self, code, content)
         return content
 
@@ -409,7 +410,7 @@ class TestHn(DPage):
 content = RC(H3('Level 3 heading'))
         """)
 
-        content = RC(H3('Level 3 heading'))
+        content = RC((H3('Level 3 heading'), H6('Level 6 heading')))
         content = page_content(self, code, content)
         return content
 
@@ -480,10 +481,16 @@ class TestLabel(DPage):
 
     def generate(self, request):
         code = escape("""
-content = RC('<h3>Example label ' + Label('New') + '</h3>')
+content = RC(('<h3>Example label ' + Label('New') + '</h3>',
+              H3('H3 header '+Label('h3 header')),
+              Label('MD more or less ok')+MD('####MD level 4'),
+              MD("### MD doesn't work well here"), Label('MD3')))
         """)
 
-        content = RC('<h3>Example label ' + Label('New') + '</h3>')
+        content = RC(('<h3>Example label ' + Label('New') + '</h3>',
+                      H3('H3 header '+Label('h3 header')),
+                      Label('MD more or less ok')+MD('####MD level 4'),
+                      MD("### MD doesn't work well here"), Label('MD3')))
         content = page_content(self, code, content)
         return content
 
@@ -536,19 +543,28 @@ class TestPanel(DPage):
         code = """
 p1 = Panel('Default panel')
 p2 = PanelPrimary('Primary panel')
-p3 = PanelSuccess('Panel 3 success with heading', PanelHeading('Panel 3 heading success'))
-p4 = PanelWarning('Panel 4 warning with heading and footer',
-                  PanelHeading('Panel 4 heading warning'),
-                  PanelFooter('Panel 4 footer'))
-content = RC((p1, p2, p3, p4))
+p3 = PanelSuccess('Panel 3 success with string heading', 'Panel 3 heading success str')
+p4 = PanelSuccess('Panel 4 success with string heading and footer',
+                  'Panel 4 heading success str',
+                  'Panel 4 footer str')
+p5 = PanelWarning('Panel 5 warning with heading and footer',
+                  PanelHeading('Panel 5 heading warning'),
+                  PanelFooter('Panel 5 footer'))
+p6 = PanelInfo(MD('MD panel body'), MD('###MD panel header'), MD('MD panel footer'))
+content = RC((p1, p2, p3, p4, p5, p6))
         """
         p1 = Panel('Default panel')
         p2 = PanelPrimary('Primary panel')
-        p3 = PanelSuccess('Panel 3 success with heading', PanelHeading('Panel 3 heading success'))
-        p4 = PanelWarning('Panel 4 warning with heading and footer',
-                          PanelHeading('Panel 4 heading warning'),
-                          PanelFooter('Panel 4 footer'))
-        content = RC((p1, p2, p3, p4))
+        p3 = PanelSuccess('Panel 3 success with string heading', 'Panel 3 heading success str')
+        p4 = PanelSuccess('Panel 4 success with string heading and footer',
+                          'Panel 4 heading success str',
+                          'Panel 4 footer str')
+        p5 = PanelWarning('Panel 5 warning with heading and footer',
+                          PanelHeading('Panel 5 heading warning'),
+                          PanelFooter('Panel 5 footer'))
+        p6 = PanelInfo(MD('MD panel body'), MD('###MD panel header'), MD('MD panel footer'))
+        content = RC((p1, p2, p3, p4, p5, p6))
+        # content = p5.render()
         content = page_content(self, code, content)
         return content
 

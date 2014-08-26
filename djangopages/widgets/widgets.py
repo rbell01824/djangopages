@@ -155,7 +155,20 @@ class DWidget(object):
 class DWidgetT(DWidget):
     """ Base class for widget template objects.
 
-    Many widgets need helper objects that simply format based on arguments.  DWidgetT supports that need.
+    Many widgets do not accept iterables as their principle argument.  DWidgetT provides a default generate
+    method for these widgets.
+
+    .. sourcecode:: python
+
+        class ModalBody(DWidgetT):
+            # noinspection PyMethodOverriding
+            def __init__(self, body):
+                template = '<div class="modal-body">{body}</div>'
+                super(ModalBody, self).__init__(template, {'body': body})
+                return
+
+    .. note:: DWidgetT classes take the widget's **template** and a **dict** of the widget's arguments.  The
+        dict is used to generate the widget's HTML based on the template.
 
     :param template: template for output
     :type template: str or unicode
@@ -170,10 +183,7 @@ class DWidgetT(DWidget):
 
     # noinspection PyMethodOverriding
     def generate(self):
-        """ Return template formatted with arguments
-        :return: Template formatted with arguments
-        :rtype: unicode
-        """
+        """ Return template formatted with arguments """
         template, xargs = self.args
         rtn = template.format(**xargs)
         return rtn

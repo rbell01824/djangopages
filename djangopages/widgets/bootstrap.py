@@ -190,6 +190,21 @@ class Button(DWidget):
     | BTNXSInfo = functools.partial(Button, button='btn-info', size='btn-xs')
     | BTNXSWarning = functools.partial(Button, button='btn-warning', size='btn-xs')
     | BTNXSDanger = functools.partial(Button, button='btn-danger', size='btn-xs')
+
+    :param text: text
+    :type text: str or unicode or tuple
+    :param button: default 'btn-default', button type per bootstrap
+    :type button: str or unicode
+    :param size: default '', button size per bootstrap
+    :type size: str or unicode
+    :param disabled: default False, if true button is disabled
+    :type disabled: bool
+    :param classes: classes to add to output
+    :type classes: str or unicode
+    :param style: styles to add to output
+    :type style: str or unicode
+    :return: HTML for bootstrap button
+    :rtype: unicode
     """
 
     def __init__(self, text, button='btn-default', size='', disabled=False, classes='', style=''):
@@ -197,25 +212,10 @@ class Button(DWidget):
         return
 
     # noinspection PyMethodOverriding
-    @staticmethod
-    def generate(text, button, size, disabled, classes, style):
-        """ Bootstrap button
-
-        :param text: text
-        :type text: str or unicode or tuple
-        :param button: default 'btn-default', button type per bootstrap
-        :type button: str or unicode
-        :param size: default '', button size per bootstrap
-        :type size: str or unicode
-        :param disabled: default False, if true button is disabled
-        :type disabled: bool
-        :param classes: classes to add to output
-        :type classes: str or unicode
-        :param style: styles to add to output
-        :type style: str or unicode
-        :return: HTML for bootstrap button
-        :rtype: unicode
-        """
+    # todo 1: rewrite to use DWidgetT
+    def generate(self):
+        """ Bootstrap button """
+        text, button, size, disabled, classes, style = self.args
         template = '<!-- start of button -->\n' \
                    '    <button type="button" class="btn {button} {size} {classes}" style="{style}" {disabled}>\n' \
                    '        {text}\n' \
@@ -269,40 +269,36 @@ class Glyphicon(DWidget):
         Glyphicon('glyphicon-star')
 
     | Shortcut: GL(...), useful abbreviation
+
+    :param glyph: glyph name in the form 'simple_name' or 'glyphicon-simple_name'
+    :type glyph: str or unicode or tuple
+    :param classes: classes to add to output
+    :type classes: str or unicode
+    :param style: styles to add to output
+    :type style: str or unicode
+    :return: Glyphicon html
+    :rtype: unicode
     """
     def __init__(self, glyph, classes='', style=''):
         super(Glyphicon, self).__init__(glyph, classes, style)
         return
 
     # noinspection PyMethodOverriding
-    @staticmethod
-    def generate(glyph, classes, style):
-        """ Bootstrap glyphicon
-
-        :param glyph: glyph name in the form 'simple_name' or 'glyphicon-simple_name'
-        :type glyph: str or unicode or tuple
-        :param classes: classes to add to output
-        :type classes: str or unicode
-        :param style: styles to add to output
-        :type style: str or unicode
-        :return: Glyphicon html
-        :rtype: unicode
-        """
-
+    def generate(self):
+        """ Bootstrap glyphicon """
+        glyph, classes, style = self.args
         if isinstance(glyph, (tuple, list)):
             rtn = ''
             for g in glyph:
                 rtn += Glyphicon(g, classes, style)
             return rtn
-        template = '<span {classes} {style}></span>'
-        if not glyph.startswith('glyphicon-'):
-            glyph = 'glyphicon-' + glyph
-        classes = 'class="glyphicon {glyph} {classes}" '.format(glyph=glyph, classes=classes)
-        if style:
-            style = 'style="{}" '.format(style)
-        rtn = template.format(classes=classes, style=style)
+        template = '<span class="glyphicon {glyph} {classes}" style="{style}"></span>'
+        glyph = ssw(glyph, 'glyphicon-')
+        rtn = template.format(glyph=glyph, classes=classes, style=style)
         return rtn
 GL = functools.partial(Glyphicon)
+
+# todo 2: review all DWidget widgets and check that type for tuple argument is properly set
 
 
 class Hn(DWidget):
@@ -322,7 +318,7 @@ class Hn(DWidget):
     | H6 = functools.partial(Hn, level=6)
 
     :param heading: heading text
-    :type heading: str or unicode
+    :type heading: str or unicode or DWdiget or tuple
     :param level: heading level
     :type level: int
     :param classes: classes to add to output
@@ -356,7 +352,7 @@ class Header(DWidget):
         Header(H3('heading'+Small('subheading'))
 
     :param heading: heading HTML
-    :type heading: str or unicode or DWidget
+    :type heading: str or unicode or DWidget or tuple
     :param classes: classes to add to output
     :type classes: str or unicode
     :param style: styles to add to output
@@ -385,7 +381,7 @@ class Jumbotron(DWidget):
         Jumbotron(MD('#Jumbotron 2') + 'Some text' + BTNSInfo('Button'))
 
     :param content: content
-    :type content: basestring or tuple or DWidget
+    :type content: str or unicode or tuple or DWidget
     :param classes: classes to add to output
     :type classes: str or unicode
     :param style: styles to add to output
@@ -413,7 +409,7 @@ class Label(DWidget):
               'primary', 'text of primary label')
 
     :param content: content, label_type, label_text, ...
-    :type content: basestring or tuple or DWidget
+    :type content: str or unicode or tuple or DWidget
     :param label_type: label type in the form 'simple_label' or 'label-simple_label'
     :type label_type: str or unicode
     :param classes: classes to add to output
@@ -527,72 +523,9 @@ LNKXSInfo = functools.partial(Link, button='btn-info', size='btn-xs')
 LNKXSWarning = functools.partial(Link, button='btn-warning', size='btn-xs')
 LNKXSDanger = functools.partial(Link, button='btn-danger', size='btn-xs')
 
-# fixme: resume work here
 
-# noinspection PyPep8Naming
-def PanelFooter(footer='', classes='', style=''):
-    """ Bootstrap Panel footer
-
-    .. sourcecode:: python
-
-        PanelFooter('Text for panel footer')
-
-    :param footer: footer
-    :type footer: str or unicode
-    :param classes: classes to add to output
-    :type classes: str or unicode
-    :param style: styles to add to output
-    :type style: str or unicode
-    :return: HTML for panel footer
-    :rtype: unicode
-    """
-    classes = 'class="panel-footer {classes}" '.format(classes=classes)
-    if style:
-        style = 'style="{}" '.format(style)
-    template = '<div {classes} {style} >\n' \
-               '    {footer}\n' \
-               '</div>\n'
-    return template.format(classes=classes, style=style, footer=footer)
-
-
-# noinspection PyPep8Naming
-def PanelHeading(heading='', level=3, classes='', style=''):
-    """ Bootstrap Panel heading
-
-    .. sourcecode:: python
-
-        PanelHeading('Text for panel heading')
-
-    :param heading: heading
-    :type heading: str or unicode
-    :param level: if > 0, heading title level, otherwise no title component
-    :type level: int
-    :param classes: classes to add to output
-    :type classes: str or unicode
-    :param style: styles to add to output
-    :type style: str or unicode
-    :return: HTML for panel heading
-    :rtype: unicode
-    """
-    classes = 'class="panel-heading {classes}" '.format(classes=classes)
-    if style:
-        style = 'style="{}" '.format(style)
-    if level > 0:
-        template = '<div {classes} {style} >\n' \
-                   '    <h{level} class="panel-title" >\n' \
-                   '        {heading}\n' \
-                   '    </h{level}>' \
-                   '</div>\n'
-        return template.format(classes=classes, style=style, level=level, heading=heading)
-    template = '<div {classes} {style} >\n' \
-               '    {heading}\n' \
-               '</div>\n'
-    return template.format(classes=classes, style=style, heading=heading)
-
-
-# todo 1: validate Panel works properly with tables and list, see http://getbootstrap.com/components/#panels
-# noinspection PyPep8Naming
-def Panel(body='', heading='', footer='', panel_type='panel-default'):
+# todo 2: validate Panel works properly with tables and list, see http://getbootstrap.com/components/#panels
+class Panel(DWidgetT):
     """ Bootstrap panel
 
     .. sourcecode:: python
@@ -620,24 +553,96 @@ def Panel(body='', heading='', footer='', panel_type='panel-default'):
     | PanelWarning = functools.partial(Panel, panel_type='panel-warning')
     | PanelDanger = functools.partial(Panel, panel_type='panel-danger')
     """
-    template = '<div class="panel {panel_type}" >\n ' \
-               '    {heading}\n' \
-               '    <div class="panel-body">\n' \
-               '        {body}' \
-               '    </div>\n ' \
-               '    {footer}\n' \
-               '</div>'
-    rtn = template.format(panel_type=panel_type,
-                          heading=heading,
-                          body=body,
-                          footer=footer)
-    return rtn
+
+    def __init__(self, body='', heading='', footer='', panel_type='panel-default'):
+        """ Bootstrap panel """
+        template = '<div class="panel {panel_type}" >\n ' \
+                   '    {heading}\n' \
+                   '    <div class="panel-body">\n' \
+                   '        {body}' \
+                   '    </div>\n ' \
+                   '    {footer}\n' \
+                   '</div>'
+        # if heading and isinstance(heading, (str, unicode)):
+        #     heading = PanelHeading(heading)
+        # if footer and isinstance(footer, (str, unicode)):
+        #     footer = PanelFooter(footer)
+        if heading and not isinstance(heading, PanelHeading):
+            heading = PanelHeading(heading)
+        if footer and not isinstance(footer, PanelFooter):
+            footer = PanelFooter(footer)
+        super(Panel, self).__init__(template, {'panel_type': panel_type,
+                                               'heading': heading,
+                                               'body': body,
+                                               'footer': footer})
+        return
 PanelDefault = functools.partial(Panel, panel_type='panel-default')
 PanelPrimary = functools.partial(Panel, panel_type='panel-primary')
 PanelSuccess = functools.partial(Panel, panel_type='panel-success')
 PanelInfo = functools.partial(Panel, panel_type='panel-info')
 PanelWarning = functools.partial(Panel, panel_type='panel-warning')
 PanelDanger = functools.partial(Panel, panel_type='panel-danger')
+
+
+class PanelFooter(DWidgetT):
+    """ Bootstrap Panel footer
+
+    .. sourcecode:: python
+
+        PanelFooter('Text for panel footer')
+
+    :param footer: footer
+    :type footer: str or unicode
+    :param classes: classes to add to output
+    :type classes: str or unicode
+    :param style: styles to add to output
+    :type style: str or unicode
+    :return: HTML for panel footer
+    :rtype: unicode
+    """
+    def __init__(self, footer='', classes='', style=''):
+        """ Bootstrap Panel footer """
+        template = '<div class="panel-footer {classes}" style="{style}">\n' \
+                   '    {footer}\n' \
+                   '</div>\n'
+        super(PanelFooter, self).__init__(template, {'classes': classes, 'style': style, 'footer': footer})
+        return
+
+
+class PanelHeading(DWidgetT):
+    """ Bootstrap Panel heading
+
+    .. sourcecode:: python
+
+        PanelHeading('Text for panel heading')
+
+    :param heading: heading
+    :type heading: str or unicode
+    :param level: if > 0, heading title level, otherwise no title component
+    :type level: int
+    :param classes: classes to add to output
+    :type classes: str or unicode
+    :param style: styles to add to output
+    :type style: str or unicode
+    :return: HTML for panel heading
+    :rtype: unicode
+    """
+    def __init__(self, heading='', level=3, classes='', style=''):
+        """ Bootstrap Panel heading """
+        if level > 0:
+            template = '<div class="panel-heading {classes}" style="{style}" >\n' \
+                       '    <h{level} class="panel-title" >\n' \
+                       '        {heading}\n' \
+                       '    </h{level}>' \
+                       '</div>\n'
+            args = {'classes': classes, 'style': style, 'level': level, 'heading': heading}
+        else:
+            template = '<div class="panel-heading {classes}" style="{style}" >\n' \
+                       '    {heading}\n' \
+                       '</div>\n'
+            args = {'classes': classes, 'style': style, 'heading': heading}
+        super(PanelHeading, self).__init__(template, args)
+        return
 
 
 class Modal(DWidget):
@@ -806,37 +811,33 @@ class Small(DWidget):
     .. sourcecode:: python
 
         Small('some text')
+
+    :param text: text to wrap
+    :type text: str or unicode
+    :param classes: classes to add to output
+    :type classes: str or unicode
+    :param style: styles to add to output
+    :type style: str or unicode
+    :return: small html
+    :rtype: unicode
     """
+    # todo 1: rewrite to use DWidget generate
     def __init__(self, text, classes='', style=''):
         super(Small, self).__init__(text, classes, style)
         return
 
     # noinspection PyMethodOverriding
-    @staticmethod
-    def generate(text,  classes, style):
-        """ Small bootstrap html
-
-        :param text: text to wrap
-        :type text: str or unicode
-        :param classes: classes to add to output
-        :type classes: str or unicode
-        :param style: styles to add to output
-        :type style: str or unicode
-        :return: small html
-        :rtype: unicode
-        """
+    def generate(self):
+        """ Small bootstrap html """
+        text, classes, style = self.args
         if isinstance(text, (list, tuple)):
             rtn = ''
             for t in text:
                 rtn += Small(t, classes, style)
             return rtn
-        template = '<small {classes} {style}>\n' \
+        template = '<small class="{classes}" style="{style}">\n' \
                    '    {text}\n' \
                    '</small>\n'
-        if classes:
-            classes = 'class="{}" '.format(classes)
-        if style:
-            style = 'style="{}" '.format(style)
         rtn = template.format(classes=classes, style=style, text=text)
         return rtn
 
