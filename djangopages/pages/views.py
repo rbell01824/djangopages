@@ -836,9 +836,9 @@ content = T([RC(MD('##Can have other DjangoPage content on the page with the gra
                                                            'subtitle.text': 'Graphs may have subtitles'})
 
         content = T([RC(MD('##Can have other DjangoPage content on the page with the graph.')),
-                     AccordionPanelM('Pie graph', pie_graph),
-                     AccordionPanelM('Column graph', column_graph),
-                     AccordionPanelM('Bar graph', bar_graph),
+                     PanelC('Pie graph', pie_graph),
+                     PanelC('Column graph', column_graph),
+                     PanelC('Bar graph', bar_graph),
                      RC(MD('####Explanation of graph') + LI(8, 5))])
         content = page_content(self, code, content)
         return content
