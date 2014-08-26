@@ -37,6 +37,20 @@ from django.template import add_to_builtins
 
 from taggit.models import TaggedItem
 
+
+#
+# This hack may prove useful.  Hang onto this comment for a bit.
+# It works by injecting a uniquely named variable for each host into the local name space
+# Later when chartkick runs it is fed data by this variable
+# What really is wanted is to bind the variable value into chartkick at the time the graphpage
+# query is run
+#
+# Don't do this:
+#     magic_name = '{}_cbtt'.format(host)
+#     magic_assign = '{}=count_by_type_type'.format(magic_name)
+#     exec(magic_assign)
+#
+
 ########################################################################################################################
 #
 # Taggit List filter for admin
@@ -148,10 +162,14 @@ def dict_nested_set(dic, key, value):
     """
     Set value in nested dictionary.
 
+    .. sourcecode:: python
+
+        dict_nested_set(some_dict, some.dotted.key, value_to_set
+
     :param dic: dictionary where value needs to be set
     :type dic: dict
     :param key: a.b.c key into dic
-    :type key: unicode
+    :type key: str or unicode
     :param value:
     :type value: varies
     :return: dictionary with value set for specified key
@@ -166,7 +184,7 @@ def dict_nested_set(dic, key, value):
 
 ########################################################################################################################
 #
-# Insure that a string startw with a value
+# Insure that a string starts with a value if the string has a value
 #
 ########################################################################################################################
 
@@ -199,21 +217,20 @@ def unique_name(base_name='x'):
 
         unique_name('basename')
 
+    .. note:: This function is used by widgets and for other internal purposes to
+              create unique names for id(s) and other purposes.
 
     :param base_name: the base name
     :type base_name: str or unicode
     :return: basename+n, ie. x0, x1, ...
     :rtype: str
-
-    .. note:: This function is used by widgets and for other internal purposes to
-              create unique names for id(s) and other purposes.
     """
     if not hasattr(unique_name, "counter"):
         unique_name.counter = 0  # it doesn't exist yet, so initialize it
     unique_name.counter += 1
     return '{}_{}'.format(base_name, unique_name.counter)
 
-# todo 3: consider using these instead of inline code.  somewhat briefer but opaque
+# note: hold this for a bit, don't think it is useful but wait in case
 # def set_classes_style(classes, style, extra_classes=''):
 #     if classes or extra_classes:
 #         if extra_classes:

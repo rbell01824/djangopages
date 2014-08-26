@@ -20,6 +20,8 @@ __status__ = "dev"
 
 # work list
 """
+Make code cleanup pass
+review graphpages and extract useful functionality/todos.  this is base for userpages!!
 get all existing test apps working
 add Nose to system for testing
 make test routines for all existing functions
@@ -45,10 +47,11 @@ Check options on markdown wrt line wraps.
 # todo 1: include css and js in the project
 # todo 1: write tests
 # todo 1: look into fixme_login.html and try to resolve issues
-
+# todo 1: add popup window feature to all graph pages and for graph objects
 # todo 1: modify Graph... classes to accommodate type() to decide how to render objects
 # todo 1: create class for forms creation
 
+# todo 2: rewrite demo based on DjangoPages and DWidget(s)
 # todo 2: add html template option to content objects universally
 # todo 2: get local versions of jquery and ALL the bootstrap cruft
 # todo 2: look into macros for graph page, see https://github.com/twidi/django-templates-macros
@@ -64,9 +67,12 @@ Check options on markdown wrt line wraps.
 # todo 2: Contact page
 # todo 2: tests for models, see http://effectivedjango.com/tutorial/models.html
 
+# todo 3: add support for direct highchart interface
+# todo 3: add support for ajax interface for highcharts
 # todo 3: system level test for navigation
 # todo 3: finish listview experiment with cia & countries
 # todo 3: sort order on admin vs listview page
 # todo 3: deploy on heroku
 # todo 3: learn about python eggs
+# todo 3: remove chartkick demo from system since no longer needed
 

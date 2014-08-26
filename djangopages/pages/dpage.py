@@ -161,6 +161,8 @@ class DPage(View):
         method.
         """
         content = self.generate(request)
+        if isinstance(content, DPage):
+            content = self.content
         return render(request, self.template, {'content': content})
 
     def generate(self, request):
@@ -174,6 +176,17 @@ class DPage(View):
                 xr3 = HTML('<h3>H3 text from DPageHTML</h3>')
                 self.content(RC([xr1, xr2, xr3])
                 return self
+
+            or
+
+            def generate(self, request):
+                xr1 = Text('This text comes from dpage.Text')
+                xr2 = Markdown('**Bold Markdown Text**')
+                xr3 = HTML('<h3>H3 text from DPageHTML</h3>')
+                content(RC([xr1, xr2, xr3])
+                return content
+
+
 
         Conceptually, the page's generate method creates HTML content that will
         subsequently be provided as a context value to the page's template.

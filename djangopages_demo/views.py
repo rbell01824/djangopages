@@ -26,6 +26,7 @@ from djangopages.pages.dpage import *
 from djangopages.widgets.layout import *
 from djangopages.widgets.bootstrap import *
 from djangopages.widgets.texthtml import *
+from djangopages.widgets.graph import *
 
 from django.db.models import Count
 from test_data.models import VSyslog
@@ -46,12 +47,12 @@ class DemoList(DPage):
     description = 'List the test/demo DPages'
     tags = []
 
-    def get(self, *args, **kwargs):
+    def generate(self, request):
         """ List available pages """
         t = '<a href="/dpages/{name}" ' \
             'class="btn btn-default btn-xs" ' \
             'role="button" ' \
-            'style="width:400px;text-align:left;margin-bottom:2px;">' \
+            'style="width:600px;text-align:left;margin-bottom:2px;">' \
             '{text}' \
             '</a><br/>\n'
         # noinspection PyUnresolvedReferences
@@ -76,7 +77,7 @@ class TestBasicGraphs001(DPage):
     description = 'Data base query with multiple graphs in a row'
     tags = ['demo', 'graphs']
 
-    def get(self, *args, **kwargs):
+    def generate(self, request):
         # set the company and node, and get the syslog data
 
         company = 'BMC_1'
@@ -112,30 +113,30 @@ class TestBasicGraphs001(DPage):
         # Create title and other page content
         text_top = Markdown('### Error count by type for {} Node {} '.format(company, node) +
                             'Total errors {}'.format(all_count_host))
-        text_bottom = Markdown('### Analysis\n'
+        text_bottom = Markdown('### Analysis\n' +
                                'Here is where the analysis can go.\n\n' +
                                LI(12, 12))
         # create back link
         lnk = Link('/demo', T(Glyphicon('arrow-left'), 'Back'),
                    classes='btn-primary', style='margin-bottom: 5px;')
-        linecnt = T(SP(4), 'Improvement: 4:1, Source ~ 50 lines, Output > 200 lines.')
+        linecnt = T(SP(4) + 'Improvement: 4:1, Source ~ 50 lines, Output > 200 lines.')
 
         # Layout the content on the page
-        self.content = T(RC(lnk + linecnt),
-                         Panel(None,
-                               T(RC(text_top),
-                                 RC6(col_graph, pie_graph),
-                                 RC(text_bottom))))
-        return self
+        panel_body = T([RC(text_top),
+                        RC6((col_graph, pie_graph)),
+                        RC(text_bottom)])
+        content = (RC(lnk + linecnt) +
+                   Panel(panel_body))
+        return content
 
 
 class TestBasicGraphs002(DPage):
     """ Basic test of Graph facility with two graphs in a row. """
     title = 'Graphs'
-    description = 'Data base query with multiple graphs in a row,version 2'
+    description = 'Data base query with multiple graphs in a row, version 2, better DB methods'
     tags = ['demo', 'graphs']
 
-    def get(self, *args, **kwargs):
+    def generate(self, request):
         # set the company and node, and get the syslog data
 
         company = 'BMC_1'
@@ -174,13 +175,12 @@ class TestBasicGraphs002(DPage):
         linecnt = T(SP(4), 'Improvement: 4:1, Source ~ 50 lines, Output > 200 lines.')
 
         # Layout the content on the page
-        self.content = T(RC(lnk + linecnt),
-                         Panel(None,
-                               T(RC(text_top),
-                                 RC6(col_graph, pie_graph),
-                                 RC(text_bottom))))
-        return self
-
+        panel_body = T([RC(text_top),
+                        RC6((col_graph, pie_graph)),
+                        RC(text_bottom)])
+        content = (RC(lnk + linecnt) +
+                   Panel(panel_body))
+        return content
 
 # class Test05(DPage):
 #     """
