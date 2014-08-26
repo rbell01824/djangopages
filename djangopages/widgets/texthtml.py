@@ -132,7 +132,7 @@ class LI(DWidget):
         LI((3, 5))      # Creates paragraph with 3 sentences and paragraph with 5 sentences
 
     :param line_count: number of sentences in paragraph
-    :type line_count: int or tuple or DWidget
+    :type line_count: int or tuple or list
     :param para: if True wrap output in a paragraph
     :type para: bool
     :param classes: classes to add to output
@@ -150,7 +150,7 @@ class LI(DWidget):
     def generate(self):
         """ Generate loremipsum paragraphs with line_count sentences. """
         line_count, para, classes, style = self.args
-        if isinstance(line_count, tuple):
+        if isinstance(line_count, (tuple, list)):
             rtn = ''
             for lc in line_count:
                 rtn += LI(lc, para, classes, style)

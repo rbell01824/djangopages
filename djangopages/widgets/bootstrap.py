@@ -51,11 +51,11 @@ from djangopages.widgets.widgets import DWidget, DWidgetT
 # todo: add small, bold, italics
 # todo: add alignment, abbreviations, initialism, addresses, blockquote, etc
 # todo: add ordered and unordered lists
-# todo: gr through bootstrap CSS and add full support
+# todo: go through bootstrap CSS and add full support
 #
 ########################################################################################################################
 
-
+# todo 2: rewrite to use DWidgetT after defining a set_accordion_id widget
 class Accordion(DWidget):
     """ Bootstrap accordion
 
@@ -141,7 +141,7 @@ class AccordionPanel(DWidget):
                    '    </div>\n' \
                    '  </div>\n' \
                    '<!-- Accordion panel end -->'
-        panel_id = unique_name('apid')
+        panel_id = unique_name('ap_id')
         expand = 'in' if expand else ''
         rtn = template.format(accordion_id=accordion_id,
                               panel_id=panel_id,
@@ -156,6 +156,72 @@ AccordionPanelSuccess = functools.partial(AccordionPanel, panel_type='panel-succ
 AccordionPanelInfo = functools.partial(AccordionPanel, panel_type='panel-info')
 AccordionPanelWarning = functools.partial(AccordionPanel, panel_type='panel-warning')
 AccordionPanelDanger = functools.partial(AccordionPanel, panel_type='panel-danger')
+
+
+class AccordionPanelM(DWidget):
+    """ Defines an accordion panel for use in Accordion.  See Accordion.
+
+    .. sourcecode:: python
+
+        AccordionPanel('Panel title', 'Panel body')
+
+    | Synonyms:
+    | AccordionPanelDefault = functools.partial(AccordionPanel, panel_type='panel-default')
+    | AccordionPanelPrimary = functools.partial(AccordionPanel, panel_type='panel-primary')
+    | AccordionPanelSuccess = functools.partial(AccordionPanel, panel_type='panel-success')
+    | AccordionPanelInfo = functools.partial(AccordionPanel, panel_type='panel-info')
+    | AccordionPanelWarning = functools.partial(AccordionPanel, panel_type='panel-warning')
+    | AccordionPanelDanger = functools.partial(AccordionPanel, panel_type='panel-danger')
+
+    :param title: Panel title
+    :type title: str or unicode
+    :param body: Panel body
+    :type body: str or unicode
+    :param expand: if true, panel is initially expanded, otherwise collapsed
+    :type expand: bool
+    :param panel_type: type for panel
+    :type panel_type: str or unicode
+    """
+    def __init__(self, title='', body='', expand=False, panel_type='panel-default'):
+        """ Accordion panel """
+        super(AccordionPanelM, self).__init__(title, body, expand, panel_type)
+        return
+
+    def generate(self):
+        title, body, expand, panel_type = self.args
+        # noinspection PyUnresolvedReferences
+        accordion_id = self.accordion_id
+        template = '<!-- Accordion panel start -->\n' \
+                   '  <div class="panel {panel_type}">\n' \
+                   '    <div class="panel-heading">\n' \
+                   '      <h4 class="panel-title">\n' \
+                   '        <a data-toggle="collapse" data-target="#{panel_id}" href="#{panel_id}">\n' \
+                   '          {heading}\n' \
+                   '        </a>\n' \
+                   '      </h4>\n' \
+                   '    </div>\n' \
+                   '    <div id="{panel_id}" class="panel-collapse collapse">\n' \
+                   '      <div class="panel-body">\n' \
+                   '        {content}\n' \
+                   '      </div>\n' \
+                   '    </div>\n' \
+                   '  </div>\n' \
+                   '<!-- Accordion panel end -->'
+        panel_id = unique_name('apm_id')
+        expand = 'in' if expand else ''
+        rtn = template.format(accordion_id=accordion_id,
+                              panel_id=panel_id,
+                              panel_type=panel_type,
+                              heading=title,
+                              content=body,
+                              expand=expand)
+        return rtn
+AccordionPanelMDefault = functools.partial(AccordionPanelM, panel_type='panel-default')
+AccordionPanelMPrimary = functools.partial(AccordionPanelM, panel_type='panel-primary')
+AccordionPanelMSuccess = functools.partial(AccordionPanelM, panel_type='panel-success')
+AccordionPanelMInfo = functools.partial(AccordionPanelM, panel_type='panel-info')
+AccordionPanelMWarning = functools.partial(AccordionPanelM, panel_type='panel-warning')
+AccordionPanelMDanger = functools.partial(AccordionPanelM, panel_type='panel-danger')
 
 
 class Button(DWidget):
@@ -524,123 +590,6 @@ LNKXSWarning = functools.partial(Link, button='btn-warning', size='btn-xs')
 LNKXSDanger = functools.partial(Link, button='btn-danger', size='btn-xs')
 
 
-# todo 2: validate Panel works properly with tables and list, see http://getbootstrap.com/components/#panels
-class Panel(DWidgetT):
-    """ Bootstrap panel
-
-    .. sourcecode:: python
-
-        Panel('panel body',
-              PanelHeading('panel heading'),
-              PanelFooter('panel footer'))
-
-    :param body: body content for panel
-    :type body: str or unicode
-    :param heading: heading content for panel
-    :type heading: str or unicode
-    :param footer: footer content for panel
-    :type footer: str or unicode
-    :param panel_type: type for panel
-    :type panel_type: str or unicode
-    :return: HTML for panel
-    :rtype: unicode
-
-    | Synonyms:
-    | PanelDefault = functools.partial(Panel, panel_type='panel-default')
-    | PanelPrimary = functools.partial(Panel, panel_type='panel-primary')
-    | PanelSuccess = functools.partial(Panel, panel_type='panel-success')
-    | PanelInfo = functools.partial(Panel, panel_type='panel-info')
-    | PanelWarning = functools.partial(Panel, panel_type='panel-warning')
-    | PanelDanger = functools.partial(Panel, panel_type='panel-danger')
-    """
-
-    def __init__(self, body='', heading='', footer='', panel_type='panel-default'):
-        """ Bootstrap panel """
-        template = '<div class="panel {panel_type}" >\n ' \
-                   '    {heading}\n' \
-                   '    <div class="panel-body">\n' \
-                   '        {body}' \
-                   '    </div>\n ' \
-                   '    {footer}\n' \
-                   '</div>'
-        if heading and not isinstance(heading, PanelHeading):
-            heading = PanelHeading(heading)
-        if footer and not isinstance(footer, PanelFooter):
-            footer = PanelFooter(footer)
-        super(Panel, self).__init__(template, {'panel_type': panel_type,
-                                               'heading': heading,
-                                               'body': body,
-                                               'footer': footer})
-        return
-PanelDefault = functools.partial(Panel, panel_type='panel-default')
-PanelPrimary = functools.partial(Panel, panel_type='panel-primary')
-PanelSuccess = functools.partial(Panel, panel_type='panel-success')
-PanelInfo = functools.partial(Panel, panel_type='panel-info')
-PanelWarning = functools.partial(Panel, panel_type='panel-warning')
-PanelDanger = functools.partial(Panel, panel_type='panel-danger')
-
-
-class PanelFooter(DWidgetT):
-    """ Bootstrap Panel footer
-
-    .. sourcecode:: python
-
-        PanelFooter('Text for panel footer')
-
-    :param footer: footer
-    :type footer: str or unicode
-    :param classes: classes to add to output
-    :type classes: str or unicode
-    :param style: styles to add to output
-    :type style: str or unicode
-    :return: HTML for panel footer
-    :rtype: unicode
-    """
-    def __init__(self, footer='', classes='', style=''):
-        """ Bootstrap Panel footer """
-        template = '<div class="panel-footer {classes}" style="{style}">\n' \
-                   '    {footer}\n' \
-                   '</div>\n'
-        super(PanelFooter, self).__init__(template, {'classes': classes, 'style': style, 'footer': footer})
-        return
-
-
-class PanelHeading(DWidgetT):
-    """ Bootstrap Panel heading
-
-    .. sourcecode:: python
-
-        PanelHeading('Text for panel heading')
-
-    :param heading: heading
-    :type heading: str or unicode
-    :param level: if > 0, heading title level, otherwise no title component
-    :type level: int
-    :param classes: classes to add to output
-    :type classes: str or unicode
-    :param style: styles to add to output
-    :type style: str or unicode
-    :return: HTML for panel heading
-    :rtype: unicode
-    """
-    def __init__(self, heading='', level=3, classes='', style=''):
-        """ Bootstrap Panel heading """
-        if level > 0:
-            template = '<div class="panel-heading {classes}" style="{style}" >\n' \
-                       '    <h{level} class="panel-title" >\n' \
-                       '        {heading}\n' \
-                       '    </h{level}>' \
-                       '</div>\n'
-            args = {'classes': classes, 'style': style, 'level': level, 'heading': heading}
-        else:
-            template = '<div class="panel-heading {classes}" style="{style}" >\n' \
-                       '    {heading}\n' \
-                       '</div>\n'
-            args = {'classes': classes, 'style': style, 'heading': heading}
-        super(PanelHeading, self).__init__(template, args)
-        return
-
-
 class Modal(DWidgetT):
     """ Bootstrap modal
 
@@ -649,11 +598,11 @@ class Modal(DWidgetT):
         Modal( header='some header', body='body stuff', footer='footer stuff', button='Show', modal_size=''):
 
     :param header: header for modal
-    :type header: str or unicode
+    :type header: str or unicode or ModalHeader
     :param body: body for modal
-    :type body: str or unicode
+    :type body: str or unicode or ModalBody
     :param footer: footer for modal
-    :type footer: str or unicode
+    :type footer: str or unicode or ModalFooter
     :param button: text for modal button or ModalButton object
     :type button: str or unicode or ModalButton
     :param modal_size: modal size per bootstrap
@@ -782,6 +731,123 @@ class ModalFooter(DWidgetT):
                    '    {footer}\n' \
                    '</div>\n'
         super(ModalFooter, self).__init__(template, {'footer': footer})
+        return
+
+
+# todo 2: validate Panel works properly with tables and list, see http://getbootstrap.com/components/#panels
+class Panel(DWidgetT):
+    """ Bootstrap panel
+
+    .. sourcecode:: python
+
+        Panel('panel body',
+              PanelHeading('panel heading'),
+              PanelFooter('panel footer'))
+
+    :param body: body content for panel
+    :type body: str or unicode
+    :param heading: heading content for panel
+    :type heading: str or unicode
+    :param footer: footer content for panel
+    :type footer: str or unicode
+    :param panel_type: type for panel
+    :type panel_type: str or unicode
+    :return: HTML for panel
+    :rtype: unicode
+
+    | Synonyms:
+    | PanelDefault = functools.partial(Panel, panel_type='panel-default')
+    | PanelPrimary = functools.partial(Panel, panel_type='panel-primary')
+    | PanelSuccess = functools.partial(Panel, panel_type='panel-success')
+    | PanelInfo = functools.partial(Panel, panel_type='panel-info')
+    | PanelWarning = functools.partial(Panel, panel_type='panel-warning')
+    | PanelDanger = functools.partial(Panel, panel_type='panel-danger')
+    """
+
+    def __init__(self, body='', heading='', footer='', panel_type='panel-default'):
+        """ Bootstrap panel """
+        template = '<div class="panel {panel_type}" >\n ' \
+                   '    {heading}\n' \
+                   '    <div class="panel-body">\n' \
+                   '        {body}' \
+                   '    </div>\n ' \
+                   '    {footer}\n' \
+                   '</div>'
+        if heading and not isinstance(heading, PanelHeading):
+            heading = PanelHeading(heading)
+        if footer and not isinstance(footer, PanelFooter):
+            footer = PanelFooter(footer)
+        super(Panel, self).__init__(template, {'panel_type': panel_type,
+                                               'heading': heading,
+                                               'body': body,
+                                               'footer': footer})
+        return
+PanelDefault = functools.partial(Panel, panel_type='panel-default')
+PanelPrimary = functools.partial(Panel, panel_type='panel-primary')
+PanelSuccess = functools.partial(Panel, panel_type='panel-success')
+PanelInfo = functools.partial(Panel, panel_type='panel-info')
+PanelWarning = functools.partial(Panel, panel_type='panel-warning')
+PanelDanger = functools.partial(Panel, panel_type='panel-danger')
+
+
+class PanelFooter(DWidgetT):
+    """ Bootstrap Panel footer
+
+    .. sourcecode:: python
+
+        PanelFooter('Text for panel footer')
+
+    :param footer: footer
+    :type footer: str or unicode
+    :param classes: classes to add to output
+    :type classes: str or unicode
+    :param style: styles to add to output
+    :type style: str or unicode
+    :return: HTML for panel footer
+    :rtype: unicode
+    """
+    def __init__(self, footer='', classes='', style=''):
+        """ Bootstrap Panel footer """
+        template = '<div class="panel-footer {classes}" style="{style}">\n' \
+                   '    {footer}\n' \
+                   '</div>\n'
+        super(PanelFooter, self).__init__(template, {'classes': classes, 'style': style, 'footer': footer})
+        return
+
+
+class PanelHeading(DWidgetT):
+    """ Bootstrap Panel heading
+
+    .. sourcecode:: python
+
+        PanelHeading('Text for panel heading')
+
+    :param heading: heading
+    :type heading: str or unicode
+    :param level: if > 0, heading title level, otherwise no title component
+    :type level: int
+    :param classes: classes to add to output
+    :type classes: str or unicode
+    :param style: styles to add to output
+    :type style: str or unicode
+    :return: HTML for panel heading
+    :rtype: unicode
+    """
+    def __init__(self, heading='', level=3, classes='', style=''):
+        """ Bootstrap Panel heading """
+        if level > 0:
+            template = '<div class="panel-heading {classes}" style="{style}" >\n' \
+                       '    <h{level} class="panel-title" >\n' \
+                       '        {heading}\n' \
+                       '    </h{level}>' \
+                       '</div>\n'
+            args = {'classes': classes, 'style': style, 'level': level, 'heading': heading}
+        else:
+            template = '<div class="panel-heading {classes}" style="{style}" >\n' \
+                       '    {heading}\n' \
+                       '</div>\n'
+            args = {'classes': classes, 'style': style, 'heading': heading}
+        super(PanelHeading, self).__init__(template, args)
         return
 
 
