@@ -21,6 +21,11 @@ __status__ = "dev"
 # work list
 """
 Make code cleanup pass
+add form support
+how to deal with a page with a form
+add ajax support
+how to deal with a page wrt ajax
+is it possible to dynamically create/update/delete python objects at runtime so that objects defined in DBs do not require a Db reference?
 review graphpages and extract useful functionality/todos.  this is base for userpages!!
 get all existing test apps working
 add Nose to system for testing
