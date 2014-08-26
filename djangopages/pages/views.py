@@ -352,23 +352,6 @@ content = Accordion((AccordionPanel('<h3>heading 1</h3>', 'content 1', expand=Tr
         return content
 
 
-class TestAccordionM(DPage):
-    """ Test Accordion widget """
-    title = 'Bootstrap: AccordionM'
-    description = 'Demonstrate ' + title
-    tags = ['test', 'bootstrap']
-
-    def generate(self, request):
-        code = """
-content = Accordion((AccordionPanelM('<h3>heading 1</h3>', 'content 1', expand=True),
-                     AccordionPanelM(MD('###heading 2'), LI((3, 5, 12))))
-        """
-        content = Accordion((AccordionPanelM('<h3>heading 1</h3>', 'content 1', expand=True),
-                             AccordionPanelMSuccess(MD('###heading 2'), LI((3, 5, 12)))))
-        content = page_content(self, code, content)
-        return content
-
-
 class TestButton(DPage):
     """ Test Button widget """
     title = 'Buttons'
@@ -584,6 +567,23 @@ content = RC((p1, p2, p3, p4, p5, p6))
         p6 = PanelInfo(MD('MD panel body'), MD('###MD panel header'), MD('MD panel footer'))
         content = RC((p1, p2, p3, p4, p5, p6))
         # content = p5.render()
+        content = page_content(self, code, content)
+        return content
+
+
+class TestPanelC(DPage):
+    """ Test collapsable panel widget """
+    title = 'Bootstrap: PanelC'
+    description = 'Demonstrate ' + title
+    tags = ['test', 'bootstrap']
+
+    def generate(self, request):
+        code = """
+content = Accordion((AccordionPanelM('<h3>heading 1</h3>', 'content 1', expand=True),
+                     AccordionPanelM(MD('###heading 2'), LI((3, 5, 12))))
+        """
+        content = T([PanelC('<h3>heading 1</h3>', 'content 1', expand=True),
+                     PanelCPrimary(MD('###heading 2'), LI((3, 5, 12)))])
         content = page_content(self, code, content)
         return content
 
@@ -836,9 +836,9 @@ content = T([RC(MD('##Can have other DjangoPage content on the page with the gra
                                                            'subtitle.text': 'Graphs may have subtitles'})
 
         content = T([RC(MD('##Can have other DjangoPage content on the page with the graph.')),
-                     Panel(pie_graph, 'Pie graph'),
-                     Panel(column_graph, 'Column graph'),
-                     Panel(bar_graph, 'Bar graph'),
+                     AccordionPanelM('Pie graph', pie_graph),
+                     AccordionPanelM('Column graph', column_graph),
+                     AccordionPanelM('Bar graph', bar_graph),
                      RC(MD('####Explanation of graph') + LI(8, 5))])
         content = page_content(self, code, content)
         return content

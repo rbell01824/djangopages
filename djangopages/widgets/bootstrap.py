@@ -158,72 +158,6 @@ AccordionPanelWarning = functools.partial(AccordionPanel, panel_type='panel-warn
 AccordionPanelDanger = functools.partial(AccordionPanel, panel_type='panel-danger')
 
 
-class AccordionPanelM(DWidget):
-    """ Defines an accordion panel for use in Accordion.  See Accordion.
-
-    .. sourcecode:: python
-
-        AccordionPanel('Panel title', 'Panel body')
-
-    | Synonyms:
-    | AccordionPanelDefault = functools.partial(AccordionPanel, panel_type='panel-default')
-    | AccordionPanelPrimary = functools.partial(AccordionPanel, panel_type='panel-primary')
-    | AccordionPanelSuccess = functools.partial(AccordionPanel, panel_type='panel-success')
-    | AccordionPanelInfo = functools.partial(AccordionPanel, panel_type='panel-info')
-    | AccordionPanelWarning = functools.partial(AccordionPanel, panel_type='panel-warning')
-    | AccordionPanelDanger = functools.partial(AccordionPanel, panel_type='panel-danger')
-
-    :param title: Panel title
-    :type title: str or unicode
-    :param body: Panel body
-    :type body: str or unicode
-    :param expand: if true, panel is initially expanded, otherwise collapsed
-    :type expand: bool
-    :param panel_type: type for panel
-    :type panel_type: str or unicode
-    """
-    def __init__(self, title='', body='', expand=False, panel_type='panel-default'):
-        """ Accordion panel """
-        super(AccordionPanelM, self).__init__(title, body, expand, panel_type)
-        return
-
-    def generate(self):
-        title, body, expand, panel_type = self.args
-        # noinspection PyUnresolvedReferences
-        accordion_id = self.accordion_id
-        template = '<!-- Accordion panel start -->\n' \
-                   '  <div class="panel {panel_type}">\n' \
-                   '    <div class="panel-heading">\n' \
-                   '      <h4 class="panel-title">\n' \
-                   '        <a data-toggle="collapse" data-target="#{panel_id}" href="#{panel_id}">\n' \
-                   '          {heading}\n' \
-                   '        </a>\n' \
-                   '      </h4>\n' \
-                   '    </div>\n' \
-                   '    <div id="{panel_id}" class="panel-collapse collapse">\n' \
-                   '      <div class="panel-body">\n' \
-                   '        {content}\n' \
-                   '      </div>\n' \
-                   '    </div>\n' \
-                   '  </div>\n' \
-                   '<!-- Accordion panel end -->'
-        panel_id = unique_name('apm_id')
-        expand = 'in' if expand else ''
-        rtn = template.format(accordion_id=accordion_id,
-                              panel_id=panel_id,
-                              panel_type=panel_type,
-                              heading=title,
-                              content=body,
-                              expand=expand)
-        return rtn
-AccordionPanelMDefault = functools.partial(AccordionPanelM, panel_type='panel-default')
-AccordionPanelMPrimary = functools.partial(AccordionPanelM, panel_type='panel-primary')
-AccordionPanelMSuccess = functools.partial(AccordionPanelM, panel_type='panel-success')
-AccordionPanelMInfo = functools.partial(AccordionPanelM, panel_type='panel-info')
-AccordionPanelMWarning = functools.partial(AccordionPanelM, panel_type='panel-warning')
-AccordionPanelMDanger = functools.partial(AccordionPanelM, panel_type='panel-danger')
-
-
 class Button(DWidget):
     """ Bootstrap button
 
@@ -849,6 +783,70 @@ class PanelHeading(DWidgetT):
             args = {'classes': classes, 'style': style, 'heading': heading}
         super(PanelHeading, self).__init__(template, args)
         return
+
+
+class PanelC(DWidget):
+    """ Defines a collapsable panel.
+
+    .. sourcecode:: python
+
+        PanelC('Panel title', 'Panel body')
+
+    | Synonyms:
+    | PanelCDefault = functools.partial(PanelC, panel_type='panel-default')
+    | PanelCPrimary = functools.partial(PanelC, panel_type='panel-primary')
+    | PanelCSuccess = functools.partial(PanelC, panel_type='panel-success')
+    | PanelCInfo = functools.partial(PanelC, panel_type='panel-info')
+    | PanelCWarning = functools.partial(PanelC, panel_type='panel-warning')
+    | PanelCDanger = functools.partial(PanelC, panel_type='panel-danger')
+
+    :param title: Panel title
+    :type title: str or unicode or PanelHeader
+    :param body: Panel body
+    :type body: str or unicode or PanelBody
+    :param expand: if true, panel is initially expanded, otherwise collapsed
+    :type expand: bool
+    :param panel_type: type for panel
+    :type panel_type: str or unicode
+    """
+    def __init__(self, heading='Heading MUST be defined',  body='Body must be defined', panel_type='panel-default', expand=False):
+        """ Accordion panel """
+        super(PanelC, self).__init__(heading, body, panel_type, expand)
+        return
+
+    def generate(self):
+        heading, body, panel_type, expand = self.args
+        # noinspection PyUnresolvedReferences
+        template = '<!-- Collapsable panel start -->\n' \
+                   '  <div class="panel {panel_type}">\n' \
+                   '    <div class="panel-heading">\n' \
+                   '      <h4 class="panel-title">\n' \
+                   '        <a data-toggle="collapse" data-target="#{panel_id}" href="#{panel_id}">\n' \
+                   '          {heading}\n' \
+                   '        </a>\n' \
+                   '      </h4>\n' \
+                   '    </div>\n' \
+                   '    <div id="{panel_id}" class="panel-collapse collapse">\n' \
+                   '      <div class="panel-body">\n' \
+                   '        {content}\n' \
+                   '      </div>\n' \
+                   '    </div>\n' \
+                   '  </div>\n' \
+                   '<!-- Accordion panel end -->'
+        panel_id = unique_name('apm_id')
+        expand = 'in' if expand else ''
+        rtn = template.format(panel_id=panel_id,
+                              panel_type=panel_type,
+                              heading=heading,
+                              content=body,
+                              expand=expand)
+        return rtn
+PanelCMDefault = functools.partial(PanelC, panel_type='panel-default')
+PanelCPrimary = functools.partial(PanelC, panel_type='panel-primary')
+PanelCSuccess = functools.partial(PanelC, panel_type='panel-success')
+PanelCInfo = functools.partial(PanelC, panel_type='panel-info')
+PanelCWarning = functools.partial(PanelC, panel_type='panel-warning')
+PanelCDanger = functools.partial(PanelC, panel_type='panel-danger')
 
 
 class Small(DWidget):
