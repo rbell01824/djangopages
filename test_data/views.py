@@ -44,65 +44,65 @@ class ListCountriesView(ListView):
     model = Countries
 
 
-class Demo8aView(View):
-    """
-    View class to test demo8a method.
-    """
-
-    # noinspection PyMethodMayBeStatic
-    def get(self, request):
-        """
-        Executre the graph method and display the results.
-
-        :param request:
-        """
-        context = syslog_demo_8a()
-        return HttpResponse(xgraph_response(context))
-
-
-class Demo8bView(View):
-    """
-    View class to test demo8b method.
-    """
-
-    # noinspection PyMethodMayBeStatic
-    def get(self, request):
-        """
-        Execute the graph method and display the results.
-
-        :param request:
-        """
-        context = syslog_demo_8b()
-        return HttpResponse(xgraph_response(context))
-
-
-class Demo8cView(View):
-    """
-    View class to test demo8c method.
-    """
-
-    # noinspection PyMethodMayBeStatic
-    def get(self, request):
-        """
-        Execute the graph method and display the results.
-
-        :param request:
-        """
-        context = syslog_demo_8c()
-        return HttpResponse(xgraph_response(context))
-
-
-class Demo8dView(View):
-    """
-    View class to test demo8d method.
-    """
-
-    # noinspection PyMethodMayBeStatic
-    def get(self, request):
-        """
-        Execute the graph method and display the results.
-
-        :param request:
-        """
-        context = syslog_demo_8d()
-        return HttpResponse(xgraph_response(context))
+# class Demo8aView(View):
+#     """
+#     View class to test demo8a method.
+#     """
+#
+#     # noinspection PyMethodMayBeStatic
+#     def get(self, request):
+#         """
+#         Executre the graph method and display the results.
+#
+#         :param request:
+#         """
+#         context = syslog_demo_8a()
+#         return HttpResponse(xgraph_response(context))
+#
+#
+# class Demo8bView(View):
+#     """
+#     View class to test demo8b method.
+#     """
+#
+#     # noinspection PyMethodMayBeStatic
+#     def get(self, request):
+#         """
+#         Execute the graph method and display the results.
+#
+#         :param request:
+#         """
+#         context = syslog_demo_8b()
+#         return HttpResponse(xgraph_response(context))
+#
+#
+# class Demo8cView(View):
+#     """
+#     View class to test demo8c method.
+#     """
+#
+#     # noinspection PyMethodMayBeStatic
+#     def get(self, request):
+#         """
+#         Execute the graph method and display the results.
+#
+#         :param request:
+#         """
+#         context = syslog_demo_8c()
+#         return HttpResponse(xgraph_response(context))
+#
+#
+# class Demo8dView(View):
+#     """
+#     View class to test demo8d method.
+#     """
+#
+#     # noinspection PyMethodMayBeStatic
+#     def get(self, request):
+#         """
+#         Execute the graph method and display the results.
+#
+#         :param request:
+#         """
+#         context = syslog_demo_8d()
+#         return HttpResponse(xgraph_response(context))
