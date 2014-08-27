@@ -25,13 +25,13 @@ from django.views.generic import View
 from django.views.generic import ListView
 from django.http import HttpResponse
 
-from graphpages.utilities import xgraph_response
+# from graphpages.utilities import xgraph_response
 
 from .models import CIA, Countries
-from .democharts import syslog_demo_8a
-from .democharts import syslog_demo_8b
-from .democharts import syslog_demo_8c
-from .democharts import syslog_demo_8d
+# from .democharts import syslog_demo_8a
+# from .democharts import syslog_demo_8b
+# from .democharts import syslog_demo_8c
+# from .democharts import syslog_demo_8d
 
 
 # noinspection PyDocstring

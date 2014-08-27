@@ -34,7 +34,7 @@ from django import forms
 from graphpages.models import GraphPage
 
 # noinspection PyUnresolvedReferences
-from graphpages.utilities import XGraphPage, XGraphRow, XGraphColumn, XGraphCK
+# from graphpages.utilities import XGraphPage, XGraphRow, XGraphColumn, XGraphCK
 
 # Supress unresolvedreferences as these are actually needed inside
 # the exec for the graph query.
@@ -273,7 +273,7 @@ class GraphPageView(View):
             local_context = form_context.dict()
 
         # Execute the query.
-        exec (query_text, global_context, local_context)
+            exec (query_text, global_context, local_context)
 
         return local_context
 
