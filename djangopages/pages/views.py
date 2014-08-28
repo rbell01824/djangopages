@@ -842,3 +842,33 @@ content = T([RC(MD('##Can have other DjangoPage content on the page with the gra
                      RC(MD('####Explanation of graph') + LI(8, 5))])
         content = page_content(self, code, content)
         return content
+
+
+class TestForms001(DPage):
+    """ Test DPage Form support """
+    title = 'DPage form support'
+    description = 'Demonstrate ' + title
+    tags = ['test', 'forms']
+
+    def generate(self, request):
+        code = """
+Fix me
+        """
+        browser_stats = GraphData.browser_stats
+        pie_graph = GraphCK('pie', browser_stats, options={'height': '400px',
+                                                           'title.text': 'Browser Stats',
+                                                           'subtitle.text': 'Graphs may have subtitles'})
+        column_graph = GraphCK('column', browser_stats, options={'height': '400px', 'chart.width': '400',
+                                                                 'title.text': 'Browser Stats',
+                                                                 'subtitle.text': 'Graphs may have subtitles'})
+        bar_graph = GraphCK('bar', browser_stats, options={'height': '400px', 'chart.width': '400',
+                                                           'title.text': 'Browser Stats',
+                                                           'subtitle.text': 'Graphs may have subtitles'})
+
+        content = T([RC(MD('##Can have other DjangoPage content on the page with the graph.')),
+                     RC4((PanelCInfo('Pie graph', pie_graph, expand=True),
+                          PanelC('Column graph', column_graph),
+                          PanelCPrimary('Bar graph', bar_graph))),
+                     RC(MD('####Explanation of graph') + LI(8, 5))])
+        content = page_content(self, code, content)
+        return content
