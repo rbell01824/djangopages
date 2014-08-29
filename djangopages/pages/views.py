@@ -61,7 +61,7 @@ class DPageView(View):
 
     """
     @staticmethod
-    def get(request, name):
+    def get(request, name, *args, **kwargs):
         """ get the named DPage
 
         :param request: the request object
@@ -73,13 +73,13 @@ class DPageView(View):
             # noinspection PyUnresolvedReferences
             dpage_obj = DPage.pages_dict[name]
             cls_obj = dpage_obj()
-            rtn = cls_obj.get(request)
+            rtn = cls_obj.get(request, *args, **kwargs)
             return rtn
         except KeyError:
             return HttpResponseNotFound('<h1>Page &lt;{}&gt; not found</h1>'.format(name))
 
     @staticmethod
-    def post(request, name):
+    def post(request, name, *args, **kwargs):
         """ post the named DPage
 
         :param request: the request object
@@ -91,7 +91,7 @@ class DPageView(View):
             # noinspection PyUnresolvedReferences
             dpage_obj = DPage.pages_dict[name]
             cls_obj = dpage_obj()
-            rtn = cls_obj.get(request)
+            rtn = cls_obj.put(request, *args, **kwargs)
             return rtn
         except KeyError:
             return HttpResponseNotFound('<h1>Page &lt;{}&gt; not found</h1>'.format(name))
@@ -111,7 +111,7 @@ class DPagesList(DPage):
     tags = ['test', 'list']
 
     # noinspection PyMethodMayBeStatic
-    def generate(self, request):
+    def generate(self, request, *args, **kwargs):
         t = '<a href="/dpages/{name}" ' \
             'class="btn btn-default btn-xs" ' \
             'role="button" ' \
@@ -185,7 +185,7 @@ class TestText(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'text']
 
-    def generate(self, request):
+    def generate(self, request, *args, **kwargs):
         code = escape("""
 doc1 = 'This is some Text content. This is some more Text content. </br>Text can also output HTML.'
 doc2 = Text('Bisque packground style para', para=True, style='background-color:bisque;')
@@ -207,7 +207,7 @@ class TestMarkdown(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'text']
 
-    def generate(self, request):
+    def generate(self, request, *args, **kwargs):
         code = """
 c1 = Markdown('###Markdown h3')
 c2 = Markdown(('**Markdown bold text**',
@@ -230,7 +230,7 @@ class TestLI(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'text']
 
-    def generate(self, request):
+    def generate(self, request, *args, **kwargs):
         code = """
 content = (LI(5, style='background-color:azure;') +
            LI((1, 2, 5)) +
@@ -251,7 +251,7 @@ class TestBRSP(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'text']
 
-    def generate(self, request):
+    def generate(self, request, *args, **kwargs):
         code = """
 content = ('line brake here' + BR() +
            'Second line followed by two newlines' + BR(2) +
@@ -273,7 +273,7 @@ class TestColumn(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'bootstrap', 'layout']
 
-    def generate(self, request):
+    def generate(self, request, *args, **kwargs):
         code = escape("""
 t = '<b>Some text</b> ' + 'Be kind to your web footed friends. ' * 15
 c1 = C(t, width=3, style='background-color:powderblue;')
@@ -301,7 +301,7 @@ class TestRow(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'bootstrap', 'layout']
 
-    def generate(self, request):
+    def generate(self, request, *args, **kwargs):
         code = """
 content = (R(C6((LI(5), LI((2, 3))), style='border:1px solid;')) +
            R(C(LI(20, style='background-color:powderblue;'))))
@@ -320,7 +320,7 @@ class TestRowColumn(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'bootstrap', 'layout']
 
-    def generate(self, request):
+    def generate(self, request, *args, **kwargs):
         code = """
 t = LI(5, para=False)
 content = RowColumn((('Row 1 Col 1 ' + t, 'Row 1 Col 2 ' + t),
@@ -341,7 +341,7 @@ class TestAccordion(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'bootstrap']
 
-    def generate(self, request):
+    def generate(self, request, *args, **kwargs):
         code = """
 content = Accordion((AccordionPanel('<h3>heading 1</h3>', 'content 1', expand=True),
                      AccordionPanel(MD('###heading 2'), LI((3, 5, 12))))
@@ -358,24 +358,24 @@ class TestButton(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'bootstrap']
 
-    def generate(self, request):
+    def generate(self, request, *args, **kwargs):
         code = """
 btn = Button(('Button 1', 'Button 2'))
-content = RC2((btn,
-               BTN('Success', button='btn-success btn-xs'),
-               BTN('Default') + BTN('Large info button', button='btn-lg btn-info'),
-               BTNXS('XSButton 6')+BTNXSSuccess('XS Sucess Button 7'),),
-              style='margin-top:2px;')
+content = RC((btn,
+              BTN('Success', button='btn-success btn-xs'),
+              BTN('Default') + BTN('Large info button', button='btn-lg btn-info'),
+              BTNXS('XSButton 6')+BTNXSSuccess('XS Sucess Button 7'),),
+             style='margin-top:2px;')
 
 Note: These 6 lines of djangopage code generated approximately 57 lines of html! 9x productivity!
         """
 
         btn = Button(('Button 1', 'Button 2'))
-        content = RC6((btn,
-                       BTN('Success', button='btn-success btn-xs'),
-                       BTN('Default') + BTN('Large info button', button='btn-lg btn-info'),
-                       BTNXS('XSButton 6')+BTNXSSuccess('XS Sucess Button 7'),),
-                      style='margin-top:2px;')
+        content = RC((btn,
+                      BTN('Success', button='btn-success btn-xs'),
+                      BTN('Default') + BTN('Large info button', button='btn-lg btn-info'),
+                      BTNXS('XSButton 6')+BTNXSSuccess('XS Sucess Button 7'),),
+                     style='margin-top:2px;')
         content = page_content(self, code, content)
         return content
 
@@ -386,16 +386,16 @@ class TestGlyphicons(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'bootstrap']
 
-    def generate(self, request):
+    def generate(self, request, *args, **kwargs):
         code = """
-content = RC2((T('Three glyphs on a line: ') + Glyphicon('star') + GL('heart') + GL('music'),
-               T('Two then one glyph on a line:') + GL(('zoom-in', 'refresh')) + GL('qrcode'),
-               BTNSSuccess(GL('star')+'Success')))
+r1 = T('Three glyphs on a line: ') + Glyphicon('star') + GL('heart') + GL('music')
+r2 = T('Two then one glyph on a line: ') + GL(('zoom-in', 'refresh')) + T(' some space ') + GL('qrcode')
+content = RC((r1, r2, BTNSSuccess(GL('star')+'Success')))
         """
 
-        content = RC2((T('Three glyphs on a line: ') + Glyphicon('star') + GL('heart') + GL('music'),
-                       (T('Two then one glyph on a line:'), GL(('zoom-in', 'refresh')), GL('qrcode')),
-                       BTNSSuccess(GL('star')+'Success')))
+        r1 = T('Three glyphs on a line: ') + Glyphicon('star') + GL('heart') + GL('music')
+        r2 = T('Two then one glyph on a line: ') + GL(('zoom-in', 'refresh')) + T(' some space ') + GL('qrcode')
+        content = RC((r1, r2, BTNSSuccess(GL('star')+'Success')))
         # content = GL('star')
         content = page_content(self, code, content)
         return content
@@ -407,9 +407,9 @@ class TestHn(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'bootstrap']
 
-    def generate(self, request):
+    def generate(self, request, *args, **kwargs):
         code = escape("""
-content = RC(H3('Level 3 heading'))
+content = RC((H3('Level 3 heading'), H6('Level 6 heading')))
         """)
 
         content = RC((H3('Level 3 heading'), H6('Level 6 heading')))
@@ -423,7 +423,7 @@ class TestSmall(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'bootstrap']
 
-    def generate(self, request):
+    def generate(self, request, *args, **kwargs):
         code = escape("""
 content = RC(H3('Level 3 heading'+Small(' subheading text')))
         """)
@@ -439,7 +439,7 @@ class TestHeader(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'bootstrap']
 
-    def generate(self, request):
+    def generate(self, request, *args, **kwargs):
         code = escape("""
 content = Header(H2('Level 2 heading'+Small(' subheading text')))
         """)
@@ -457,7 +457,7 @@ class TestJumbotron(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'bootstrap']
 
-    def generate(self, request):
+    def generate(self, request, *args, **kwargs):
         code = escape("""
 t = '#Heading\n' \
     'Some text after the heading.'
@@ -481,7 +481,7 @@ class TestLabel(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'bootstrap']
 
-    def generate(self, request):
+    def generate(self, request, *args, **kwargs):
         code = escape("""
 content = RC(('<h3>Example label ' + Label('New') + '</h3>',
               H3('H3 header '+Label('h3 header')),
@@ -503,7 +503,7 @@ class TestLink(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'bootstrap', 'link']
 
-    def generate(self, request):
+    def generate(self, request, *args, **kwargs):
         code = """
 # define content objects
 r1 = Link('/dpages/DPagesList', 'DPagesList link')
@@ -541,7 +541,7 @@ class TestPanel(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'bootstrap']
 
-    def generate(self, request):
+    def generate(self, request, *args, **kwargs):
         code = """
 p1 = Panel('Default panel')
 p2 = PanelPrimary('Primary panel')
@@ -577,7 +577,7 @@ class TestPanelC(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'bootstrap']
 
-    def generate(self, request):
+    def generate(self, request, *args, **kwargs):
         code = """
 content = Accordion((AccordionPanelM('<h3>heading 1</h3>', 'content 1', expand=True),
                      AccordionPanelM(MD('###heading 2'), LI((3, 5, 12))))
@@ -594,7 +594,7 @@ class TestModal(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'bootstrap']
 
-    def generate(self, request):
+    def generate(self, request, *args, **kwargs):
         code = escape("""
 m_header = MD('####Modal header')
 m_body = MD('**Body**' + LI(5, 5, 5, 2))
@@ -705,7 +705,7 @@ class TestBasicGraphs(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'graphs']
 
-    def generate(self, request):
+    def generate(self, request, *args, **kwargs):
         code = """
 #
 # see example source for data definitions
@@ -770,7 +770,7 @@ class TestMultipleGraphs(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'graphs']
 
-    def generate(self, request):
+    def generate(self, request, *args, **kwargs):
         code = """
 pie_graph = GraphCK('pie', GraphData.browser_stats, options={'height': '400px',
                                                              'title.text': 'Browser Stats',
@@ -806,7 +806,7 @@ class TestMultipleGraphsInPanels(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'graphs']
 
-    def generate(self, request):
+    def generate(self, request, *args, **kwargs):
         code = """
 pie_graph = GraphCK('pie', browser_stats, options={'height': '400px',
                                                    'title.text': 'Browser Stats',
@@ -839,7 +839,7 @@ content = T([RC(MD('##Can have other DjangoPage content on the page with the gra
                      RC4((PanelCInfo('Pie graph', pie_graph, expand=True),
                           PanelC('Column graph', column_graph),
                           PanelCPrimary('Bar graph', bar_graph))),
-                     RC(MD('####Explanation of graph') + LI(8, 5))])
+                     RC(MD('####Explanation of graph') + LI((8, 5)))])
         content = page_content(self, code, content)
         return content
 
@@ -850,7 +850,7 @@ class TestForms001(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'forms']
 
-    def generate(self, request):
+    def generate(self, request, *args, **kwargs):
         code = """
 Fix me
         """
@@ -869,6 +869,6 @@ Fix me
                      RC4((PanelCInfo('Pie graph', pie_graph, expand=True),
                           PanelC('Column graph', column_graph),
                           PanelCPrimary('Bar graph', bar_graph))),
-                     RC(MD('####Explanation of graph') + LI(8, 5))])
+                     RC(MD('####Explanation of graph') + LI((8, 5)))])
         content = page_content(self, code, content)
         return content

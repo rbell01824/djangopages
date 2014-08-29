@@ -68,6 +68,7 @@ __email__ = "rbell01824@gmail.com"
 from django.conf import settings
 from django.shortcuts import render
 from django.views.generic import View
+from django.http import HttpResponse
 
 # todo 3: add class to deal with file like objects and queryset objects
 # todo 3: add support for select2 https://github.com/applegrew/django-select2
@@ -154,23 +155,47 @@ class DPage(View):
         self.content = []
         return
 
-    def get(self, request):
-        """ Base class default get method
-
-        Child classes need not provide a get method but *MUST* provide a generate
-        method.
-        """
-        content = self.generate(request)
+    def _get_post(self, request, *args, **kwargs):
+        """ DPage shared default get/post processing """
+        content = self.generate(request, *args, **kwargs)
         if isinstance(content, DPage):
             content = self.content
+        elif isinstance(content, (str, unicode)):
+            pass
+        elif isinstance(content, HttpResponse):
+            return content
+        else:
+            raise ValueError("Generate returned illegal type {}.".format(type(content)))
         return render(request, self.template, {'content': content})
 
-    def generate(self, request):
+    def get(self, request, *args, **kwargs):
+        """ Base class default get method
+
+        Invokes self.generate(request. *args, **kwargs).  If generate returns str/unicode renders with returned
+        value.  If generate returns DPage, renders self.content.  If generate returns HTTPResponse, returns response.
+
+        .. note:: Child classes need not provide a get method but *MUST* provide a generate
+            method.
+        """
+        return self._get_post(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        """ Base class default post method
+
+        Invokes self.generate(request. *args, **kwargs).  If generate returns str/unicode renders with returned
+        value.  If generate returns DPage, renders self.content.  If generate returns HTTPResponse, returns response.
+
+        .. note:: Child classes need not provide a post method but *MUST* provide a generate
+            method.
+        """
+        return self._get_post(request, *args, **kwargs)
+
+    def generate(self, request, *args, **kwargs):
         """ Generate the page content. The subclass must define this method to create the page content.
 
         .. sourcecode:: python
 
-            def generate(self, request):
+            def generate(self, request, *args, **kwargs):
                 xr1 = Text('This text comes from dpage.Text')
                 xr2 = Markdown('**Bold Markdown Text**')
                 xr3 = HTML('<h3>H3 text from DPageHTML</h3>')
@@ -179,7 +204,7 @@ class DPage(View):
 
             or
 
-            def generate(self, request):
+            def generate(self, request, *args, **kwargs):
                 xr1 = Text('This text comes from dpage.Text')
                 xr2 = Markdown('**Bold Markdown Text**')
                 xr3 = HTML('<h3>H3 text from DPageHTML</h3>')

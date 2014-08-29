@@ -47,7 +47,7 @@ class DemoList(DPage):
     description = 'List the test/demo DPages'
     tags = []
 
-    def generate(self, request):
+    def generate(self, request, *args, **kwargs):
         """ List available pages """
         t = '<a href="/dpages/{name}" ' \
             'class="btn btn-default btn-xs" ' \
@@ -77,7 +77,7 @@ class TestBasicGraphs001(DPage):
     description = 'Data base query with multiple graphs in a row'
     tags = ['demo', 'graphs']
 
-    def generate(self, request):
+    def generate(self, request, *args, **kwargs):
         # set the company and node, and get the syslog data
 
         company = 'BMC_1'
@@ -136,7 +136,7 @@ class TestBasicGraphs002(DPage):
     description = 'Data base query with multiple graphs in a row, version 2, better DB methods'
     tags = ['demo', 'graphs']
 
-    def generate(self, request):
+    def generate(self, request, *args, **kwargs):
         # set the company and node, and get the syslog data
 
         company = 'BMC_1'

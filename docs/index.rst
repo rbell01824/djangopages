@@ -23,7 +23,7 @@ A DjangoPage might look something like this:
         description = 'Longer description'          # longer description
         tags = ['example']                          # queryable tags to support searching
 
-        def generate(self, request):                # create the page's HTML
+        def generate(self, request, *args, **kwargs):                # create the page's HTML
             c1 = Markdown('###Markdown h3')         # Markdown widget
             content = RC(c1, c2)                    # bootstrap row column widget
             return content                          # return the page's content
@@ -43,7 +43,7 @@ content creation and layout. For example
 
 .. sourcecode:: python
 
-        def generate(self, request):
+        def generate(self, request, *args, **kwargs):
             t = LI(5, para=False)
             content = RowColumn((('Row 1 Col 1 ' + t, 'Row 1 Col 2 ' + t),
                                  ('Row 2 Col 1 ' + t, 'Row 2 Col 2 ' + t)),
