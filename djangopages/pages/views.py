@@ -36,6 +36,7 @@ from djangopages.widgets.texthtml import *
 from djangopages.widgets.graph import GraphCK
 from django.http import HttpResponseNotFound
 from django.views.generic import View
+from django import forms
 
 # todo 3: unused imports, shouldn't I have examples for these
 # from test_data.models import syslog_query, syslog_event_graph, VNode, VCompany
@@ -850,25 +851,22 @@ class TestForms001(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'forms']
 
-    def generate(self, request, *args, **kwargs):
-        code = """
+    code = """
 Fix me
         """
-        browser_stats = GraphData.browser_stats
-        pie_graph = GraphCK('pie', browser_stats, options={'height': '400px',
-                                                           'title.text': 'Browser Stats',
-                                                           'subtitle.text': 'Graphs may have subtitles'})
-        column_graph = GraphCK('column', browser_stats, options={'height': '400px', 'chart.width': '400',
-                                                                 'title.text': 'Browser Stats',
-                                                                 'subtitle.text': 'Graphs may have subtitles'})
-        bar_graph = GraphCK('bar', browser_stats, options={'height': '400px', 'chart.width': '400',
-                                                           'title.text': 'Browser Stats',
-                                                           'subtitle.text': 'Graphs may have subtitles'})
 
-        content = T([RC(MD('##Can have other DjangoPage content on the page with the graph.')),
-                     RC4((PanelCInfo('Pie graph', pie_graph, expand=True),
-                          PanelC('Column graph', column_graph),
-                          PanelCPrimary('Bar graph', bar_graph))),
-                     RC(MD('####Explanation of graph') + LI((8, 5)))])
-        content = page_content(self, code, content)
+    class NameForm(forms.Form):
+        name = forms.CharField(label='Your name', max_length=100)
+
+    def get(self, request, *args, **kwargs):
+        form = self.NameForm()
+
+        content = RC(T(form))
+        content = page_content(self, self.code, content)
+        return content
+
+    def post(self, request, *args, **kwargs):
+        form = self.NameForm()
+        content = RC(T(form))
+        content = page_content(self, self.code, content)
         return content

@@ -173,9 +173,6 @@ class DPage(View):
 
         Invokes self.generate(request. *args, **kwargs).  If generate returns str/unicode renders with returned
         value.  If generate returns DPage, renders self.content.  If generate returns HTTPResponse, returns response.
-
-        .. note:: Child classes need not provide a get method but *MUST* provide a generate
-            method.
         """
         return self._get_post(request, *args, **kwargs)
 
@@ -184,9 +181,6 @@ class DPage(View):
 
         Invokes self.generate(request. *args, **kwargs).  If generate returns str/unicode renders with returned
         value.  If generate returns DPage, renders self.content.  If generate returns HTTPResponse, returns response.
-
-        .. note:: Child classes need not provide a post method but *MUST* provide a generate
-            method.
         """
         return self._get_post(request, *args, **kwargs)
 
