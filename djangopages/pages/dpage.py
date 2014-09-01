@@ -10,12 +10,12 @@ DPage
 
 .. moduleauthor:: Richard Bell <rbell01824@gmail.com>
 
-5/9/14 - Initial creation
-
 DjangoPages replaces the conventional Django notion of HTML templates, views, and URLs.
 Instead, DjangoPages uses a declarative approach similar to Django's models.Model and
 forms.Form. This declarative approach is used both for page definition and creation of
 content on the page.
+
+5/9/14 - Initial creation
 
 DPage(s)
 ========
@@ -112,19 +112,19 @@ class DPage(View):
     .. note:: As a general rule, you need not perform initialization in the DPage child class.
               However, if you do these parameters are available.
 
-        :param request: The request object
-        :type request: WSGIRequest
-        :param context: Additional context values for the page
-        :type context: dict
-        :param template: template name to use for this DPage object.  If None, DPageDefaultTemplate specified in
-                         settings is used.
-        :type template: unicode
-        :param title: brief title for this DPage object
-        :type title: unicode
-        :param description: longer description for this DPage object
-        :type description: unicode
-        :param tags: list of tags for this DPage
-        :type tags: list
+    :param request: The request object
+    :type request: WSGIRequest
+    :param context: Additional context values for the page
+    :type context: dict
+    :param template: template name to use for this DPage object.  If None, DPageDefaultTemplate specified in
+                     settings is used.
+    :type template: unicode
+    :param title: brief title for this DPage object
+    :type title: unicode
+    :param description: longer description for this DPage object
+    :type description: unicode
+    :param tags: list of tags for this DPage
+    :type tags: list
 
     .. note:: It is legal and sometimes useful to define a DPage and render it as part of another DPage.
 
@@ -155,6 +155,15 @@ class DPage(View):
         self.content = []
         return
 
+    def render(self, request, content):
+        """ Base class render response object with this content
+
+        :param request: request object
+        :param content: content
+        :return: response object
+        """
+        return render(request, self.template, {'content': content})
+
     def _get_post(self, request, *args, **kwargs):
         """ DPage shared default get/post processing """
         content = self.generate(request, *args, **kwargs)
@@ -171,16 +180,22 @@ class DPage(View):
     def get(self, request, *args, **kwargs):
         """ Base class default get method
 
-        Invokes self.generate(request. *args, **kwargs).  If generate returns str/unicode renders with returned
+        Invokes self.generate(...).  If generate returns str/unicode renders with returned
         value.  If generate returns DPage, renders self.content.  If generate returns HTTPResponse, returns response.
+
+        .. note:: Child classes may, and sometimes need to, override get.
+            If so they **must** return a response object!
         """
         return self._get_post(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         """ Base class default post method
 
-        Invokes self.generate(request. *args, **kwargs).  If generate returns str/unicode renders with returned
+        Invokes self.generate(...).  If generate returns str/unicode renders with returned
         value.  If generate returns DPage, renders self.content.  If generate returns HTTPResponse, returns response.
+
+        .. note:: Child classes may, and sometimes need to, override post.
+            If so they **must** return a response object!
         """
         return self._get_post(request, *args, **kwargs)
 

@@ -34,6 +34,8 @@ from djangopages.widgets.layout import *
 from djangopages.widgets.bootstrap import *
 from djangopages.widgets.texthtml import *
 from djangopages.widgets.graph import GraphCK
+from djangopages.widgets.form import *
+
 from django.http import HttpResponseNotFound
 from django.views.generic import View
 from django import forms
@@ -92,7 +94,7 @@ class DPageView(View):
             # noinspection PyUnresolvedReferences
             dpage_obj = DPage.pages_dict[name]
             cls_obj = dpage_obj()
-            rtn = cls_obj.put(request, *args, **kwargs)
+            rtn = cls_obj.post(request, *args, **kwargs)
             return rtn
         except KeyError:
             return HttpResponseNotFound('<h1>Page &lt;{}&gt; not found</h1>'.format(name))
@@ -845,28 +847,56 @@ content = T([RC(MD('##Can have other DjangoPage content on the page with the gra
         return content
 
 
-class TestForms001(DPage):
-    """ Test DPage Form support """
-    title = 'DPage form support'
+class TestForm001(DPage):
+    """ Test Form support """
+    title = 'Form support'
     description = 'Demonstrate ' + title
     tags = ['test', 'forms']
 
     code = """
-Fix me
+class NameForm(forms.Form):
+    name = forms.CharField(label='Your name', max_length=100)
+
+def get(self, request, *args, **kwargs):
+    form = self.NameForm(initial={'name': 'Enter your name here'})
+    reset = LNKSPrimary('/dpages/TestForm001', 'Reset')
+    form = Form(request, form, 'Fire phasers', '/dpages/TestForm001')
+    content = RC((reset, form))
+    content = page_content(self, self.code, content)
+    return self.render(request, content)
+
+def post(self, request, *args, **kwargs):
+    form = self.NameForm(request.POST)
+    reset = LNKSPrimary('/dpages/TestForm001', 'Reset')
+    if form.is_valid():
+        content = RC((reset, MD("### Success")))
+        content = page_content(self, self.code, content)
+        return self.render(request, content)
+    form = self.NameForm(request.POST)
+    content = RC((reset, form))
+    content = page_content(self, self.code, content)
+    return self.render(request, content)
         """
 
     class NameForm(forms.Form):
         name = forms.CharField(label='Your name', max_length=100)
 
     def get(self, request, *args, **kwargs):
-        form = self.NameForm()
-
-        content = RC(T(form))
+        form = self.NameForm(initial={'name': 'Enter your name here'})
+        reset = LNKSPrimary('/dpages/TestForm001', 'Reset')
+        form = Form(request, form, 'Fire phasers', '/dpages/TestForm001')
+        content = RC((reset, form))
         content = page_content(self, self.code, content)
-        return content
+        return self.render(request, content)
 
     def post(self, request, *args, **kwargs):
-        form = self.NameForm()
-        content = RC(T(form))
+        form = self.NameForm(request.POST)
+        reset = LNKSPrimary('/dpages/TestForm001', 'Reset')
+        if form.is_valid():
+            content = RC((reset, MD("### Success")))
+            content = page_content(self, self.code, content)
+            return self.render(request, content)
+        form = self.NameForm(request.POST)
+        content = RC((reset, form))
         content = page_content(self, self.code, content)
-        return content
+        return self.render(request, content)

@@ -3,7 +3,7 @@
 
 """
 Graph Widgets
-=============
+*************
 
 .. module:: graph
    :synopsis: Provides DjangoPage widgets to create chartkick graphs

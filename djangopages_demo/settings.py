@@ -65,17 +65,17 @@ INSTALLED_APPS = (
     #
     # apps to support djangopages
     #
-    'bootstrap3',
+    # 'bootstrap3',                   # toto 1: probably deprecated but leave for time being
     'chartkick',
-    'django_tables2',
+    # 'django_tables2',               # todo 1: probably deprecated but leave for time being
     'taggit',
     'taggit_suggest',
-    'django_ace',
+    # 'django_ace',                   # todo 1: probably deprecated but leave for time being
     #
     # djangopages proper
     #
     'djangopages',
-    'graphpages',                   # fixme: depracated but leave for time being
+    'graphpages',                    # todo 1: deprecated but leave for time being
     #
     # start of demo applications
     #

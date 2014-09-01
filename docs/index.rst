@@ -71,7 +71,8 @@ Table of Contents
    text
    layout
    bootstrap3
-   graphs
+   form
+   graph
    libs
    view
 
