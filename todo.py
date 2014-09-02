@@ -71,6 +71,15 @@ Check options on markdown wrt line wraps.
 # todo 2: About page
 # todo 2: Contact page
 # todo 2: tests for models, see http://effectivedjango.com/tutorial/models.html
+# todo 2: create djpages.format method that deals sensibly with errors
+#         try:
+#             rtn = template.format(form=form, method=method, action_url=action_url, button=button )
+#         except:
+#             rtn = None
+#             exception = sys.exc_info()[0]
+#             error_args = sys.exc_info()[1]
+#             print exception, error_args
+#             pass
 
 # todo 3: add support for direct highchart interface
 # todo 3: add support for ajax interface for highcharts
