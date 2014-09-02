@@ -856,6 +856,7 @@ class TestForm001(DPage):
     code = """
 class NameForm(forms.Form):
     name = forms.CharField(label='Your name', max_length=100)
+    myname = forms.CharField(label='My very long name', max_length=100)
 
 def get(self, request, *args, **kwargs):
     form = self.NameForm(initial={'name': 'Enter your name here'})
@@ -872,14 +873,15 @@ def post(self, request, *args, **kwargs):
         content = RC((reset, MD("### Success")))
         content = page_content(self, self.code, content)
         return self.render(request, content)
-    form = self.NameForm(request.POST)
+    form = Form(request, form, 'Fire phasers', '/dpages/TestForm001')
     content = RC((reset, form))
     content = page_content(self, self.code, content)
-    return self.render(request, content)
+        return self.render(request, content)
         """
 
     class NameForm(forms.Form):
         name = forms.CharField(label='Your name', max_length=100)
+        myname = forms.CharField(label='My very long name', max_length=100)
 
     def get(self, request, *args, **kwargs):
         form = self.NameForm(initial={'name': 'Enter your name here'})
@@ -896,7 +898,7 @@ def post(self, request, *args, **kwargs):
             content = RC((reset, MD("### Success")))
             content = page_content(self, self.code, content)
             return self.render(request, content)
-        form = self.NameForm(request.POST)
+        form = Form(request, form, 'Fire phasers', '/dpages/TestForm001')
         content = RC((reset, form))
         content = page_content(self, self.code, content)
         return self.render(request, content)

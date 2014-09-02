@@ -39,8 +39,6 @@ from django.core.context_processors import csrf
 from djangopages.widgets.widgets import DWidget, DWidgetT
 from djangopages.libs import ssw
 
-import sys
-
 
 class Form(DWidget):
     """ Django form widget
@@ -74,25 +72,23 @@ class Form(DWidget):
             template = '<!-- form -->\n' \
                        '<form role="form" method="{{ method }}" class="form" action="{{ action_url }}">\n' \
                        '     <!-- csrf -->{% csrf_token %}<!-- / csrf -->\n' \
-                       '     {# Include the hidden fields #}\n' \
-                       '     {% for hidden in form.hidden_fields %}\n' \
-                       '         {{ hidden }}\n' \
-                       '     {% endfor %}\n' \
-                       '     {# form non-field errors #}\n' \
-                       '          {{ form.non_field_errors }}\n' \
-                       '     {# Include the visible fields #}\n' \
-                       '     {% for field in form.visible_fields %}\n' \
-                       '         {% if field.errors %}\n' \
-                       '             <div class="row bg-danger">\n' \
-                       '                 <div class="col-md-3 text-right"></div>\n' \
-                       '                 <div class="col-md-7">{{ field.errors }}</div>\n' \
-                       '             </div>\n' \
-                       '         {% endif %}\n' \
-                       '         <div class="row">\n' \
-                       '             <div class="col-md-3 text-right">{{ field.label_tag }}</div>\n' \
-                       '             <div class="col-md-7">{{ field }}</div>\n' \
-                       '         </div>\n' \
-                       '     {% endfor %}\n' \
+                       '    {# Include the hidden fields #}\n' \
+                       '    {% for hidden in form.hidden_fields %}\n' \
+                       '        {{ hidden }}\n' \
+                       '    {% endfor %}\n' \
+                       '    {# Include the visible fields #}\n' \
+                       '    {% for field in form.visible_fields %}\n' \
+                       '        {% if field.errors %}' \
+                       '        <div class="row bg-danger">\n' \
+                       '            <div class="col-md-3"></div>\n' \
+                       '            <div class="col-md-9">{{ field.errors }}</div>\n' \
+                       '        {% else %}' \
+                       '        <div class="row">\n' \
+                       '        {% endif %}' \
+                       '            <div class="col-md-3 text-right">{{ field.label_tag }}</div>\n' \
+                       '            <div class="col-md-9">{{ field }}</div>\n' \
+                       '        </div>\n' \
+                       '    {% endfor %}\n' \
                        '     <div class="row">\n' \
                        '         <div class="col-md-3 text-right">\n' \
                        '             <input type="submit" value="{{ button }}" class="btn btn-primary"/>\n' \
@@ -100,11 +96,14 @@ class Form(DWidget):
                        '     </div>\n' \
                        '</form>\n' \
                        '<!-- /form -->\n'
+        # if not isinstance(button, FormButton):
+        #     button = FormButton(button)
         t = Template(template)
         c = {'form': form, 'method': method, 'action_url': action_url, 'button': button}
         c.update(csrf(request))
         rtn = t.render(Context(c))
         return rtn
+
 # todo 2: create djpages.format method that deals sensibly with errors
 #         try:
 #             rtn = template.format(form=form, method=method, action_url=action_url, button=button )

@@ -115,10 +115,7 @@ class DWidget(object):
         # log.debug('##### DWidget render for {}'.format(self.__class__))
         args = tuple()
         for a in self.args:
-            if isinstance(a, DWidget):
-                args += (_render(a),)
-            else:
-                args += (a,)
+            args += (_render(a),)
         self.args = args
         out = self.generate()
         # log.debug('##### DWidget out for {}'.format(self.__class__))
@@ -151,10 +148,7 @@ class DWidget(object):
         return self.render() * other
 
     def __str__(self):
-        if isinstance(self, DWidget):
-            return self.render()
-        else:
-            return self
+        return self.render()
 
     def __repr__(self):
         return self.render()
