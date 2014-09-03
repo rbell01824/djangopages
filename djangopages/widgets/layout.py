@@ -100,11 +100,11 @@ class Column(DWidget):
         classes = 'class="col-md-{width} {classes}" '.format(width=width, classes=classes)
         if style:
             style = 'style="{}" '.format(style)
-        template = '<!-- Start of dpage col -->\n' \
+        template = '\n<!-- DWidget col -->\n' \
                    '<div {classes} {style}>\n' \
                    '    {content}\n'  \
                    '</div>\n' \
-                   '<!-- End of dpage col -->\n'
+                   '<!-- / DWidget col -->\n'
         rtn = template.format(content=content, classes=classes, style=style)
         return rtn
 C = functools.partial(Column)
@@ -128,6 +128,7 @@ class Row(DWidget):
     .. sourcecode:: python
 
         Row(Column(MD(("##Bootstrap row', '##Bootstrap column', 'Other text in row/column'))))
+
 
     | Shortcut: R(...), useful abbreviation
 
@@ -157,11 +158,11 @@ class Row(DWidget):
         classes = 'class="row {classes}" '.format(classes=classes)
         if style:
             style = 'style="{}" '.format(style)
-        template = '<!-- Start of dpage row -->\n' \
+        template = '\n<!-- DWidget row -->\n' \
                    '<div {classes} {style}>\n' \
                    '    {content}\n' \
                    '</div>\n' \
-                   '<!-- End of dpage row -->\n'
+                   '<!-- / DWidget row -->\n'
         rtn = template.format(content=content, classes=classes, style=style)
         return rtn
 R = functools.partial(Row)
@@ -173,6 +174,8 @@ class RowColumn(DWidget):
     .. sourcecode:: python
 
         RC(MD(("##Bootstrap row', '##Bootstrap column', 'Other text in row/column')))
+
+    .. note:: RowColumn generates **one** row with multiple columns.
 
     .. note:: **All** parameters are passed to Column.  Row uses defaults.
 
@@ -210,14 +213,18 @@ class RowColumn(DWidget):
     # noinspection PyMethodOverriding
     def generate(self):
         """ Equivalent to Row(Column(...)) """
+        template = '\n<!-- DWidget RowColumn -->\n' \
+                   '{rc}\n' \
+                   '<!-- / DWidget RowColumn -->\n'
         content, width, classes, style = self.args
         if isinstance(content, tuple):
             cols = ''
             for c in content:
                 cols += Column(c, width, classes, style).render()
             rtn = Row(cols).render()
-            return rtn
-        rtn = Row(Column(content, width, classes, style)).render()
+        else:
+            rtn = Row(Column(content, width, classes, style)).render()
+        rtn = template.format(rc=rtn)
         return rtn
 RC = functools.partial(RowColumn, width=12)
 RC1 = functools.partial(RowColumn, width=1)
@@ -232,3 +239,76 @@ RC9 = functools.partial(RowColumn, width=9)
 RC10 = functools.partial(RowColumn, width=10)
 RC11 = functools.partial(RowColumn, width=11)
 RC12 = functools.partial(RowColumn, width=12)
+
+
+class RowRowColumn(DWidget):
+    """ Equivalent to Row(Column(...)).  Unlike RowColumn, generates a Row for **each** Column.
+
+    .. sourcecode:: python
+
+        RC(MD(("##Bootstrap row', '##Bootstrap column', 'Other text in row/column')))
+        
+    .. note:: Generates a Row for **each** column.
+
+    .. note:: **All** parameters are passed to Column.  Row uses defaults.
+
+    | Shortcuts:
+    | RRC(...), default width 12
+    | RRC1(...), default width 1
+    | RRC2(...), default width 2
+    | RRC3(...), default width 3
+    | RRC4(...), default width 4
+    | RRC5(...), default width 5
+    | RRC6(...), default width 6
+    | RRC7(...), default width 7
+    | RRC8(...), default width 8
+    | RRC9(...), default width 9
+    | RRC10(...), default width 10
+    | RRC11(...), default width 12
+    | RRC12(...), default width 11
+
+
+    :param content: content
+    :type content: str or unicode or tuple
+    :param width: bootstrap width, see bootstrap docs
+    :type width: int
+    :param classes: classes to add to output
+    :type classes: str or unicode
+    :param style: styles to add to output
+    :type style: str or unicode
+    :return: HTML for Row(Column(...))
+    :rtype: unicode
+    """
+    def __init__(self, content, width=12, classes='', style=''):
+        super(RowRowColumn, self).__init__(content, width, classes, style)
+        return
+
+    # noinspection PyMethodOverriding
+    def generate(self):
+        """ Equivalent to Row(Column(...)) """
+        template = '\n<!-- DWidget RowRowColumn -->\n' \
+                   '{rrc}\n' \
+                   '<!-- / DWidget RowRowColumn -->\n'
+        content, width, classes, style = self.args
+        if isinstance(content, tuple):
+            rtn = ''
+            for c in content:
+                col = Column(c, width, classes, style).render()
+                rtn += Row(col).render()
+        else:
+            rtn = Row(Column(content, width, classes, style)).render()
+        rtn = template.format(rrc=rtn)
+        return rtn
+RRC = functools.partial(RowRowColumn, width=12)
+RRC1 = functools.partial(RowRowColumn, width=1)
+RRC2 = functools.partial(RowRowColumn, width=2)
+RRC3 = functools.partial(RowRowColumn, width=3)
+RRC4 = functools.partial(RowRowColumn, width=4)
+RRC5 = functools.partial(RowRowColumn, width=5)
+RRC6 = functools.partial(RowRowColumn, width=6)
+RRC7 = functools.partial(RowRowColumn, width=7)
+RRC8 = functools.partial(RowRowColumn, width=8)
+RRC9 = functools.partial(RowRowColumn, width=9)
+RRC10 = functools.partial(RowRowColumn, width=10)
+RRC11 = functools.partial(RowRowColumn, width=11)
+RRC12 = functools.partial(RowRowColumn, width=12)

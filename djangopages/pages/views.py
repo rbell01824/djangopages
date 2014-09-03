@@ -338,6 +338,27 @@ content = RowColumn((('Row 1 Col 1 ' + t, 'Row 1 Col 2 ' + t),
         return content
 
 
+class TestRowRowColumn(DPage):
+    """ Test RowRowColumn widget """
+    title = 'Bootstrap: RowRowColumn/RRC'
+    description = 'Demonstrate ' + title
+    tags = ['test', 'bootstrap', 'layout']
+
+    def generate(self, request, *args, **kwargs):
+        code = """
+t = LI(5, para=False)
+content = RowRowColumn((('Row 1 Col 1 ' + t, 'Row 1 Col 2 ' + t),
+                     ('Row 2 Col 1 ' + t, 'Row 2 Col 2 ' + t)),
+                    width=6)
+        """
+        t = LI(5, para=False)
+        content = RowRowColumn((('Row 1 Col 1 ' + t, 'Row 1 Col 2 ' + t),
+                                ('Row 2 Col 1 ' + t, 'Row 2 Col 2 ' + t)),
+                               width=6)
+        content = page_content(self, code, content)
+        return content
+
+
 class TestAccordion(DPage):
     """ Test Accordion widget """
     title = 'Bootstrap: Accordion'
@@ -847,9 +868,9 @@ content = T([RC(MD('##Can have other DjangoPage content on the page with the gra
         return content
 
 
-class TestForm001(DPage):
-    """ Test Form support """
-    title = 'Form support 001'
+class TestFormD001(DPage):
+    """ Django form support """
+    title = 'Django form support 001'
     description = 'Demonstrate ' + title
     tags = ['test', 'forms']
 
@@ -860,20 +881,20 @@ class NameForm(forms.Form):
 
 def get(self, request, *args, **kwargs):
     form = self.NameForm(initial={'name': 'Enter your name here'})
-    reset = LNKSPrimary('/dpages/TestForm001', 'Reset')
-    form = Form(request, form, 'Fire phasers', '/dpages/TestForm001')
+    reset = LNKSPrimary('/dpages/TestFormD001', 'Reset')
+    form = Form(request, form, 'Fire phasers', '/dpages/TestFormD001')
     content = RC((reset, form))
     content = page_content(self, self.code, content)
     return self.render(request, content)
 
 def post(self, request, *args, **kwargs):
     form = self.NameForm(request.POST)
-    reset = LNKSPrimary('/dpages/TestForm001', 'Reset')
+    reset = LNKSPrimary('/dpages/TestFormD001', 'Reset')
     if form.is_valid():
         content = RC((reset, MD("### Success")))
         content = page_content(self, self.code, content)
         return self.render(request, content)
-    form = Form(request, form, 'Fire phasers', '/dpages/TestForm001')
+    form = Form(request, form, 'Fire phasers', '/dpages/TestFormD001')
     content = RC((reset, form))
     content = page_content(self, self.code, content)
         return self.render(request, content)
@@ -885,33 +906,59 @@ def post(self, request, *args, **kwargs):
 
     def get(self, request, *args, **kwargs):
         form = self.NameForm(initial={'name': 'Enter your name here'})
-        reset = LNKSPrimary('/dpages/TestForm001', 'Reset')
-        form = FormD(request, form, 'Fire phasers', '/dpages/TestForm001')
+        reset = LNKSPrimary('/dpages/TestFormD001', 'Reset')
+        form = FormD(request, form, 'Fire phasers', '/dpages/TestFormD001')
         content = RC((reset, form))
         content = page_content(self, self.code, content)
         return self.render(request, content)
 
     def post(self, request, *args, **kwargs):
         form = self.NameForm(request.POST)
-        reset = LNKSPrimary('/dpages/TestForm001', 'Reset')
+        reset = LNKSPrimary('/dpages/TestFormD001', 'Reset')
         if form.is_valid():
             content = RC((reset, MD("### Success")))
             content = page_content(self, self.code, content)
             return self.render(request, content)
-        form = FormD(request, form, 'Fire phasers', '/dpages/TestForm001')
+        form = FormD(request, form, 'Fire phasers', '/dpages/TestFormD001')
         content = RC((reset, form))
         content = page_content(self, self.code, content)
         return self.render(request, content)
 
 
-class TestForm002(DPage):
-    """ Test Form support """
-    title = 'Form support 002 (with help)'
+class TestFormD002(DPage):
+    """ Django form support """
+    title = 'Django form support 002 (with help)'
     description = 'Demonstrate ' + title
     tags = ['test', 'forms']
 
     code = """
 class NameForm(forms.Form):
+    name = forms.CharField(label='Your name', initial='Your name',
+                           help_text='Enter your name', max_length=100)
+    subject = forms.CharField(max_length=100, help_text='100 characters max.')
+    message = forms.CharField(help_text='Message you would like to send')
+    sender = forms.EmailField(help_text='A valid email address, please.')
+    cc_myself = forms.BooleanField(required=False)
+
+def get(self, request, *args, **kwargs):
+    form = self.NameForm(initial={'name': 'Enter your name here'})
+    reset = LNKSPrimary('/dpages/TestFormD002', 'Reset')
+    form = FormD(request, form, 'Fire phasers', '/dpages/TestFormD002')
+    content = RC((reset, form))
+    content = page_content(self, self.code, content)
+    return self.render(request, content)
+
+def post(self, request, *args, **kwargs):
+    form = self.NameForm(request.POST)
+    reset = LNKSPrimary('/dpages/TestFormD002', 'Reset')
+    if form.is_valid():
+        content = RC((reset, MD("### Success")))
+        content = page_content(self, self.code, content)
+        return self.render(request, content)
+    form = FormD(request, form, 'Fire phasers', '/dpages/TestFormD002')
+    content = RC((reset, form))
+    content = page_content(self, self.code, content)
+    return self.render(request, content)
         """
 
     class NameForm(forms.Form):
@@ -922,22 +969,84 @@ class NameForm(forms.Form):
         sender = forms.EmailField(help_text='A valid email address, please.')
         cc_myself = forms.BooleanField(required=False)
 
+        class Meta:
+            foobar = 'something'
+
     def get(self, request, *args, **kwargs):
         form = self.NameForm(initial={'name': 'Enter your name here'})
-        reset = LNKSPrimary('/dpages/TestForm002', 'Reset')
-        form = FormD(request, form, 'Fire phasers', '/dpages/TestForm002')
+        for f in form.fields:
+            print f
+        reset = LNKSPrimary('/dpages/TestFormD002', 'Reset')
+        form = FormD(request, form, 'Fire phasers', '/dpages/TestFormD002')
         content = RC((reset, form))
         content = page_content(self, self.code, content)
         return self.render(request, content)
 
     def post(self, request, *args, **kwargs):
         form = self.NameForm(request.POST)
-        reset = LNKSPrimary('/dpages/TestForm002', 'Reset')
+        reset = LNKSPrimary('/dpages/TestFormD002', 'Reset')
         if form.is_valid():
             content = RC((reset, MD("### Success")))
             content = page_content(self, self.code, content)
             return self.render(request, content)
-        form = FormD(request, form, 'Fire phasers', '/dpages/TestForm002')
+        for f in form.fields:
+            print f
+        form = FormD(request, form, 'Fire phasers', '/dpages/TestFormD002')
         content = RC((reset, form))
         content = page_content(self, self.code, content)
         return self.render(request, content)
+
+
+class TestFormB001(DPage):
+    """ Bootstrap form support """
+    title = 'Bootstrap form support 001'
+    description = 'Demonstrate ' + title
+    tags = ['test', 'forms']
+
+    code = """
+class NameForm(forms.Form):
+        """
+
+    class TestForm(forms.Form):
+        name = forms.CharField(label='Your name', initial='Your name',
+                               help_text='Enter your name', max_length=100)
+        subject = forms.CharField(max_length=100, help_text='100 characters max.')
+        message = forms.CharField(help_text='Message you would like to send')
+        # sender = forms.EmailField(help_text='A valid email address, please.')
+        cc_myself = forms.BooleanField(required=False)
+
+    def get(self, request, *args, **kwargs):
+        form = self.TestForm()
+        for f in form.fields:
+            print f
+        reset = LNKSPrimary('/dpages/TestFormB001', 'Reset')
+        form = FormB(request, form, 'Submit', '/dpages/TestFormB001', horinl=2)
+        # content = R((C(reset), C(form)))
+        content = T((RC(reset), form))
+        content = page_content(self, self.code, content)
+        return self.render(request, content)
+
+    def post(self, request, *args, **kwargs):
+        form = self.TestForm(request.POST)
+        reset = LNKSPrimary('/dpages/TestFormB001', 'Reset')
+        if form.is_valid():
+            content = RRC((reset, MD("### Success")))
+            content = page_content(self, self.code, content)
+            return self.render(request, content)
+        for f in form.fields:
+            print f
+        form = FormB(request, form, 'Submit', '/dpages/TestFormB001', horinl=2)
+        content = R((C(reset), C(form)))
+        content = page_content(self, self.code, content)
+        return self.render(request, content)
+
+
+# class ProjectView(View):`
+#     @method_decorator(csrf_protect)
+#     def get(self, request, *args, **kwargs):
+#
+# For example, in the Cheetah template language, your form could contain the following:
+#
+# <div style="display:none">
+#     <input type="hidden" name="csrfmiddlewaretoken" value="$csrf_token"/>
+# </div>
