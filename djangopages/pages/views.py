@@ -1082,12 +1082,12 @@ class NameForm(forms.Form):
 
     def get(self, request, *args, **kwargs):
         form = self.TestForm()
-        for f in form.fields:
-            print f
+        # for f in form.fields:
+        #     print f
         reset = LNKSPrimary('/dpages/TestBForm001', 'Reset')
-        form = BForm(request, form, 'Submit', '/dpages/TestBForm001', horinl=2)
+        form = BForm(request, form)
         # content = R((C(reset), C(form)))
-        content = T((RC(reset), form))
+        content = X(RC(reset), RC6(form))
         content = page_content(self, self.code, content)
         return self.render(request, content)
 
@@ -1100,18 +1100,8 @@ class NameForm(forms.Form):
             return self.render(request, content)
         # for f in form.fields:
         #     print f
-        form = BForm(request, form, 'Submit', '/dpages/TestBForm001', horinl=2)
-        content = R((C(reset), C(form)))
+        form = BForm(request, form)
+        # content = R((C(reset), C(form)))
+        content = X(RC(reset), RC6(form))
         content = page_content(self, self.code, content)
         return self.render(request, content)
-
-
-# class ProjectView(View):`
-#     @method_decorator(csrf_protect)
-#     def get(self, request, *args, **kwargs):
-#
-# For example, in the Cheetah template language, your form could contain the following:
-#
-# <div style="display:none">
-#     <input type="hidden" name="csrfmiddlewaretoken" value="$csrf_token"/>
-# </div>

@@ -230,7 +230,7 @@ def _render(content):
             lst.append(_render(con))
         return lst
     return content
-X = functools.partial(_render)
+Render = functools.partial(_render)
 
 
 # def _renderstr(content):

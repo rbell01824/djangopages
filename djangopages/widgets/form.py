@@ -182,6 +182,8 @@ class DForm(DWidget):
                        '    {% for hidden in form.hidden_fields %}\n' \
                        '        {{ hidden }}\n' \
                        '    {% endfor %}\n' \
+                       '    {# Include non-field errors #}\n' \
+                       '         {{ form.non_field_errors }}\n' \
                        '    {# Include the visible fields #}\n' \
                        '    {% for field in form.visible_fields %}\n' \
                        '        {% if field.errors %}' \
@@ -219,23 +221,27 @@ class DForm(DWidget):
         rtn = t.render(Context(c))
         return rtn
 
+# fixme: make BForm a basic bootstrap form widget and create BIForm (inline) and BHForm (horizontal)
+
 
 class BForm(DWidget):
     """ Bootstrap form """
-    def __init__(self, request, form, button='Submit', action_url=None, method='Post', horinl=''):
+    def __init__(self, request, form, button='Submit', action_url=None, method='Post'):
         if not isinstance(button, FormButton):
             button = FormButton(button)
-        super(BForm, self).__init__(request, form, button, action_url, method, horinl)
+        super(BForm, self).__init__(request, form, button, action_url, method)
 
     def generate(self):
-        request, form, button, action_url, method, horinl = self.args
+        request, form, button, action_url, method = self.args
         template = '<!-- form -->\n' \
-                   '<form role="form" method="{{ method }}" class="{{form_class}}" action="{{ action_url }}">\n' \
+                   '<form role="form" method="{{ method }}" action="{{ action_url }}">\n' \
                    '    <!-- csrf -->{% csrf_token %}<!-- / csrf -->\n' \
                    '    {# Include the hidden fields #}\n' \
                    '    {% for hidden in form.hidden_fields %}\n' \
                    '        {{ hidden }}\n' \
                    '    {% endfor %}\n' \
+                   '    {# Include non-field errors #}\n' \
+                   '         {{ form.non_field_errors }}\n' \
                    '    {# Include the visible fields #}\n' \
                    '    {% for field in form.visible_fields %}\n' \
                    '        {% if field.errors %}' \
@@ -244,7 +250,7 @@ class BForm(DWidget):
                    '        {% else %}' \
                    '        <div class="form-group">\n' \
                    '        {% endif %}' \
-                   '            <label for={{ field.id_for_label }} {{label_class|safe}}>{{ field.label }}</label>\n' \
+                   '            <label for={{ field.id_for_label }}>{{ field.label }}</label>\n' \
                    '            {% if field.data %}' \
                    '            <input type="{{ field.field.widget.input_type}}" id={{ field.id_for_label }} ' \
                    '             name="{{field.name}}" class="form-control" value="{{field.data}}" >\n' \
@@ -261,56 +267,13 @@ class BForm(DWidget):
                    '    {{ button|safe }}\n' \
                    '</form>\n' \
                    '<!-- /form -->\n'
-        form_class = ''
-        label_class = ''
-        if not horinl:
-            pass
-        elif horinl == 'inline':
-            pass
-        elif isinstance(horinl, int):
-            form_class = 'form-horizontal'
-            label_class = 'class="col-md-{} control-label" '.format(horinl)
-        form_class = ssw(form_class, 'form-')
+        if not action_url:
+            action_url = request.path
         t = Template(template)
-        c = {'form': form, 'method': method, 'action_url': action_url, 'button': button,
-             'form_class': form_class, 'label_class': label_class}
+        c = {'form': form, 'method': method, 'action_url': action_url, 'button': button}
         c.update(csrf(request))
         rtn = t.render(Context(c))
         return rtn
-
-
-# class BFormButton(DWidgetT):
-#     """ Form bootstrap button definition
-#
-#     .. sourcecode:: python
-#
-#         DFormButton('Text of button')
-#
-#     :param text: text
-#     :type text: str or unicode or tuple
-#     :param button: default 'btn-default', button type per bootstrap
-#     :type button: str or unicode
-#     :param size: default '', button size per bootstrap
-#     :type size: str or unicode
-#     :param classes: classes to add to output
-#     :type classes: str or unicode
-#     :param style: styles to add to output
-#     :type style: str or unicode
-#     """
-#     def __init__(self, text='Submit', button='btn-primary', size='', classes='', style=''):
-#         template = '<button type="submit" class="btn {button} {classes} {size}" style="{style}">{text}</button>\n'
-#         # template = '<div class="row">\n' \
-#         #            '    <div class="col-md-3 text-right">\n' \
-#         #            '        <input type="submit" value="{text}" ' \
-#         #            '            class="btn {button} {size} {classes}" style="{style}" />\n' \
-#         #            '    </div>\n' \
-#         #            '</div>\n'
-#         button = ssw(button, 'btn-')
-#         size = ssw(size, 'btn-')
-#         modal_id = None
-#         super(BFormButton, self).__init__(template, {'text': text,
-#                                                      'button': button, 'size': size,
-#                                                      'classes': classes, 'style': style})
 
 #
 # # todo 1: add support for normal bootstrap forms

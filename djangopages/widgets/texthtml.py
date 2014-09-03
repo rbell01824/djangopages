@@ -84,6 +84,26 @@ T = functools.partial(Text)
 HTML = functools.partial(Text)
 
 
+class X(DWidget):
+    """ Renders list of widgets.
+
+    .. sourcecode:: python
+
+            X(MD(...), T(...), ...)
+
+    :param content: content to output
+    :type content: list of DWidget(s)
+    """
+    def __init__(self, *content):
+        super(X, self).__init__(*content)
+        return
+
+    def generate(self):
+        content = self.args
+        rtn = '\n'.join(content)
+        return rtn
+
+
 class Markdown(DWidget):
     """ Renders markdown content to the page.
 
