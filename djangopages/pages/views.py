@@ -1126,30 +1126,36 @@ class NameForm(forms.Form):
         # sender = forms.EmailField(help_text='A valid email address, please.')
         cc_myself = forms.BooleanField(required=False)
 
-    def get(self, request, *args, **kwargs):
-        form = self.TestForm()
-        # for f in form.fields:
-        #     print f
+    def reset_link(self):
         reset = LNKSPrimary('/dpages/TestBForm001', 'Reset')
-        form = BF(request,
-                  BFG(form.name),
-                  BFG(form.subject),
-                  BFG(form.message),
-                  BCB(form.cc_myself))
+        return reset
+
+    def make_form(self, request, form=None):
+        if not form:
+            form = self.TestForm()
+        return BForm(request,
+                     BFG(form.name),
+                     BFG(form.subject),
+                     BFG(form.message),
+                     BCB(form.cc_myself))
+
+    def get(self, request, *args, **kwargs):
+        reset = self.reset_link()
+        form = self.make_form(request)
         content = Layout(C(reset), C6(form))
         content = page_content(self, self.code, content)
         return self.render(request, content)
 
     def post(self, request, *args, **kwargs):
         form = self.TestForm(request.POST)
-        reset = LNKSPrimary('/dpages/TestBForm001', 'Reset')
+        reset = self.reset_link()
         if form.is_valid():
             content = RRC((reset, MD("### Success")))
             content = page_content(self, self.code, content)
             return self.render(request, content)
         # for f in form.fields:
         #     print f
-        form = BForm(request, form)
+        form = self.make_form(request, form)
         content = Layout(C(reset), C6(form))
         content = page_content(self, self.code, content)
         return self.render(request, content)

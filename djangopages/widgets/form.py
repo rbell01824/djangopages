@@ -235,15 +235,13 @@ class DBForm(DWidget):
         rtn = t.render(Context(c))
         return rtn
 
-# fixme: make BForm a basic bootstrap form widget and create BIForm (inline) and BHForm (horizontal)
 
-
-class BForm(DWidget):
+class B0Form(DWidget):
     """ Bootstrap form """
     def __init__(self, request, form, button='Submit', action_url=None, method='Post'):
         if not isinstance(button, FormButton):
             button = FormButton(button)
-        super(BForm, self).__init__(request, form, button, action_url, method)
+        super(B0Form, self).__init__(request, form, button, action_url, method)
 
     def generate(self):
         request, form, button, action_url, method = self.args
@@ -290,6 +288,92 @@ class BForm(DWidget):
         return rtn
 
 
+class BForm(DWidget):
+    """ Bootstrap form """
+    # def __init__(self, request, form, button='Submit', action_url=None, method='Post'):
+    def __init__(self, request, *form, **kwargs):
+        button = kwargs.pop('button', 'Submit')
+        if not isinstance(button, FormButton):
+            button = FormButton(button)
+        action_url = kwargs.pop('action_url', None)
+        method = kwargs.pop('method', 'Post')
+        form_type = ssw(kwargs.pop('form_type', ''), 'form-')
+        for f in form:
+            if isinstance(f, (BFG, BCB)):
+                f.form_type = form_type
+        super(BForm, self).__init__(request, form, button, action_url, method, form_type)
+
+    def generate(self):
+        request, form, button, action_url, method, form_type = self.args
+        template = '<!-- form -->\n' \
+                   '<form role="form" class="{form_type}" method="{method}" action="{action_url}">\n' \
+                   '    {csrf}\n' \
+                   '    {form}\n' \
+                   '    {button}\n' \
+                   '</form>\n' \
+                   '<!-- /form -->\n'
+        if not action_url:
+            action_url = request.path
+        if isinstance(form, tuple):
+            form = '\n'.join(form)
+        rtn = template.format(form_type=form_type, method=method, action_url=action_url,
+                              csrf=_csrf_(request), form=form,
+                              button=button)
+        return rtn
+
+# fixme: form-group can have classes has-success, has-warning, has-error, has-feedback,
+# fixme: form-group can take a span <span class="glyphicon glyphicon-ok form-control-feedback"></span>, etc.
+# fixme: support help text <span class="help-block">A block of help text that breaks onto a new line and may extend beyond one line.</span>
+# fixme: ass support for input groups http://getbootstrap.com/components/#input-groups
+
+
+class BFG(DWidget):
+    """ Bootstrap form group field """
+    def __init__(self, fld, lbl_width=None, fld_width=None):
+        super(BFG, self).__init__(fld, lbl_width, fld_width)
+
+    def generate(self):
+        fld, lbl_width, fld_width = self.args
+        # noinspection PyUnresolvedReferences
+        if self.form_type == '':
+            template = '<div class="form-group">\n' \
+                       '    {label}\n' \
+                       '    {field}\n' \
+                       '{fld_help}' \
+                       '</div>\n'
+            label = fld.label_tag()
+            if lbl_width:
+                label = add_classes(label, 'col-md-{}'.format(lbl_width))
+            field = add_classes(str(fld), 'form-control')
+            if fld_width:
+                field = '<div class="col-md-{}" >{}</div>'.format(fld_width, field)
+            if fld.help_text:
+                fld_help = '    <p>{}</p>'.format(fld.help_text)
+            else:
+                fld_help = ''
+            rtn = template.format(label=label, field=field, fld_help=fld_help)
+            return rtn
+        elif lbl_width and fld_width:
+            template = '<div class="form-group">\n' \
+                       '    {label}\n' \
+                       '    <div class="col-md-{fld_width}>\n' \
+                       '        {field}>\n' \
+                       '    </div>' \
+                       '{fld_help}' \
+                       '</div>\n'
+            label = fld.label_tag()
+            label_classes = 'class="col-md-{} control-label" '.format(lbl_width)
+            label = label.replace('<label', '<label ' + label_classes, 1)
+            fld.css_classes('form-control')
+            if fld.help_text:
+                fld_help = '    <p>{}</p>'.format(fld.help_text)
+            else:
+                fld_help = ''
+            rtn = template.format(label=label, fld_width=fld_width, field=fld, fld_help=fld_help)
+            return rtn
+        raise AttributeError
+
+
 class BCB(DWidget):
     """ Bootstrap check box field """
     def __init__(self, fld, lbl_width=None, fld_width=None):
@@ -329,74 +413,6 @@ class BCB(DWidget):
             rtn = template.format(label=label, fld_width=fld_width, field=fld, fld_help=fld_help)
             return rtn
         raise AttributeError
-
-
-class BFG(DWidget):
-    """ Bootstrap form group field """
-    def __init__(self, fld, lbl_width=None, fld_width=None):
-        super(BFG, self).__init__(fld, lbl_width, fld_width)
-
-    def generate(self):
-        fld, lbl_width, fld_width = self.args
-        if not lbl_width and not fld_width:
-            # template = '<div class="form-group">\n' \
-            #            '    <label for="{fld_label_id}">{fld_label}</label>\n' \
-            #            '    <input type="{fld_type}" class="form-control" id="{fld_id}" ' \
-            #            'placeholder="{fld_placeholder}">\n' \
-            #            '{fld_help}' \
-            #            '</div>\n'
-            template = '<div class="form-group">\n' \
-                       '    {label}\n' \
-                       '    {field}\n' \
-                       '{fld_help}' \
-                       '</div>\n'
-            field = add_classes(str(fld), 'form-control')
-            if fld.help_text:
-                fld_help = '    <p>{}</p>'.format(fld.help_text)
-            else:
-                fld_help = ''
-            rtn = template.format(label=fld.label_tag(), field=field, fld_help=fld_help)
-            return rtn
-        elif lbl_width and fld_width:
-            template = '<div class="form-group">\n' \
-                       '    {label}\n' \
-                       '    <div class="col-md-{fld_width}>\n' \
-                       '        {field}>\n' \
-                       '    </div>' \
-                       '{fld_help}' \
-                       '</div>\n'
-            label = fld.label_tag()
-            label_classes = 'class="col-md-{} control-label" '.format(lbl_width)
-            label = label.replace('<label', '<label ' + label_classes, 1)
-            fld.css_classes('form-control')
-            if fld.help_text:
-                fld_help = '    <p>{}</p>'.format(fld.help_text)
-            else:
-                fld_help = ''
-            rtn = template.format(label=label, fld_width=fld_width, field=fld, fld_help=fld_help)
-            return rtn
-        raise AttributeError
-
-
-class BF(DWidget):
-    """ Bootstrap form """
-    # def __init__(self, request, form, button='Submit', action_url=None, method='Post'):
-    def __init__(self, request, *form):
-        super(BF, self).__init__(request, form)
-
-    def generate(self):
-        request, form = self.args
-        template = '<!-- form -->\n' \
-                   '<form role="form" method="Post" action="{action_url}">\n' \
-                   '    {csrf}\n' \
-                   '    {form}' \
-                   '</form>\n' \
-                   '<!-- /form -->\n'
-        action_url = request.path
-        if isinstance(form, tuple):
-            form = '\n'.join(form)
-        rtn = template.format(action_url=action_url, csrf=_csrf_(request), form=form)
-        return rtn
 
 
 # todo 1: add id to Form
