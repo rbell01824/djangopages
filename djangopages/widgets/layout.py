@@ -44,6 +44,28 @@ from djangopages.widgets.widgets import DWidget
 ########################################################################################################################
 
 
+class WList(DWidget):
+    """ Renders list of widgets.
+
+    .. sourcecode:: python
+
+            WList(MD(...), T(...), ...)
+
+    :param content: content to output
+    :type content: list of DWidget(s)
+    """
+    def __init__(self, *content):
+        super(WList, self).__init__(*content)
+        return
+
+    def generate(self):
+        content = self.args
+        rtn = '\n'.join(content)
+        return rtn
+WL = functools.partial(WList)
+Layout = functools.partial(WList)
+
+
 class Column(DWidget):
     """ Outputs a bootstrap column
 

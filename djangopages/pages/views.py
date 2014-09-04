@@ -1087,7 +1087,7 @@ class NameForm(forms.Form):
         reset = LNKSPrimary('/dpages/TestBForm001', 'Reset')
         form = BForm(request, form)
         # content = R((C(reset), C(form)))
-        content = X(RC(reset), RC6(form))
+        content = Layout(RC(reset), RC6(form))
         content = page_content(self, self.code, content)
         return self.render(request, content)
 
@@ -1102,6 +1102,6 @@ class NameForm(forms.Form):
         #     print f
         form = BForm(request, form)
         # content = R((C(reset), C(form)))
-        content = X(RC(reset), RC6(form))
+        content = Layout(RC(reset), RC6(form))
         content = page_content(self, self.code, content)
         return self.render(request, content)
