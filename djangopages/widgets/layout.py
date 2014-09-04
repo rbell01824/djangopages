@@ -53,7 +53,6 @@ class WList(DWidget):
 
     | Shortcuts:
     | WL = functools.partial(WList)
-    | Layout = functools.partial(WList)
 
     :param content: content to output
     :type content: list of DWidget(s)
@@ -67,7 +66,31 @@ class WList(DWidget):
         rtn = '\n'.join(content)
         return rtn
 WL = functools.partial(WList)
-Layout = functools.partial(WList)
+
+
+class Layout(DWidget):
+    """ Renders list of widgets.
+
+    .. sourcecode:: python
+
+            Layout(row1, row2, ...)
+
+    | Shortcuts:
+
+    :param content: content to output
+    :type content: list of DWidget(s)
+    """
+    def __init__(self, *content):
+        super(Layout, self).__init__(*content)
+        return
+
+    def generate(self):
+        content = self.args
+        rtn = ''
+        for r in content:
+            rtn += Row('\n'.join(r))
+        return rtn
+L = functools.partial(WList)
 
 
 class Column(DWidget):

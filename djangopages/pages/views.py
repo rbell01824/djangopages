@@ -359,6 +359,45 @@ content = RowRowColumn((('Row 1 Col 1 ' + t, 'Row 1 Col 2 ' + t),
         return content
 
 
+class TestWList(DPage):
+    """ Test WList widget """
+    title = 'Bootstrap: WList'
+    description = 'Demonstrate ' + title
+    tags = ['test', 'bootstrap', 'layout']
+
+    def generate(self, request, *args, **kwargs):
+        code = """
+t = LI(5, para=False)
+content = WL(R(WL(C2(t), C4(t))),
+             R(WL(C4(t), C3(t), C2(t))))
+        """
+        t = LI(5, para=False)
+        content = WL(R(WL(C2(t), C4(t))),
+                     R(WL(C4(t), C3(t), C2(t))))
+        content = page_content(self, code, content)
+        return content
+
+
+class TestLayout(DPage):
+    """ Test Layout widget """
+    title = 'Bootstrap: layout'
+    description = 'Demonstrate ' + title
+    tags = ['test', 'bootstrap', 'layout']
+
+    def generate(self, request, *args, **kwargs):
+        code = """
+t = LI(5, para=False)
+content = WL(R(WL(C2(t), C4(t))),
+             R(WL(C4(t), C3(t), C2(t))))
+        """
+        t = LI(5, para=False)
+        content = Layout((C2(t), C4(t), C3(t)),
+                         (C4(t), C3(t), C2(t)),
+                         (C4(t), C5(t)))
+        content = page_content(self, code, content)
+        return content
+
+
 class TestAccordion(DPage):
     """ Test Accordion widget """
     title = 'Bootstrap: Accordion'

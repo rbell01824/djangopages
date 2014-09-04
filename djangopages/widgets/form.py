@@ -275,7 +275,4 @@ class BForm(DWidget):
         rtn = t.render(Context(c))
         return rtn
 
-#
-# # todo 1: add support for normal bootstrap forms
-# # todo 1: add id to Form
-#
+# todo 1: add id to Form
