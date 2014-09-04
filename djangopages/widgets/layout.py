@@ -51,6 +51,10 @@ class WList(DWidget):
 
             WList(MD(...), T(...), ...)
 
+    | Shortcuts:
+    | WL = functools.partial(WList)
+    | Layout = functools.partial(WList)
+
     :param content: content to output
     :type content: list of DWidget(s)
     """
