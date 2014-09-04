@@ -1101,6 +1101,11 @@ def post(self, request, *args, **kwargs):
         return self.render(request, content)
 
 
+class XXXForm(forms.Form):
+    def __getattr__(self, item):
+        return self.base_fields[item]
+
+
 class TestBForm001(DPage):
     """ Bootstrap form support """
     title = 'Bootstrap BForm support 001'
@@ -1121,12 +1126,11 @@ class NameForm(forms.Form):
 
     def get(self, request, *args, **kwargs):
         form = self.TestForm()
-        # for f in form.fields:
-        #     print f
+        for f in form.fields:
+            print f
         reset = LNKSPrimary('/dpages/TestBForm001', 'Reset')
         form = BForm(request, form)
-        # content = R((C(reset), C(form)))
-        content = Layout(RC(reset), RC6(form))
+        content = Layout(C(reset), C6(form))
         content = page_content(self, self.code, content)
         return self.render(request, content)
 
@@ -1140,7 +1144,6 @@ class NameForm(forms.Form):
         # for f in form.fields:
         #     print f
         form = BForm(request, form)
-        # content = R((C(reset), C(form)))
-        content = Layout(RC(reset), RC6(form))
+        content = Layout(C(reset), C6(form))
         content = page_content(self, self.code, content)
         return self.render(request, content)

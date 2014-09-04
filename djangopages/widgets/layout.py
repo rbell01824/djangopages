@@ -88,7 +88,10 @@ class Layout(DWidget):
         content = self.args
         rtn = ''
         for r in content:
-            rtn += Row('\n'.join(r))
+            if isinstance(r, tuple):
+                rtn += Row('\n'.join(r))
+            else:
+                rtn += Row(r)
         return rtn
 L = functools.partial(WList)
 
