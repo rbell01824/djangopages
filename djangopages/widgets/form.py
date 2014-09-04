@@ -35,9 +35,10 @@ __email__ = 'rbell01824@gmail.com'
 
 from django.template import Context, Template
 from django.core.context_processors import csrf
+from django import forms
 
 from djangopages.widgets.widgets import DWidget, DWidgetT
-from djangopages.libs import ssw
+from djangopages.libs import ssw, add_classes
 
 # class ProjectView(View):`
 #     @method_decorator(csrf_protect)
@@ -59,12 +60,23 @@ def _csrf_(request):
     return rtn
 
 
-class Form(DWidget):
+class Form(forms.Form):
+    """ Extension to forms.Form to support various DWidget features """
+    def __getattr__(self, item, default=None):
+        try:
+            return self[item]
+        except:
+            if default:
+                return default
+            raise AttributeError
+
+
+class DForm(DWidget):
     """ Django form widget
 
     .. sourcecode:: python
 
-        Form(request_obj, django_form, submit_text, action_url)
+        DForm(request_obj, django_form, submit_text, action_url)
 
     :param request: request object
     :type request: WSGIRequest
@@ -88,7 +100,7 @@ class Form(DWidget):
     def __init__(self, request, form, form_type='', button='Submit', action_url=None, method='Post', template=None):
         if not isinstance(button, FormButton):
             button = FormButton(button)
-        super(Form, self).__init__(request, form, form_type, button, action_url, method, template)
+        super(DForm, self).__init__(request, form, form_type, button, action_url, method, template)
         return
 
     # noinspection PyMethodOverriding
@@ -144,7 +156,7 @@ class FormButton(DWidgetT):
                                                     'classes': classes, 'style': style})
 
 
-class DForm(DWidget):
+class DBForm(DWidget):
     """ Django form widget
 
     .. sourcecode:: python
@@ -165,7 +177,7 @@ class DForm(DWidget):
     def __init__(self, request, form, button='Submit', action_url=None, method='Post', width=(3, 6), template=None):
         if not isinstance(button, FormButton):
             button = FormButton(button)
-        super(DForm, self).__init__(request, form, button, action_url, method, width, template)
+        super(DBForm, self).__init__(request, form, button, action_url, method, width, template)
         return
 
     # noinspection PyMethodOverriding
@@ -190,6 +202,8 @@ class DForm(DWidget):
                        '        <div class="row bg-danger">\n' \
                        '            <div class="col-md-{{ l_width }}"></div>\n' \
                        '            <div class="col-md-{{ i_width }}">{{ field.errors }}</div>\n' \
+                       '        </div>\n' \
+                       '        <div class="row bg-danger">\n' \
                        '        {% else %}' \
                        '        <div class="row">\n' \
                        '        {% endif %}' \
@@ -274,5 +288,115 @@ class BForm(DWidget):
         c.update(csrf(request))
         rtn = t.render(Context(c))
         return rtn
+
+
+class BCB(DWidget):
+    """ Bootstrap check box field """
+    def __init__(self, fld, lbl_width=None, fld_width=None):
+        super(BCB, self).__init__(fld, lbl_width, fld_width)
+
+    def generate(self):
+        fld, lbl_width, fld_width = self.args
+        if not lbl_width and not fld_width:
+            template = '<div class="checkbox">\n' \
+                       '    <label>\n' \
+                       '    {field} {label}\n' \
+                       '    </label>' \
+                       '{fld_help}' \
+                       '</div>\n'
+            if fld.help_text:
+                fld_help = '    <p>{}</p>'.format(fld.help_text)
+            else:
+                fld_help = ''
+            rtn = template.format(label=fld.label, field=fld, fld_help=fld_help)
+            return rtn
+        elif lbl_width and fld_width:
+            template = '<div class="form-group">\n' \
+                       '    {label}\n' \
+                       '    <div class="col-md-{fld_width}>\n' \
+                       '        {field}>\n' \
+                       '    </div>' \
+                       '{fld_help}' \
+                       '</div>\n'
+            label = fld.label_tag()
+            label_classes = 'class="col-md-{} control-label" '.format(lbl_width)
+            label = label.replace('<label', '<label ' + label_classes, 1)
+            fld.css_classes('form-control')
+            if fld.help_text:
+                fld_help = '    <p>{}</p>'.format(fld.help_text)
+            else:
+                fld_help = ''
+            rtn = template.format(label=label, fld_width=fld_width, field=fld, fld_help=fld_help)
+            return rtn
+        raise AttributeError
+
+
+class BFG(DWidget):
+    """ Bootstrap form group field """
+    def __init__(self, fld, lbl_width=None, fld_width=None):
+        super(BFG, self).__init__(fld, lbl_width, fld_width)
+
+    def generate(self):
+        fld, lbl_width, fld_width = self.args
+        if not lbl_width and not fld_width:
+            # template = '<div class="form-group">\n' \
+            #            '    <label for="{fld_label_id}">{fld_label}</label>\n' \
+            #            '    <input type="{fld_type}" class="form-control" id="{fld_id}" ' \
+            #            'placeholder="{fld_placeholder}">\n' \
+            #            '{fld_help}' \
+            #            '</div>\n'
+            template = '<div class="form-group">\n' \
+                       '    {label}\n' \
+                       '    {field}\n' \
+                       '{fld_help}' \
+                       '</div>\n'
+            field = add_classes(str(fld), 'form-control')
+            if fld.help_text:
+                fld_help = '    <p>{}</p>'.format(fld.help_text)
+            else:
+                fld_help = ''
+            rtn = template.format(label=fld.label_tag(), field=field, fld_help=fld_help)
+            return rtn
+        elif lbl_width and fld_width:
+            template = '<div class="form-group">\n' \
+                       '    {label}\n' \
+                       '    <div class="col-md-{fld_width}>\n' \
+                       '        {field}>\n' \
+                       '    </div>' \
+                       '{fld_help}' \
+                       '</div>\n'
+            label = fld.label_tag()
+            label_classes = 'class="col-md-{} control-label" '.format(lbl_width)
+            label = label.replace('<label', '<label ' + label_classes, 1)
+            fld.css_classes('form-control')
+            if fld.help_text:
+                fld_help = '    <p>{}</p>'.format(fld.help_text)
+            else:
+                fld_help = ''
+            rtn = template.format(label=label, fld_width=fld_width, field=fld, fld_help=fld_help)
+            return rtn
+        raise AttributeError
+
+
+class BF(DWidget):
+    """ Bootstrap form """
+    # def __init__(self, request, form, button='Submit', action_url=None, method='Post'):
+    def __init__(self, request, *form):
+        super(BF, self).__init__(request, form)
+
+    def generate(self):
+        request, form = self.args
+        template = '<!-- form -->\n' \
+                   '<form role="form" method="Post" action="{action_url}">\n' \
+                   '    {csrf}\n' \
+                   '    {form}' \
+                   '</form>\n' \
+                   '<!-- /form -->\n'
+        action_url = request.path
+        if isinstance(form, tuple):
+            form = '\n'.join(form)
+        rtn = template.format(action_url=action_url, csrf=_csrf_(request), form=form)
+        return rtn
+
 
 # todo 1: add id to Form
