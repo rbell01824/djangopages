@@ -1107,9 +1107,51 @@ def post(self, request, *args, **kwargs):
         content = page_content(self, self.code, content)
         return self.render(request, content)
 
+
 class FLD(object):
     def __init__(self, fld):
         self.field = fld
+
+
+YEAR_IN_SCHOOL_CHOICES = (
+    ('fr', 'Freshman'),
+    ('so', 'Sophomore'),
+    ('jr', 'Junior'),
+    ('sr', 'Senior'),
+)
+
+class TestForm(forms.Form):
+    name = forms.CharField(label='Your name', initial='Your name',
+                           help_text='Enter your name', max_length=100)
+    subject = forms.CharField(max_length=100, help_text='100 characters max.')
+    bf = forms.BooleanField(required=False)
+    charf = forms.CharField()
+    choif = forms.ChoiceField(choices=YEAR_IN_SCHOOL_CHOICES)
+    daf = forms.DateField()
+    dtf = forms.DateTimeField()
+    dec = forms.DecimalField()
+    email = forms.EmailField()
+    filef = forms.FileField()
+    fppathf = forms.FilePathField('/')
+    float = forms.FloatField()
+    img = forms.ImageField()
+    int = forms.IntegerField()
+    ipa = forms.IPAddressField()
+    gipa = forms.GenericIPAddressField()
+    mc = forms.MultipleChoiceField(choices=YEAR_IN_SCHOOL_CHOICES)
+    nbf = forms.NullBooleanField()
+    regf = forms.RegexField(regex='.*')
+    sf = forms.SlugField()
+    tf = forms.TimeField()
+    urlf = forms.URLField()
+    # todo 1: ComboField, MultiVlaueField, SplitDateTimeField, ModelChoiceField, ModelMultipleChoiceField
+
+    class Meta:
+        button = 'Submit'
+        method = 'Post'
+        # form_type = 'table'
+        # layout = [FLD('name'), FLD('subject')]
+
 
 class TestBForm001(DPage):
     """ Bootstrap form support """
@@ -1121,35 +1163,21 @@ class TestBForm001(DPage):
 class NameForm(forms.Form):
         """
 
-    class TestForm(Form):
-        name = forms.CharField(label='Your name', initial='Your name',
-                               help_text='Enter your name', max_length=100)
-        subject = forms.CharField(max_length=100, help_text='100 characters max.')
-        message = forms.CharField(help_text='Message you would like to send')
-        # sender = forms.EmailField(help_text='A valid email address, please.')
-        cc_myself = forms.BooleanField(required=False)
-
-        class Meta:
-            button = 'Submit'
-            method = 'Post'
-            form_type = 'horizontal'
-            layout = [FLD('name'), FLD('subject')]
-
     def reset_link(self):
         reset = LNKSPrimary('/dpages/TestBForm001', 'Reset')
         return reset
 
     def get(self, request, *args, **kwargs):
         reset = self.reset_link()
-        form = self.TestForm(request)
+        form = Form(request, TestForm())
         # for f in form.fields:
         #     print f
-        content = Layout(C(reset), C6(form))
-        content = page_content(self, self.code, content)
+        # content = Layout(C(reset), C6(form))
+        content = page_content(self, self.code, form)
         return self.render(request, content)
 
     def post(self, request, *args, **kwargs):
-        form = self.TestForm(request)
+        form = Form(request, TestForm(request.POST))
         reset = self.reset_link()
         if form.is_valid():
             content = RRC((reset, MD("### Success")))

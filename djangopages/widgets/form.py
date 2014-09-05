@@ -60,20 +60,28 @@ def _csrf_(request):
     return rtn
 
 
-class Form(forms.Form, DWidget):
+class Form(DWidget):
     """ Extension to forms.Form to support various DWidget features """
 
-    def __init__(self, request=None):
-        self.request = request              # WSGIRequest
-        if not request:
-            raise ValueError
-        if request.method == 'POST':
-            super(Form, self).__init__(request.POST)
-        else:
-            super(Form, self).__init__()
+    def __init__(self, request, form):
+        # if request.method == 'POST':
+        #     form = form(request.POST)
+        # else:
+        #     form = form()
+        super(Form, self).__init__()
+        self.request = request
+        self.the_form = form
+
         return
 
     def generate(self):
+        # request, form = self.args
+
+        request = self.request
+        form = self.form
+
+
+        # process it
         template = '<!-- form -->\n' \
                    '<form role="form" class="{form_type}" method="{method}" action="{action_url}">\n' \
                    '    {csrf}\n' \
@@ -81,34 +89,46 @@ class Form(forms.Form, DWidget):
                    '    {button}\n' \
                    '</form>\n' \
                    '<!-- /form -->\n'
-        request = self.request
-        action_url = getattr(self.Meta, 'action_url', request.path)
-        button = getattr(self.Meta, 'button', 'Submit')
+        action_url = getattr(form.Meta, 'action_url', request.path)
+        button = getattr(form.Meta, 'button', 'Submit')
         if not isinstance(button, FormButton):
+            # noinspection PyTypeChecker
             button = FormButton(button).render()
-        method = getattr(self.Meta, 'method', 'Post')
-        form_type = getattr(self.Meta, 'form_type', '')
-        layout = getattr(self.Meta, 'layout', None)
+        method = getattr(form.Meta, 'method', 'Post')
+        form_type = getattr(form.Meta, 'form_type', '')
+        layout = getattr(form.Meta, 'layout', None)
         dispatch = {'p': self._as_p,
                     'ul': self._as_ul,
                     'table': self._as_table,
                     'horizontal': self._as_table,
                     'h': self._as_table}
-        rndr = getattr(dispatch, form_type, self._as_table)
-        form_text = rndr()
+        rndr = dispatch.get(form_type, self._as_bootstrap)
+        form_text = rndr(form, layout)
         rtn = template.format(form_type=form_type, method=method, action_url=action_url,
                               csrf=_csrf_(request), form=form_text,
                               button=button)
         return rtn
 
-    def _as_p(self):
+    def _as_p(self, *args):
         return self.as_p()
 
-    def _as_ul(self):
+    def _as_ul(self, *args):
         return '<ul>' + self.as_ul() + '</ul>'
 
-    def _as_table(self):
+    def _as_table(self, *args):
         return '<table>' + self.as_table() + '</table>'
+
+    def _as_bootstrap(self, form, layout):
+        rtn = ''
+        if not layout:
+            layout = tuple()
+            for name in form.fields:
+                layout += (FormField(name),)
+        for ff in layout:
+            ff.form_type = 'bootstrap'
+            ff.form = form
+            rtn += ff.render()
+        return rtn
 
     def __getattr__(self, item, *default):
         try:
@@ -117,6 +137,26 @@ class Form(forms.Form, DWidget):
             if len(default) > 0:
                 return default[0]
             raise AttributeError
+
+
+class FormField(DWidget):
+    """
+
+    """
+    def __init__(self, field):
+        self.form = None
+        self.form_type = None
+        super(FormField, self).__init__(field)
+
+    def generate(self):
+        field_name = self.args[0]
+        form_type = self.form_type
+        form = self.form
+        bound_field = form[field_name]
+        field_field = form.fields[field_name]
+        field_type = field_field.widget.input_type
+        print '>>>>', field_name, form_type, field_type, str(bound_field)
+        return str(bound_field)
 
 
 class DForm(DWidget):

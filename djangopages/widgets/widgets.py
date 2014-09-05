@@ -90,9 +90,9 @@ class DWidget(object):
     .. note:: add (+) and mul (*) force immediate rendering of the widget.
     """
     def __init__(self, *args):
-        # log.debug('-----in dwidget init')
+        log.debug('----- in dwidget init {}'.format(self.__class__.__name__))
         self.args = args
-        # log.debug('-----done dwidget init')
+        log.debug('----- done dwidget init {}'.format(self.__class__.__name__))
         return
 
     def render(self):
