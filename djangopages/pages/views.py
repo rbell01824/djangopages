@@ -1107,6 +1107,9 @@ def post(self, request, *args, **kwargs):
         content = page_content(self, self.code, content)
         return self.render(request, content)
 
+class FLD(object):
+    def __init__(self, fld):
+        self.field = fld
 
 class TestBForm001(DPage):
     """ Bootstrap form support """
@@ -1126,28 +1129,27 @@ class NameForm(forms.Form):
         # sender = forms.EmailField(help_text='A valid email address, please.')
         cc_myself = forms.BooleanField(required=False)
 
+        class Meta:
+            button = 'Submit'
+            method = 'Post'
+            form_type = 'horizontal'
+            layout = [FLD('name'), FLD('subject')]
+
     def reset_link(self):
         reset = LNKSPrimary('/dpages/TestBForm001', 'Reset')
         return reset
 
-    def make_form(self, request, form=None):
-        if not form:
-            form = self.TestForm()
-        return BForm(request,
-                     BFG(form.name),
-                     BFG(form.subject),
-                     BFG(form.message),
-                     BCB(form.cc_myself))
-
     def get(self, request, *args, **kwargs):
         reset = self.reset_link()
-        form = self.make_form(request)
+        form = self.TestForm(request)
+        # for f in form.fields:
+        #     print f
         content = Layout(C(reset), C6(form))
         content = page_content(self, self.code, content)
         return self.render(request, content)
 
     def post(self, request, *args, **kwargs):
-        form = self.TestForm(request.POST)
+        form = self.TestForm(request)
         reset = self.reset_link()
         if form.is_valid():
             content = RRC((reset, MD("### Success")))
@@ -1155,7 +1157,6 @@ class NameForm(forms.Form):
             return self.render(request, content)
         # for f in form.fields:
         #     print f
-        form = self.make_form(request, form)
         content = Layout(C(reset), C6(form))
         content = page_content(self, self.code, content)
         return self.render(request, content)

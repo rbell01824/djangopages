@@ -60,14 +60,62 @@ def _csrf_(request):
     return rtn
 
 
-class Form(forms.Form):
+class Form(forms.Form, DWidget):
     """ Extension to forms.Form to support various DWidget features """
-    def __getattr__(self, item, default=None):
+
+    def __init__(self, request=None):
+        self.request = request              # WSGIRequest
+        if not request:
+            raise ValueError
+        if request.method == 'POST':
+            super(Form, self).__init__(request.POST)
+        else:
+            super(Form, self).__init__()
+        return
+
+    def generate(self):
+        template = '<!-- form -->\n' \
+                   '<form role="form" class="{form_type}" method="{method}" action="{action_url}">\n' \
+                   '    {csrf}\n' \
+                   '    {form}\n' \
+                   '    {button}\n' \
+                   '</form>\n' \
+                   '<!-- /form -->\n'
+        request = self.request
+        action_url = getattr(self.Meta, 'action_url', request.path)
+        button = getattr(self.Meta, 'button', 'Submit')
+        if not isinstance(button, FormButton):
+            button = FormButton(button).render()
+        method = getattr(self.Meta, 'method', 'Post')
+        form_type = getattr(self.Meta, 'form_type', '')
+        layout = getattr(self.Meta, 'layout', None)
+        dispatch = {'p': self._as_p,
+                    'ul': self._as_ul,
+                    'table': self._as_table,
+                    'horizontal': self._as_table,
+                    'h': self._as_table}
+        rndr = getattr(dispatch, form_type, self._as_table)
+        form_text = rndr()
+        rtn = template.format(form_type=form_type, method=method, action_url=action_url,
+                              csrf=_csrf_(request), form=form_text,
+                              button=button)
+        return rtn
+
+    def _as_p(self):
+        return self.as_p()
+
+    def _as_ul(self):
+        return '<ul>' + self.as_ul() + '</ul>'
+
+    def _as_table(self):
+        return '<table>' + self.as_table() + '</table>'
+
+    def __getattr__(self, item, *default):
         try:
             return self[item]
-        except:
-            if default:
-                return default
+        except KeyError:
+            if len(default) > 0:
+                return default[0]
             raise AttributeError
 
 
@@ -82,9 +130,9 @@ class DForm(DWidget):
     :type request: WSGIRequest
     :param form: form object
     :type form: forms.Form
-    :param button: text for submit button or DFormButton object.  If None, no submit button.
+    :param button: text for submit button or FormButton object.  Default to Submit.
     :type button: str or unicode or DFormButton.
-    :param action_url: submit action url
+    :param action_url: submit action url.  Default to request.path (ie. Post to issuing view).
     :type action_url: str or unicode
     :param template: override default widget template
     :type template: str or unicode
@@ -131,17 +179,17 @@ class FormButton(DWidgetT):
 
     .. sourcecode:: python
 
-        DFormButton('Text of button')
+        FormButton('Text of button')
 
-    :param text: text
-    :type text: str or unicode or tuple
-    :param button: default 'btn-default', button type per bootstrap
+    :param text: Button text.
+    :type text: str or unicode
+    :param button: Button type per bootstrap.  Default 'btn-default',
     :type button: str or unicode
-    :param size: default '', button size per bootstrap
+    :param size: Button size per bootstrap.  Default ''
     :type size: str or unicode
-    :param classes: classes to add to output
+    :param classes: Classes to add to output
     :type classes: str or unicode
-    :param style: styles to add to output
+    :param style: Styles to add to output
     :type style: str or unicode
     """
     def __init__(self, text='Submit', button='btn-primary', size='', classes='', style=''):
@@ -289,7 +337,36 @@ class B0Form(DWidget):
 
 
 class BForm(DWidget):
-    """ Bootstrap form """
+    """ Bootstrap form
+
+    .. sourcecode:: python
+
+        BForm(request, form)
+        BForm(request, form, form_type='horizontal')
+        BForm(request, FLD(form.field1, ...), FLD(form.field2, ...), form_type='horizontal')
+
+    | Shortcuts:
+
+    :param request: The request
+    :type request: WSGIRequest
+    :param form: The form. May be a form or a tuple of DWidgets including form fields.
+    :type form: form.Form or Form or tuple
+    :param kwargs: **The following kwargs are available**
+    :param button: text for submit button or FormButton object.  Default to Submit.
+    :type button: str or unicode or DFormButton.
+    :param action_url: submit action url.  Default to request.path (ie. Post to issuing view).
+    :type action_url: str or unicode
+    :param method: Submit method.  Default 'Post'.
+    :type method: str or unicode
+    :param form_type: Form type.  Default ''.
+    :type form_type: str or unicode
+
+    The following form types are available:
+        * '' - basic bootstrap form.
+        * horizontal - bootstrap horizontal form.
+        * inline - bootstrap inline form
+
+    """
     # def __init__(self, request, form, button='Submit', action_url=None, method='Post'):
     def __init__(self, request, *form, **kwargs):
         button = kwargs.pop('button', 'Submit')
@@ -320,6 +397,8 @@ class BForm(DWidget):
                               csrf=_csrf_(request), form=form,
                               button=button)
         return rtn
+
+
 
 # fixme: form-group can have classes has-success, has-warning, has-error, has-feedback,
 # fixme: form-group can take a span <span class="glyphicon glyphicon-ok form-control-feedback"></span>, etc.

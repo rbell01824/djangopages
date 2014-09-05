@@ -114,8 +114,11 @@ class DWidget(object):
 
         # log.debug('##### DWidget render for {}'.format(self.__class__))
         args = tuple()
-        for a in self.args:
-            args += (_render(a),)
+        try:
+            for a in self.args:
+                args += (_render(a),)
+        except AttributeError:
+            pass
         self.args = args
         out = self.generate()
         # log.debug('##### DWidget out for {}'.format(self.__class__))
