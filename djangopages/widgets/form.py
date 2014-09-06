@@ -63,23 +63,19 @@ def _csrf_(request):
 class Form(DWidget):
     """ Extension to forms.Form to support various DWidget features """
 
-    def __init__(self, request, form):
-        # if request.method == 'POST':
-        #     form = form(request.POST)
-        # else:
-        #     form = form()
+    def __init__(self, request):
         super(Form, self).__init__()
         self.request = request
-        self.the_form = form
-
         return
 
     def generate(self):
         # request, form = self.args
 
         request = self.request
-        form = self.form
-
+        if request.method == 'POST':
+            form = self.Form(request.POST)
+        else:
+            form = self.Form()
 
         # process it
         template = '<!-- form -->\n' \
@@ -89,7 +85,8 @@ class Form(DWidget):
                    '    {button}\n' \
                    '</form>\n' \
                    '<!-- /form -->\n'
-        action_url = getattr(form.Meta, 'action_url', request.path)
+        # action_url = getattr(form.Meta, 'action_url', request.path)
+        action_url = self.action_url if hasattr(self, 'action_url') else request.path
         button = getattr(form.Meta, 'button', 'Submit')
         if not isinstance(button, FormButton):
             # noinspection PyTypeChecker
@@ -97,11 +94,11 @@ class Form(DWidget):
         method = getattr(form.Meta, 'method', 'Post')
         form_type = getattr(form.Meta, 'form_type', '')
         layout = getattr(form.Meta, 'layout', None)
-        dispatch = {'p': self._as_p,
-                    'ul': self._as_ul,
-                    'table': self._as_table,
-                    'horizontal': self._as_table,
-                    'h': self._as_table}
+        dispatch = {'p': form._as_p,
+                    'ul': form._as_ul,
+                    'table': form._as_table,
+                    'horizontal': form._as_table,
+                    'h': form._as_table}
         rndr = dispatch.get(form_type, self._as_bootstrap)
         form_text = rndr(form, layout)
         rtn = template.format(form_type=form_type, method=method, action_url=action_url,
