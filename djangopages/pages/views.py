@@ -1121,38 +1121,68 @@ YEAR_IN_SCHOOL_CHOICES = (
 )
 
 
-class TestForm(Form):
+# class TestForm(Form):
+#     button = 'Submit'
+#     method = 'Post'
+#     form_type = 'table'
+#     layout = [FLD('name'), FLD('subject')]
+#
+#     class Form(forms.Form):
+#         name = forms.CharField(label='Your name', initial='Your name',
+#                                help_text='Enter your name', max_length=100)
+#         subject = forms.CharField(max_length=100, help_text='100 characters max.')
+#         bf = forms.BooleanField(required=False)
+#         charf = forms.CharField()
+#         choif = forms.ChoiceField(choices=YEAR_IN_SCHOOL_CHOICES)
+#         daf = forms.DateField()
+#         dtf = forms.DateTimeField()
+#         dec = forms.DecimalField()
+#         email = forms.EmailField()
+#         filef = forms.FileField()
+#         fppathf = forms.FilePathField('/')
+#         float = forms.FloatField()
+#         img = forms.ImageField()
+#         int = forms.IntegerField()
+#         ipa = forms.IPAddressField()
+#         gipa = forms.GenericIPAddressField()
+#         mc = forms.MultipleChoiceField(choices=YEAR_IN_SCHOOL_CHOICES)
+#         nbf = forms.NullBooleanField()
+#         regf = forms.RegexField(regex='.*')
+#         sf = forms.SlugField()
+#         tf = forms.TimeField()
+#         urlf = forms.URLField()
+#         # todo 1: ComboField, MultiVlaueField, SplitDateTimeField, ModelChoiceField, ModelMultipleChoiceField
+
+class TestForm(forms.Form):
     button = 'Submit'
     method = 'Post'
-    form_type = 'table'
-    layout = [FLD('name'), FLD('subject')]
+    form_type = 'h'
+    # layout = [FF('name'), MD('Some text'), FF('subject')]
 
-    class Form(forms.Form):
-        name = forms.CharField(label='Your name', initial='Your name',
-                               help_text='Enter your name', max_length=100)
-        subject = forms.CharField(max_length=100, help_text='100 characters max.')
-        bf = forms.BooleanField(required=False)
-        charf = forms.CharField()
-        choif = forms.ChoiceField(choices=YEAR_IN_SCHOOL_CHOICES)
-        daf = forms.DateField()
-        dtf = forms.DateTimeField()
-        dec = forms.DecimalField()
-        email = forms.EmailField()
-        filef = forms.FileField()
-        fppathf = forms.FilePathField('/')
-        float = forms.FloatField()
-        img = forms.ImageField()
-        int = forms.IntegerField()
-        ipa = forms.IPAddressField()
-        gipa = forms.GenericIPAddressField()
-        mc = forms.MultipleChoiceField(choices=YEAR_IN_SCHOOL_CHOICES)
-        nbf = forms.NullBooleanField()
-        regf = forms.RegexField(regex='.*')
-        sf = forms.SlugField()
-        tf = forms.TimeField()
-        urlf = forms.URLField()
-        # todo 1: ComboField, MultiVlaueField, SplitDateTimeField, ModelChoiceField, ModelMultipleChoiceField
-
+    name = forms.CharField(label='Your name', initial='Your name',
+                           help_text='Enter your name', max_length=100)
+    subject = forms.CharField(max_length=100, help_text='100 characters max.')
+    bf = forms.BooleanField(required=False)
+    charf = forms.CharField()
+    choif = forms.ChoiceField(choices=YEAR_IN_SCHOOL_CHOICES)
+    daf = forms.DateField()
+    dtf = forms.DateTimeField()
+    dec = forms.DecimalField()
+    email = forms.EmailField()
+    filef = forms.FileField()
+    fppathf = forms.FilePathField('/')
+    float = forms.FloatField()
+    img = forms.ImageField()
+    int = forms.IntegerField()
+    ipa = forms.IPAddressField()
+    gipa = forms.GenericIPAddressField()
+    mc = forms.MultipleChoiceField(choices=YEAR_IN_SCHOOL_CHOICES)
+    nbf = forms.NullBooleanField()
+    regf = forms.RegexField(regex='.*')
+    sf = forms.SlugField()
+    tf = forms.TimeField()
+    urlf = forms.URLField()
+    # todo 1: ComboField, MultiVlaueField, SplitDateTimeField, ModelChoiceField, ModelMultipleChoiceField
 
 
 class TestBForm001(DPage):
@@ -1171,7 +1201,7 @@ class NameForm(forms.Form):
 
     def get(self, request, *args, **kwargs):
         # reset = self.reset_link()
-        form = TestForm(request)
+        form = Form(request, TestForm())
         # for f in form.fields:
         #     print f
         # content = Layout(C(reset), C6(form))
@@ -1179,7 +1209,7 @@ class NameForm(forms.Form):
         return self.render(request, content)
 
     def post(self, request, *args, **kwargs):
-        form = TestForm(request)
+        form = Form(request, TestForm(request.POST))
         reset = self.reset_link()
         if form.is_valid():
             content = RRC((reset, MD("### Success")))

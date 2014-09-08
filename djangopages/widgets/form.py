@@ -33,6 +33,8 @@ __version__ = '0.1'
 __maintainer__ = 'rbell01824'
 __email__ = 'rbell01824@gmail.com'
 
+import functools
+
 from django.template import Context, Template
 from django.core.context_processors import csrf
 from django import forms
@@ -63,19 +65,25 @@ def _csrf_(request):
 class Form(DWidget):
     """ Extension to forms.Form to support various DWidget features """
 
-    def __init__(self, request):
+    def __init__(self, request, form):
         super(Form, self).__init__()
         self.request = request
+        self.form = form
+        # if request.method == 'POST':
+        #     theform = form(request.POST)
+        # else:
+        #     theform = form()
+        # self.theform = theform
         return
 
     def generate(self):
         # request, form = self.args
 
         request = self.request
-        if request.method == 'POST':
-            form = self.Form(request.POST)
-        else:
-            form = self.Form()
+        # if request.method == 'POST':
+        #     form = self.form(request.POST)
+        # else:
+        #     form = self.form()
 
         # process it
         template = '<!-- form -->\n' \
@@ -86,46 +94,64 @@ class Form(DWidget):
                    '</form>\n' \
                    '<!-- /form -->\n'
         # action_url = getattr(form.Meta, 'action_url', request.path)
-        action_url = self.action_url if hasattr(self, 'action_url') else request.path
-        button = getattr(form.Meta, 'button', 'Submit')
+        action_url = getattr(self.form, 'action_url', self.request.path)
+        button = getattr(self.form, 'button', 'Submit')
         if not isinstance(button, FormButton):
             # noinspection PyTypeChecker
             button = FormButton(button).render()
-        method = getattr(form.Meta, 'method', 'Post')
-        form_type = getattr(form.Meta, 'form_type', '')
-        layout = getattr(form.Meta, 'layout', None)
-        dispatch = {'p': form._as_p,
-                    'ul': form._as_ul,
-                    'table': form._as_table,
-                    'horizontal': form._as_table,
-                    'h': form._as_table}
+        method = getattr(self.form, 'method', 'Post')
+        form_type = getattr(self.form, 'form_type', '')
+        dispatch = {'p': self._as_p,
+                    'ul': self._as_ul,
+                    'table': self._as_table,
+                    'horizontal': self._as_table,
+                    'h': self._as_bootstrap}
         rndr = dispatch.get(form_type, self._as_bootstrap)
-        form_text = rndr(form, layout)
+        form_text = rndr()
         rtn = template.format(form_type=form_type, method=method, action_url=action_url,
                               csrf=_csrf_(request), form=form_text,
                               button=button)
         return rtn
 
-    def _as_p(self, *args):
-        return self.as_p()
+    def _as_p(self):
+        rtn = self.form.as_p()
+        return rtn
 
-    def _as_ul(self, *args):
-        return '<ul>' + self.as_ul() + '</ul>'
+    def _as_ul(self):
+        rtn = '<ul>' + self.form.as_ul() + '</ul>'
+        return rtn
 
-    def _as_table(self, *args):
-        return '<table>' + self.as_table() + '</table>'
+    def _as_table(self):
+        rtn = '<table>' + self.form.as_table() + '</table>'
+        return rtn
 
-    def _as_bootstrap(self, form, layout):
+    def _as_bootstrap(self):
+        layout = self._get_layout()
         rtn = ''
-        if not layout:
-            layout = tuple()
-            for name in form.fields:
-                layout += (FormField(name),)
         for ff in layout:
+            log.debug('----- _as_bootstrap for {} {}'.format(ff.__class__.__name__, ff.args[0]))
             ff.form_type = 'bootstrap'
-            ff.form = form
+            ff.form = self.form
             rtn += ff.render()
         return rtn
+
+    def _as_bootstrap_inline(self, form, layout):
+        layout = self._get_layout()
+        rtn = ''
+        return rtn
+
+    def _as_bootstrap_horizontal(self, form, layout):
+        layout = self._get_layout()
+        rtn = ''
+        return rtn
+
+    def _get_layout(self):
+        layout = getattr(self.form, 'layout', None)
+        if not layout:
+            layout = tuple()
+            for name in self.form.fields:
+                layout += (FF(name),)
+        return layout
 
     def __getattr__(self, item, *default):
         try:
@@ -136,14 +162,14 @@ class Form(DWidget):
             raise AttributeError
 
 
-class FormField(DWidget):
+class FF(DWidget):
     """
 
     """
     def __init__(self, field):
         self.form = None
         self.form_type = None
-        super(FormField, self).__init__(field)
+        super(FF, self).__init__(field)
 
     def generate(self):
         field_name = self.args[0]
@@ -152,7 +178,7 @@ class FormField(DWidget):
         bound_field = form[field_name]
         field_field = form.fields[field_name]
         field_type = field_field.widget.input_type
-        print '>>>>', field_name, form_type, field_type, str(bound_field)
+        log.debug('>>>> Generate for field {} {} {} {}'.format(field_name, form_type, field_type, str(bound_field)))
         return str(bound_field)
 
 
