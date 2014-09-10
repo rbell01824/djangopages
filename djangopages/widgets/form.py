@@ -77,29 +77,6 @@ class Form(DWidget):
         return
 
     def generate(self):
-        # request, form = self.args
-
-        request = self.request
-        # if request.method == 'POST':
-        #     form = self.form(request.POST)
-        # else:
-        #     form = self.form()
-
-        # process it
-        template = '<!-- form -->\n' \
-                   '<form role="form" class="{form_type}" method="{method}" action="{action_url}">\n' \
-                   '    {csrf}\n' \
-                   '    {form}\n' \
-                   '    {button}\n' \
-                   '</form>\n' \
-                   '<!-- /form -->\n'
-        # action_url = getattr(form.Meta, 'action_url', request.path)
-        action_url = getattr(self.form, 'action_url', self.request.path)
-        button = getattr(self.form, 'button', 'Submit')
-        if not isinstance(button, FormButton):
-            # noinspection PyTypeChecker
-            button = FormButton(button).render()
-        method = getattr(self.form, 'method', 'Post')
         form_type = getattr(self.form, 'form_type', '')
         dispatch = {'p': self._as_p,
                     'ul': self._as_ul,
@@ -107,32 +84,178 @@ class Form(DWidget):
                     'horizontal': self._as_table,
                     'h': self._as_bootstrap}
         rndr = dispatch.get(form_type, self._as_bootstrap)
-        form_text = rndr()
-        rtn = template.format(form_type=form_type, method=method, action_url=action_url,
-                              csrf=_csrf_(request), form=form_text,
+        rtn = rndr()
+        return rtn
+
+    def xxx(self):
+        action_url = getattr(self.form, 'action_url', self.request.path)
+        button = getattr(self.form, 'button', 'Submit')
+        if not isinstance(button, FormButton):
+            # noinspection PyTypeChecker
+            button = FormButton(button).render()
+        method = getattr(self.form, 'method', 'Post')
+        return action_url, button, method
+
+    def _as_p_ul_table(self, rtn):
+        template = '<!-- form -->\n' \
+                   '<form role="form" method="{method}" action="{action_url}">\n' \
+                   '    {csrf}\n' \
+                   '    {form}\n' \
+                   '    {button}\n' \
+                   '</form>\n' \
+                   '<!-- /form -->\n'
+        action_url, button, method = self.xxx()
+        rtn = template.format(method=method, action_url=action_url,
+                              csrf=_csrf_(self.request), form=rtn,
                               button=button)
         return rtn
 
     def _as_p(self):
         rtn = self.form.as_p()
-        return rtn
+        return self._as_p_ul_table(rtn)
 
     def _as_ul(self):
         rtn = '<ul>' + self.form.as_ul() + '</ul>'
-        return rtn
+        return self._as_p_ul_table(rtn)
 
     def _as_table(self):
         rtn = '<table>' + self.form.as_table() + '</table>'
+        return self._as_p_ul_table(rtn)
+
+    # noinspection PyPep8Naming
+    def b_TextInput(self, form, bound_field, field_name):
+        template = '<div class="form-group">\n' \
+                   '    {label}\n' \
+                   '    {field}\n' \
+                   '    {help}' \
+                   '</div>\n'
+        fld_id = bound_field.id_for_label
+        fld_label = bound_field.label_tag()
+        field = str(bound_field)
+        field = add_classes(field, 'form-control')
+        if bound_field.help_text:
+            fld_help = '    <p>{}</p>'.format(bound_field.help_text)
+        else:
+            fld_help = ''
+        rtn = template.format(id=fld_id, label=fld_label, field=field, help=fld_help)
         return rtn
 
+    # noinspection PyPep8Naming
+    def b_NumberInput(self, form, bound_field, field_name):
+        return 'hi '
+
+    # noinspection PyPep8Naming
+    def b_EmailInput(self, form, bound_field, field_name):
+        return 'hi '
+
+    # noinspection PyPep8Naming
+    def b_URLInput(self, form, bound_field, field_name):
+        return 'hi '
+
+    # noinspection PyPep8Naming
+    def b_PasswordInput(self, form, bound_field, field_name):
+        return 'hi '
+
+    # noinspection PyPep8Naming
+    def b_HiddenInput(self, form, bound_field, field_name):
+        return 'hi '
+
+    # noinspection PyPep8Naming
+    def b_DateInput(self, form, bound_field, field_name):
+        return 'hi '
+
+    # noinspection PyPep8Naming
+    def b_DateTimeInput(self, form, bound_field, field_name):
+        return 'hi '
+
+    # noinspection PyPep8Naming
+    def b_TimeInput(self, form, bound_field, field_name):
+        return 'hi '
+
+    # noinspection PyPep8Naming
+    def b_Textarea(self, form, bound_field, field_name):
+        return 'hi '
+
+    # noinspection PyPep8Naming
+    def b_CheckboxInput(self, form, bound_field, field_name):
+        template = '<div class="checkbox">\n' \
+                   '    {field} {label}\n' \
+                   '    {help}' \
+                   '</div>\n'
+        fld_id = bound_field.id_for_label
+        fld_label = bound_field.label
+        field = str(bound_field)
+        if bound_field.help_text:
+            fld_help = '    <p>{}</p>'.format(bound_field.help_text)
+        else:
+            fld_help = ''
+        rtn = template.format(id=fld_id, label=fld_label, field=field, help=fld_help)
+        return rtn
+
+    # noinspection PyPep8Naming
+    def b_Select(self, form, bound_field, field_name):
+        return 'hi '
+
+    # noinspection PyPep8Naming
+    def b_NullBooleanSelect(self, form, bound_field, field_name):
+        return 'hi '
+
+    # noinspection PyPep8Naming
+    def b_SelectMultiple(self, form, bound_field, field_name):
+        return 'hi '
+
+    # noinspection PyPep8Naming
+    def b_RadioSelect(self, form, bound_field, field_name):
+        return 'hi '
+
+    # noinspection PyPep8Naming
+    def b_CheckboxSelectMultiple(self, form, bound_field, field_name):
+        return 'hi '
+
+    # noinspection PyPep8Naming
+    def b_FileInput(self, form, bound_field, field_name):
+        return 'hi '
+
+    # noinspection PyPep8Naming
+    def b_ClearableFileInput(self, form, bound_field, field_name):
+        return 'hi '
+
+    # noinspection PyPep8Naming
+    def b_MultipleHiddenInput(self, form, bound_field, field_name):
+        return 'hi '
+
+    # noinspection PyPep8Naming
+    def b_SplitDateTimeWidget(self, form, bound_field, field_name):
+        return 'hi '
+
+    # noinspection PyPep8Naming
+    def b_SplitHiddenDateTimeWidget(self, form, bound_field, field_name):
+        return 'hi '
+
+    # noinspection PyPep8Naming
+    def b_SelectDateWidget(self, form, bound_field, field_name):
+        return 'hi '
+
     def _as_bootstrap(self):
-        layout = self._get_layout()
         rtn = ''
-        for ff in layout:
-            log.debug('----- _as_bootstrap for {} {}'.format(ff.__class__.__name__, ff.args[0]))
-            ff.form_type = 'bootstrap'
-            ff.form = self.form
-            rtn += ff.render()
+        form = self.form
+        for name in form.fields:
+            field = form[name]
+            widget_name = 'b_' + form.fields[name].widget.__class__.__name__
+            widget_method = getattr(self, widget_name)
+            rtn += widget_method(form, field, name)
+            log.debug('>>>> Bootstrap field {}:{}'.format(name, widget_name))
+        template = '<!-- form -->\n' \
+                   '<form role="form" method="{method}" action="{action_url}">\n' \
+                   '    {csrf}\n' \
+                   '    {form}\n' \
+                   '    {button}\n' \
+                   '</form>\n' \
+                   '<!-- /form -->\n'
+        action_url, button, method = self.xxx()
+        rtn = template.format(method=method, action_url=action_url,
+                              csrf=_csrf_(self.request), form=rtn,
+                              button=button)
         return rtn
 
     def _as_bootstrap_inline(self, form, layout):

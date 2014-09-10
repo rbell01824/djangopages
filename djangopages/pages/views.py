@@ -1156,13 +1156,13 @@ YEAR_IN_SCHOOL_CHOICES = (
 class TestForm(forms.Form):
     button = 'Submit'
     method = 'Post'
-    form_type = 'h'
+    form_type = 'bootstrap'
     # layout = [FF('name'), MD('Some text'), FF('subject')]
 
     name = forms.CharField(label='Your name', initial='Your name',
                            help_text='Enter your name', max_length=100)
     subject = forms.CharField(max_length=100, help_text='100 characters max.')
-    bf = forms.BooleanField(required=False)
+    bf = forms.BooleanField(required=False, help_text='Help for bf field.')
     charf = forms.CharField()
     choif = forms.ChoiceField(choices=YEAR_IN_SCHOOL_CHOICES)
     daf = forms.DateField()
