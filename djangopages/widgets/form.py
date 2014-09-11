@@ -188,7 +188,7 @@ class Form(DWidget):
 
     # noinspection PyPep8Naming
     def b_HiddenInput(self, form, bound_field, field_name):
-        return ' hi b_HiddenInput'
+        return self.b_base(form, bound_field, field_name)
 
     # noinspection PyPep8Naming
     def b_DateInput(self, form, bound_field, field_name):
@@ -237,15 +237,15 @@ class Form(DWidget):
 
     # noinspection PyPep8Naming
     def b_RadioSelect(self, form, bound_field, field_name):
-        return ' hi b_RadioSelect'
+        return self.b_base_select(form, bound_field, field_name)
 
     # noinspection PyPep8Naming
     def b_CheckboxSelectMultiple(self, form, bound_field, field_name):
-        return ' hi b_CheckboxSelectMultiple'
+        return self.b_base_select(form, bound_field, field_name)
 
     # noinspection PyPep8Naming
     def b_FileInput(self, form, bound_field, field_name):
-        return ' hi b_FileInput'
+        return self.b_base_select(form, bound_field, field_name)
 
     # noinspection PyPep8Naming
     def b_ClearableFileInput(self, form, bound_field, field_name):
@@ -253,11 +253,11 @@ class Form(DWidget):
 
     # noinspection PyPep8Naming
     def b_MultipleHiddenInput(self, form, bound_field, field_name):
-        return ' hi b_ClearableFileInput'
+        return ' hi b_MultipleHiddenInput'
 
     # noinspection PyPep8Naming
     def b_SplitDateTimeWidget(self, form, bound_field, field_name):
-        return ' hi b_SplitDateTimeWidget'
+        return self.b_base_select(form, bound_field, field_name)
 
     # noinspection PyPep8Naming
     def b_SplitHiddenDateTimeWidget(self, form, bound_field, field_name):
