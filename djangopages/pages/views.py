@@ -39,6 +39,7 @@ from djangopages.widgets.form import *
 from django.http import HttpResponseNotFound
 from django.views.generic import View
 from django import forms
+from django.forms.extras import SelectDateWidget
 
 # todo 3: unused imports, shouldn't I have examples for these
 # from test_data.models import syslog_query, syslog_event_graph, VNode, VCompany
@@ -1121,38 +1122,6 @@ YEAR_IN_SCHOOL_CHOICES = (
 )
 
 
-# class TestForm(Form):
-#     button = 'Submit'
-#     method = 'Post'
-#     form_type = 'table'
-#     layout = [FLD('name'), FLD('subject')]
-#
-#     class Form(forms.Form):
-#         name = forms.CharField(label='Your name', initial='Your name',
-#                                help_text='Enter your name', max_length=100)
-#         subject = forms.CharField(max_length=100, help_text='100 characters max.')
-#         bf = forms.BooleanField(required=False)
-#         charf = forms.CharField()
-#         choif = forms.ChoiceField(choices=YEAR_IN_SCHOOL_CHOICES)
-#         daf = forms.DateField()
-#         dtf = forms.DateTimeField()
-#         dec = forms.DecimalField()
-#         email = forms.EmailField()
-#         filef = forms.FileField()
-#         fppathf = forms.FilePathField('/')
-#         float = forms.FloatField()
-#         img = forms.ImageField()
-#         int = forms.IntegerField()
-#         ipa = forms.IPAddressField()
-#         gipa = forms.GenericIPAddressField()
-#         mc = forms.MultipleChoiceField(choices=YEAR_IN_SCHOOL_CHOICES)
-#         nbf = forms.NullBooleanField()
-#         regf = forms.RegexField(regex='.*')
-#         sf = forms.SlugField()
-#         tf = forms.TimeField()
-#         urlf = forms.URLField()
-#         # todo 1: ComboField, MultiVlaueField, SplitDateTimeField, ModelChoiceField, ModelMultipleChoiceField
-
 class TestForm(forms.Form):
     button = 'Submit'
     method = 'Post'
@@ -1164,24 +1133,27 @@ class TestForm(forms.Form):
     subject = forms.CharField(max_length=100, help_text='100 characters max.')
     boolean_field = forms.BooleanField(required=False, help_text='Help for bf field.')
     char_field = forms.CharField()
+    textarea_field = forms.CharField(widget=forms.Textarea)
     choice_field = forms.ChoiceField(choices=YEAR_IN_SCHOOL_CHOICES)
     date_field = forms.DateField()
+    date_widget_field = forms.DateField(widget=forms.DateInput)
+    select_date_widget_field = forms.DateField(widget=SelectDateWidget)
     date_time_field = forms.DateTimeField()
     decimal_field = forms.DecimalField()
     email_field = forms.EmailField()
-    filef = forms.FileField()
-    fppathf = forms.FilePathField('/')
-    float = forms.FloatField()
-    img = forms.ImageField()
-    int = forms.IntegerField()
-    ipa = forms.IPAddressField()
-    gipa = forms.GenericIPAddressField()
+    file_field = forms.FileField()
+    file_path_field = forms.FilePathField('/')
+    float_field = forms.FloatField()
+    img_field = forms.ImageField()
+    int_field = forms.IntegerField()
+    ip_address_field = forms.IPAddressField()
+    generic_ip_address_field = forms.GenericIPAddressField()
     multiple_choice_field = forms.MultipleChoiceField(choices=YEAR_IN_SCHOOL_CHOICES)
-    nbf = forms.NullBooleanField()
-    regf = forms.RegexField(regex='.*')
-    sf = forms.SlugField()
-    tf = forms.TimeField()
-    urlf = forms.URLField()
+    null_boolean_field = forms.NullBooleanField()
+    regular_ex_field = forms.RegexField(regex='.*')
+    slug_field = forms.SlugField()
+    time_field = forms.TimeField()
+    url_field = forms.URLField()
     # todo 1: ComboField, MultiVlaueField, SplitDateTimeField, ModelChoiceField, ModelMultipleChoiceField
 
 
@@ -1192,11 +1164,11 @@ def test_bform_get(obj, request, form_type):
     # for f in form.fields:
     #     log.debug('field: {}'.format(f)
     content = Layout(C(reset), C6(form))
-    content = page_content(obj, obj.code, form)
+    content = page_content(obj, obj.code, content)
     return obj.render(request, content)
 
 
-def post(obj, request, form_type):
+def test_bform_post(obj, request, form_type):
     reset = LNKSPrimary('/dpages/' + obj.__class__.__name__, 'Reset')
     form = Form(request, TestForm(request.POST))
     form.form_type = form_type
@@ -1217,38 +1189,12 @@ class TestBFormTable(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'forms']
 
-    code = """
-class NameForm(forms.Form):
-        """
-    #
-    # def reset_link(self):
-    #     reset = LNKSPrimary('/dpages/TestBFormTable', 'Reset')
-    #     return reset
+    code = 'See view example.'
 
     def get(self, request, *args, **kwargs):
-        # reset = self.reset_link()
-        # form = Form(request, TestForm())
-        # form.form_type = 'table'
-        # # for f in form.fields:
-        # #     log.debug('field: {}'.format(f)
-        # content = Layout(C(reset), C6(form))
-        # content = page_content(self, self.code, form)
-        # return self.render(request, content)
         return test_bform_get(self, request, 'table')
 
     def post(self, request, *args, **kwargs):
-        # reset = self.reset_link()
-        # form = Form(request, TestForm(request.POST))
-        # form.form_type = 'table'
-        # if form.form.is_valid():
-        #     content = RRC((reset, MD("### Success")))
-        #     content = page_content(self, self.code, content)
-        #     return self.render(request, content)
-        # # for f in form.fields:
-        # #     log.debug('field: {}'.format(f)
-        # content = Layout(C(reset), C6(form))
-        # content = page_content(self, self.code, content)
-        # return self.render(request, content)
         return test_bform_post(self, request, 'table')
 
 
@@ -1258,33 +1204,41 @@ class TestBFormP(DPage):
     description = 'Demonstrate ' + title
     tags = ['test', 'forms']
 
-    code = """
-class NameForm(forms.Form):
-        """
-
-    def reset_link(self):
-        reset = LNKSPrimary('/dpages/TestBFormP', 'Reset')
-        return reset
+    code = 'See view example.'
 
     def get(self, request, *args, **kwargs):
-        # reset = self.reset_link()
-        form = Form(request, TestForm())
-        form.form_type = 'p'
-        # for f in form.fields:
-        #     log.debug('field: {}'.format(f)
-        # content = Layout(C(reset), C6(form))
-        content = page_content(self, self.code, form)
-        return self.render(request, content)
+        return test_bform_get(self, request, 'p')
 
     def post(self, request, *args, **kwargs):
-        form = Form(request, TestForm(request.POST))
-        reset = self.reset_link()
-        if form.form.is_valid():
-            content = RRC((reset, MD("### Success")))
-            content = page_content(self, self.code, content)
-            return self.render(request, content)
-        # for f in form.fields:
-        #     log.debug('field: {}'.format(f)
-        content = Layout(C(reset), C6(form))
-        content = page_content(self, self.code, content)
-        return self.render(request, content)
+        return test_bform_post(self, request, 'p')
+
+
+class TestBFormUL(DPage):
+    """ Bootstrap form support """
+    title = 'Bootstrap BForm paragraph support'
+    description = 'Demonstrate ' + title
+    tags = ['test', 'forms']
+
+    code = 'See view example.'
+
+    def get(self, request, *args, **kwargs):
+        return test_bform_get(self, request, 'ul')
+
+    def post(self, request, *args, **kwargs):
+        return test_bform_post(self, request, 'ul')
+
+
+class TestBFormBootstrap(DPage):
+    """ Bootstrap form support """
+    title = 'Bootstrap BForm bootstrap support'
+    description = 'Demonstrate ' + title
+    tags = ['test', 'forms']
+
+
+    code = 'See view example.'
+
+    def get(self, request, *args, **kwargs):
+        return test_bform_get(self, request, '')
+
+    def post(self, request, *args, **kwargs):
+        return test_bform_post(self, request, '')

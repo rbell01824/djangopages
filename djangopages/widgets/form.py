@@ -83,6 +83,8 @@ class Form(DWidget):
                     'ul': self._as_ul,
                     'table': self._as_table,
                     'horizontal': self._as_table,
+                    'b': self._as_bootstrap,
+                    'bootstrap': self._as_bootstrap,
                     'h': self._as_bootstrap}
         rndr = dispatch.get(self.form_type, self._as_bootstrap)
         rtn = rndr()
@@ -130,8 +132,7 @@ class Form(DWidget):
         rtn = '<table>' + self.form.as_table() + '</table>'
         return self._as_p_ul_table(rtn)
 
-    # noinspection PyPep8Naming
-    def b_TextInput(self, form, bound_field, field_name):
+    def b_base(self, form, bound_field, field_name):
         template = '<div class="form-group">\n' \
                    '    {label}\n' \
                    '    {field}\n' \
@@ -148,41 +149,63 @@ class Form(DWidget):
         rtn = template.format(id=fld_id, label=fld_label, field=field, help=fld_help)
         return rtn
 
+    def b_base_select(self, form, bound_field, field_name):
+        template = '<div class="form-group">\n' \
+                   '    {label}\n' \
+                   '    {field}\n' \
+                   '    {help}' \
+                   '</div>\n'
+        fld_id = bound_field.id_for_label
+        fld_label = bound_field.label_tag()
+        field = str(bound_field)
+        # field = add_classes(field, 'form-control')
+        if bound_field.help_text:
+            fld_help = '    <p>{}</p>'.format(bound_field.help_text)
+        else:
+            fld_help = ''
+        rtn = template.format(id=fld_id, label=fld_label, field=field, help=fld_help)
+        return rtn
+
+    # noinspection PyPep8Naming
+    def b_TextInput(self, form, bound_field, field_name):
+        return self.b_base(form, bound_field, field_name)
+
     # noinspection PyPep8Naming
     def b_NumberInput(self, form, bound_field, field_name):
-        return 'hi '
+        return self.b_base(form, bound_field, field_name)
 
     # noinspection PyPep8Naming
     def b_EmailInput(self, form, bound_field, field_name):
-        return 'hi '
+        return self.b_base(form, bound_field, field_name)
 
     # noinspection PyPep8Naming
     def b_URLInput(self, form, bound_field, field_name):
-        return 'hi '
+        return self.b_base(form, bound_field, field_name)
 
     # noinspection PyPep8Naming
     def b_PasswordInput(self, form, bound_field, field_name):
-        return 'hi '
+        return self.b_base(form, bound_field, field_name)
 
     # noinspection PyPep8Naming
     def b_HiddenInput(self, form, bound_field, field_name):
-        return 'hi '
+        return ' hi b_HiddenInput'
 
     # noinspection PyPep8Naming
     def b_DateInput(self, form, bound_field, field_name):
-        return 'hi '
+        return self.b_base(form, bound_field, field_name)
 
     # noinspection PyPep8Naming
     def b_DateTimeInput(self, form, bound_field, field_name):
-        return 'hi '
+        return self.b_base(form, bound_field, field_name)
 
     # noinspection PyPep8Naming
     def b_TimeInput(self, form, bound_field, field_name):
-        return 'hi '
+        return self.b_base(form, bound_field, field_name)
 
     # noinspection PyPep8Naming
     def b_Textarea(self, form, bound_field, field_name):
-        return 'hi '
+        # todo 2: add way to specify textarea rows
+        return self.b_base(form, bound_field, field_name)
 
     # noinspection PyPep8Naming
     def b_CheckboxInput(self, form, bound_field, field_name):
@@ -202,47 +225,47 @@ class Form(DWidget):
 
     # noinspection PyPep8Naming
     def b_Select(self, form, bound_field, field_name):
-        return 'hi '
+        return self.b_base_select(form, bound_field, field_name)
 
     # noinspection PyPep8Naming
     def b_NullBooleanSelect(self, form, bound_field, field_name):
-        return 'hi '
+        return self.b_base_select(form, bound_field, field_name)
 
     # noinspection PyPep8Naming
     def b_SelectMultiple(self, form, bound_field, field_name):
-        return 'hi '
+        return self.b_base_select(form, bound_field, field_name)
 
     # noinspection PyPep8Naming
     def b_RadioSelect(self, form, bound_field, field_name):
-        return 'hi '
+        return ' hi b_RadioSelect'
 
     # noinspection PyPep8Naming
     def b_CheckboxSelectMultiple(self, form, bound_field, field_name):
-        return 'hi '
+        return ' hi b_CheckboxSelectMultiple'
 
     # noinspection PyPep8Naming
     def b_FileInput(self, form, bound_field, field_name):
-        return 'hi '
+        return ' hi b_FileInput'
 
     # noinspection PyPep8Naming
     def b_ClearableFileInput(self, form, bound_field, field_name):
-        return 'hi '
+        return self.b_base_select(form, bound_field, field_name)
 
     # noinspection PyPep8Naming
     def b_MultipleHiddenInput(self, form, bound_field, field_name):
-        return 'hi '
+        return ' hi b_ClearableFileInput'
 
     # noinspection PyPep8Naming
     def b_SplitDateTimeWidget(self, form, bound_field, field_name):
-        return 'hi '
+        return ' hi b_SplitDateTimeWidget'
 
     # noinspection PyPep8Naming
     def b_SplitHiddenDateTimeWidget(self, form, bound_field, field_name):
-        return 'hi '
+        return ' hi b_SplitHiddenDateTimeWidget'
 
     # noinspection PyPep8Naming
     def b_SelectDateWidget(self, form, bound_field, field_name):
-        return 'hi '
+        return self.b_base_select(form, bound_field, field_name)
 
     def _as_bootstrap(self):
         rtn = ''
@@ -260,10 +283,9 @@ class Form(DWidget):
                    '    {button}\n' \
                    '</form>\n' \
                    '<!-- /form -->\n'
-        action_url, button, method = self.xxx()
-        rtn = template.format(method=method, action_url=action_url,
+        rtn = template.format(method=self.method, action_url=self.action_url,
                               csrf=_csrf_(self.request), form=rtn,
-                              button=button)
+                              button=self.button)
         return rtn
 
     def _as_bootstrap_inline(self, form, layout):
