@@ -62,6 +62,12 @@ def _csrf_(request):
     return rtn
 
 
+def _getattr_(obj, item, default):
+    if hasattr(obj, item):
+        return getattr(obj, item)
+    return default
+
+
 class Form(DWidget):
     """ Extension to forms.Form to support various DWidget features """
 
@@ -69,32 +75,35 @@ class Form(DWidget):
         super(Form, self).__init__()
         self.request = request
         self.form = form
-        # if request.method == 'POST':
-        #     theform = form(request.POST)
-        # else:
-        #     theform = form()
-        # self.theform = theform
         return
 
     def generate(self):
-        form_type = getattr(self.form, 'form_type', '')
+        self.resolve_attrs()
         dispatch = {'p': self._as_p,
                     'ul': self._as_ul,
                     'table': self._as_table,
                     'horizontal': self._as_table,
                     'h': self._as_bootstrap}
-        rndr = dispatch.get(form_type, self._as_bootstrap)
+        rndr = dispatch.get(self.form_type, self._as_bootstrap)
         rtn = rndr()
         return rtn
 
-    def xxx(self):
-        action_url = getattr(self.form, 'action_url', self.request.path)
-        button = getattr(self.form, 'button', 'Submit')
-        if not isinstance(button, FormButton):
-            # noinspection PyTypeChecker
-            button = FormButton(button).render()
-        method = getattr(self.form, 'method', 'Post')
-        return action_url, button, method
+    # def __getattr__(self, item, default):
+    #     try:
+    #         return getattr(self, item, default)
+    #     except TypeError:
+    #         return default
+
+    # noinspection PyAttributeOutsideInit
+    def resolve_attrs(self):
+        self.button = _getattr_(self, 'button', _getattr_(self.form, 'button', 'Submit'))
+        if self.button and not isinstance(self.button, FormButton):
+            self.button = FormButton(self.button).render()
+        self.method = _getattr_(self, 'method', _getattr_(self.form, 'method', 'Post'))
+        self.action_url = _getattr_(self, 'action_url', _getattr_(self.form, 'action_url', self.request.path))
+        self.form_type = _getattr_(self, 'form_type', _getattr_(self.form, 'form_type', ''))
+        self.layout = _getattr_(self, 'layout', _getattr_(self.form, 'layout', None))
+        return
 
     def _as_p_ul_table(self, rtn):
         template = '<!-- form -->\n' \
@@ -104,10 +113,9 @@ class Form(DWidget):
                    '    {button}\n' \
                    '</form>\n' \
                    '<!-- /form -->\n'
-        action_url, button, method = self.xxx()
-        rtn = template.format(method=method, action_url=action_url,
+        rtn = template.format(method=self.method, action_url=self.action_url,
                               csrf=_csrf_(self.request), form=rtn,
-                              button=button)
+                              button=self.button)
         return rtn
 
     def _as_p(self):
@@ -276,13 +284,13 @@ class Form(DWidget):
                 layout += (FF(name),)
         return layout
 
-    def __getattr__(self, item, *default):
-        try:
-            return self[item]
-        except KeyError:
-            if len(default) > 0:
-                return default[0]
-            raise AttributeError
+    # def __getattr__(self, item, *default):
+    #     try:
+    #         return self[item]
+    #     except KeyError:
+    #         if len(default) > 0:
+    #             return default[0]
+    #         raise AttributeError
 
 
 class FF(DWidget):

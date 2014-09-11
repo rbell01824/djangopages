@@ -1162,13 +1162,13 @@ class TestForm(forms.Form):
     name = forms.CharField(label='Your name', initial='Your name',
                            help_text='Enter your name', max_length=100)
     subject = forms.CharField(max_length=100, help_text='100 characters max.')
-    bf = forms.BooleanField(required=False, help_text='Help for bf field.')
-    charf = forms.CharField()
-    choif = forms.ChoiceField(choices=YEAR_IN_SCHOOL_CHOICES)
-    daf = forms.DateField()
-    dtf = forms.DateTimeField()
-    dec = forms.DecimalField()
-    email = forms.EmailField()
+    boolean_field = forms.BooleanField(required=False, help_text='Help for bf field.')
+    char_field = forms.CharField()
+    choice_field = forms.ChoiceField(choices=YEAR_IN_SCHOOL_CHOICES)
+    date_field = forms.DateField()
+    date_time_field = forms.DateTimeField()
+    decimal_field = forms.DecimalField()
+    email_field = forms.EmailField()
     filef = forms.FileField()
     fppathf = forms.FilePathField('/')
     float = forms.FloatField()
@@ -1176,7 +1176,7 @@ class TestForm(forms.Form):
     int = forms.IntegerField()
     ipa = forms.IPAddressField()
     gipa = forms.GenericIPAddressField()
-    mc = forms.MultipleChoiceField(choices=YEAR_IN_SCHOOL_CHOICES)
+    multiple_choice_field = forms.MultipleChoiceField(choices=YEAR_IN_SCHOOL_CHOICES)
     nbf = forms.NullBooleanField()
     regf = forms.RegexField(regex='.*')
     sf = forms.SlugField()
@@ -1185,9 +1185,76 @@ class TestForm(forms.Form):
     # todo 1: ComboField, MultiVlaueField, SplitDateTimeField, ModelChoiceField, ModelMultipleChoiceField
 
 
-class TestBForm001(DPage):
+def test_bform_get(obj, request, form_type):
+    reset = LNKSPrimary('/dpages/' + obj.__class__.__name__, 'Reset')
+    form = Form(request, TestForm())
+    form.form_type = form_type
+    # for f in form.fields:
+    #     log.debug('field: {}'.format(f)
+    content = Layout(C(reset), C6(form))
+    content = page_content(obj, obj.code, form)
+    return obj.render(request, content)
+
+
+def post(obj, request, form_type):
+    reset = LNKSPrimary('/dpages/' + obj.__class__.__name__, 'Reset')
+    form = Form(request, TestForm(request.POST))
+    form.form_type = form_type
+    if form.form.is_valid():
+        content = RRC((reset, MD("### Success")))
+        content = page_content(obj, obj.code, content)
+        return obj.render(request, content)
+    # for f in form.fields:
+    #     log.debug('field: {}'.format(f)
+    content = Layout(C(reset), C6(form))
+    content = page_content(obj, obj.code, content)
+    return obj.render(request, content)
+
+
+class TestBFormTable(DPage):
     """ Bootstrap form support """
-    title = 'Bootstrap BForm support 001'
+    title = 'Bootstrap BForm table support'
+    description = 'Demonstrate ' + title
+    tags = ['test', 'forms']
+
+    code = """
+class NameForm(forms.Form):
+        """
+    #
+    # def reset_link(self):
+    #     reset = LNKSPrimary('/dpages/TestBFormTable', 'Reset')
+    #     return reset
+
+    def get(self, request, *args, **kwargs):
+        # reset = self.reset_link()
+        # form = Form(request, TestForm())
+        # form.form_type = 'table'
+        # # for f in form.fields:
+        # #     log.debug('field: {}'.format(f)
+        # content = Layout(C(reset), C6(form))
+        # content = page_content(self, self.code, form)
+        # return self.render(request, content)
+        return test_bform_get(self, request, 'table')
+
+    def post(self, request, *args, **kwargs):
+        # reset = self.reset_link()
+        # form = Form(request, TestForm(request.POST))
+        # form.form_type = 'table'
+        # if form.form.is_valid():
+        #     content = RRC((reset, MD("### Success")))
+        #     content = page_content(self, self.code, content)
+        #     return self.render(request, content)
+        # # for f in form.fields:
+        # #     log.debug('field: {}'.format(f)
+        # content = Layout(C(reset), C6(form))
+        # content = page_content(self, self.code, content)
+        # return self.render(request, content)
+        return test_bform_post(self, request, 'table')
+
+
+class TestBFormP(DPage):
+    """ Bootstrap form support """
+    title = 'Bootstrap BForm paragraph support'
     description = 'Demonstrate ' + title
     tags = ['test', 'forms']
 
@@ -1196,14 +1263,15 @@ class NameForm(forms.Form):
         """
 
     def reset_link(self):
-        reset = LNKSPrimary('/dpages/TestBForm001', 'Reset')
+        reset = LNKSPrimary('/dpages/TestBFormP', 'Reset')
         return reset
 
     def get(self, request, *args, **kwargs):
         # reset = self.reset_link()
         form = Form(request, TestForm())
+        form.form_type = 'p'
         # for f in form.fields:
-        #     print f
+        #     log.debug('field: {}'.format(f)
         # content = Layout(C(reset), C6(form))
         content = page_content(self, self.code, form)
         return self.render(request, content)
@@ -1211,12 +1279,12 @@ class NameForm(forms.Form):
     def post(self, request, *args, **kwargs):
         form = Form(request, TestForm(request.POST))
         reset = self.reset_link()
-        if form.is_valid():
+        if form.form.is_valid():
             content = RRC((reset, MD("### Success")))
             content = page_content(self, self.code, content)
             return self.render(request, content)
         # for f in form.fields:
-        #     print f
+        #     log.debug('field: {}'.format(f)
         content = Layout(C(reset), C6(form))
         content = page_content(self, self.code, content)
         return self.render(request, content)
