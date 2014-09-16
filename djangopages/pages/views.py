@@ -1191,7 +1191,7 @@ def test_bform_post(obj, request, form_type):
 
 
 class TestBFormTable(DPage):
-    """ Bootstrap form support """
+    """ Bootstrap table form support """
     title = 'Bootstrap BForm table support'
     description = 'Demonstrate ' + title
     tags = ['test', 'forms']
@@ -1206,7 +1206,7 @@ class TestBFormTable(DPage):
 
 
 class TestBFormP(DPage):
-    """ Bootstrap form support """
+    """ Bootstrap paragraph form support """
     title = 'Bootstrap BForm paragraph support'
     description = 'Demonstrate ' + title
     tags = ['test', 'forms']
@@ -1221,7 +1221,7 @@ class TestBFormP(DPage):
 
 
 class TestBFormUL(DPage):
-    """ Bootstrap form support """
+    """ Bootstrap UL form support """
     title = 'Bootstrap BForm paragraph support'
     description = 'Demonstrate ' + title
     tags = ['test', 'forms']
@@ -1236,11 +1236,10 @@ class TestBFormUL(DPage):
 
 
 class TestBFormBootstrap(DPage):
-    """ Bootstrap form support """
+    """ Bootstrap default form support """
     title = 'Bootstrap BForm bootstrap support'
     description = 'Demonstrate ' + title
     tags = ['test', 'forms']
-
 
     code = 'See view example.'
 
@@ -1249,3 +1248,18 @@ class TestBFormBootstrap(DPage):
 
     def post(self, request, *args, **kwargs):
         return test_bform_post(self, request, '')
+
+
+class TestBFormHorizontal(DPage):
+    """ Bootstrap horizontal form support """
+    title = 'Bootstrap BForm horizontal support'
+    description = 'Demonstrate ' + title
+    tags = ['test', 'forms']
+
+    code = 'See view example.'
+
+    def get(self, request, *args, **kwargs):
+        return test_bform_get(self, request, 'horizontal')
+
+    def post(self, request, *args, **kwargs):
+        return test_bform_post(self, request, 'horizontal')

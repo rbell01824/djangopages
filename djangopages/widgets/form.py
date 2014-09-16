@@ -82,10 +82,11 @@ class Form(DWidget):
         dispatch = {'p': self._as_p,
                     'ul': self._as_ul,
                     'table': self._as_table,
-                    'horizontal': self._as_table,
                     'b': self._as_bootstrap,
                     'bootstrap': self._as_bootstrap,
-                    'h': self._as_bootstrap}
+                    'h': self._as_bootstrap_horizontal,
+                    'horizontal': self._as_bootstrap_horizontal,
+                    }
         rndr = dispatch.get(self.form_type, self._as_bootstrap)
         rtn = rndr()
         return rtn
@@ -106,6 +107,10 @@ class Form(DWidget):
         self.form_type = _getattr_(self, 'form_type', _getattr_(self.form, 'form_type', ''))
         self.layout = _getattr_(self, 'layout', _getattr_(self.form, 'layout', None))
         return
+
+    #
+    # Basic Django support ############################################################################################
+    #
 
     def _as_p_ul_table(self, rtn):
         template = '<!-- form -->\n' \
@@ -132,39 +137,59 @@ class Form(DWidget):
         rtn = '<table>' + self.form.as_table() + '</table>'
         return self._as_p_ul_table(rtn)
 
-    def b_base(self, form, bound_field, field_name):
-        template = '<div class="form-group">\n' \
-                   '    {label}\n' \
-                   '    {field}\n' \
-                   '    {help}' \
-                   '</div>\n'
+    #
+    # bootstrap default support #######################################################################################
+    #
+
+    def b_base(self, form, bound_field, field_name, form_control='form-control', template=None):
+        """ Output bootstrap field
+
+        :param form: The form
+        :param bound_field: A bound field
+        :param field_name: The field's name
+        :param form_control: Class to apply to the field's input html or None
+        :type form_control: unicode or None
+        :return:
+        """
+        if not template:
+            template = '<div class="form-group {group_extra}">\n' \
+                       '    {label}\n' \
+                       '    {errors}\n' \
+                       '    {field}\n' \
+                       '    {help}' \
+                       '</div>\n'
         fld_id = bound_field.id_for_label
-        fld_label = bound_field.label_tag()
+        fld_label = add_classes(bound_field.label_tag(), 'control-label')
         field = str(bound_field)
-        field = add_classes(field, 'form-control')
+        if form_control:
+            field = add_classes(field, 'form-control')
+        if bound_field.errors:
+            fld_errors = '    <span style="color:#a94442;>{}</span>'.format(bound_field.errors)
+            group_extra = 'has-error'
+        else:
+            fld_errors = ''
+            if self.request.POST:
+                group_extra = 'has-success'
+            else:
+                group_extra = ''
         if bound_field.help_text:
             fld_help = '    <p>{}</p>'.format(bound_field.help_text)
         else:
             fld_help = ''
-        rtn = template.format(id=fld_id, label=fld_label, field=field, help=fld_help)
+        rtn = template.format(id=fld_id, group_extra=group_extra,
+                              label=fld_label, field=field, errors=fld_errors, help=fld_help)
         return rtn
 
-    def b_base_select(self, form, bound_field, field_name):
-        template = '<div class="form-group">\n' \
-                   '    {label}\n' \
-                   '    {field}\n' \
+    # todo 1: custom widget for inline radio (choice radio select) and checkbox(multiple choice checkbox)
+
+    # noinspection PyPep8Naming
+    def b_CheckboxInput(self, form, bound_field, field_name):
+        template = '<div class="checkbox {group_extra}">\n' \
+                   '    {field} {label}\n' \
+                   '    {errors}\n' \
                    '    {help}' \
                    '</div>\n'
-        fld_id = bound_field.id_for_label
-        fld_label = bound_field.label_tag()
-        field = str(bound_field)
-        # field = add_classes(field, 'form-control')
-        if bound_field.help_text:
-            fld_help = '    <p>{}</p>'.format(bound_field.help_text)
-        else:
-            fld_help = ''
-        rtn = template.format(id=fld_id, label=fld_label, field=field, help=fld_help)
-        return rtn
+        return self.b_base(form, bound_field, field_name, form_control=None, template=template)
 
     # noinspection PyPep8Naming
     def b_TextInput(self, form, bound_field, field_name):
@@ -208,64 +233,48 @@ class Form(DWidget):
         return self.b_base(form, bound_field, field_name)
 
     # noinspection PyPep8Naming
-    def b_CheckboxInput(self, form, bound_field, field_name):
-        template = '<div class="checkbox">\n' \
-                   '    {field} {label}\n' \
-                   '    {help}' \
-                   '</div>\n'
-        fld_id = bound_field.id_for_label
-        fld_label = bound_field.label
-        field = str(bound_field)
-        if bound_field.help_text:
-            fld_help = '    <p>{}</p>'.format(bound_field.help_text)
-        else:
-            fld_help = ''
-        rtn = template.format(id=fld_id, label=fld_label, field=field, help=fld_help)
-        return rtn
-
-    # noinspection PyPep8Naming
     def b_Select(self, form, bound_field, field_name):
-        return self.b_base_select(form, bound_field, field_name)
+        return self.b_base(form, bound_field, field_name, form_control=None)
 
     # noinspection PyPep8Naming
     def b_NullBooleanSelect(self, form, bound_field, field_name):
-        return self.b_base_select(form, bound_field, field_name)
+        return self.b_base(form, bound_field, field_name, form_control=None)
 
     # noinspection PyPep8Naming
     def b_SelectMultiple(self, form, bound_field, field_name):
-        return self.b_base_select(form, bound_field, field_name)
+        return self.b_base(form, bound_field, field_name, form_control=None)
 
     # noinspection PyPep8Naming
     def b_RadioSelect(self, form, bound_field, field_name):
-        return self.b_base_select(form, bound_field, field_name)
+        return self.b_base(form, bound_field, field_name, form_control=None)
 
     # noinspection PyPep8Naming
     def b_CheckboxSelectMultiple(self, form, bound_field, field_name):
-        return self.b_base_select(form, bound_field, field_name)
+        return self.b_base(form, bound_field, field_name, form_control=None)
 
     # noinspection PyPep8Naming
     def b_FileInput(self, form, bound_field, field_name):
-        return self.b_base_select(form, bound_field, field_name)
+        return self.b_base(form, bound_field, field_name, form_control=None)
 
     # noinspection PyPep8Naming
     def b_ClearableFileInput(self, form, bound_field, field_name):
-        return self.b_base_select(form, bound_field, field_name)
+        return self.b_base(form, bound_field, field_name, form_control=None)
 
     # noinspection PyPep8Naming
     def b_MultipleHiddenInput(self, form, bound_field, field_name):
-        return ' hi b_MultipleHiddenInput'
+        return self.b_base(form, bound_field, field_name, form_control=None)
 
     # noinspection PyPep8Naming
     def b_SplitDateTimeWidget(self, form, bound_field, field_name):
-        return self.b_base_select(form, bound_field, field_name)
+        return self.b_base(form, bound_field, field_name, form_control=None)
 
     # noinspection PyPep8Naming
     def b_SplitHiddenDateTimeWidget(self, form, bound_field, field_name):
-        return ' hi b_SplitHiddenDateTimeWidget'
+        return self.b_base(form, bound_field, field_name, form_control=None)
 
     # noinspection PyPep8Naming
     def b_SelectDateWidget(self, form, bound_field, field_name):
-        return self.b_base_select(form, bound_field, field_name)
+        return self.b_base(form, bound_field, field_name, form_control=None)
 
     def _as_bootstrap(self):
         rtn = ''
@@ -289,12 +298,178 @@ class Form(DWidget):
         return rtn
 
     def _as_bootstrap_inline(self, form, layout):
-        layout = self._get_layout()
+        # fixme: implement this
         rtn = ''
         return rtn
 
-    def _as_bootstrap_horizontal(self, form, layout):
+    #
+    # Horizontal support ##############################################################################################
+    #
+
+    def h_base(self, form, bound_field, field_name, form_control='form-control', template=None):
+        """ Output bootstrap field
+
+        :param form: The form
+        :param bound_field: A bound field
+        :param field_name: The field's name
+        :param form_control: Class to apply to the field's input html or None
+        :type form_control: unicode or None
+        :return:
+        """
+        if not template:
+            template = '<div class="form-group {group_extra}">\n' \
+                       '    {label}\n' \
+                       '    {errors}\n' \
+                       '    {field}\n' \
+                       '    {help}' \
+                       '</div>\n'
+        fld_id = bound_field.id_for_label
+        fld_label = add_classes(bound_field.label_tag(), 'control-label')
+        field = str(bound_field)
+        if form_control:
+            field = add_classes(field, 'form-control')
+        if bound_field.errors:
+            fld_errors = '    <span style="color:#a94442;>{}</span>'.format(bound_field.errors)
+            group_extra = 'has-error'
+        else:
+            fld_errors = ''
+            if self.request.POST:
+                group_extra = 'has-success'
+            else:
+                group_extra = ''
+        if bound_field.help_text:
+            fld_help = '    <p>{}</p>'.format(bound_field.help_text)
+        else:
+            fld_help = ''
+        rtn = template.format(id=fld_id, group_extra=group_extra,
+                              label=fld_label, field=field, errors=fld_errors, help=fld_help)
+        return rtn
+
+    # todo 1: custom widget for inline radio (choice radio select) and checkbox(multiple choice checkbox)
+
+    # noinspection PyPep8Naming
+    def h_CheckboxInput(self, form, bound_field, field_name):
+        template = '<div class="checkbox {group_extra}">\n' \
+                   '    {field} {label}\n' \
+                   '    {errors}\n' \
+                   '    {help}' \
+                   '</div>\n'
+        return self.h_base(form, bound_field, field_name, form_control=None, template=template)
+
+    # noinspection PyPep8Naming
+    def h_TextInput(self, form, bound_field, field_name):
+        return self.h_base(form, bound_field, field_name)
+
+    # noinspection PyPep8Naming
+    def h_NumberInput(self, form, bound_field, field_name):
+        return self.h_base(form, bound_field, field_name)
+
+    # noinspection PyPep8Naming
+    def h_EmailInput(self, form, bound_field, field_name):
+        return self.h_base(form, bound_field, field_name)
+
+    # noinspection PyPep8Naming
+    def h_URLInput(self, form, bound_field, field_name):
+        return self.h_base(form, bound_field, field_name)
+
+    # noinspection PyPep8Naming
+    def h_PasswordInput(self, form, bound_field, field_name):
+        return self.h_base(form, bound_field, field_name)
+
+    # noinspection PyPep8Naming
+    def h_HiddenInput(self, form, bound_field, field_name):
+        return self.h_base(form, bound_field, field_name)
+
+    # noinspection PyPep8Naming
+    def h_DateInput(self, form, bound_field, field_name):
+        return self.h_base(form, bound_field, field_name)
+
+    # noinspection PyPep8Naming
+    def h_DateTimeInput(self, form, bound_field, field_name):
+        return self.h_base(form, bound_field, field_name)
+
+    # noinspection PyPep8Naming
+    def h_TimeInput(self, form, bound_field, field_name):
+        return self.h_base(form, bound_field, field_name)
+
+    # noinspection PyPep8Naming
+    def h_Textarea(self, form, bound_field, field_name):
+        # todo 2: add way to specify textarea rows
+        return self.h_base(form, bound_field, field_name)
+
+    # noinspection PyPep8Naming
+    def h_Select(self, form, bound_field, field_name):
+        return self.h_base(form, bound_field, field_name, form_control=None)
+
+    # noinspection PyPep8Naming
+    def h_NullBooleanSelect(self, form, bound_field, field_name):
+        return self.h_base(form, bound_field, field_name, form_control=None)
+
+    # noinspection PyPep8Naming
+    def h_SelectMultiple(self, form, bound_field, field_name):
+        return self.h_base(form, bound_field, field_name, form_control=None)
+
+    # noinspection PyPep8Naming
+    def h_RadioSelect(self, form, bound_field, field_name):
+        return self.h_base(form, bound_field, field_name, form_control=None)
+
+    # noinspection PyPep8Naming
+    def h_CheckboxSelectMultiple(self, form, bound_field, field_name):
+        return self.h_base(form, bound_field, field_name, form_control=None)
+
+    # noinspection PyPep8Naming
+    def h_FileInput(self, form, bound_field, field_name):
+        return self.h_base(form, bound_field, field_name, form_control=None)
+
+    # noinspection PyPep8Naming
+    def h_ClearableFileInput(self, form, bound_field, field_name):
+        return self.h_base(form, bound_field, field_name, form_control=None)
+
+    # noinspection PyPep8Naming
+    def h_MultipleHiddenInput(self, form, bound_field, field_name):
+        return self.h_base(form, bound_field, field_name, form_control=None)
+
+    # noinspection PyPep8Naming
+    def h_SplitDateTimeWidget(self, form, bound_field, field_name):
+        return self.h_base(form, bound_field, field_name, form_control=None)
+
+    # noinspection PyPep8Naming
+    def h_SplitHiddenDateTimeWidget(self, form, bound_field, field_name):
+        return self.h_base(form, bound_field, field_name, form_control=None)
+
+    # noinspection PyPep8Naming
+    def h_SelectDateWidget(self, form, bound_field, field_name):
+        return self.h_base(form, bound_field, field_name, form_control=None)
+
+    def _as_bootstrap_horizontal(self):
+        # fixme: implement this
+        rtn = ''
+        form = self.form
+        for name in form.fields:
+            field = form[name]
+            widget_name = 'h_' + form.fields[name].widget.__class__.__name__
+            widget_method = getattr(self, widget_name)
+            rtn += widget_method(form, field, name)
+            log.debug('>>>> Bootstrap field {}:{}'.format(name, widget_name))
+        template = '<!-- form -->\n' \
+                   '<form class="form-horizontal" role="form" method="{method}" action="{action_url}">\n' \
+                   '    {csrf}\n' \
+                   '    {form}\n' \
+                   '    {button}\n' \
+                   '</form>\n' \
+                   '<!-- /form -->\n'
+        rtn = template.format(method=self.method, action_url=self.action_url,
+                              csrf=_csrf_(self.request), form=rtn,
+                              button=self.button)
+        return rtn
+
+    #
+    # Bootstrap layout support ########################################################################################
+    #
+
+    def _as_bootstrap_layout(self, form, layout):
         layout = self._get_layout()
+        # fixme: implement this
         rtn = ''
         return rtn
 
