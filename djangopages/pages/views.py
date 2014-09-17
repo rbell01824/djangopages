@@ -1164,30 +1164,42 @@ class TestForm(forms.Form):
     # todo 1: ComboField, MultiVlaueField, SplitDateTimeField, ModelChoiceField, ModelMultipleChoiceField
 
 
-def test_bform_get(obj, request, form_type):
-    reset = LNKSPrimary('/dpages/' + obj.__class__.__name__, 'Reset')
+def test_bform_get(dpage_obj, request, form_type, width_label=None, width_field=None, layout=None):
+    reset = LNKSPrimary('/dpages/' + dpage_obj.__class__.__name__, 'Reset')
+    # for f in form.fields:
+    #     log.debug('field: {}'.format(f)
     form = Form(request, TestForm())
     form.form_type = form_type
-    # for f in form.fields:
-    #     log.debug('field: {}'.format(f)
+    if width_label:
+        form.width_label = width_label
+    if width_field:
+        form.width_field = width_field
+    if layout:
+        form.layout = layout
     content = Layout(C(reset), C6(form))
-    content = page_content(obj, obj.code, content)
-    return obj.render(request, content)
+    content = page_content(dpage_obj, dpage_obj.code, content)
+    return dpage_obj.render(request, content)
 
 
-def test_bform_post(obj, request, form_type):
-    reset = LNKSPrimary('/dpages/' + obj.__class__.__name__, 'Reset')
-    form = Form(request, TestForm(request.POST))
+def test_bform_post(dpage_obj, request, form_type, width_label=None, width_field=None, layout=None):
+    reset = LNKSPrimary('/dpages/' + dpage_obj.__class__.__name__, 'Reset')
+    form = Form(request, TestForm())
     form.form_type = form_type
+    if width_label:
+        form.width_label = width_label
+    if width_field:
+        form.width_field = width_field
+    if layout:
+        form.layout = layout
     if form.form.is_valid():
         content = RRC((reset, MD("### Success")))
-        content = page_content(obj, obj.code, content)
-        return obj.render(request, content)
+        content = page_content(dpage_obj, dpage_obj.code, content)
+        return dpage_obj.render(request, content)
     # for f in form.fields:
     #     log.debug('field: {}'.format(f)
     content = Layout(C(reset), C6(form))
-    content = page_content(obj, obj.code, content)
-    return obj.render(request, content)
+    content = page_content(dpage_obj, dpage_obj.code, content)
+    return dpage_obj.render(request, content)
 
 
 class TestBFormTable(DPage):
@@ -1202,6 +1214,8 @@ class TestBFormTable(DPage):
         return test_bform_get(self, request, 'table')
 
     def post(self, request, *args, **kwargs):
+        form = Form(request, TestForm())
+        form.form_type = 'table'
         return test_bform_post(self, request, 'table')
 
 
@@ -1217,6 +1231,8 @@ class TestBFormP(DPage):
         return test_bform_get(self, request, 'p')
 
     def post(self, request, *args, **kwargs):
+        form = Form(request, TestForm())
+        form.form_type = 'p'
         return test_bform_post(self, request, 'p')
 
 
@@ -1259,7 +1275,10 @@ class TestBFormHorizontal(DPage):
     code = 'See view example.'
 
     def get(self, request, *args, **kwargs):
-        return test_bform_get(self, request, 'horizontal')
+        form = Form(request, TestForm())
+        return test_bform_get(self, request, 'horizontal', 3, 9)
 
     def post(self, request, *args, **kwargs):
-        return test_bform_post(self, request, 'horizontal')
+        form = Form(request, TestForm())
+        return test_bform_post(self, request, 'horizontal', 3, 9)
+

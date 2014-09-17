@@ -231,7 +231,7 @@ def unique_name(base_name='x'):
     return '{}_{}'.format(base_name, unique_name.counter)
 
 
-def add_classes(html_str, classes):
+def add_classes(html_str, *classes):
     """ Add classes to html_str
 
     :param html_str:
@@ -239,12 +239,13 @@ def add_classes(html_str, classes):
     :return:
     """
     cl = html_str.find('class="')
+    _classes = ' '.join(classes)
     if cl != -1:
-        rtn = html_str.replace('class="', 'class="{} '.format(classes), 1)
+        rtn = html_str.replace('class="', 'class="{} '.format(_classes), 1)
         return rtn
     sp = html_str.find(' ')
     if sp:
-        rtn = html_str.replace(' ', ' class="{}" '.format(classes), 1)
+        rtn = html_str.replace(' ', ' class="{}" '.format(_classes), 1)
         return rtn
     raise ValueError
 

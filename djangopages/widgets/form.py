@@ -320,11 +320,18 @@ class Form(DWidget):
             template = '<div class="form-group {group_extra}">\n' \
                        '    {label}\n' \
                        '    {errors}\n' \
-                       '    {field}\n' \
+                       '    <div class={field_width}>\n' \
+                       '        {field}\n' \
+                       '    </div>\n' \
                        '    {help}' \
                        '</div>\n'
+        # fixme: add test for str vs int for format of widths
+        # fixme: wrap help in offset div to position under entry block
+        # fixme: boolean layout
+        width_label = 'col-md-{}'.format(self.width_label)
+        width_field = 'col-md-{}'.format(self.width_field)
         fld_id = bound_field.id_for_label
-        fld_label = add_classes(bound_field.label_tag(), 'control-label')
+        fld_label = add_classes(bound_field.label_tag(), 'control-label', width_label)
         field = str(bound_field)
         if form_control:
             field = add_classes(field, 'form-control')
@@ -342,7 +349,7 @@ class Form(DWidget):
         else:
             fld_help = ''
         rtn = template.format(id=fld_id, group_extra=group_extra,
-                              label=fld_label, field=field, errors=fld_errors, help=fld_help)
+                              label=fld_label, field_width=width_field, field=field, errors=fld_errors, help=fld_help)
         return rtn
 
     # todo 1: custom widget for inline radio (choice radio select) and checkbox(multiple choice checkbox)
