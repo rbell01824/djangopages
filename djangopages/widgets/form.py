@@ -285,6 +285,8 @@ class Form(DWidget):
             widget_method = getattr(self, widget_name)
             rtn += widget_method(form, field, name)
             log.debug('>>>> Bootstrap field {}:{}'.format(name, widget_name))
+            log.debug('     errors {}'.format(field.errors))
+            log.debug('     errors {}'.format(form.fields[name].error_messages))
         template = '<!-- form -->\n' \
                    '<form role="form" method="{method}" action="{action_url}">\n' \
                    '    {csrf}\n' \
@@ -318,18 +320,21 @@ class Form(DWidget):
         """
         if not template:
             template = '<div class="form-group {group_extra}">\n' \
-                       '    {label}\n' \
-                       '    {errors}\n' \
-                       '    <div class={field_width}>\n' \
-                       '        {field}\n' \
-                       '    </div>\n' \
-                       '    {help}' \
+                       '    <div class="row">\n' \
+                       '        {label}\n' \
+                       '        <div class="{width_field}">\n' \
+                       '            {errors}\n' \
+                       '            {field}\n' \
+                       '            {help}\n' \
+                       '        </div>\n' \
+                       '    </div>' \
                        '</div>\n'
-        # fixme: add test for str vs int for format of widths
-        # fixme: wrap help in offset div to position under entry block
-        # fixme: boolean layout
-        width_label = 'col-md-{}'.format(self.width_label)
-        width_field = 'col-md-{}'.format(self.width_field)
+        width_label = self.width_label
+        if isinstance(width_label, int):
+            width_label = 'col-md-{}'.format(width_label)
+        width_field = self.width_field
+        if isinstance(width_field, int):
+            width_field = 'col-md-{}'.format(width_field)
         fld_id = bound_field.id_for_label
         fld_label = add_classes(bound_field.label_tag(), 'control-label', width_label)
         field = str(bound_field)
@@ -345,21 +350,25 @@ class Form(DWidget):
             else:
                 group_extra = ''
         if bound_field.help_text:
-            fld_help = '    <p>{}</p>'.format(bound_field.help_text)
+            fld_help = '    <div>{}</div>\n'.format(bound_field.help_text)
         else:
             fld_help = ''
         rtn = template.format(id=fld_id, group_extra=group_extra,
-                              label=fld_label, field_width=width_field, field=field, errors=fld_errors, help=fld_help)
+                              label=fld_label, width_label=width_label,
+                              width_field=width_field, field=field, errors=fld_errors, help=fld_help)
         return rtn
 
-    # todo 1: custom widget for inline radio (choice radio select) and checkbox(multiple choice checkbox)
+    # todo 1: custom widget for inline radio (choice radio select) and checkbox(multiple choice checkbox) without ul/li
 
     # noinspection PyPep8Naming
     def h_CheckboxInput(self, form, bound_field, field_name):
-        template = '<div class="checkbox {group_extra}">\n' \
-                   '    {field} {label}\n' \
-                   '    {errors}\n' \
-                   '    {help}' \
+        template = '<div class="form-group {group_extra}">\n' \
+                   '    {label}\n' \
+                   '    <div class={width_field}>\n' \
+                   '        {errors}\n' \
+                   '        {field}\n' \
+                   '        {help}\n' \
+                   '    </div>\n' \
                    '</div>\n'
         return self.h_base(form, bound_field, field_name, form_control=None, template=template)
 

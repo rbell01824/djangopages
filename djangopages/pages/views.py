@@ -1183,7 +1183,7 @@ def test_bform_get(dpage_obj, request, form_type, width_label=None, width_field=
 
 def test_bform_post(dpage_obj, request, form_type, width_label=None, width_field=None, layout=None):
     reset = LNKSPrimary('/dpages/' + dpage_obj.__class__.__name__, 'Reset')
-    form = Form(request, TestForm())
+    form = Form(request, TestForm(request.POST))
     form.form_type = form_type
     if width_label:
         form.width_label = width_label
@@ -1275,10 +1275,8 @@ class TestBFormHorizontal(DPage):
     code = 'See view example.'
 
     def get(self, request, *args, **kwargs):
-        form = Form(request, TestForm())
-        return test_bform_get(self, request, 'horizontal', 3, 9)
+        return test_bform_get(self, request, 'horizontal', 3, 6)
 
     def post(self, request, *args, **kwargs):
-        form = Form(request, TestForm())
-        return test_bform_post(self, request, 'horizontal', 3, 9)
+        return test_bform_post(self, request, 'horizontal', 3, 6)
 
