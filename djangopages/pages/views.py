@@ -908,206 +908,87 @@ content = T([RC(MD('##Can have other DjangoPage content on the page with the gra
         return content
 
 
-# class TestDForm001(DPage):
-#     """ DForm support """
-#     title = 'DForm support 001'
-#     description = 'Demonstrate ' + title
-#     tags = ['test', 'forms']
-#
-#     code = """
-# class NameForm(forms.Form):
-#     name = forms.CharField(label='Your name', initial='Your name',
-#                            help_text='Enter your name', max_length=100)
-#     subject = forms.CharField(max_length=100, help_text='100 characters max.')
-#     message = forms.CharField(help_text='Message you would like to send')
-#     sender = forms.EmailField(help_text='A valid email address, please.')
-#     cc_myself = forms.BooleanField(required=False)
-#
-# def get(self, request, *args, **kwargs):
-#     form = self.NameForm(initial={'name': 'Enter your name here'})
-#     reset = LNKSPrimary('/dpages/TestDForm001', 'Reset')
-#     form = DForm(request, form)
-#     content = RC((reset, form))
-#     content = page_content(self, self.code, content)
-#     return self.render(request, content)
-#
-# def post(self, request, *args, **kwargs):
-#     form = self.NameForm(request.POST)
-#     reset = LNKSPrimary('/dpages/TestDForm001', 'Reset')
-#     if form.is_valid():
-#         content = RC((reset, MD("### Success")))
-#         content = page_content(self, self.code, content)
-#         return self.render(request, content)
-#     form = DForm(request, form, 'table', 'Fire phasers', '/dpages/TestDForm001')
-#     content = RC((reset, form))
-#     content = page_content(self, self.code, content)
-#     return self.render(request, content)
-#         """
-#
-#     class NameForm(forms.Form):
-#         name = forms.CharField(label='Your name', initial='Your name',
-#                                help_text='Enter your name', max_length=100)
-#         subject = forms.CharField(max_length=100, help_text='100 characters max.')
-#         message = forms.CharField(help_text='Message you would like to send')
-#         sender = forms.EmailField(help_text='A valid email address, please.')
-#         cc_myself = forms.BooleanField(required=False)
-#
-#     def get(self, request, *args, **kwargs):
-#         reset = LNKSPrimary('/dpages/TestDForm001', 'Reset')
-#         form = Form(request,
-#                     self.NameForm(initial={'name': 'Enter your name here'}),
-#                     'table')
-#         content = RC((reset, form))
-#         content = page_content(self, self.code, content)
-#         return self.render(request, content)
-#
-#     def post(self, request, *args, **kwargs):
-#         form = self.NameForm(request.POST)
-#         reset = LNKSPrimary('/dpages/TestDForm001', 'Reset')
-#         if form.is_valid():
-#             content = RC((reset, MD("### Success")))
-#             content = page_content(self, self.code, content)
-#             return self.render(request, content)
-#         form = DForm(request, form, 'table', 'Fire phasers', '/dpages/TestDForm001')
-#         content = RC((reset, form))
-#         content = page_content(self, self.code, content)
-#         return self.render(request, content)
-#
-#
-# class TestDBForm001(DPage):
-#     """ DBForm support """
-#     title = 'Django DBForm support 001'
-#     description = 'Demonstrate ' + title
-#     tags = ['test', 'forms']
-#
-#     code = """
-# class NameForm(forms.Form):
-#     name = forms.CharField(label='Your name', max_length=100)
-#     myname = forms.CharField(label='My very long name', max_length=100)
-#
-# def get(self, request, *args, **kwargs):
-#     form = self.NameForm(initial={'name': 'Enter your name here'})
-#     reset = LNKSPrimary('/dpages/TestDBForm001', 'Reset')
-#     form = DBForm(request, form, 'Fire phasers', width=(2, 4))
-#     content = RC((reset, form))
-#     content = page_content(self, self.code, content)
-#     return self.render(request, content)
-#
-# def post(self, request, *args, **kwargs):
-#     form = self.NameForm(request.POST)
-#     reset = LNKSPrimary('/dpages/TestDBForm001', 'Reset')
-#     if form.is_valid():
-#         content = RC((reset, MD("### Success")))
-#         content = page_content(self, self.code, content)
-#         return self.render(request, content)
-#     form = DBForm(request, form, 'Fire phasers', width=(2, 4))
-#     content = RC((reset, form))
-#     content = page_content(self, self.code, content)
-#     return self.render(request, content)
-#         """
-#
-#     class NameForm(forms.Form):
-#         name = forms.CharField(label='Your name', max_length=100)
-#         myname = forms.CharField(label='My very long name', max_length=100)
-#
-#     def get(self, request, *args, **kwargs):
-#         form = self.NameForm(initial={'name': 'Enter your name here'})
-#         reset = LNKSPrimary('/dpages/TestDBForm001', 'Reset')
-#         form = DBForm(request, form, 'Fire phasers', width=(2, 4))
-#         content = RC((reset, form))
-#         content = page_content(self, self.code, content)
-#         return self.render(request, content)
-#
-#     def post(self, request, *args, **kwargs):
-#         form = self.NameForm(request.POST)
-#         reset = LNKSPrimary('/dpages/TestDBForm001', 'Reset')
-#         if form.is_valid():
-#             content = RC((reset, MD("### Success")))
-#             content = page_content(self, self.code, content)
-#             return self.render(request, content)
-#         form = DBForm(request, form, 'Fire phasers', width=(2, 4))
-#         content = RC((reset, form))
-#         content = page_content(self, self.code, content)
-#         return self.render(request, content)
-#
-#
-# class TestDBForm002(DPage):
-#     """ DBForm support """
-#     title = 'Django DBForm support 002 (with help)'
-#     description = 'Demonstrate ' + title
-#     tags = ['test', 'forms']
-#
-#     code = """
-# class NameForm(forms.Form):
-#     name = forms.CharField(label='Your name', initial='Your name',
-#                            help_text='Enter your name', max_length=100)
-#     subject = forms.CharField(max_length=100, help_text='100 characters max.')
-#     message = forms.CharField(help_text='Message you would like to send')
-#     sender = forms.EmailField(help_text='A valid email address, please.')
-#     cc_myself = forms.BooleanField(required=False)
-#
-#     class Meta:
-#         foobar = 'something'
-#
-# def get(self, request, *args, **kwargs):
-#     form = self.NameForm(initial={'name': 'Enter your name here'})
-#     # for f in form.fields:
-#     #     print f
-#     reset = LNKSPrimary('/dpages/TestDForm002', 'Reset')
-#     form = DBForm(request, form, 'Fire phasers', '/dpages/TestDBForm002')
-#     content = RC((reset, form))
-#     content = page_content(self, self.code, content)
-#     return self.render(request, content)
-#
-# def post(self, request, *args, **kwargs):
-#     form = self.NameForm(request.POST)
-#     reset = LNKSPrimary('/dpages/TestDBForm002', 'Reset')
-#     if form.is_valid():
-#         content = RC((reset, MD("### Success")))
-#         content = page_content(self, self.code, content)
-#         return self.render(request, content)
-#     # for f in form.fields:
-#     #     print f
-#     form = DBForm(request, form, 'Fire phasers', '/dpages/TestDBForm002')
-#     content = RC((reset, form))
-#     content = page_content(self, self.code, content)
-#     return self.render(request, content)
-#         """
-#
-#     class NameForm(forms.Form):
-#         name = forms.CharField(label='Your name', initial='Your name',
-#                                help_text='Enter your name', max_length=100)
-#         subject = forms.CharField(max_length=100, help_text='100 characters max.')
-#         message = forms.CharField(help_text='Message you would like to send')
-#         sender = forms.EmailField(help_text='A valid email address, please.')
-#         cc_myself = forms.BooleanField(required=False)
-#
-#         class Meta:
-#             foobar = 'something'
-#
-#     def get(self, request, *args, **kwargs):
-#         form = self.NameForm(initial={'name': 'Enter your name here'})
-#         for f in form.fields:
-#             print f
-#         reset = LNKSPrimary('/dpages/TestDForm002', 'Reset')
-#         form = DBForm(request, form, 'Fire phasers', '/dpages/TestDBForm002')
-#         content = RC((reset, form))
-#         content = page_content(self, self.code, content)
-#         return self.render(request, content)
-#
-#     def post(self, request, *args, **kwargs):
-#         form = self.NameForm(request.POST)
-#         reset = LNKSPrimary('/dpages/TestDBForm002', 'Reset')
-#         if form.is_valid():
-#             content = RC((reset, MD("### Success")))
-#             content = page_content(self, self.code, content)
-#             return self.render(request, content)
-#         # for f in form.fields:
-#         #     print f
-#         form = DBForm(request, form, 'Fire phasers', '/dpages/TestDBForm002')
-#         content = RC((reset, form))
-#         content = page_content(self, self.code, content)
-#         return self.render(request, content)
+class TestDjangoTableForm001(DPage):
+    """ Django table form support """
+    title = 'Django table form support 001'
+    description = 'Demonstrate ' + title
+    tags = ['test', 'forms']
+
+    code = 'See code'
+
+    class NameForm(forms.Form):
+        name = forms.CharField(label='Your name', initial='Your name',
+                               help_text='Enter your name', max_length=100)
+        subject = forms.CharField(max_length=100, help_text='100 characters max.')
+        message = forms.CharField(help_text='Message you would like to send')
+        sender = forms.EmailField(help_text='A valid email address, please.')
+        cc_myself = forms.BooleanField(required=False)
+
+    def get(self, request, *args, **kwargs):
+        reset = LNKSPrimary('/dpages/TestDjangoTableForm001', 'Reset')
+        form = Form(request,
+                    self.NameForm(initial={'name': 'Enter your name here'}),
+                    'table',
+                    'Fire phasers')
+        content = RC((reset, form))
+        content = page_content(self, self.code, content)
+        return self.render(request, content)
+
+    def post(self, request, *args, **kwargs):
+        form = self.NameForm(request.POST)
+        reset = LNKSPrimary('/dpages/TestDjangoTableForm001', 'Reset')
+        if form.is_valid():
+            content = RC((reset, MD("### Success")))
+            content = page_content(self, self.code, content)
+            return self.render(request, content)
+        form = Form(request, form, 'table', 'Fire photon torpedoes')
+        content = RC((reset, form))
+        content = page_content(self, self.code, content)
+        return self.render(request, content)
+
+
+class TestDjangoTableForm002(DPage):
+    """ Django table form support """
+    title = 'Django table form support 002'
+    description = 'Demonstrate ' + title
+    tags = ['test', 'forms']
+
+    code = 'See code'
+
+    class NameForm(forms.Form):
+        name = forms.CharField(label='Your name', initial='Your name',
+                               help_text='Enter your name', max_length=100)
+        subject = forms.CharField(max_length=100, help_text='100 characters max.')
+        message = forms.CharField(help_text='Message you would like to send')
+        sender = forms.EmailField(help_text='A valid email address, please.')
+        cc_myself = forms.BooleanField(required=False)
+
+        class Meta:
+            foobar = 'something'
+
+    def get(self, request, *args, **kwargs):
+        form = self.NameForm(initial={'name': 'Enter your name here'})
+        for f in form.fields:
+            print f
+        reset = LNKSPrimary('/dpages/TestDjangoTableForm002', 'Reset')
+        form = Form(request, form, 'table', 'Fire phasers', '/dpages/TestDjangoTableForm002')
+        content = RC((reset, form))
+        content = page_content(self, self.code, content)
+        return self.render(request, content)
+
+    def post(self, request, *args, **kwargs):
+        form = self.NameForm(request.POST)
+        reset = LNKSPrimary('/dpages/TestDBForm002', 'Reset')
+        if form.is_valid():
+            content = RC((reset, MD("### Success")))
+            content = page_content(self, self.code, content)
+            return self.render(request, content)
+        # for f in form.fields:
+        #     print f
+        form = Form(request, form, 'table', 'Fire phasers', '/dpages/TestDjangoTableForm002')
+        content = RC((reset, form))
+        content = page_content(self, self.code, content)
+        return self.render(request, content)
 
 
 class FLD(object):
