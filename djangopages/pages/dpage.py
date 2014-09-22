@@ -255,61 +255,77 @@ class DPage(View):
                 lst.append(p)
         return lst
 
-    def next(self, obj=False):
+    def next(self, tag=None, obj=False):
         """ Return DPage after this DPage in the DPage list.
         .. sourcecode:: python
 
             next()
 
+        :param tag: tag for next
+        :type tag: str or unicode
         :param obj: If true, return the object.  Otherwise return the name.
         :type obj: bool
         :return: Next dpage in the list
         :rtype: str or DPage object
         """
-        # noinspection PyUnresolvedReferences
-        pl = DPage.pages_list
+        if not tag:
+            # noinspection PyUnresolvedReferences
+            pl = DPage.pages_list
+        else:
+            pl = DPage.find(tag)
         # noinspection PyBroadException
         try:
-            pi = pl.index({'name': self.__class__.__name__, 'cls': self.__class__})
+            pi = pl.index({'name': self.__class__.__name__, 'cls': self.__class__}) + 1
+            if pi == len(pl):
+                pi = 0
             if obj:
-                return pl[pi+1]
+                return pl[pi]
             else:
-                return pl[pi+1]['name']
+                return pl[pi]['name']
         except:
             return None
 
-    def prev(self, obj=False):
+    def prev(self, tag=None, obj=False):
         """Return DPage before this DPage in the DPage list.
         .. sourcecode:: python
 
             prev()
 
+        :param tag: tag for next
+        :type tag: str or unicode
         :param obj: If true, return the object.  Otherwise return the name.
         :type obj: bool
         :return: Previous page in the list
         :rtype: str or DPage object
         """
-        # noinspection PyUnresolvedReferences
-        pl = DPage.pages_list
+        if not tag:
+            # noinspection PyUnresolvedReferences
+            pl = DPage.pages_list
+        else:
+            pl = DPage.find(tag)
         # noinspection PyBroadException
         try:
-            pi = pl.index({'name': self.__class__.__name__, 'cls': self.__class__})
+            pi = pl.index({'name': self.__class__.__name__, 'cls': self.__class__}) - 1
+            if pi < 0:
+                pi = len(pl) - 1
             if obj:
-                return pl[pi-1]
+                return pl[pi]
             else:
-                return pl[pi-1]['name']
+                return pl[pi]['name']
         except:
             return None
 
-    def siblings(self, obj=False):
+    def siblings(self, tag=None, obj=False):
         """ Return DPage(s) before and after this DPage in the list.
         .. sourcecode:: python
 
             siblings()
 
+        :param tag: tag for next
+        :type tag: str or unicode
         :param obj: If true, return the objects.  Otherwise return the names.
         :type obj: bool
         :return: Siblings in the list
         :rtype: tuple
         """
-        return self.prev(obj), self.next(obj)
+        return self.prev(tag, obj), self.next(tag, obj)
