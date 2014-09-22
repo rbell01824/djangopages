@@ -20,9 +20,6 @@ __status__ = "dev"
 
 # work list
 """
-Make code cleanup pass
-add form support
-how to deal with a page with a form
 add ajax support
 how to deal with a page wrt ajax
 is it possible to dynamically create/update/delete python objects at runtime so that objects defined in DBs do not require a Db reference?
@@ -32,7 +29,6 @@ add Nose to system for testing
 make test routines for all existing functions
 add link button
 add bootstrap tables
-add syntactic suggar for Forms
 django pandas
 django rest pandas
 Move layout objects to their own module
@@ -46,6 +42,8 @@ Add tag view page
 Row doesn't scale properly for phones
 Check options on markdown wrt line wraps.
 """
+
+# fixme: add test to all classes
 
 # todo 1: review all DWidget(s) to see where DWidgetX should be used.
 # todo 1: new application modeled after chartkick setup for distribution

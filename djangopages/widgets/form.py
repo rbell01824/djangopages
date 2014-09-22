@@ -42,16 +42,6 @@ from django import forms
 from djangopages.widgets.widgets import DWidget, DWidgetT
 from djangopages.libs import ssw, add_classes
 
-# class ProjectView(View):`
-#     @method_decorator(csrf_protect)
-#     def get(self, request, *args, **kwargs):
-#
-# For example, in the Cheetah template language, your form could contain the following:
-#
-# <div style="display:none">
-#     <input type="hidden" name="csrfmiddlewaretoken" value="$csrf_token"/>
-# </div>
-
 
 def _csrf_(request):
     rtn = '<!-- csrf -->\n' \
@@ -298,7 +288,7 @@ class Form(DWidget):
         return rtn
 
     def _as_bootstrap_inline(self, form, layout):
-        # fixme: implement this
+        # fixme: implement bootstrap inline forms
         rtn = ''
         return rtn
 
@@ -479,7 +469,7 @@ class Form(DWidget):
 
     def _as_bootstrap_layout(self, form, layout):
         layout = self._get_layout()
-        # fixme: implement this
+        # fixme: implement bootstrap layout forms
         rtn = ''
         return rtn
 
@@ -490,35 +480,6 @@ class Form(DWidget):
             for name in self.form.fields:
                 layout += (FF(name),)
         return layout
-
-    # def __getattr__(self, item, *default):
-    #     try:
-    #         return self[item]
-    #     except KeyError:
-    #         if len(default) > 0:
-    #             return default[0]
-    #         raise AttributeError
-
-
-# class FF(DWidget):
-#     """
-#
-#     """
-#     def __init__(self, field):
-#         self.form = None
-#         self.form_type = None
-#         super(FF, self).__init__(field)
-#
-#     def generate(self):
-#         field_name = self.args[0]
-#         form_type = self.form_type
-#         form = self.form
-#         bound_field = form[field_name]
-#         field_field = form.fields[field_name]
-#         field_type = field_field.widget.input_type
-#         log.debug('>>>> Generate for field {} {} {} {}'.format(field_name, form_type, field_type, str(bound_field)))
-#         return str(bound_field)
-
 
 class FormButton(DWidgetT):
     """ Form button definition
@@ -552,7 +513,7 @@ class FormButton(DWidgetT):
 # fixme: form-group can have classes has-success, has-warning, has-error, has-feedback,
 # fixme: form-group can take a span <span class="glyphicon glyphicon-ok form-control-feedback"></span>, etc.
 # fixme: support help text <span class="help-block">A block of help text that breaks onto a new line and may extend beyond one line.</span>
-# fixme: ass support for input groups http://getbootstrap.com/components/#input-groups
+# fixme: class support for input groups http://getbootstrap.com/components/#input-groups
 
 
 # class BFG(DWidget):
@@ -641,6 +602,26 @@ class FormButton(DWidgetT):
 #             rtn = template.format(label=label, fld_width=fld_width, field=fld, fld_help=fld_help)
 #             return rtn
 #         raise AttributeError
+
+
+# class FF(DWidget):
+#     """
+#
+#     """
+#     def __init__(self, field):
+#         self.form = None
+#         self.form_type = None
+#         super(FF, self).__init__(field)
+#
+#     def generate(self):
+#         field_name = self.args[0]
+#         form_type = self.form_type
+#         form = self.form
+#         bound_field = form[field_name]
+#         field_field = form.fields[field_name]
+#         field_type = field_field.widget.input_type
+#         log.debug('>>>> Generate for field {} {} {} {}'.format(field_name, form_type, field_type, str(bound_field)))
+#         return str(bound_field)
 
 
 # todo 2: add id to Form
