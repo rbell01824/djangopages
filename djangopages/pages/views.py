@@ -1161,3 +1161,85 @@ class TestFormBootstrapHorizontal(DPage):
     def post(self, request, *args, **kwargs):
         return test_bform_post(self, request, 'horizontal', 3, 6)
 
+
+class TestFormLayout(DPage):
+    """ Form with layout rendering """
+    title = 'Form with layout rendering'
+    description = 'Demonstrate ' + title
+    tags = ['test', 'forms']
+
+    code = 'See code'
+
+    class EmailForm(forms.Form):
+        firstname = forms.CharField(label='Your name',
+                                    help_text='Enter your first name',
+                                    max_length=20, widget=forms.TextInput(attrs={'size': 20}))
+        middleinitial = forms.CharField(label='Middle initial',
+                                        help_text='Middle initial',
+                                        max_length=1, widget=forms.TextInput(attrs={'size': 1}))
+        lastname = forms.CharField(label='Last name',
+                                   help_text='Enter your last name', max_length=20)
+        subject = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'size': 100}),
+                                  help_text='100 characters max')
+        message = forms.CharField(widget=forms.Textarea,
+                                  help_text='Message you would like to send')
+        to = forms.EmailField(help_text='Email address',
+                              widget=forms.TextInput(attrs={'size':100}))
+        cc_myself = forms.BooleanField(required=False)
+
+    def layout(self, form):
+        # content = Layout((C1('Your name'), C2(form['firstname']), C1(form['middleinitial']), C2(form['lastname'])))
+        # content = Row(C4('Your name: ' + form['firstname'] + ' ' + form['middleinitial'] + ' ' + form['lastname']))
+        # content = Row(C9('Your name: {} {} {}'.format(form['firstname'], form['middleinitial'], form['lastname'])))
+        content = Layout((C1('Your name') +
+                          C6('{} {} {} cc self: {}'.format(form['firstname'], form['middleinitial'], form['lastname'],
+                                                           form['cc_myself']))),
+                         (C1('To') + C6('{}'.format(form['to']))),
+                         (C1('Subject') + C6('{}'.format(form['subject']))),
+                         (C1('Message') + C6('{}'.format(form['message'])))
+                         )
+        xxx = """
+<div class="row">
+  <div class="col-xs-2">
+    <div class="row"> Error messages here </div>
+    <div class="row"> <input type="text" class="form-control" placeholder=".col-xs-2"> </div>
+    <div class="row"> Help here </div>
+  </div>
+  <div class="col-xs-3">
+    <div class="row"> Error messages here </div>
+    <div class="row"> <input type="text" class="form-control" placeholder=".col-xs-3"> </div>
+    <div class="row"> Help here </div>
+  </div>
+  <div class="col-xs-4">
+    <div class="row"> Error messages here </div>
+    <div class="row"> <input type="text" class="form-control" placeholder=".col-xs-4"> </div>
+    <div class="row"> Help here </div>
+  </div>
+</div>
+        """
+        content += xxx
+        return content
+
+    def get(self, request, *args, **kwargs):
+        form = self.EmailForm()
+        url = '/dpages/' + self.__class__.__name__
+        reset = LNKSPrimary(url, 'Reset')
+        form = self.layout(form)
+        content = RC((reset, form))
+        content = page_content(self, self.code, content)
+        return self.render(request, content)
+
+    def post(self, request, *args, **kwargs):
+        form = self.EmailForm(request.POST)
+        url = '/dpages/' + self.__class__.__name__
+        reset = LNKSPrimary(url, 'Reset')
+        if form.is_valid():
+            content = RC((reset, MD("### Success")))
+            content = page_content(self, self.code, content)
+            return self.render(request, content)
+        # for f in form.fields:
+        #     print f
+        form = Form(request, form, 'table', 'Fire phasers', url)
+        content = RC((reset, form))
+        content = page_content(self, self.code, content)
+        return self.render(request, content)
