@@ -1196,24 +1196,91 @@ class TestFormLayout(DPage):
                                                            form['cc_myself']))),
                          (C1('To') + C6('{}'.format(form['to']))),
                          (C1('Subject') + C6('{}'.format(form['subject']))),
-                         (C1('Message') + C6('{}'.format(form['message'])))
+                         (C1('Message') + C6('{}'.format(form['message']))),
+                         C1('Subject') + C6('{}'.format(form['subject'])),
+                         C1('Subject'),
+                         C6('{}'.format(form['subject'])),
                          )
         xxx = """
 <div class="row">
+  <div class="form-group">
+    <div class="col-sm-4">
+        <label> label xxx</label>
+        <input type="text" class="form-control" placeholder=".col-xs-2">
+        Error messages here Error messages here Error messages here Error messages here
+        Error messages here Error messages here Error messages here Error messages here
+        Error messages here Error messages here Error messages here Error messages here </br>
+        Help here Help here Help here Help here Help here Help here
+        Help here Help here Help here Help here Help here Help here
+        Help here Help here Help here Help here Help here Help here
+    </div>
+    <div class="col-sm-4">
+        <label> label xxx</label>
+        <input type="text" class="form-control" placeholder=".col-xs-2">
+        Error messages here Error messages here Error messages here Error messages here
+        Error messages here Error messages here Error messages here Error messages here
+        Error messages here Error messages here Error messages here Error messages here </br>
+        Help here Help here Help here Help here Help here Help here
+        Help here Help here Help here Help here Help here Help here
+        Help here Help here Help here Help here Help here Help here
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="form-group">
+    <label class="col-sm-1 control-label"> Label</label>
+    <div class="col-sm-2"> <input type="text" class="form-control" placeholder=".col-xs-2"> </div>
+    <div class="col-sm-4">
+    Error messages here Error messages here Error messages here Error messages here
+    Error messages here Error messages here Error messages here Error messages here
+    Error messages here Error messages here Error messages here Error messages here </br>
+    Help here Help here Help here Help here Help here Help here
+    Help here Help here Help here Help here Help here Help here
+    Help here Help here Help here Help here Help here Help here
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="form-group">
+    <label class="col-sm-1 control-label"> Label</label>
+    <div class="col-sm-2"> <input type="text" class="form-control" placeholder=".col-xs-2">
+    Error messages here Error messages here Error messages here Error messages here
+    Error messages here Error messages here Error messages here Error messages here
+    Error messages here Error messages here Error messages here Error messages here </br>
+    Help here Help here Help here Help here Help here Help here
+    Help here Help here Help here Help here Help here Help here
+    Help here Help here Help here Help here Help here Help here
+    </div>
+    <label class="col-sm-1 control-label"> Label</label>
+    <div class="col-sm-2"> <input type="text" class="form-control" placeholder=".col-xs-2">
+    Error messages here Error messages here Error messages here Error messages here
+    Error messages here Error messages here Error messages here Error messages here
+    Error messages here Error messages here Error messages here Error messages here </br>
+    Help here Help here Help here Help here Help here Help here
+    Help here Help here Help here Help here Help here Help here
+    Help here Help here Help here Help here Help here Help here
+    </div>
+  </div>
+</div>
+<div class="row">
   <div class="col-xs-2">
-    <div class="row"> Error messages here </div>
-    <div class="row"> <input type="text" class="form-control" placeholder=".col-xs-2"> </div>
-    <div class="row"> Help here </div>
+    <input type="text" class="form-control" placeholder=".col-xs-2">
+    Error messages here </br>
+    Help here
   </div>
   <div class="col-xs-3">
-    <div class="row"> Error messages here </div>
-    <div class="row"> <input type="text" class="form-control" placeholder=".col-xs-3"> </div>
-    <div class="row"> Help here </div>
+    <input type="text" class="form-control" placeholder=".col-xs-3">
+    Error messages here Error messages here Error messages here Error messages here
+    Error messages here Error messages here Error messages here Error messages here
+    Error messages here Error messages here Error messages here Error messages here </br>
+    Help here Help here Help here Help here Help here Help here
+    Help here Help here Help here Help here Help here Help here
+    Help here Help here Help here Help here Help here Help here
   </div>
   <div class="col-xs-4">
-    <div class="row"> Error messages here </div>
-    <div class="row"> <input type="text" class="form-control" placeholder=".col-xs-4"> </div>
-    <div class="row"> Help here </div>
+    <input type="text" class="form-control" placeholder=".col-xs-4">
+    Error messages here </br>
+    Help here
   </div>
 </div>
         """
