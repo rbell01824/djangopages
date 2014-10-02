@@ -1215,7 +1215,7 @@ class TestFormLayout(DPage):
         Help here Help here Help here Help here Help here Help here
     </div>
     <div class="col-sm-4">
-        <label> label xxx</label>
+        <label> label yyy</label>
         <input type="text" class="form-control" placeholder=".col-xs-2">
         Error messages here Error messages here Error messages here Error messages here
         Error messages here Error messages here Error messages here Error messages here
@@ -1223,20 +1223,6 @@ class TestFormLayout(DPage):
         Help here Help here Help here Help here Help here Help here
         Help here Help here Help here Help here Help here Help here
         Help here Help here Help here Help here Help here Help here
-    </div>
-  </div>
-</div>
-<div class="row">
-  <div class="form-group">
-    <label class="col-sm-1 control-label"> Label</label>
-    <div class="col-sm-2"> <input type="text" class="form-control" placeholder=".col-xs-2"> </div>
-    <div class="col-sm-4">
-    Error messages here Error messages here Error messages here Error messages here
-    Error messages here Error messages here Error messages here Error messages here
-    Error messages here Error messages here Error messages here Error messages here </br>
-    Help here Help here Help here Help here Help here Help here
-    Help here Help here Help here Help here Help here Help here
-    Help here Help here Help here Help here Help here Help here
     </div>
   </div>
 </div>
