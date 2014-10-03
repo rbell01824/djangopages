@@ -119,8 +119,8 @@ def loremipsum(line_count, para=True, classes='', style=''):
         LI((3, 5))      # Creates paragraph with 3 sentences and paragraph with 5 sentences
 
     :param line_count: number of sentences in paragraph
-    :type line_count: int or tuple or list
-    :param para: if True wrap output in a paragraph
+    :type line_count: int or long or iterable
+    :param para: if True wrap output in a paragraph, default True
     :type para: bool
     :param classes: classes to add to output
     :type classes: str or unicode or DWidget
@@ -137,10 +137,10 @@ def loremipsum(line_count, para=True, classes='', style=''):
     content = ' '.join(li.get_sentences(line_count))
     if para:
         if classes:
-            classes = 'class="{}" '.format(classes)
+            classes = '{}'.format(classes)
         if style:
-            style = 'style="{}" '.format(style)
-        template = '<p {classes} {style}>' \
+            style = '{}'.format(style)
+        template = '<p class="{classes}" style="{style}">' \
                    '{content}' \
                    '</p>'
         return template.format(content=content, classes=classes, style=style)

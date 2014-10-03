@@ -24,7 +24,7 @@ __email__ = 'rbell01824@gmail.com'
 
 from django.test import TestCase
 
-from widgets.texthtml import text, markdown
+from widgets.texthtml import text, markdown, loremipsum
 
 
 class TestText(TestCase):
@@ -67,3 +67,22 @@ class TestMarkdown(TestCase):
         rtn = markdown(['para 1', 'para 2'])
         self.assertEqual(rtn, '<p>para 1</p><p>para 2</p>')
 
+
+class TestLoremipsum(TestCase):
+
+    def test_simple_case(self):
+        rtn = loremipsum(2)
+        self.assertTrue(rtn.startswith('<p class="" style="">'))
+        self.assertTrue(rtn.endswith('</p>'))
+        self.assertEqual(rtn.count('.'), 2)
+
+    def test_list(self):
+        rtn = loremipsum([2, 1])
+        self.assertTrue(rtn.startswith('<p class="" style="">'))
+        self.assertTrue(rtn.endswith('</p>'))
+        self.assertEqual(rtn.count('<p class="" style="">'), 2)
+        self.assertEqual(rtn.count('</p>'), 2)
+        self.assertEqual(rtn.count('.'), 3)
+
+# fixme: add test for para=False, classes, and style
+# fixme: add test for dup
