@@ -61,7 +61,7 @@ def text(content, para=False, classes='', style=''):
     :return: HTML for content
     :rtype: unicode
     """
-    if isinstance(content, Iterable):
+    if not isinstance(content, basestring) and isinstance(content, Iterable):
         rtn = ''
         for c in content:
             rtn += text(c, para, classes, style)
@@ -95,7 +95,7 @@ def markdown(markdown_text, markdown_extensions=list()):
     :return: HTML for markdown_text.
     :rtype: unicode
     """
-    if isinstance(markdown_text, Iterable):
+    if not isinstance(markdown_text, basestring) and isinstance(markdown_text, Iterable):
         rtn = ''
         for mt in markdown_text:
             rtn += markdown(mt, markdown_extensions)
