@@ -40,8 +40,7 @@ Besides graphs **DjangoPages** contains a rich feature set that allows users to
 <br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">DjangoPages</span> by
 <span xmlns:cc="http://creativecommons.org/ns#" property="cc:attributionName">Richard Bell</span> is licensed under a
 <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/deed.en_US">
-Creative Commons Attribution-NonCommercial 4.0 International License</a>.<br />Based on a work at
-<a xmlns:dct="http://purl.org/dc/terms/" href="https://github.com/rbell01824/django_pages" rel="dct:source">github.com/rbell01824/djangopages</a>.
+Creative Commons Attribution-NonCommercial 4.0 International License</a>.
 
 # Getting Started
 
