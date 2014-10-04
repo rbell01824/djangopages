@@ -1,10 +1,21 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-""" Some description here
+"""
+Text Widgets Overview
+*********************
+
+.. module:: widgets.texthtml
+   :synopsis: Widgets to create HTML text
+
+.. moduleauthor:: Richard Bell <rbell01824@gmail.com>
+
+widgets.texthtml provides a number of widgets to create HTML text on pages.
 
 10/2/14 - Initial creation
 
+Widgets
+=======
 """
 
 from __future__ import unicode_literals
@@ -39,7 +50,8 @@ from django.utils.encoding import force_unicode
 
 def text(content, para=False, classes='', style=''):
     """ Returns text content optionally with classes and style and wrapped in paragraph.  If
-    content is iterable, wraps each element and returns concatenated results.
+    content is iterable, wraps each element and returns concatenated results. Optionally set
+    classes and style.
 
     .. sourcecode:: python
 
@@ -78,7 +90,7 @@ HTML = functools.partial(text)
 
 
 def markdown(markdown_text, markdown_extensions=list()):
-    """ Returns HTML equivalent for markdown text. If markdown_text is iterable applies to each
+    """ Returns HTML equivalent of markdown_text. If markdown_text is iterable applies to each
     element and returns concatenated result.
 
     .. sourcecode:: python
@@ -110,8 +122,8 @@ MD = functools.partial(markdown)
 
 
 def loremipsum(line_count, para=True, classes='', style=''):
-    """ Return loremipsum paragraphs with line_count sentences.  If line_count is iterable returns concatenated
-    results.
+    """ Return loremipsum paragraphs with line_count sentences.  If line_count is iterable returns multiple
+    concatenated paragraphs. Optionally will set classes and style.
 
     .. sourcecode:: python
 
@@ -136,21 +148,19 @@ def loremipsum(line_count, para=True, classes='', style=''):
         return rtn
     content = ' '.join(li.get_sentences(line_count))
     if para:
-        if classes:
-            classes = '{}'.format(classes)
-        if style:
-            style = '{}'.format(style)
-        template = '<p class="{classes}" style="{style}">' \
-                   '{content}' \
-                   '</p>'
-        return template.format(content=content, classes=classes, style=style)
-    return content
+        template = '<p class="{classes}" style="{style}">{content}</p>'
+    elif classes or style:
+        template = '<span class="{classes}" style="{style}">{content}</span>'
+    else:
+        template = '{content}'
+    return template.format(content=content, classes=classes, style=style)
 LI = functools.partial(loremipsum)
 
 
 def dup(string, count=1, classes='', style=''):
-    """ Generate count duplicates of a string.  If string is iterable return concatenated result. Dup is useful
-    to define certain commonly used HTML/Bootstrap singletons such as '&nbsp;'.
+    """ Generate count duplicates of a string.  If string is iterable return duplicate each string
+    and return concatenated result.
+
 
     .. sourcecode:: python
 
@@ -175,22 +185,14 @@ def dup(string, count=1, classes='', style=''):
     :return: HTML for duplicated string
     :rtype: unicode
     """
-    if isinstance(string, Iterable):
+    if not isinstance(string, basestring) and isinstance(string, Iterable):
         rtn = ''
         for s in string:
             rtn += dup(s, count, classes, style)
         return rtn
-    assert isinstance(string, (str, unicode))
-    assert len(string) > 0
-    assert isinstance(count, int)
-    assert count > 0
     content = string * count
     if classes or style:
-        if classes:
-            classes = 'class="{}" '.format(classes)
-        if style:
-            style = 'style="{}" '.format(style)
-        template = '<span {classes} {style}>{content}</span>'
+        template = '<span class="{classes}" style="{style}">{content}</span>'
         return template.format(content=content, classes=classes, style=style)
     return content
 SD = functools.partial(dup)

@@ -24,7 +24,7 @@ __email__ = 'rbell01824@gmail.com'
 
 from django.test import TestCase
 
-from widgets.texthtml import text, markdown, loremipsum
+from widgets.texthtml import text, markdown, loremipsum, dup
 
 
 class TestText(TestCase):
@@ -84,5 +84,35 @@ class TestLoremipsum(TestCase):
         self.assertEqual(rtn.count('</p>'), 2)
         self.assertEqual(rtn.count('.'), 3)
 
-# fixme: add test for para=False, classes, and style
-# fixme: add test for dup
+    def test_para_false(self):
+        rtn = loremipsum(2, para=False)
+        self.assertFalse(rtn.startswith('<p class="" style="">'))
+        self.assertFalse(rtn.endswith('</p>'))
+        self.assertEqual(rtn.count('.'), 2)
+
+    def test_para_with_classes_and_style(self):
+        rtn = loremipsum(2, classes='class_1', style='style_1')
+        self.assertTrue(rtn.startswith('<p class="class_1" style="style_1">'))
+        self.assertTrue(rtn.endswith('</p>'))
+        self.assertEqual(rtn.count('.'), 2)
+
+    def test_classes_and_style(self):
+        rtn = loremipsum(2, para=False, classes='class_1', style='style_1')
+        self.assertTrue(rtn.startswith('<span class="class_1" style="style_1">'))
+        self.assertTrue(rtn.endswith('</span>'))
+        self.assertEqual(rtn.count('.'), 2)
+
+
+class TestDup(TestCase):
+
+    def test_simple_case(self):
+        rtn = dup('string', 2)
+        self.assertEqual(rtn, 'stringstring')
+
+    def test_list(self):
+        rtn = dup(['a', 'b'], 2)
+        self.assertEqual(rtn, 'aabb')
+
+    def test_classes_style(self):
+        rtn = dup('a', 3, classes='class_1', style='style_1')
+        self.assertEqual(rtn, '<span class="class_1" style="style_1">aaa</span>')

@@ -68,7 +68,7 @@ Table of Contents
 
    dpage
    widgets
-   text
+   texthtml
    layout
    bootstrap3
    form
